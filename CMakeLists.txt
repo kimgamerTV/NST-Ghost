@@ -73,6 +73,7 @@ endif()
 target_link_libraries(NST PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Network
     BGACore
     QtLingo
 )
