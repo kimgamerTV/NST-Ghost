@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(NST VERSION 0.4.0 LANGUAGES CXX)
+project(NST VERSION 0.4.1 LANGUAGES CXX)
 
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
@@ -129,5 +129,6 @@ endif()
 # Windows (ZIP)
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
-    
+    set(CPACK_PACKAGE_FILE_NAME "nst-windows")
+endif()
 
