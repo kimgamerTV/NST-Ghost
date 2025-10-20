@@ -33,14 +33,34 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_translationModel = new QStandardItemModel(this);
     ui->translationTableView->setModel(m_translationModel);
+
+    // ===== ปรับการแสดงผลตาราง =====
     ui->translationTableView->setWordWrap(true);
+    ui->translationTableView->setTextElideMode(Qt::ElideNone);
+    ui->translationTableView->setAlternatingRowColors(true);
+
+    // ปรับ Vertical Header
     ui->translationTableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->translationTableView->verticalHeader()->setDefaultSectionSize(60); // ความสูงขั้นต่ำ
+
+    // ปรับ Horizontal Header
+    ui->translationTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    ui->translationTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->translationTableView->horizontalHeader()->setStretchLastSection(true);
 
-    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation"); // Removed File Path
+    // ตั้งชื่อ Header
+    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation");
 
-    // Set initial column widths
-    ui->translationTableView->setColumnWidth(0, 300);
+    // กำหนดความกว้างเริ่มต้นของคอลัมน์ Source Text
+    ui->translationTableView->setColumnWidth(0, 400);
+
+    // ปรับ Selection behavior
+    ui->translationTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->translationTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+    // เพิ่ม Margins สำหรับเซลล์
+    ui->translationTableView->setShowGrid(true);
+    ui->translationTableView->setGridStyle(Qt::SolidLine);
 
     // Set initial splitter sizes
     ui->splitter->setSizes(QList<int>() << 250 << 774);
@@ -53,7 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Setup search dialog
     m_searchDialog = new SearchDialog(this);
-    // m_searchDialog->setSearchController(m_searchController); // Removed direct access
     connect(m_searchDialog, &SearchDialog::searchRequested, this, &MainWindow::onSearchRequested);
     connect(m_searchDialog, &SearchDialog::resultSelected, this, &MainWindow::onSearchResultSelected);
 
@@ -61,7 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_shortcutController = new ShortcutController(this);
     m_shortcutController->createShortcuts();
     connect(m_shortcutController, &ShortcutController::focusSearch, this, &MainWindow::openSearchDialog);
-    m_shortcutController->createSelectAllShortcut(ui->translationTableView); // Use ShortcutController for Ctrl+A
+    m_shortcutController->createSelectAllShortcut(ui->translationTableView);
     connect(m_shortcutController, &ShortcutController::selectAllRequested, this, &MainWindow::onSelectAllRequested);
 
     // Setup BGA Data Manager
@@ -100,9 +119,9 @@ MainWindow::~MainWindow()
 void MainWindow::on_fileListView_clicked(const QModelIndex &index)
 {
     QString fileName = m_fileListModel->data(index, Qt::DisplayRole).toString();
-    
+
     m_translationModel->clear();
-    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation"); // Removed File Path
+    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation");
 
     // Find the full file path from the display name
     QString fullFilePath = fileName;
@@ -118,24 +137,45 @@ void MainWindow::on_fileListView_clicked(const QModelIndex &index)
         for (const QJsonValue &value : textsArray) {
             if (value.isObject()) {
                 QJsonObject textObject = value.toObject();
-                // QString key = textObject["key"].toString(); // Removed
                 QString text = textObject["text"].toString();
-                // QString filePath = textObject["file"].toString(); // Removed
 
-                if (!text.isEmpty()) { // Use text as source
+                if (!text.isEmpty()) {
                     QList<QStandardItem *> rowItems;
-                    rowItems << new QStandardItem(text) << new QStandardItem(""); // Source Text is now 'text', Translation is empty
+
+                    // สร้าง Source Text Item
+                    QStandardItem *sourceItem = new QStandardItem(text);
+                    sourceItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+                    sourceItem->setFlags(sourceItem->flags() & ~Qt::ItemIsEditable); // ไม่ให้แก้ไข Source
+
+                    // เพิ่ม padding ด้วย margin (ใช้ data role สำหรับ custom delegate ถ้ามี)
+                    QFont font = sourceItem->font();
+                    sourceItem->setFont(font);
+
+                    // สร้าง Translation Item
+                    QStandardItem *translationItem = new QStandardItem("");
+                    translationItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+                    translationItem->setFlags(translationItem->flags() | Qt::ItemIsEditable); // ให้แก้ไขได้
+                    translationItem->setFont(font);
+
+                    rowItems << sourceItem << translationItem;
                     m_translationModel->appendRow(rowItems);
                 }
             }
         }
     } else {
         QList<QStandardItem *> rowItems;
-        rowItems << new QStandardItem("No strings found for this file.") << new QStandardItem("");
+        QStandardItem *emptyItem = new QStandardItem("No strings found for this file.");
+        emptyItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
+        emptyItem->setFlags(emptyItem->flags() & ~Qt::ItemIsEditable);
+        rowItems << emptyItem << new QStandardItem("");
         m_translationModel->appendRow(rowItems);
     }
 
+    // ปรับขนาดแถวให้พอดีกับเนื้อหา
     ui->translationTableView->resizeRowsToContents();
+
+    // รีเซ็ตความกว้างคอลัมน์ Source Text
+    ui->translationTableView->setColumnWidth(0, 400);
 }
 
 void MainWindow::openSearchDialog()
@@ -224,7 +264,7 @@ void MainWindow::onLoadFromGameProject()
                     if (!filePath.isEmpty()) {
                         // Store texts grouped by full file path
                         m_loadedGameProjectData[filePath].append(value);
-                        if (!fileNamesForDisplay.contains(QFileInfo(filePath).fileName())) { // Use file name for display
+                        if (!fileNamesForDisplay.contains(QFileInfo(filePath).fileName())) {
                             fileNamesForDisplay.append(QFileInfo(filePath).fileName());
                         }
                     }
@@ -262,7 +302,7 @@ void MainWindow::onTranslateSelectedTextWithService(const QString &serviceName, 
     QModelIndexList matchingIndexes = m_translationModel->match(m_translationModel->index(0, 0),
                                                                 Qt::DisplayRole, sourceText, 1, Qt::MatchExactly);
     if (!matchingIndexes.isEmpty()) {
-        m_pendingTranslations.insert(sourceText, m_translationModel->index(matchingIndexes.first().row(), 1)); // Store index of Translation column
+        m_pendingTranslations.insert(sourceText, m_translationModel->index(matchingIndexes.first().row(), 1));
 
         QVariantMap settings;
         settings["googleApiKey"] = m_apiKey;
@@ -284,6 +324,9 @@ void MainWindow::onTranslationFinished(const qtlingo::TranslationResult &result)
         m_translationModel->setData(index, result.translatedText);
     }
     m_pendingTranslations.remove(result.sourceText);
+
+    // ปรับขนาดแถวหลังจากแปล
+    ui->translationTableView->resizeRowsToContents();
 }
 
 void MainWindow::onTranslationServiceError(const QString &message)
@@ -333,7 +376,7 @@ void MainWindow::onTranslateAllSelectedText()
 
         if (!sourceText.isEmpty()) {
             // Store the index for later update
-            m_pendingTranslations.insert(sourceText, m_translationModel->index(selectedIndex.row(), 1)); // Store index of Translation column
+            m_pendingTranslations.insert(sourceText, m_translationModel->index(selectedIndex.row(), 1));
 
             QVariantMap settings;
             settings["googleApiKey"] = m_apiKey;
@@ -363,7 +406,7 @@ void MainWindow::onSettingsActionTriggered()
     dialog.setLlmApiKey(m_llmApiKey);
     dialog.setLlmModel(m_llmModel);
 
-    QFile file(":/style.qss"); // Assuming style.qss is added as a resource
+    QFile file(":/style.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&file);
         QString styleSheet = stream.readAll();
@@ -387,7 +430,7 @@ void MainWindow::loadSettings()
 {
     QSettings settings("MySoft", "NST");
     m_apiKey = settings.value("googleApiKey").toString();
-    m_targetLanguage = settings.value("targetLanguage", "es").toString(); // Default to Spanish
+    m_targetLanguage = settings.value("targetLanguage", "es").toString();
     m_targetLanguageName = settings.value("targetLanguageName", "Spanish").toString();
     m_googleApi = settings.value("googleApi", false).toBool();
     m_llmProvider = settings.value("llmProvider", "OpenAI").toString();
