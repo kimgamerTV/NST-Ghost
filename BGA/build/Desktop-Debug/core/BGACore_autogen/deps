@@ -1,0 +1,10 @@
+BGACore_autogen/timestamp: \
+	/home/jop/work/chanomhub/NST_library/BGA/core/CMakeLists.txt \
+	/home/jop/work/chanomhub/NST_library/BGA/core/include/core/analyzerfactory.h \
+	/home/jop/work/chanomhub/NST_library/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+	/home/jop/work/chanomhub/NST_library/BGA/core/include/core/engines/unity/unityanalyzer.h \
+	/home/jop/work/chanomhub/NST_library/BGA/core/include/core/gameanalyzer.h \
+	/home/jop/work/chanomhub/NST_library/BGA/core/src/analyzerfactory.cpp \
+	/home/jop/work/chanomhub/NST_library/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+	/home/jop/work/chanomhub/NST_library/BGA/core/src/engines/unity/unityanalyzer.cpp \
+	/usr/bin/cmake

@@ -1,0 +1,7 @@
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/lib/libBGACore.so
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/include/core/analyzerfactory.h
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/include/core/engines/rpgm/rpganalyzer.h
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/include/core/engines/unity/unityanalyzer.h
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/include/core/gameanalyzer.h
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/bin/BGARunner
+/home/jop/work/chanomhub/NST_library/BGA/build-t1/bin/tests/BGACoreTests

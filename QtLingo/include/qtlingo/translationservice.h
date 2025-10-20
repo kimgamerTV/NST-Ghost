@@ -1,0 +1,41 @@
+#ifndef QTLINGO_TRANSLATIONSERVICE_H
+#define QTLINGO_TRANSLATIONSERVICE_H
+
+#include <QString>
+#include <QStringList>
+#include <QObject>
+
+namespace qtlingo {
+
+struct TranslationResult {
+    QString sourceText;
+    QString translatedText;
+    // Potentially add more fields like confidence, error message, etc.
+};
+
+class ITranslationService : public QObject {
+    Q_OBJECT
+public:
+    explicit ITranslationService(QObject *parent = nullptr) : QObject(parent) {}
+    virtual ~ITranslationService() = default;
+    virtual QString serviceName() const = 0;
+    virtual TranslationResult translate(const QString &sourceText) = 0;
+
+    virtual void setApiKey(const QString &apiKey) { Q_UNUSED(apiKey); }
+    virtual void setTargetLanguage(const QString &language) { Q_UNUSED(language); }
+
+    // Google Translate specific
+    virtual void setGoogleTranslateMode(bool isApi) { Q_UNUSED(isApi); }
+
+    // LLM specific
+    virtual void setLlmProvider(const QString &provider) { Q_UNUSED(provider); }
+    virtual void setLlmModel(const QString &model) { Q_UNUSED(model); }
+
+signals:
+    void translationFinished(const TranslationResult &result);
+    void errorOccurred(const QString &message);
+};
+
+} // namespace qtlingo
+
+#endif // QTLINGO_TRANSLATIONSERVICE_H

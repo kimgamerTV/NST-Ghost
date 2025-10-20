@@ -1,0 +1,11 @@
+Source: nst
+Section: utils
+Priority: optional
+Maintainer: Your Name <you@example.com>
+Build-Depends: debhelper-compat (= 13), cmake, qt6-base-dev, qt6-tools-dev
+Standards-Version: 4.5.0
+
+Package: nst
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A tool for translating video games.

@@ -1,0 +1,6 @@
+BGAAnalyzerRpgm_autogen/timestamp: \
+	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/rpgm/CMakeLists.txt \
+	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/rpgm/main.cpp \
+	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/rpgm/rpganalyzer.cpp \
+	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/rpgm/rpganalyzer.h \
+	/usr/bin/cmake

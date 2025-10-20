@@ -1,0 +1,299 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						5
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-fda0365673186245e735.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						9,
+						10,
+						11
+					]
+				},
+				{
+					"build" : "BGA",
+					"childIndexes" : 
+					[
+						2,
+						3,
+						4
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-BGA-Debug-fcfa6d0ebc5136f56c85.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "BGA"
+				},
+				{
+					"build" : "BGA/core",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-BGA.core-Debug-6de63bae4b0ad1e86004.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "BGA/core",
+					"targetIndexes" : 
+					[
+						0,
+						4,
+						5
+					]
+				},
+				{
+					"build" : "BGA/tools/runner",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-BGA.tools.runner-Debug-957d02511941137aa6e8.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "BGA/tools/runner",
+					"targetIndexes" : 
+					[
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"build" : "BGA/tests",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-BGA.tests-Debug-d1b7ef08dc8cc5073b0e.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "BGA/tests",
+					"targetIndexes" : 
+					[
+						1,
+						2,
+						3
+					]
+				},
+				{
+					"build" : "QtLingo",
+					"jsonFile" : "directory-QtLingo-Debug-6750c7ccd4d85bbadc08.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "QtLingo",
+					"targetIndexes" : 
+					[
+						12,
+						13,
+						14
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "NST",
+					"targetIndexes" : 
+					[
+						9,
+						10,
+						11
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2,
+						3,
+						4
+					],
+					"name" : "BGA",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						5
+					],
+					"name" : "QtLingo",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						12,
+						13,
+						14
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 2,
+					"id" : "BGACore::@b9e1be12f4b877bc57b9",
+					"jsonFile" : "target-BGACore-Debug-344cd65d0b4bb8112be6.json",
+					"name" : "BGACore",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "BGACoreTests::@49a06de0d6b7110b9b4a",
+					"jsonFile" : "target-BGACoreTests-Debug-617e370feaeaa5f2a20a.json",
+					"name" : "BGACoreTests",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "BGACoreTests_autogen::@49a06de0d6b7110b9b4a",
+					"jsonFile" : "target-BGACoreTests_autogen-Debug-70d7667bf9229568238a.json",
+					"name" : "BGACoreTests_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 4,
+					"id" : "BGACoreTests_autogen_timestamp_deps::@49a06de0d6b7110b9b4a",
+					"jsonFile" : "target-BGACoreTests_autogen_timestamp_deps-Debug-f2515e3c5897cb9ac20a.json",
+					"name" : "BGACoreTests_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "BGACore_autogen::@b9e1be12f4b877bc57b9",
+					"jsonFile" : "target-BGACore_autogen-Debug-03840305dd8cd37de12c.json",
+					"name" : "BGACore_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "BGACore_autogen_timestamp_deps::@b9e1be12f4b877bc57b9",
+					"jsonFile" : "target-BGACore_autogen_timestamp_deps-Debug-400ffc1b79dd5dadf605.json",
+					"name" : "BGACore_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "BGARunner::@2c195f4c75e3c20ad993",
+					"jsonFile" : "target-BGARunner-Debug-8d4750c4aaa6128d4572.json",
+					"name" : "BGARunner",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "BGARunner_autogen::@2c195f4c75e3c20ad993",
+					"jsonFile" : "target-BGARunner_autogen-Debug-7832db79c7ad4399ac29.json",
+					"name" : "BGARunner_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "BGARunner_autogen_timestamp_deps::@2c195f4c75e3c20ad993",
+					"jsonFile" : "target-BGARunner_autogen_timestamp_deps-Debug-9d8c84310cf7858a4c94.json",
+					"name" : "BGARunner_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NST::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NST-Debug-80b8fcf52bf91aa0a735.json",
+					"name" : "NST",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NST_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NST_autogen-Debug-77242d28fa8c03c00f50.json",
+					"name" : "NST_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "NST_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-NST_autogen_timestamp_deps-Debug-02dabd0bcb0e26c98c9b.json",
+					"name" : "NST_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "QtLingo::@bd1b718d9400d476a67a",
+					"jsonFile" : "target-QtLingo-Debug-ee6895ca71841c3e5394.json",
+					"name" : "QtLingo",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "QtLingo_autogen::@bd1b718d9400d476a67a",
+					"jsonFile" : "target-QtLingo_autogen-Debug-76674cf72b8e885211fb.json",
+					"name" : "QtLingo_autogen",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 5,
+					"id" : "QtLingo_autogen_timestamp_deps::@bd1b718d9400d476a67a",
+					"jsonFile" : "target-QtLingo_autogen_timestamp_deps-Debug-e0466651e60bfbfe277a.json",
+					"name" : "QtLingo_autogen_timestamp_deps",
+					"projectIndex" : 2
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/jop/work/NST/NST/build/Desktop-Debug",
+		"source" : "/home/jop/work/NST/NST"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

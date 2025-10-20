@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC -DQT_QML_DEBUG -g -Wl,--dependency-file=CMakeFiles/BGA.dir/link.d -shared -Wl,-soname,libBGA.so -o libBGA.so CMakeFiles/BGA.dir/BGA_autogen/mocs_compilation.cpp.o CMakeFiles/BGA.dir/bga.cpp.o  /usr/lib64/libQt6Core.so.6.9.2

@@ -1,0 +1,11 @@
+# Hashes of file build rules.
+0ede565dbb900a5c3da1d6857be9d0c5 BGA/core/BGACore_autogen/timestamp
+6d016f4625d8940237b87ef0198715cf BGA/core/CMakeFiles/BGACore_autogen
+b2527d8b21161fc36fbac9f391eeca41 BGA/tests/BGACoreTests_autogen/timestamp
+8268400a86d586ff16dd8eacc509d85c BGA/tests/CMakeFiles/BGACoreTests_autogen
+181f8b1e0c91774c3e3d6202cd7cab88 BGA/tools/runner/BGARunner_autogen/timestamp
+aed9f55d867e14da24017d354e080bd0 BGA/tools/runner/CMakeFiles/BGARunner_autogen
+0ac2a6af544fe80ca7977a03e1915aca CMakeFiles/NST_autogen
+8f8039330fa952ffae388eb111483444 NST_autogen/timestamp
+06c51d9c9911e5b047cd7325a2d297ce QtLingo/CMakeFiles/QtLingo_autogen
+200392465d6e0c9290d272668a0c18a7 QtLingo/QtLingo_autogen/timestamp

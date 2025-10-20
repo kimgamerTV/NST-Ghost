@@ -1,0 +1,34 @@
+{
+	"backtrace" : 0,
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : 
+		[
+			"tools/runner/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			}
+		]
+	},
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 0,
+			"id" : "BGACore::@57760688d1f824db5d9c"
+		}
+	],
+	"id" : "BGARunner_autogen_timestamp_deps::@b77b0440f1b6c221c6f0",
+	"isGeneratorProvided" : true,
+	"name" : "BGARunner_autogen_timestamp_deps",
+	"paths" : 
+	{
+		"build" : "tools/runner",
+		"source" : "tools/runner"
+	},
+	"sources" : [],
+	"type" : "UTILITY"
+}
