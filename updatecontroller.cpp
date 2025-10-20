@@ -22,8 +22,8 @@ UpdateController::UpdateController(QObject *parent) : QObject(parent)
 void UpdateController::checkForUpdates()
 {
     QNetworkRequest request(m_manifestUrl);
-    QNetworkReply *reply = m_networkManager->get(request);
-    connect(reply, &QNetworkReply::finished, this, &UpdateController::onManifestDownloaded);
+    m_networkManager->get(request);
+    connect(m_networkManager, &QNetworkAccessManager::finished, this, &UpdateController::onManifestDownloaded);
 }
 
 void UpdateController::onManifestDownloaded(QNetworkReply *reply)
