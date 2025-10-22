@@ -61,8 +61,8 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+      
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -71,10 +71,47 @@ jobs:
             New-Item -ItemType Directory -Path 'build' | Out-Null
           }
           Set-Location -Path build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
       
-      - name: Build
-        run: cmake --build build --config Release
+      - name: Build (ALL_BUILD)
+        # Use a single command that works cross-platform; cmake --build will pick msbuild on Windows
+        run: cmake --build build --config Release --target ALL_BUILD --parallel
+      
+      - name: List build tree (Linux / macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          echo "=== build tree (top) ==="
+          ls -la build || true
+          echo "=== build/core content ==="
+          ls -la build/core || true
+          echo "=== build/core/Release content ==="
+          ls -la build/core/Release || true
+      
+      - name: List build tree (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "=== build tree (top) ==="
+          Get-ChildItem -Force build | Format-Table
+          Write-Host "=== build/core content ==="
+          if (Test-Path build\core) { Get-ChildItem -Force build\core | Format-Table } else { Write-Host "build\\core not found" }
+          Write-Host "=== build/core/Release content ==="
+          if (Test-Path build\core\Release) { Get-ChildItem -Force build\core\Release | Format-Table } else { Write-Host "build\\core\\Release not found" }
+      
+      - name: Check for BGACore.lib on Windows and fail with diagnostics if missing
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $expected = 'build\core\Release\BGACore.lib'
+          if (Test-Path $expected) {
+            Write-Host "Found $expected"
+          } else {
+            Write-Host "ERROR: $expected not found. Printing additional diagnostics..."
+            Write-Host "All files under build:"
+            Get-ChildItem -Recurse -Force build | Format-Table
+            throw "BGACore.lib missing; see diagnostics above"
+          }
       
       - name: Package
         run: |
@@ -103,7 +140,6 @@ jobs:
               break
             fi
           done
-          # export (may be empty)
           echo "package_file=$file" >> $GITHUB_OUTPUT
           if [ -n "$file" ]; then
             echo "Found package: $file"
