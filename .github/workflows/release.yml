@@ -72,19 +72,37 @@ jobs:
           }
           Set-Location -Path build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
-      
-      - name: Build (Windows)
+
+      # --- Windows: build BGACore first, show diagnostics, then build ALL_BUILD ---
+      - name: Build BGACore (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # Use ALL_BUILD for Visual Studio generator
+          Write-Host "Building BGACore first to ensure library is created..."
+          cmake --build build --config Release --target BGACore --parallel || {
+            Write-Host "BGACore build failed — printing build/core tree and logs for diagnostics..."
+            if (Test-Path build\BGA\core\Release) { Get-ChildItem -Force build\BGA\core\Release | Format-Table } else { Write-Host "build\\BGA\\core\\Release not found" }
+            if (Test-Path build\core\Release) { Get-ChildItem -Force build\core\Release | Format-Table } else { Write-Host "build\\core\\Release not found" }
+            Write-Host "Printing full build tree (first 500 lines)..."
+            Get-ChildItem -Recurse -Force build | Select-Object -First 500 | Format-Table
+            exit 1
+          }
+          Write-Host "BGACore built — checking expected locations..."
+          if (Test-Path build\BGA\core\Release\BGACore.lib) { Write-Host "Found build\\BGA\\core\\Release\\BGACore.lib" }
+          elseif (Test-Path build\core\Release\BGACore.lib) { Write-Host "Found build\\core\\Release\\BGACore.lib" }
+          else { Write-Host "BGACore.lib not found after BGACore build; listing build tree..."; Get-ChildItem -Recurse -Force build | Format-Table; exit 1 }
+
+      - name: Build ALL (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Building remaining targets..."
           cmake --build build --config Release --target ALL_BUILD --parallel
-      
+
       - name: Build (Linux / macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
-          # Do not request ALL_BUILD on Makefile/ninja generators — just build default (all)
           cmake --build build --config Release --parallel
       
       - name: List build tree (Linux / macOS)
@@ -111,7 +129,6 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # common expected path (adjust if your CMake places libs elsewhere)
           $expected1 = 'build\BGA\core\Release\BGACore.lib'
           $expected2 = 'build\core\Release\BGACore.lib'
           if (Test-Path $expected1) {
