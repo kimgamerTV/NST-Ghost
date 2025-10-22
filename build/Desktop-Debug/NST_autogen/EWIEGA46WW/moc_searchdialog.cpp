@@ -46,12 +46,10 @@ template <> constexpr inline auto SearchDialog::qt_create_metaobjectdata<qt_meta
         "resultSelected",
         "fileName",
         "row",
-        "onSearchQueryChanged",
         "onResultSelected",
         "QTreeWidgetItem*",
         "item",
-        "intColumn",
-        "onReturnPressed"
+        "intColumn"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -63,16 +61,10 @@ template <> constexpr inline auto SearchDialog::qt_create_metaobjectdata<qt_meta
         QtMocHelpers::SignalData<void(const QString &, int)>(4, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 5 }, { QMetaType::Int, 6 },
         }}),
-        // Slot 'onSearchQueryChanged'
-        QtMocHelpers::SlotData<void(const QString &)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { QMetaType::QString, 3 },
-        }}),
         // Slot 'onResultSelected'
-        QtMocHelpers::SlotData<void(QTreeWidgetItem *, int)>(8, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { 0x80000000 | 9, 10 }, { QMetaType::Int, 11 },
+        QtMocHelpers::SlotData<void(QTreeWidgetItem *, int)>(7, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 8, 9 }, { QMetaType::Int, 10 },
         }}),
-        // Slot 'onReturnPressed'
-        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -98,9 +90,7 @@ void SearchDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         switch (_id) {
         case 0: _t->searchRequested((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 1: _t->resultSelected((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2]))); break;
-        case 2: _t->onSearchQueryChanged((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 3: _t->onResultSelected((*reinterpret_cast< std::add_pointer_t<QTreeWidgetItem*>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2]))); break;
-        case 4: _t->onReturnPressed(); break;
+        case 2: _t->onResultSelected((*reinterpret_cast< std::add_pointer_t<QTreeWidgetItem*>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<int>>(_a[2]))); break;
         default: ;
         }
     }
@@ -131,14 +121,14 @@ int SearchDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 3)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 3;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 3)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 3;
     }
     return _id;
 }

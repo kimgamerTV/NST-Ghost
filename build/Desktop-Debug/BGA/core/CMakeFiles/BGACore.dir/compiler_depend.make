@@ -9,6 +9,123 @@ BGA/core/BGACore_autogen/timestamp: /home/jop/work/NST/NST/BGA/core/CMakeLists.t
   /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
   /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
   /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /home/jop/work/NST/NST/BGA/core/CMakeLists.txt \
+  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
   /usr/bin/cmake
 
 BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o: BGA/core/BGACore_autogen/mocs_compilation.cpp \
@@ -46,6 +163,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/bits/iscanonical.h \
   /usr/include/bits/libc-header-start.h \
   /usr/include/bits/libm-simd-decl-stubs.h \
+  /usr/include/bits/local_lim.h \
   /usr/include/bits/locale.h \
   /usr/include/bits/long-double.h \
   /usr/include/bits/math-vector.h \
@@ -53,6 +171,8 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/bits/mathcalls-macros.h \
   /usr/include/bits/mathcalls-narrow.h \
   /usr/include/bits/mathcalls.h \
+  /usr/include/bits/posix1_lim.h \
+  /usr/include/bits/posix2_lim.h \
   /usr/include/bits/pthread_stack_min-dynamic.h \
   /usr/include/bits/pthreadtypes-arch.h \
   /usr/include/bits/pthreadtypes.h \
@@ -98,10 +218,12 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/bits/types/wint_t.h \
   /usr/include/bits/typesizes.h \
   /usr/include/bits/uintn-identity.h \
+  /usr/include/bits/uio_lim.h \
   /usr/include/bits/waitflags.h \
   /usr/include/bits/waitstatus.h \
   /usr/include/bits/wchar.h \
   /usr/include/bits/wordsize.h \
+  /usr/include/bits/xopen_lim.h \
   /usr/include/c++/15/algorithm \
   /usr/include/c++/15/array \
   /usr/include/c++/15/atomic \
@@ -119,6 +241,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/bits/basic_string.tcc \
   /usr/include/c++/15/bits/char_traits.h \
   /usr/include/c++/15/bits/charconv.h \
+  /usr/include/c++/15/bits/chrono.h \
   /usr/include/c++/15/bits/concept_check.h \
   /usr/include/c++/15/bits/cpp_type_traits.h \
   /usr/include/c++/15/bits/cxxabi_forced.h \
@@ -135,6 +258,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/bits/hashtable_policy.h \
   /usr/include/c++/15/bits/invoke.h \
   /usr/include/c++/15/bits/ios_base.h \
+  /usr/include/c++/15/bits/list.tcc \
   /usr/include/c++/15/bits/locale_classes.h \
   /usr/include/c++/15/bits/locale_classes.tcc \
   /usr/include/c++/15/bits/localefwd.h \
@@ -168,11 +292,17 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/bits/stl_iterator.h \
   /usr/include/c++/15/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/15/bits/stl_iterator_base_types.h \
+  /usr/include/c++/15/bits/stl_list.h \
+  /usr/include/c++/15/bits/stl_map.h \
+  /usr/include/c++/15/bits/stl_multimap.h \
+  /usr/include/c++/15/bits/stl_multiset.h \
   /usr/include/c++/15/bits/stl_numeric.h \
   /usr/include/c++/15/bits/stl_pair.h \
   /usr/include/c++/15/bits/stl_raw_storage_iter.h \
   /usr/include/c++/15/bits/stl_relops.h \
+  /usr/include/c++/15/bits/stl_set.h \
   /usr/include/c++/15/bits/stl_tempbuf.h \
+  /usr/include/c++/15/bits/stl_tree.h \
   /usr/include/c++/15/bits/stl_uninitialized.h \
   /usr/include/c++/15/bits/stl_vector.h \
   /usr/include/c++/15/bits/stream_iterator.h \
@@ -183,6 +313,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/bits/uniform_int_dist.h \
   /usr/include/c++/15/bits/unique_ptr.h \
   /usr/include/c++/15/bits/unordered_map.h \
+  /usr/include/c++/15/bits/unordered_set.h \
   /usr/include/c++/15/bits/uses_allocator.h \
   /usr/include/c++/15/bits/uses_allocator_args.h \
   /usr/include/c++/15/bits/utility.h \
@@ -190,6 +321,8 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/bits/version.h \
   /usr/include/c++/15/cctype \
   /usr/include/c++/15/cerrno \
+  /usr/include/c++/15/chrono \
+  /usr/include/c++/15/climits \
   /usr/include/c++/15/clocale \
   /usr/include/c++/15/cmath \
   /usr/include/c++/15/compare \
@@ -199,6 +332,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/cstdio \
   /usr/include/c++/15/cstdlib \
   /usr/include/c++/15/cstring \
+  /usr/include/c++/15/ctime \
   /usr/include/c++/15/cwchar \
   /usr/include/c++/15/debug/assertions.h \
   /usr/include/c++/15/debug/debug.h \
@@ -215,6 +349,8 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/iosfwd \
   /usr/include/c++/15/iterator \
   /usr/include/c++/15/limits \
+  /usr/include/c++/15/list \
+  /usr/include/c++/15/map \
   /usr/include/c++/15/memory \
   /usr/include/c++/15/new \
   /usr/include/c++/15/numeric \
@@ -224,6 +360,8 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/pstl/glue_memory_defs.h \
   /usr/include/c++/15/pstl/glue_numeric_defs.h \
   /usr/include/c++/15/pstl/pstl_config.h \
+  /usr/include/c++/15/ratio \
+  /usr/include/c++/15/set \
   /usr/include/c++/15/stdexcept \
   /usr/include/c++/15/stdlib.h \
   /usr/include/c++/15/streambuf \
@@ -246,6 +384,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/c++/15/type_traits \
   /usr/include/c++/15/typeinfo \
   /usr/include/c++/15/unordered_map \
+  /usr/include/c++/15/unordered_set \
   /usr/include/c++/15/utility \
   /usr/include/c++/15/variant \
   /usr/include/c++/15/vector \
@@ -266,7 +405,9 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/features.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/gnu/stubs.h \
+  /usr/include/limits.h \
   /usr/include/linux/errno.h \
+  /usr/include/linux/limits.h \
   /usr/include/linux/posix_types.h \
   /usr/include/linux/sched/types.h \
   /usr/include/linux/stddef.h \
@@ -275,12 +416,15 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/math.h \
   /usr/include/pthread.h \
   /usr/include/qt6/QtCore/QByteArray \
+  /usr/include/qt6/QtCore/QJsonArray \
   /usr/include/qt6/QtCore/QString \
   /usr/include/qt6/QtCore/QStringList \
   /usr/include/qt6/QtCore/q17memory.h \
   /usr/include/qt6/QtCore/q20functional.h \
   /usr/include/qt6/QtCore/q20memory.h \
   /usr/include/qt6/QtCore/q20type_traits.h \
+  /usr/include/qt6/QtCore/q20utility.h \
+  /usr/include/qt6/QtCore/q23utility.h \
   /usr/include/qt6/QtCore/qalgorithms.h \
   /usr/include/qt6/QtCore/qanystringview.h \
   /usr/include/qt6/QtCore/qarraydata.h \
@@ -290,10 +434,14 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/qt6/QtCore/qatomic.h \
   /usr/include/qt6/QtCore/qatomic_cxx11.h \
   /usr/include/qt6/QtCore/qbasicatomic.h \
+  /usr/include/qt6/QtCore/qbindingstorage.h \
   /usr/include/qt6/QtCore/qbytearray.h \
   /usr/include/qt6/QtCore/qbytearrayalgorithms.h \
   /usr/include/qt6/QtCore/qbytearraylist.h \
   /usr/include/qt6/QtCore/qbytearrayview.h \
+  /usr/include/qt6/QtCore/qcalendar.h \
+  /usr/include/qt6/QtCore/qcborcommon.h \
+  /usr/include/qt6/QtCore/qcborvalue.h \
   /usr/include/qt6/QtCore/qchar.h \
   /usr/include/qt6/QtCore/qcompare.h \
   /usr/include/qt6/QtCore/qcompare_impl.h \
@@ -303,28 +451,60 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/qt6/QtCore/qconfig.h \
   /usr/include/qt6/QtCore/qconstructormacros.h \
   /usr/include/qt6/QtCore/qcontainerfwd.h \
+  /usr/include/qt6/QtCore/qcontainerinfo.h \
   /usr/include/qt6/QtCore/qcontainertools_impl.h \
+  /usr/include/qt6/QtCore/qcontiguouscache.h \
   /usr/include/qt6/QtCore/qdarwinhelpers.h \
+  /usr/include/qt6/QtCore/qdatastream.h \
+  /usr/include/qt6/QtCore/qdatetime.h \
+  /usr/include/qt6/QtCore/qdebug.h \
+  /usr/include/qt6/QtCore/qendian.h \
   /usr/include/qt6/QtCore/qexceptionhandling.h \
   /usr/include/qt6/QtCore/qflags.h \
+  /usr/include/qt6/QtCore/qfloat16.h \
   /usr/include/qt6/QtCore/qforeach.h \
+  /usr/include/qt6/QtCore/qfunctionaltools_impl.h \
   /usr/include/qt6/QtCore/qfunctionpointer.h \
   /usr/include/qt6/QtCore/qgenericatomic.h \
   /usr/include/qt6/QtCore/qglobal.h \
   /usr/include/qt6/QtCore/qglobalstatic.h \
+  /usr/include/qt6/QtCore/qhash.h \
   /usr/include/qt6/QtCore/qhashfunctions.h \
+  /usr/include/qt6/QtCore/qiodevicebase.h \
+  /usr/include/qt6/QtCore/qiterable.h \
   /usr/include/qt6/QtCore/qiterator.h \
+  /usr/include/qt6/QtCore/qjsonarray.h \
+  /usr/include/qt6/QtCore/qjsondocument.h \
+  /usr/include/qt6/QtCore/qjsonparseerror.h \
+  /usr/include/qt6/QtCore/qjsonvalue.h \
   /usr/include/qt6/QtCore/qlatin1stringview.h \
   /usr/include/qt6/QtCore/qlist.h \
+  /usr/include/qt6/QtCore/qlocale.h \
   /usr/include/qt6/QtCore/qlogging.h \
   /usr/include/qt6/QtCore/qmalloc.h \
+  /usr/include/qt6/QtCore/qmap.h \
+  /usr/include/qt6/QtCore/qmath.h \
+  /usr/include/qt6/QtCore/qmetacontainer.h \
+  /usr/include/qt6/QtCore/qmetatype.h \
   /usr/include/qt6/QtCore/qminmax.h \
   /usr/include/qt6/QtCore/qnamespace.h \
   /usr/include/qt6/QtCore/qnumeric.h \
+  /usr/include/qt6/QtCore/qobject.h \
+  /usr/include/qt6/QtCore/qobject_impl.h \
+  /usr/include/qt6/QtCore/qobjectdefs.h \
+  /usr/include/qt6/QtCore/qobjectdefs_impl.h \
   /usr/include/qt6/QtCore/qoverload.h \
   /usr/include/qt6/QtCore/qpair.h \
   /usr/include/qt6/QtCore/qprocessordetection.h \
   /usr/include/qt6/QtCore/qrefcount.h \
+  /usr/include/qt6/QtCore/qregularexpression.h \
+  /usr/include/qt6/QtCore/qscopedpointer.h \
+  /usr/include/qt6/QtCore/qscopeguard.h \
+  /usr/include/qt6/QtCore/qset.h \
+  /usr/include/qt6/QtCore/qshareddata.h \
+  /usr/include/qt6/QtCore/qshareddata_impl.h \
+  /usr/include/qt6/QtCore/qsharedpointer.h \
+  /usr/include/qt6/QtCore/qsharedpointer_impl.h \
   /usr/include/qt6/QtCore/qstdlibdetection.h \
   /usr/include/qt6/QtCore/qstring.h \
   /usr/include/qt6/QtCore/qstringalgorithms.h \
@@ -340,6 +520,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/qt6/QtCore/qswap.h \
   /usr/include/qt6/QtCore/qsysinfo.h \
   /usr/include/qt6/QtCore/qsystemdetection.h \
+  /usr/include/qt6/QtCore/qtaggedpointer.h \
   /usr/include/qt6/QtCore/qtclasshelpermacros.h \
   /usr/include/qt6/QtCore/qtconfiginclude.h \
   /usr/include/qt6/QtCore/qtconfigmacros.h \
@@ -349,6 +530,8 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/qt6/QtCore/qtdeprecationdefinitions.h \
   /usr/include/qt6/QtCore/qtdeprecationmarkers.h \
   /usr/include/qt6/QtCore/qtenvironmentvariables.h \
+  /usr/include/qt6/QtCore/qtextstream.h \
+  /usr/include/qt6/QtCore/qtformat_impl.h \
   /usr/include/qt6/QtCore/qtmetamacros.h \
   /usr/include/qt6/QtCore/qtnoop.h \
   /usr/include/qt6/QtCore/qtpreprocessorsupport.h \
@@ -359,7 +542,11 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/qt6/QtCore/qtversionchecks.h \
   /usr/include/qt6/QtCore/qtypeinfo.h \
   /usr/include/qt6/QtCore/qtypes.h \
+  /usr/include/qt6/QtCore/qurl.h \
   /usr/include/qt6/QtCore/qutf8stringview.h \
+  /usr/include/qt6/QtCore/quuid.h \
+  /usr/include/qt6/QtCore/qvariant.h \
+  /usr/include/qt6/QtCore/qvarlengtharray.h \
   /usr/include/qt6/QtCore/qversiontagging.h \
   /usr/include/qt6/QtCore/qxptype_traits.h \
   /usr/include/qt6/QtCore/qyieldcpu.h \
@@ -376,10 +563,12 @@ BGA/core/CMakeFiles/BGACore.dir/src/analyzerfactory.cpp.o: /home/jop/work/NST/NS
   /usr/include/sys/types.h \
   /usr/include/time.h \
   /usr/include/wchar.h \
+  /usr/lib/gcc/x86_64-redhat-linux/15/include/limits.h \
   /usr/lib/gcc/x86_64-redhat-linux/15/include/stdarg.h \
   /usr/lib/gcc/x86_64-redhat-linux/15/include/stdbool.h \
   /usr/lib/gcc/x86_64-redhat-linux/15/include/stddef.h \
-  /usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h
+  /usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h \
+  /usr/lib/gcc/x86_64-redhat-linux/15/include/syslimits.h
 
 BGA/core/CMakeFiles/BGACore.dir/src/engines/rpgm/rpganalyzer.cpp.o: /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
   /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
@@ -697,15 +886,16 @@ BGA/core/CMakeFiles/BGACore.dir/src/engines/rpgm/rpganalyzer.cpp.o: /home/jop/wo
   /usr/include/math.h \
   /usr/include/pthread.h \
   /usr/include/qt6/QtCore/QByteArray \
+  /usr/include/qt6/QtCore/QDebug \
   /usr/include/qt6/QtCore/QDir \
-  /usr/include/qt6/QtCore/QDirIterator \
   /usr/include/qt6/QtCore/QFile \
   /usr/include/qt6/QtCore/QFileInfoList \
   /usr/include/qt6/QtCore/QJsonArray \
   /usr/include/qt6/QtCore/QJsonDocument \
   /usr/include/qt6/QtCore/QJsonObject \
-  /usr/include/qt6/QtCore/QJsonValue \
+  /usr/include/qt6/QtCore/QStandardPaths \
   /usr/include/qt6/QtCore/QString \
+  /usr/include/qt6/QtCore/QTextStream \
   /usr/include/qt6/QtCore/q17memory.h \
   /usr/include/qt6/QtCore/q20functional.h \
   /usr/include/qt6/QtCore/q20iterator.h \
@@ -747,7 +937,6 @@ BGA/core/CMakeFiles/BGACore.dir/src/engines/rpgm/rpganalyzer.cpp.o: /home/jop/wo
   /usr/include/qt6/QtCore/qdatetime.h \
   /usr/include/qt6/QtCore/qdebug.h \
   /usr/include/qt6/QtCore/qdir.h \
-  /usr/include/qt6/QtCore/qdiriterator.h \
   /usr/include/qt6/QtCore/qdirlisting.h \
   /usr/include/qt6/QtCore/qendian.h \
   /usr/include/qt6/QtCore/qexceptionhandling.h \
@@ -802,6 +991,7 @@ BGA/core/CMakeFiles/BGACore.dir/src/engines/rpgm/rpganalyzer.cpp.o: /home/jop/wo
   /usr/include/qt6/QtCore/qsharedpointer.h \
   /usr/include/qt6/QtCore/qsharedpointer_impl.h \
   /usr/include/qt6/QtCore/qspan.h \
+  /usr/include/qt6/QtCore/qstandardpaths.h \
   /usr/include/qt6/QtCore/qstdlibdetection.h \
   /usr/include/qt6/QtCore/qstring.h \
   /usr/include/qt6/QtCore/qstringalgorithms.h \
@@ -1185,12 +1375,11 @@ BGA/core/CMakeFiles/BGACore.dir/src/engines/unity/unityanalyzer.cpp.o: /home/jop
   /usr/include/math.h \
   /usr/include/pthread.h \
   /usr/include/qt6/QtCore/QByteArray \
+  /usr/include/qt6/QtCore/QDebug \
   /usr/include/qt6/QtCore/QDirIterator \
-  /usr/include/qt6/QtCore/QFile \
   /usr/include/qt6/QtCore/QJsonArray \
   /usr/include/qt6/QtCore/QJsonDocument \
   /usr/include/qt6/QtCore/QJsonObject \
-  /usr/include/qt6/QtCore/QJsonValue \
   /usr/include/qt6/QtCore/QString \
   /usr/include/qt6/QtCore/q17memory.h \
   /usr/include/qt6/QtCore/q20functional.h \
@@ -1395,55 +1584,13 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /lib64/ld-linux-x86-64.so.2:
 
-/usr/lib/gcc/x86_64-redhat-linux/15/include/syslimits.h:
-
-/usr/include/qt6/QtCore/qvarlengtharray.h:
-
-/usr/include/qt6/QtCore/quuid.h:
-
-/usr/include/qt6/QtCore/qurl.h:
-
-/usr/include/qt6/QtCore/qtformat_impl.h:
-
-/usr/include/qt6/QtCore/qtextstream.h:
-
 /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so:
 
 /usr/include/qt6/QtCore/qspan.h:
 
-/usr/include/qt6/QtCore/qset.h:
-
-/usr/include/qt6/QtCore/qscopeguard.h:
-
-/usr/include/qt6/QtCore/qscopedpointer.h:
-
-/usr/include/qt6/QtCore/qobjectdefs.h:
-
-/usr/include/qt6/QtCore/qobject.h:
-
-/usr/include/qt6/QtCore/qmetatype.h:
-
-/usr/include/qt6/QtCore/qmetacontainer.h:
-
-/usr/include/qt6/QtCore/qmath.h:
-
-/usr/include/qt6/QtCore/qmap.h:
-
-/usr/include/qt6/QtCore/qjsonvalue.h:
-
-/usr/include/qt6/QtCore/qiodevicebase.h:
-
-/usr/include/qt6/QtCore/qhash.h:
-
-/usr/include/qt6/QtCore/qsharedpointer_impl.h:
-
-/usr/include/qt6/QtCore/qfunctionaltools_impl.h:
-
 /usr/include/qt6/QtCore/qfileinfo.h:
 
 /usr/include/qt6/QtCore/qfile.h:
-
-/usr/include/qt6/QtCore/qendian.h:
 
 /usr/include/qt6/QtCore/qtimezone.h:
 
@@ -1451,23 +1598,11 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qdirlisting.h:
 
-/usr/include/qt6/QtCore/qcontiguouscache.h:
-
-/usr/include/qt6/QtCore/qcborvalue.h:
-
-/usr/include/qt6/QtCore/qbindingstorage.h:
-
-/usr/include/qt6/QtCore/q20utility.h:
-
-/usr/include/qt6/QtCore/QJsonValue:
-
-/usr/include/qt6/QtCore/QJsonArray:
+/usr/include/qt6/QtCore/QTextStream:
 
 /usr/include/qt6/QtCore/QJsonObject:
 
 /usr/include/qt6/QtCore/QFile:
-
-/usr/include/linux/limits.h:
 
 /usr/include/c++/15/x86_64-redhat-linux/bits/messages_members.h:
 
@@ -1483,22 +1618,6 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/c++/15/cwctype:
 
-/usr/include/c++/15/climits:
-
-/usr/include/qt6/QtCore/qregularexpression.h:
-
-/usr/include/qt6/QtCore/qobject_impl.h:
-
-/usr/include/c++/15/cassert:
-
-/usr/include/c++/15/bits/unordered_set.h:
-
-/usr/include/c++/15/bits/stl_set.h:
-
-/usr/include/c++/15/bits/stl_multiset.h:
-
-/usr/include/c++/15/bits/stl_list.h:
-
 /usr/include/c++/15/bits/sstream.tcc:
 
 /usr/include/c++/15/bits/quoted_string.h:
@@ -1511,25 +1630,13 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/c++/15/bits/locale_facets.tcc:
 
-/usr/include/qt6/QtCore/qdebug.h:
-
-/usr/include/c++/15/bits/fs_path.h:
-
 /usr/include/c++/15/bits/basic_ios.tcc:
 
 /usr/include/c++/15/bits/basic_ios.h:
 
-/usr/include/bits/xopen_lim.h:
-
-/usr/include/bits/posix2_lim.h:
+/usr/lib/gcc/x86_64-redhat-linux/15/include/syslimits.h:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/include/stdarg.h:
-
-/usr/include/c++/15/sstream:
-
-/usr/include/bits/posix1_lim.h:
-
-/usr/include/wchar.h:
 
 /usr/include/time.h:
 
@@ -1542,6 +1649,12 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 /usr/include/stdlib.h:
 
 /usr/include/qt6/QtCore/qyieldcpu.h:
+
+/usr/include/qt6/QtCore/qvarlengtharray.h:
+
+/usr/include/qt6/QtCore/quuid.h:
+
+/usr/include/qt6/QtCore/qurl.h:
 
 /usr/include/qt6/QtCore/qtypes.h:
 
@@ -1561,15 +1674,17 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qtmetamacros.h:
 
+/usr/include/qt6/QtCore/qtformat_impl.h:
+
+/usr/include/qt6/QtCore/qtextstream.h:
+
 /usr/include/qt6/QtCore/qtenvironmentvariables.h:
 
 /usr/include/qt6/QtCore/qtdeprecationmarkers.h:
 
 /usr/include/qt6/QtCore/qtcoreglobal.h:
 
-/usr/include/qt6/QtCore/qjsonparseerror.h:
-
-/usr/include/qt6/QtCore/qtcore-config.h:
+/usr/include/qt6/QtCore/QStandardPaths:
 
 /usr/include/qt6/QtCore/qtconfigmacros.h:
 
@@ -1580,10 +1695,6 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 /usr/include/qt6/QtCore/qsysinfo.h:
 
 /usr/include/qt6/QtCore/qswap.h:
-
-/usr/include/qt6/QtCore/qcalendar.h:
-
-/usr/include/qt6/QtCore/qstringview.h:
 
 /usr/include/qt6/QtCore/qstringmatcher.h:
 
@@ -1597,6 +1708,12 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qstringconverter_base.h:
 
+/usr/include/qt6/QtCore/qset.h:
+
+/usr/include/qt6/QtCore/qscopeguard.h:
+
+/usr/include/qt6/QtCore/qscopedpointer.h:
+
 /usr/include/c++/15/bits/fs_ops.h:
 
 /usr/include/qt6/QtCore/qprocessordetection.h:
@@ -1605,13 +1722,37 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qoverload.h:
 
+/usr/include/qt6/QtCore/qobjectdefs.h:
+
+/usr/include/c++/15/cassert:
+
+/usr/include/qt6/QtCore/qregularexpression.h:
+
+/usr/include/qt6/QtCore/qobject_impl.h:
+
+/usr/include/qt6/QtCore/qobject.h:
+
 /usr/include/qt6/QtCore/qnumeric.h:
+
+/usr/include/qt6/QtCore/qmetatype.h:
+
+/usr/include/qt6/QtCore/qmetacontainer.h:
+
+/usr/include/qt6/QtCore/qmath.h:
+
+/usr/include/qt6/QtCore/qmap.h:
 
 /usr/include/qt6/QtCore/qlogging.h:
 
-/usr/include/qt6/QtCore/qfloat16.h:
+/usr/include/qt6/QtCore/qjsonvalue.h:
 
-/usr/include/qt6/QtCore/qlatin1stringview.h:
+/usr/include/qt6/QtCore/qtcore-config.h:
+
+/usr/include/qt6/QtCore/qjsonparseerror.h:
+
+/usr/include/qt6/QtCore/qiodevicebase.h:
+
+/usr/include/qt6/QtCore/qhash.h:
 
 /usr/include/qt6/QtCore/qglobalstatic.h:
 
@@ -1619,9 +1760,27 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qgenericatomic.h:
 
+/usr/include/qt6/QtCore/qsharedpointer_impl.h:
+
+/usr/include/qt6/QtCore/qfunctionaltools_impl.h:
+
+/usr/include/qt6/QtCore/QDebug:
+
+/usr/include/qt6/QtCore/qlatin1stringview.h:
+
+/usr/include/qt6/QtCore/qfloat16.h:
+
 /usr/include/c++/15/bits/ostream.tcc:
 
 /usr/include/qt6/QtCore/qexceptionhandling.h:
+
+/usr/include/qt6/QtCore/qendian.h:
+
+/usr/include/c++/15/bits/fs_path.h:
+
+/usr/include/qt6/QtCore/qdebug.h:
+
+/usr/include/qt6/QtCore/qcontiguouscache.h:
 
 /usr/include/qt6/QtCore/qcontainerfwd.h:
 
@@ -1639,6 +1798,14 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qchar.h:
 
+/usr/include/qt6/QtCore/qcborvalue.h:
+
+/usr/include/qt6/QtCore/qstringview.h:
+
+/usr/include/qt6/QtCore/qcalendar.h:
+
+/usr/include/qt6/QtCore/qstandardpaths.h:
+
 /usr/include/qt6/QtCore/qjsondocument.h:
 
 /usr/include/qt6/QtCore/qbytearrayview.h:
@@ -1649,13 +1816,9 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qbytearrayalgorithms.h:
 
+/usr/include/qt6/QtCore/qbindingstorage.h:
+
 /usr/include/qt6/QtCore/qatomic_cxx11.h:
-
-/usr/include/limits.h:
-
-/usr/include/qt6/QtCore/qtconfiginclude.h:
-
-/usr/include/qt6/QtCore/qatomic.h:
 
 /usr/include/qt6/QtCore/qarraydatapointer.h:
 
@@ -1667,15 +1830,11 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/qt6/QtCore/qalgorithms.h:
 
+/usr/include/qt6/QtCore/q20utility.h:
+
 /usr/include/qt6/QtCore/q20memory.h:
 
-/usr/include/c++/15/map:
-
-/usr/include/qt6/QtCore/qfunctionpointer.h:
-
-/usr/include/qt6/QtCore/QStringList:
-
-/usr/include/qt6/QtCore/QString:
+/usr/include/qt6/QtCore/QJsonArray:
 
 /usr/include/qt6/QtCore/qstringtokenizer.h:
 
@@ -1689,9 +1848,53 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/linux/types.h:
 
+/usr/include/linux/limits.h:
+
+/usr/include/qt6/QtCore/qtconfiginclude.h:
+
+/usr/include/qt6/QtCore/qatomic.h:
+
+/usr/include/limits.h:
+
 /usr/include/gnu/stubs.h:
 
-/usr/include/c++/15/bits/locale_classes.tcc:
+/usr/include/qt6/QtCore/qtversionchecks.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/qt6/QtCore/q17memory.h:
+
+/usr/include/features-time64.h:
+
+/usr/include/stdint.h:
+
+/usr/include/qt6/QtCore/qstringbuilder.h:
+
+/usr/include/endian.h:
+
+/usr/lib64/libc.so:
+
+/usr/include/ctype.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/gthr.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/error_constants.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/c++allocator.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/atomic_word.h:
+
+/usr/include/c++/15/version:
+
+/usr/include/c++/15/vector:
+
+/usr/include/c++/15/variant:
+
+/usr/lib/gcc/x86_64-redhat-linux/15/crtendS.o:
+
+/usr/include/c++/15/utility:
 
 /usr/include/c++/15/ostream:
 
@@ -1713,8 +1916,6 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/bits/types/struct_sched_param.h:
 
-/usr/include/c++/15/variant:
-
 /usr/include/c++/15/bits/basic_string.h:
 
 /usr/include/bits/wctype-wchar.h:
@@ -1725,25 +1926,25 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/c++/15/streambuf:
 
-/usr/include/c++/15/set:
+/usr/include/qt6/QtCore/qfunctionpointer.h:
 
-/usr/include/qt6/QtCore/qnamespace.h:
+/usr/include/qt6/QtCore/QStringList:
 
-/usr/include/c++/15/bits/memory_resource.h:
+/usr/include/qt6/QtCore/QString:
+
+/usr/include/c++/15/map:
 
 /usr/include/c++/15/bits/algorithmfwd.h:
+
+/usr/include/c++/15/bits/fs_fwd.h:
+
+/usr/include/errno.h:
+
+/usr/include/c++/15/cstddef:
 
 /usr/include/qt6/QtCore/q20functional.h:
 
 /usr/include/c++/15/bits/version.h:
-
-/usr/include/c++/15/bits/new_allocator.h:
-
-/usr/include/bits/cpu-set.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/15/crtendS.o:
-
-/usr/include/c++/15/utility:
 
 /usr/include/qt6/QtCore/qobjectdefs_impl.h:
 
@@ -1751,17 +1952,9 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/c++/15/tuple:
 
-/lib64/libm.so.6:
-
-/usr/lib/gcc/x86_64-redhat-linux/15/include/limits.h:
-
-/usr/include/qt6/QtCore/qcontainertools_impl.h:
-
-/usr/include/c++/15/bits/hash_bytes.h:
-
-/usr/include/c++/15/algorithm:
-
 /usr/include/c++/15/bits/range_access.h:
+
+/usr/include/bits/xopen_lim.h:
 
 /usr/lib64/crti.o:
 
@@ -1787,25 +1980,13 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/c++/15/bits/localefwd.h:
 
-/usr/include/qt6/QtCore/qcborcommon.h:
-
 /usr/include/qt6/QtCore/qcompilerdetection.h:
+
+/usr/include/qt6/QtCore/qcborcommon.h:
 
 /usr/include/bits/waitflags.h:
 
-/usr/lib64/libc.so:
-
-/usr/include/ctype.h:
-
-/usr/include/c++/15/bits/uses_allocator.h:
-
-/usr/include/bits/struct_rwlock.h:
-
 /usr/include/bits/types/mbstate_t.h:
-
-/usr/lib64/crtn.o:
-
-/usr/include/c++/15/bits/ios_base.h:
 
 /usr/include/qt6/QtCore/QJsonDocument:
 
@@ -1814,16 +1995,6 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 /usr/include/qt6/QtCore/qsharedpointer.h:
 
 /usr/bin/cmake:
-
-/usr/include/c++/15/list:
-
-/usr/include/c++/15/bits/stl_map.h:
-
-/usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h:
-
-/usr/include/linux/stddef.h:
-
-/usr/include/c++/15/bits/locale_classes.h:
 
 /usr/include/bits/mathcalls.h:
 
@@ -1841,16 +2012,6 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/bits/types/__fpos64_t.h:
 
-/usr/include/qt6/QtCore/QDirIterator:
-
-/usr/include/qt6/QtCore/q20type_traits.h:
-
-/usr/include/bits/types/struct_itimerspec.h:
-
-/usr/include/c++/15/bits/hashtable.h:
-
-/usr/include/bits/types/time_t.h:
-
 /usr/include/qt6/QtCore/q23utility.h:
 
 /usr/include/linux/posix_types.h:
@@ -1859,9 +2020,9 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/bits/flt-eval-method.h:
 
-/usr/include/qt6/QtCore/qtaggedpointer.h:
-
 /usr/include/qt6/QtCore/qiodevice.h:
+
+/usr/include/qt6/QtCore/qtaggedpointer.h:
 
 /usr/include/bits/types.h:
 
@@ -1879,17 +2040,23 @@ BGA/core/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 /usr/include/bits/time64.h:
 
+/usr/include/c++/15/x86_64-redhat-linux/bits/gthr-default.h:
+
+/usr/include/bits/stdlib-float.h:
+
+/usr/include/bits/thread-shared-types.h:
+
+/usr/include/bits/struct_mutex.h:
+
 /usr/include/libintl.h:
 
 /usr/include/bits/endianness.h:
 
 BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
-/usr/include/bits/uio_lim.h:
+/usr/include/c++/15/unordered_map:
 
-/usr/include/c++/15/bits/concept_check.h:
-
-/usr/include/bits/math-vector.h:
+/usr/include/c++/15/chrono:
 
 /usr/include/bits/libm-simd-decl-stubs.h:
 
@@ -1898,8 +2065,6 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 /usr/include/bits/uintn-identity.h:
 
 /usr/include/bits/typesizes.h:
-
-/usr/include/bits/struct_mutex.h:
 
 /usr/include/c++/15/bits/stl_iterator_base_funcs.h:
 
@@ -1921,9 +2086,9 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/unordered_map.h:
 
-/usr/include/qt6/QtCore/qdatetime.h:
-
 /usr/include/qt6/QtCore/qxptype_traits.h:
+
+/usr/include/qt6/QtCore/qdatetime.h:
 
 /usr/include/asm-generic/int-ll64.h:
 
@@ -1979,7 +2144,9 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/stl_raw_storage_iter.h:
 
-/usr/include/bits/thread-shared-types.h:
+/usr/include/c++/15/x86_64-redhat-linux/bits/cpu_defines.h:
+
+/usr/include/c++/15/bits/chrono.h:
 
 /usr/include/c++/15/bits/node_handle.h:
 
@@ -1989,7 +2156,7 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/asm/types.h:
 
-/usr/include/c++/15/bits/invoke.h:
+/usr/include/c++/15/cstdio:
 
 /usr/include/alloca.h:
 
@@ -1997,7 +2164,11 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/move.h:
 
-/usr/include/c++/15/x86_64-redhat-linux/bits/atomic_word.h:
+/usr/include/c++/15/bits/concept_check.h:
+
+/usr/include/bits/math-vector.h:
+
+/usr/include/bits/uio_lim.h:
 
 /usr/include/c++/15/bits/istream.tcc:
 
@@ -2009,27 +2180,11 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/vector.tcc:
 
-/usr/include/c++/15/version:
-
-/usr/include/c++/15/bits/stl_tree.h:
-
-/usr/include/bits/waitstatus.h:
-
-/usr/include/bits/wchar.h:
-
-/usr/include/c++/15/bits/enable_special_members.h:
-
-/usr/include/bits/types/struct___jmp_buf_tag.h:
-
 /usr/include/bits/types/sigset_t.h:
 
 /usr/include/c++/15/tr1/poly_hermite.tcc:
 
-/usr/include/qt6/QtCore/qbasicatomic.h:
-
-/usr/include/c++/15/iterator:
-
-/home/jop/work/NST/NST/BGA/core/CMakeLists.txt:
+/usr/include/bits/posix2_lim.h:
 
 /usr/include/qt6/QtCore/q20iterator.h:
 
@@ -2038,6 +2193,12 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 /usr/include/c++/15/bits/atomic_lockfree_defines.h:
 
 /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp:
+
+/usr/include/c++/15/sstream:
+
+/usr/include/wchar.h:
+
+/usr/include/bits/posix1_lim.h:
 
 /usr/include/qt6/QtCore/qiterator.h:
 
@@ -2049,9 +2210,9 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h:
 
-/home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h:
+/usr/include/c++/15/bits/unordered_set.h:
 
-/usr/include/c++/15/x86_64-redhat-linux/bits/error_constants.h:
+/home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h:
 
 /usr/include/qt6/QtCore/QDir:
 
@@ -2069,23 +2230,11 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/type_traits:
 
-/usr/include/c++/15/x86_64-redhat-linux/bits/gthr.h:
-
-/usr/include/wctype.h:
-
-/usr/include/sched.h:
-
-/usr/include/bits/fp-fast.h:
-
 /usr/include/bits/long-double.h:
 
-/usr/include/c++/15/bits/functional_hash.h:
-
-/usr/include/c++/15/ext/type_traits.h:
+/usr/include/c++/15/codecvt:
 
 /usr/include/qt6/QtCore/qdatastream.h:
-
-/usr/include/c++/15/codecvt:
 
 /usr/include/bits/iscanonical.h:
 
@@ -2093,15 +2242,57 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/bits/libc-header-start.h:
 
+/usr/include/bits/types/time_t.h:
+
+/usr/include/qt6/QtCore/QDirIterator:
+
+/usr/include/qt6/QtCore/q20type_traits.h:
+
+/usr/include/bits/types/struct_itimerspec.h:
+
+/usr/include/c++/15/bits/hashtable.h:
+
+/usr/include/qt6/QtCore/qbasicatomic.h:
+
+/home/jop/work/NST/NST/BGA/core/CMakeLists.txt:
+
+/usr/include/c++/15/iterator:
+
+/usr/include/bits/mathcalls-helper-functions.h:
+
+/usr/include/c++/15/bits/fs_dir.h:
+
+/usr/include/c++/15/bits/stl_function.h:
+
+/usr/include/c++/15/cwchar:
+
 /usr/include/qt6/QtCore/qlocale.h:
 
 /usr/include/c++/15/bits/align.h:
 
 /usr/include/bits/mathcalls-narrow.h:
 
+/usr/include/wctype.h:
+
+/usr/include/sched.h:
+
+/usr/include/bits/fp-fast.h:
+
 /usr/include/bits/pthread_stack_min-dynamic.h:
 
 /usr/include/bits/pthreadtypes-arch.h:
+
+/usr/include/bits/types/cookie_io_functions_t.h:
+
+/usr/include/asm/errno.h:
+
+/usr/include/bits/stdint-uintn.h:
+
+/usr/include/features.h:
+
+/usr/include/bits/types/__FILE.h:
+
+/usr/include/bits/sched.h:
 
 /usr/include/qt6/QtCore/qvariant.h:
 
@@ -2125,29 +2316,45 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/bits/types/error_t.h:
 
+/usr/include/c++/15/typeinfo:
+
+/usr/include/bits/types/clockid_t.h:
+
+/usr/include/bits/stdint-intn.h:
+
 /usr/include/c++/15/bits/utility.h:
-
-/usr/include/bits/types/cookie_io_functions_t.h:
-
-/usr/include/features.h:
-
-/usr/include/bits/types/__FILE.h:
-
-/usr/include/bits/sched.h:
-
-/usr/include/asm/errno.h:
-
-/usr/include/bits/stdint-uintn.h:
 
 /usr/include/bits/types/struct_timeval.h:
 
-/usr/include/bits/mathcalls-helper-functions.h:
+/usr/include/c++/15/bits/functional_hash.h:
 
-/usr/include/c++/15/bits/fs_dir.h:
+/usr/include/c++/15/ext/type_traits.h:
 
-/usr/include/c++/15/bits/stl_function.h:
+/lib64/libm.so.6:
 
-/usr/include/c++/15/cwchar:
+/usr/lib/gcc/x86_64-redhat-linux/15/include/limits.h:
+
+/usr/include/qt6/QtCore/qcontainertools_impl.h:
+
+/usr/include/c++/15/algorithm:
+
+/usr/include/c++/15/bits/hash_bytes.h:
+
+/usr/include/c++/15/bits/locale_classes.tcc:
+
+/usr/include/bits/cpu-set.h:
+
+/usr/include/c++/15/bits/new_allocator.h:
+
+/usr/include/bits/struct_rwlock.h:
+
+/usr/include/c++/15/bits/uses_allocator.h:
+
+/usr/include/c++/15/bits/invoke.h:
+
+/usr/lib64/crtn.o:
+
+/usr/include/c++/15/bits/ios_base.h:
 
 /usr/include/linux/sched/types.h:
 
@@ -2155,9 +2362,9 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/parse_numbers.h:
 
-/usr/include/bits/local_lim.h:
-
 /usr/include/qt6/QtCore/qtcoreexports.h:
+
+/usr/include/bits/local_lim.h:
 
 /usr/include/c++/15/bits/postypes.h:
 
@@ -2177,23 +2384,17 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/shared_ptr_atomic.h:
 
-/usr/include/c++/15/bits/stl_multimap.h:
-
-/usr/include/c++/15/bits/stl_uninitialized.h:
-
-/usr/include/c++/15/bits/shared_ptr_base.h:
-
 /usr/include/c++/15/backward/binders.h:
 
 /usr/include/c++/15/bits/specfun.h:
 
 /usr/include/c++/15/bits/std_abs.h:
 
-/usr/include/bits/types/clockid_t.h:
+/usr/include/c++/15/bits/codecvt.h:
 
-/usr/include/bits/stdint-intn.h:
+/usr/include/c++/15/x86_64-redhat-linux/bits/c++locale.h:
 
-/usr/include/c++/15/typeinfo:
+/usr/include/c++/15/bits/std_function.h:
 
 /usr/include/c++/15/concepts:
 
@@ -2219,8 +2420,6 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/memory:
 
-/usr/include/c++/15/vector:
-
 /usr/include/c++/15/bits/ptr_traits.h:
 
 /usr/include/c++/15/bits/stl_construct.h:
@@ -2228,6 +2427,16 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 /usr/include/qt6/QtCore/qstringconverter.h:
 
 /usr/include/c++/15/bits/stl_iterator_base_types.h:
+
+/usr/include/c++/15/bits/stl_list.h:
+
+/usr/include/c++/15/bits/stl_uninitialized.h:
+
+/usr/include/c++/15/bits/shared_ptr_base.h:
+
+/usr/include/c++/15/bits/stl_multimap.h:
+
+/usr/include/c++/15/bits/stl_multiset.h:
 
 /usr/include/c++/15/bits/stl_bvector.h:
 
@@ -2237,7 +2446,31 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/cctype:
 
+/usr/include/c++/15/bits/stl_set.h:
+
 /usr/include/c++/15/bits/stl_tempbuf.h:
+
+/usr/include/bits/waitstatus.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/c++/15/bits/enable_special_members.h:
+
+/usr/include/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/c++/15/bits/stl_tree.h:
+
+/usr/include/qt6/QtCore/qforeach.h:
+
+/usr/include/c++/15/cstring:
+
+/usr/include/qt6/QtCore/qjsonarray.h:
+
+/usr/include/c++/15/x86_64-redhat-linux/bits/os_defines.h:
+
+/usr/include/c++/15/bits/functexcept.h:
+
+/usr/include/c++/15/bits/stl_vector.h:
 
 /usr/include/bits/types/struct_tm.h:
 
@@ -2245,31 +2478,27 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/bits/uniform_int_dist.h:
 
-/usr/include/qt6/QtCore/q17memory.h:
-
-/usr/include/features-time64.h:
-
 /usr/include/qt6/QtCore/qtresource.h:
 
 /usr/include/c++/15/bits/unique_ptr.h:
 
 /usr/include/c++/15/bits/uses_allocator_args.h:
 
+/usr/include/c++/15/climits:
+
 /usr/include/c++/15/cmath:
 
-/usr/include/stdint.h:
+/usr/lib/gcc/x86_64-redhat-linux/15/include/stdint.h:
 
-/usr/include/qt6/QtCore/qstringbuilder.h:
+/usr/include/linux/stddef.h:
 
-/usr/include/endian.h:
+/usr/include/c++/15/bits/locale_classes.h:
+
+/usr/include/c++/15/bits/stl_map.h:
+
+/usr/include/c++/15/list:
 
 /usr/include/c++/15/cstdint:
-
-/usr/include/c++/15/cstdio:
-
-/usr/include/qt6/QtCore/qforeach.h:
-
-/usr/include/c++/15/cstring:
 
 /usr/include/c++/15/bits/list.tcc:
 
@@ -2303,14 +2532,6 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/ext/string_conversions.h:
 
-/usr/include/qt6/QtCore/qjsonarray.h:
-
-/usr/include/c++/15/bits/functexcept.h:
-
-/usr/include/c++/15/bits/stl_vector.h:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/os_defines.h:
-
 /usr/include/c++/15/functional:
 
 /usr/include/qt6/QtCore/qrefcount.h:
@@ -2335,9 +2556,15 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/pstl/pstl_config.h:
 
-/usr/include/c++/15/ratio:
+/usr/include/qt6/QtCore/qnamespace.h:
+
+/usr/include/c++/15/bits/memory_resource.h:
+
+/usr/include/c++/15/set:
 
 /usr/include/c++/15/atomic:
+
+/usr/include/c++/15/ratio:
 
 /usr/include/c++/15/stdexcept:
 
@@ -2357,19 +2584,9 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/tr1/bessel_function.tcc:
 
-/usr/include/c++/15/bits/codecvt.h:
-
-/usr/include/c++/15/bits/std_function.h:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/c++locale.h:
-
 /usr/include/c++/15/tr1/ell_integral.tcc:
 
 /usr/include/c++/15/tr1/gamma.tcc:
-
-/usr/include/c++/15/bits/chrono.h:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/cpu_defines.h:
 
 /usr/include/bits/mathcalls-macros.h:
 
@@ -2383,26 +2600,4 @@ BGA/core/BGACore_autogen/mocs_compilation.cpp:
 
 /usr/include/c++/15/tr1/riemann_zeta.tcc:
 
-/usr/include/bits/stdlib-float.h:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/gthr-default.h:
-
 /usr/include/c++/15/tr1/special_function_util.h:
-
-/usr/include/c++/15/chrono:
-
-/usr/include/c++/15/unordered_map:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/c++allocator.h:
-
-/usr/include/c++/15/x86_64-redhat-linux/bits/c++config.h:
-
-/usr/include/c++/15/bits/fs_fwd.h:
-
-/usr/include/c++/15/cstddef:
-
-/usr/include/errno.h:
-
-/usr/include/qt6/QtCore/qtversionchecks.h:
-
-/usr/include/gnu/stubs-64.h:

@@ -44,29 +44,62 @@ SearchDialog::SearchDialog(QWidget *parent)
     m_animation = new QPropertyAnimation(m_placeholderLabel, "windowOpacity", this);
     m_animation->setDuration(200);
 
-    connect(m_lineEdit, &QLineEdit::textChanged, this, &SearchDialog::onSearchQueryChanged);
-    connect(m_lineEdit, &QLineEdit::returnPressed, this, &SearchDialog::onReturnPressed);
+    m_searchTimer = new QTimer(this);
+    m_searchTimer->setInterval(300); // 300ms debounce interval
+    m_searchTimer->setSingleShot(true);
+
+    connect(m_lineEdit, &QLineEdit::textChanged, this, [this](const QString &query) {
+        m_searchTimer->start();
+        if (query.isEmpty()) {
+            m_resultsTreeWidget->hide();
+            m_placeholderLabel->show();
+            m_animation->setStartValue(0.0);
+            m_animation->setEndValue(1.0);
+            m_animation->start();
+        } else {
+            m_placeholderLabel->hide();
+        }
+        adjustSize();
+    });
+    connect(m_searchTimer, &QTimer::timeout, this, [this]() {
+        emit searchRequested(m_lineEdit->text());
+    });
     connect(m_resultsTreeWidget, &QTreeWidget::itemClicked, this, &SearchDialog::onResultSelected);
 
     // Set tab order
     setTabOrder(m_lineEdit, m_resultsTreeWidget);
 }
 
-void SearchDialog::onSearchQueryChanged(const QString &query)
+void SearchDialog::keyPressEvent(QKeyEvent *event)
 {
-    emit searchRequested(query); // Emit for search across all files
-
-    if (query.isEmpty()) {
-        m_resultsTreeWidget->hide();
-        m_placeholderLabel->show();
-        m_animation->setStartValue(0.0);
-        m_animation->setEndValue(1.0);
-        m_animation->start();
+    if (event->key() == Qt::Key_Escape) {
+        close();
+    } else if (event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter) {
+        if (m_lineEdit->hasFocus()) {
+            emit searchRequested(m_lineEdit->text());
+        } else if (m_resultsTreeWidget->hasFocus()) {
+            QTreeWidgetItem *selectedItem = m_resultsTreeWidget->currentItem();
+            if (selectedItem) {
+                onResultSelected(selectedItem, 0);
+            }
+        }
+    } else if (event->key() == Qt::Key_Down) {
+        if (m_lineEdit->hasFocus() && m_resultsTreeWidget->topLevelItemCount() > 0) {
+            m_resultsTreeWidget->setFocus();
+            if (m_resultsTreeWidget->currentItem() == nullptr) {
+                m_resultsTreeWidget->setCurrentItem(m_resultsTreeWidget->topLevelItem(0));
+            }
+        }
+    } else if (event->key() == Qt::Key_Up) {
+        if (m_resultsTreeWidget->hasFocus() && m_resultsTreeWidget->currentItem() == m_resultsTreeWidget->topLevelItem(0)) {
+            m_lineEdit->setFocus();
+        }
     } else {
-        m_placeholderLabel->hide();
+        QDialog::keyPressEvent(event);
     }
-    adjustSize(); // Adjust size after query change
 }
+
+
 
 void SearchDialog::displaySearchResults(const QList<QPair<QString, QPair<int, QString>>> &results, const QString &query)
 {
@@ -126,42 +159,10 @@ void SearchDialog::onResultSelected(QTreeWidgetItem *item, int column)
     }
 }
 
-void SearchDialog::onReturnPressed()
-{
-    // If line edit has focus, and there are results, move focus to tree widget
-    if (m_lineEdit->hasFocus() && m_resultsTreeWidget->topLevelItemCount() > 0) {
-        m_resultsTreeWidget->setFocus();
-        if (m_resultsTreeWidget->currentItem() == nullptr) {
-            m_resultsTreeWidget->setCurrentItem(m_resultsTreeWidget->topLevelItem(0));
-        }
-    } else { // Otherwise, if tree widget has focus, select the current item
-        QTreeWidgetItem *selectedItem = m_resultsTreeWidget->currentItem();
-        if (selectedItem) {
-            onResultSelected(selectedItem, 0);
-        }
-    }
-}
 
-void SearchDialog::showEvent(QShowEvent *event)
-{
-    QDialog::showEvent(event);
-    m_lineEdit->clear(); // Clear previous search
-    m_lineEdit->setFocus();
-    m_resultsTreeWidget->hide();
-    m_placeholderLabel->show();
-    adjustSize(); // Adjust size when shown
-}
 
-bool SearchDialog::eventFilter(QObject *obj, QEvent *event)
-{
-    return QDialog::eventFilter(obj, event);
-}
 
-void SearchDialog::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Escape) {
-        close();
-    } else {
-        QDialog::keyPressEvent(event);
-    }
-}
+
+
+
+

@@ -39,7 +39,7 @@
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/home/jop/work/NST/NST/build/Desktop-Debug/BGA/core/BGACore_autogen/include",
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/build/Desktop-Debug/BGA/core/BGACore_autogen/mocs_compilation.cpp",
-	"MOC_DEFINITIONS" : [ "BGACore_EXPORTS", "QT_CORE_LIB" ],
+	"MOC_DEFINITIONS" : [ "APP_VERSION=\"0.4.1\"", "BGACore_EXPORTS", "QT_CORE_LIB" ],
 	"MOC_DEPEND_FILTERS" : 
 	[
 		[

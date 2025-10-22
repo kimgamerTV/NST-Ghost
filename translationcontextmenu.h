@@ -15,6 +15,7 @@ public:
 signals:
     void translateRequested(const QString &serviceName, const QString &sourceText);
     void translateAllSelected();
+    void undoTranslationRequested(); // New signal for undoing translation
 
 private:
     TranslationServiceManager *m_serviceManager;

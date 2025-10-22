@@ -1,15 +1,20 @@
-#ifndef CORE_ENGINES_UNITY_UNITYANALYZER_H
-#define CORE_ENGINES_UNITY_UNITYANALYZER_H
+#ifndef UNITY_ANALYZER_H
+#define UNITY_ANALYZER_H
 
 #include "core/gameanalyzer.h"
 
-namespace core::engines::unity {
+namespace core {
+namespace engines {
+namespace unity {
 
-class UnityAnalyzer : public IGameAnalyzer {
+class UnityAnalyzer : public core::IGameAnalyzer {
 public:
-    AnalyzerOutput analyze(const QString &inputPath) override;
+    core::AnalyzerOutput analyze(const QString &inputPath) override;
+    bool save(const QString &outputPath, const QJsonArray &texts) override; // Implement save method
 };
 
-} // namespace core::engines::unity
+} // namespace unity
+} // namespace engines
+} // namespace core
 
-#endif // CORE_ENGINES_UNITY_UNITYANALYZER_H
+#endif // UNITY_ANALYZER_H

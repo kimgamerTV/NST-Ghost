@@ -279,14 +279,19 @@ CMakeFiles/NST.dir/translationservicemanager.cpp.o: \
  /usr/include/qt6/QtCore/qbindingstorage.h /usr/include/c++/15/chrono \
  /usr/include/c++/15/bits/chrono.h /usr/include/c++/15/ratio \
  /usr/include/c++/15/ctime /usr/include/qt6/QtCore/QStringList \
- /usr/include/qt6/QtCore/qstringlist.h /usr/include/qt6/QtCore/QMap \
- /usr/include/qt6/QtCore/qmap.h /usr/include/qt6/QtCore/qshareddata.h \
- /usr/include/qt6/QtCore/qshareddata_impl.h \
+ /usr/include/qt6/QtCore/qstringlist.h /usr/include/qt6/QtCore/QList \
+ /usr/include/qt6/QtCore/qlist.h /usr/include/qt6/QtCore/QPointer \
+ /usr/include/qt6/QtCore/qpointer.h \
+ /usr/include/qt6/QtCore/qsharedpointer.h \
+ /usr/include/qt6/QtCore/qshareddata.h \
+ /usr/include/qt6/QtCore/qsharedpointer_impl.h \
  /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservice.h \
  /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/qstring.h \
  /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservicefactory.h \
  /usr/include/qt6/QtCore/QVariantMap \
  /usr/include/qt6/QtCore/qvariantmap.h /usr/include/qt6/QtCore/QMap \
+ /usr/include/qt6/QtCore/qmap.h \
+ /usr/include/qt6/QtCore/qshareddata_impl.h \
  /usr/include/qt6/QtCore/QVariant /usr/include/qt6/QtCore/qvariant.h \
  /usr/include/qt6/QtCore/qdebug.h /usr/include/qt6/QtCore/qtextstream.h \
  /usr/include/qt6/QtCore/qcontiguouscache.h /usr/include/c++/15/climits \
@@ -295,8 +300,7 @@ CMakeFiles/NST.dir/translationservicemanager.cpp.o: \
  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
  /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
- /usr/include/bits/uio_lim.h /usr/include/qt6/QtCore/qsharedpointer.h \
- /usr/include/qt6/QtCore/qsharedpointer_impl.h /usr/include/c++/15/set \
+ /usr/include/bits/uio_lim.h /usr/include/c++/15/set \
  /usr/include/c++/15/bits/stl_set.h \
  /usr/include/c++/15/bits/stl_multiset.h \
  /usr/include/c++/15/unordered_set \

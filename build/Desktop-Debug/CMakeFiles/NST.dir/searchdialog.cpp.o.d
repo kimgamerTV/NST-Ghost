@@ -376,8 +376,8 @@ CMakeFiles/NST.dir/searchdialog.cpp.o: \
  /usr/include/qt6/QtCore/qpropertyanimation.h \
  /usr/include/qt6/QtCore/qvariantanimation.h \
  /usr/include/qt6/QtCore/qabstractanimation.h \
- /usr/include/qt6/QtCore/qeasingcurve.h \
- /usr/include/qt6/QtWidgets/QVBoxLayout \
+ /usr/include/qt6/QtCore/qeasingcurve.h /usr/include/qt6/QtCore/QTimer \
+ /usr/include/qt6/QtCore/qtimer.h /usr/include/qt6/QtWidgets/QVBoxLayout \
  /usr/include/qt6/QtWidgets/qboxlayout.h \
  /usr/include/qt6/QtWidgets/qlayout.h \
  /usr/include/qt6/QtWidgets/qlayoutitem.h \

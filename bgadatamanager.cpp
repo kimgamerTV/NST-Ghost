@@ -3,6 +3,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QFile> // New include
+#include <QTextStream> // New include
+#include <QStandardPaths> // New include
 
 BGADataManager::BGADataManager(QObject *parent)
     : QObject(parent)
@@ -16,34 +19,86 @@ QStringList BGADataManager::getAvailableAnalyzers() const
 
 QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName, const QString &projectPath)
 {
+    QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/bgadatamanager_log.txt";
+    QFile logFile(logFilePath);
+    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream logStream(&logFile);
+
     QJsonArray extractedTextsArray;
 
+    logStream << "BGADataManager: Creating analyzer for engine: " << engineName << "\n";
     std::unique_ptr<core::IGameAnalyzer> analyzer = core::createAnalyzer(engineName);
     if (!analyzer) {
         emit errorOccurred(QString("Failed to create analyzer for engine: %1").arg(engineName));
+        logStream << "BGADataManager: Failed to create analyzer." << "\n";
+        logFile.close();
         return extractedTextsArray;
     }
 
+    logStream << "BGADataManager: Calling analyzer->analyze for project: " << projectPath << "\n";
     core::AnalyzerOutput output = analyzer->analyze(projectPath);
+    logStream << "BGADataManager: Analyzer output payload size:" << output.payload.size() << "bytes" << "\n";
+
+    if (!output.errorMessage.isEmpty()) { // Check for error message from analyzer
+        emit errorOccurred(output.errorMessage);
+        logStream << "BGADataManager: Analyzer returned error: " << output.errorMessage << "\n";
+        logFile.close();
+        return extractedTextsArray; // Return empty array on error
+    }
 
     if (output.payload.isEmpty()) {
         emit errorOccurred(QString("No data extracted from project: %1").arg(projectPath));
+        logStream << "BGADataManager: No data extracted from project." << "\n";
+        logFile.close();
         return extractedTextsArray;
     }
 
+    logStream << "BGADataManager: Before QJsonDocument::fromJson" << "\n";
     if (output.format == "application/json") {
         QJsonDocument doc = QJsonDocument::fromJson(output.payload);
-        if (doc.isNull() || !doc.isObject()) {
+        logStream << "BGADataManager: After QJsonDocument::fromJson" << "\n";
+        if (doc.isNull() || !doc.isArray()) { // Check if the document is an array
             emit errorOccurred("Invalid JSON output from analyzer.");
+            logStream << "BGADataManager: Invalid JSON output from analyzer." << "\n";
+            logFile.close();
             return extractedTextsArray;
         }
 
-        QJsonObject root = doc.object();
-        extractedTextsArray = root["texts"].toArray();
+        extractedTextsArray = doc.array(); // Directly get the array from the document
+        logStream << "BGADataManager: Extracted " << extractedTextsArray.size() << " entries." << "\n";
+        logStream << "BGADataManager: After extracting entries" << "\n";
 
     } else {
+        logStream << "BGADataManager: Unsupported format detected: " << output.format << "\n";
         emit errorOccurred(QString("Unsupported analyzer output format: %1").arg(output.format));
+        logStream << "BGADataManager: Unsupported analyzer output format." << "\n";
+        logFile.close();
+        return extractedTextsArray;
+    }
+    logStream << "BGADataManager: loadStringsFromGameProject returning." << "\n";
+    logFile.close();
+    return extractedTextsArray;
+}
+    
+bool BGADataManager::saveStringsToGameProject(const QString &engineName, const QString &projectPath, const QMap<QString, QJsonArray> &data)
+{
+    std::unique_ptr<core::IGameAnalyzer> analyzer = core::createAnalyzer(engineName);
+    if (!analyzer) {
+        emit errorOccurred(QString("Failed to create analyzer for engine: %1").arg(engineName));
+        return false;
     }
 
-    return extractedTextsArray;
+    // Convert the QMap<QString, QJsonArray> to a single QJsonArray suitable for the analyzer's save method
+    QJsonArray textsToSave;
+    for (const QJsonArray &fileTexts : data.values()) {
+        for (const QJsonValue &value : fileTexts) {
+            textsToSave.append(value);
+        }
+    }
+
+    if (!analyzer->save(projectPath, textsToSave)) {
+        emit errorOccurred(QString("Failed to save strings to project: %1").arg(projectPath));
+        return false;
+    }
+    return true;
 }

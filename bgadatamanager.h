@@ -20,6 +20,7 @@ public:
 
     QStringList getAvailableAnalyzers() const;
     QJsonArray loadStringsFromGameProject(const QString &engineName, const QString &projectPath);
+    bool saveStringsToGameProject(const QString &engineName, const QString &projectPath, const QMap<QString, QJsonArray> &data); // New method
 
 signals:
     void errorOccurred(const QString &message);

@@ -7,6 +7,7 @@
 *****************************************************************************/
 
 #include "../../../../../QtLingo/src/llm_translation_service.h"
+#include <QtNetwork/QSslError>
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
@@ -38,10 +39,18 @@ template <> constexpr inline auto qtlingo::LLMTranslationService::qt_create_meta
 {
     namespace QMC = QtMocConstants;
     QtMocHelpers::StringRefStorage qt_stringData {
-        "qtlingo::LLMTranslationService"
+        "qtlingo::LLMTranslationService",
+        "onNetworkReply",
+        "",
+        "QNetworkReply*",
+        "reply"
     };
 
     QtMocHelpers::UintData qt_methods {
+        // Slot 'onNetworkReply'
+        QtMocHelpers::SlotData<void(QNetworkReply *)>(1, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 3, 4 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -63,10 +72,24 @@ Q_CONSTINIT const QMetaObject qtlingo::LLMTranslationService::staticMetaObject =
 void qtlingo::LLMTranslationService::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     auto *_t = static_cast<LLMTranslationService *>(_o);
-    (void)_t;
-    (void)_c;
-    (void)_id;
-    (void)_a;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        switch (_id) {
+        case 0: _t->onNetworkReply((*reinterpret_cast< std::add_pointer_t<QNetworkReply*>>(_a[1]))); break;
+        default: ;
+        }
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        switch (_id) {
+        default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+        case 0:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+            case 0:
+                *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< QNetworkReply* >(); break;
+            }
+            break;
+        }
+    }
 }
 
 const QMetaObject *qtlingo::LLMTranslationService::metaObject() const
@@ -85,6 +108,18 @@ void *qtlingo::LLMTranslationService::qt_metacast(const char *_clname)
 int qtlingo::LLMTranslationService::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = ITranslationService::qt_metacall(_c, _id, _a);
+    if (_id < 0)
+        return _id;
+    if (_c == QMetaObject::InvokeMetaMethod) {
+        if (_id < 1)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        if (_id < 1)
+            qt_static_metacall(this, _c, _id, _a);
+        _id -= 1;
+    }
     return _id;
 }
 QT_WARNING_POP

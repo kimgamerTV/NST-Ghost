@@ -261,6 +261,7 @@
  mdp:/usr/include/locale.h
  mdp:/usr/include/pthread.h
  mdp:/usr/include/qt6/QtCore/QByteArray
+ mdp:/usr/include/qt6/QtCore/QJsonArray
  mdp:/usr/include/qt6/QtCore/QString
  mdp:/usr/include/qt6/QtCore/q17memory.h
  mdp:/usr/include/qt6/QtCore/q20functional.h
@@ -336,6 +337,10 @@
  mdp:/usr/include/qt6/QtCore/qiodevicebase.h
  mdp:/usr/include/qt6/QtCore/qiterable.h
  mdp:/usr/include/qt6/QtCore/qiterator.h
+ mdp:/usr/include/qt6/QtCore/qjsonarray.h
+ mdp:/usr/include/qt6/QtCore/qjsondocument.h
+ mdp:/usr/include/qt6/QtCore/qjsonparseerror.h
+ mdp:/usr/include/qt6/QtCore/qjsonvalue.h
  mdp:/usr/include/qt6/QtCore/qlatin1stringview.h
  mdp:/usr/include/qt6/QtCore/qlist.h
  mdp:/usr/include/qt6/QtCore/qlocale.h

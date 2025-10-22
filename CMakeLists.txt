@@ -17,31 +17,29 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Con
 set(TS_FILES NST_en_US.ts)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        searchcontroller.cpp
-        searchcontroller.h
-        shortcutcontroller.cpp
-        shortcutcontroller.h
-        searchdialog.cpp
-        searchdialog.h
-        bgadatamanager.cpp
-        bgadatamanager.h
-        loadprojectdialog.cpp
-        loadprojectdialog.h
-        loadprojectdialog.ui
-        translationservicemanager.cpp
-        translationservicemanager.h
-        translationcontextmenu.cpp
-        translationcontextmenu.h
-        settingsdialog.cpp
-        settingsdialog.h
-        settingsdialog.ui
-        updatecontroller.cpp
-        updatecontroller.h
-        ${TS_FILES}
+    main.cpp
+    mainwindow.cpp
+    menubar.cpp
+    loadprojectdialog.cpp
+    searchdialog.cpp
+    settingsdialog.cpp
+    searchcontroller.cpp
+    shortcutcontroller.cpp
+    bgadatamanager.cpp
+    translationservicemanager.cpp
+    translationcontextmenu.cpp
+    updatecontroller.cpp
+    mainwindow.h
+    menubar.h
+    loadprojectdialog.h
+    searchdialog.h
+    settingsdialog.h
+    searchcontroller.h
+    shortcutcontroller.h
+    bgadatamanager.h
+    translationservicemanager.h
+    translationcontextmenu.h
+    updatecontroller.h
 )
 
 # Add BGA as a subdirectory

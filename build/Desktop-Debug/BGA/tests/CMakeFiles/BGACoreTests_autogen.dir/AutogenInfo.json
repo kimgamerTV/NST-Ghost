@@ -15,6 +15,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/build/Desktop-Debug/BGA/tests/BGACoreTests_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
+		"APP_VERSION=\"0.4.1\"",
 		"QT_CORE_LIB",
 		"QT_TESTCASE_BUILDDIR=\"/home/jop/work/NST/NST/build/Desktop-Debug/BGA/tests\"",
 		"QT_TESTCASE_SOURCEDIR=\"/home/jop/work/NST/NST/BGA/tests\"",

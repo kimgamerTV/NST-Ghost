@@ -5,6 +5,8 @@
 #include <QTranslator>
 #include <QFile>
 #include <QTextStream>
+#include <QSettings>
+#include <QTimer>
 
 int main(int argc, char *argv[])
 {
@@ -29,5 +31,9 @@ int main(int argc, char *argv[])
     }
     MainWindow w;
     w.show();
+
+    QTimer::singleShot(0, &w, &MainWindow::onLoadFromGameProject);
+
+
     return a.exec();
 }

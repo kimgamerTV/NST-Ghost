@@ -1,15 +1,22 @@
-#ifndef CORE_ENGINES_RPGM_RPGANALYZER_H
-#define CORE_ENGINES_RPGM_RPGANALYZER_H
+#ifndef RPGM_ANALYZER_H
+#define RPGM_ANALYZER_H
 
 #include "core/gameanalyzer.h"
 
-namespace core::engines::rpgm {
+namespace core {
+namespace engines {
+namespace rpgm {
 
-class RpgmAnalyzer : public IGameAnalyzer {
+class RpgmAnalyzer : public core::IGameAnalyzer {
 public:
-    AnalyzerOutput analyze(const QString &inputPath) override;
+    core::AnalyzerOutput analyze(const QString &inputPath) override;
+    bool save(const QString &outputPath, const QJsonArray &texts) override; // Implement save method
+private:
+    void extractStringsFromJsonValue(const QJsonValue &jsonValue, QJsonArray &extractedStrings, const QString &filePath, const QString &currentKeyPath = ""); // New helper function
 };
 
-} // namespace core::engines::rpgm
+} // namespace rpgm
+} // namespace engines
+} // namespace core
 
-#endif // CORE_ENGINES_RPGM_RPGANALYZER_H
+#endif // RPGM_ANALYZER_H

@@ -121,33 +121,33 @@ CMakeFiles/NST.dir/mainwindow.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/mainwindow.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/mainwindow.cpp -o CMakeFiles/NST.dir/mainwindow.cpp.s
 
-CMakeFiles/NST.dir/searchcontroller.cpp.o: CMakeFiles/NST.dir/flags.make
-CMakeFiles/NST.dir/searchcontroller.cpp.o: /home/jop/work/NST/NST/searchcontroller.cpp
-CMakeFiles/NST.dir/searchcontroller.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/NST.dir/searchcontroller.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/searchcontroller.cpp.o -MF CMakeFiles/NST.dir/searchcontroller.cpp.o.d -o CMakeFiles/NST.dir/searchcontroller.cpp.o -c /home/jop/work/NST/NST/searchcontroller.cpp
+CMakeFiles/NST.dir/menubar.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/menubar.cpp.o: /home/jop/work/NST/NST/menubar.cpp
+CMakeFiles/NST.dir/menubar.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/NST.dir/menubar.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/menubar.cpp.o -MF CMakeFiles/NST.dir/menubar.cpp.o.d -o CMakeFiles/NST.dir/menubar.cpp.o -c /home/jop/work/NST/NST/menubar.cpp
 
-CMakeFiles/NST.dir/searchcontroller.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/searchcontroller.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/searchcontroller.cpp > CMakeFiles/NST.dir/searchcontroller.cpp.i
+CMakeFiles/NST.dir/menubar.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/menubar.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/menubar.cpp > CMakeFiles/NST.dir/menubar.cpp.i
 
-CMakeFiles/NST.dir/searchcontroller.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/searchcontroller.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/searchcontroller.cpp -o CMakeFiles/NST.dir/searchcontroller.cpp.s
+CMakeFiles/NST.dir/menubar.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/menubar.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/menubar.cpp -o CMakeFiles/NST.dir/menubar.cpp.s
 
-CMakeFiles/NST.dir/shortcutcontroller.cpp.o: CMakeFiles/NST.dir/flags.make
-CMakeFiles/NST.dir/shortcutcontroller.cpp.o: /home/jop/work/NST/NST/shortcutcontroller.cpp
-CMakeFiles/NST.dir/shortcutcontroller.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/NST.dir/shortcutcontroller.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/shortcutcontroller.cpp.o -MF CMakeFiles/NST.dir/shortcutcontroller.cpp.o.d -o CMakeFiles/NST.dir/shortcutcontroller.cpp.o -c /home/jop/work/NST/NST/shortcutcontroller.cpp
+CMakeFiles/NST.dir/loadprojectdialog.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/loadprojectdialog.cpp.o: /home/jop/work/NST/NST/loadprojectdialog.cpp
+CMakeFiles/NST.dir/loadprojectdialog.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/NST.dir/loadprojectdialog.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/loadprojectdialog.cpp.o -MF CMakeFiles/NST.dir/loadprojectdialog.cpp.o.d -o CMakeFiles/NST.dir/loadprojectdialog.cpp.o -c /home/jop/work/NST/NST/loadprojectdialog.cpp
 
-CMakeFiles/NST.dir/shortcutcontroller.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/shortcutcontroller.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/shortcutcontroller.cpp > CMakeFiles/NST.dir/shortcutcontroller.cpp.i
+CMakeFiles/NST.dir/loadprojectdialog.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/loadprojectdialog.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/loadprojectdialog.cpp > CMakeFiles/NST.dir/loadprojectdialog.cpp.i
 
-CMakeFiles/NST.dir/shortcutcontroller.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/shortcutcontroller.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/shortcutcontroller.cpp -o CMakeFiles/NST.dir/shortcutcontroller.cpp.s
+CMakeFiles/NST.dir/loadprojectdialog.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/loadprojectdialog.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/loadprojectdialog.cpp -o CMakeFiles/NST.dir/loadprojectdialog.cpp.s
 
 CMakeFiles/NST.dir/searchdialog.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/searchdialog.cpp.o: /home/jop/work/NST/NST/searchdialog.cpp
@@ -163,10 +163,52 @@ CMakeFiles/NST.dir/searchdialog.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/searchdialog.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/searchdialog.cpp -o CMakeFiles/NST.dir/searchdialog.cpp.s
 
+CMakeFiles/NST.dir/settingsdialog.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/settingsdialog.cpp.o: /home/jop/work/NST/NST/settingsdialog.cpp
+CMakeFiles/NST.dir/settingsdialog.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/NST.dir/settingsdialog.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/settingsdialog.cpp.o -MF CMakeFiles/NST.dir/settingsdialog.cpp.o.d -o CMakeFiles/NST.dir/settingsdialog.cpp.o -c /home/jop/work/NST/NST/settingsdialog.cpp
+
+CMakeFiles/NST.dir/settingsdialog.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/settingsdialog.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/settingsdialog.cpp > CMakeFiles/NST.dir/settingsdialog.cpp.i
+
+CMakeFiles/NST.dir/settingsdialog.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/settingsdialog.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/settingsdialog.cpp -o CMakeFiles/NST.dir/settingsdialog.cpp.s
+
+CMakeFiles/NST.dir/searchcontroller.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/searchcontroller.cpp.o: /home/jop/work/NST/NST/searchcontroller.cpp
+CMakeFiles/NST.dir/searchcontroller.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/NST.dir/searchcontroller.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/searchcontroller.cpp.o -MF CMakeFiles/NST.dir/searchcontroller.cpp.o.d -o CMakeFiles/NST.dir/searchcontroller.cpp.o -c /home/jop/work/NST/NST/searchcontroller.cpp
+
+CMakeFiles/NST.dir/searchcontroller.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/searchcontroller.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/searchcontroller.cpp > CMakeFiles/NST.dir/searchcontroller.cpp.i
+
+CMakeFiles/NST.dir/searchcontroller.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/searchcontroller.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/searchcontroller.cpp -o CMakeFiles/NST.dir/searchcontroller.cpp.s
+
+CMakeFiles/NST.dir/shortcutcontroller.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/shortcutcontroller.cpp.o: /home/jop/work/NST/NST/shortcutcontroller.cpp
+CMakeFiles/NST.dir/shortcutcontroller.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/NST.dir/shortcutcontroller.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/shortcutcontroller.cpp.o -MF CMakeFiles/NST.dir/shortcutcontroller.cpp.o.d -o CMakeFiles/NST.dir/shortcutcontroller.cpp.o -c /home/jop/work/NST/NST/shortcutcontroller.cpp
+
+CMakeFiles/NST.dir/shortcutcontroller.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/shortcutcontroller.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/shortcutcontroller.cpp > CMakeFiles/NST.dir/shortcutcontroller.cpp.i
+
+CMakeFiles/NST.dir/shortcutcontroller.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/shortcutcontroller.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/shortcutcontroller.cpp -o CMakeFiles/NST.dir/shortcutcontroller.cpp.s
+
 CMakeFiles/NST.dir/bgadatamanager.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/bgadatamanager.cpp.o: /home/jop/work/NST/NST/bgadatamanager.cpp
 CMakeFiles/NST.dir/bgadatamanager.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/NST.dir/bgadatamanager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/NST.dir/bgadatamanager.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/bgadatamanager.cpp.o -MF CMakeFiles/NST.dir/bgadatamanager.cpp.o.d -o CMakeFiles/NST.dir/bgadatamanager.cpp.o -c /home/jop/work/NST/NST/bgadatamanager.cpp
 
 CMakeFiles/NST.dir/bgadatamanager.cpp.i: cmake_force
@@ -177,24 +219,10 @@ CMakeFiles/NST.dir/bgadatamanager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/bgadatamanager.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/bgadatamanager.cpp -o CMakeFiles/NST.dir/bgadatamanager.cpp.s
 
-CMakeFiles/NST.dir/loadprojectdialog.cpp.o: CMakeFiles/NST.dir/flags.make
-CMakeFiles/NST.dir/loadprojectdialog.cpp.o: /home/jop/work/NST/NST/loadprojectdialog.cpp
-CMakeFiles/NST.dir/loadprojectdialog.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/NST.dir/loadprojectdialog.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/loadprojectdialog.cpp.o -MF CMakeFiles/NST.dir/loadprojectdialog.cpp.o.d -o CMakeFiles/NST.dir/loadprojectdialog.cpp.o -c /home/jop/work/NST/NST/loadprojectdialog.cpp
-
-CMakeFiles/NST.dir/loadprojectdialog.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/loadprojectdialog.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/loadprojectdialog.cpp > CMakeFiles/NST.dir/loadprojectdialog.cpp.i
-
-CMakeFiles/NST.dir/loadprojectdialog.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/loadprojectdialog.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/loadprojectdialog.cpp -o CMakeFiles/NST.dir/loadprojectdialog.cpp.s
-
 CMakeFiles/NST.dir/translationservicemanager.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/translationservicemanager.cpp.o: /home/jop/work/NST/NST/translationservicemanager.cpp
 CMakeFiles/NST.dir/translationservicemanager.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/NST.dir/translationservicemanager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/NST.dir/translationservicemanager.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/translationservicemanager.cpp.o -MF CMakeFiles/NST.dir/translationservicemanager.cpp.o.d -o CMakeFiles/NST.dir/translationservicemanager.cpp.o -c /home/jop/work/NST/NST/translationservicemanager.cpp
 
 CMakeFiles/NST.dir/translationservicemanager.cpp.i: cmake_force
@@ -208,7 +236,7 @@ CMakeFiles/NST.dir/translationservicemanager.cpp.s: cmake_force
 CMakeFiles/NST.dir/translationcontextmenu.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/translationcontextmenu.cpp.o: /home/jop/work/NST/NST/translationcontextmenu.cpp
 CMakeFiles/NST.dir/translationcontextmenu.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/NST.dir/translationcontextmenu.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/NST.dir/translationcontextmenu.cpp.o"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/translationcontextmenu.cpp.o -MF CMakeFiles/NST.dir/translationcontextmenu.cpp.o.d -o CMakeFiles/NST.dir/translationcontextmenu.cpp.o -c /home/jop/work/NST/NST/translationcontextmenu.cpp
 
 CMakeFiles/NST.dir/translationcontextmenu.cpp.i: cmake_force
@@ -219,33 +247,35 @@ CMakeFiles/NST.dir/translationcontextmenu.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/translationcontextmenu.cpp.s"
 	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/translationcontextmenu.cpp -o CMakeFiles/NST.dir/translationcontextmenu.cpp.s
 
-CMakeFiles/NST.dir/settingsdialog.cpp.o: CMakeFiles/NST.dir/flags.make
-CMakeFiles/NST.dir/settingsdialog.cpp.o: /home/jop/work/NST/NST/settingsdialog.cpp
-CMakeFiles/NST.dir/settingsdialog.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/NST.dir/settingsdialog.cpp.o"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/settingsdialog.cpp.o -MF CMakeFiles/NST.dir/settingsdialog.cpp.o.d -o CMakeFiles/NST.dir/settingsdialog.cpp.o -c /home/jop/work/NST/NST/settingsdialog.cpp
+CMakeFiles/NST.dir/updatecontroller.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/updatecontroller.cpp.o: /home/jop/work/NST/NST/updatecontroller.cpp
+CMakeFiles/NST.dir/updatecontroller.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/NST.dir/updatecontroller.cpp.o"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/updatecontroller.cpp.o -MF CMakeFiles/NST.dir/updatecontroller.cpp.o.d -o CMakeFiles/NST.dir/updatecontroller.cpp.o -c /home/jop/work/NST/NST/updatecontroller.cpp
 
-CMakeFiles/NST.dir/settingsdialog.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/settingsdialog.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/settingsdialog.cpp > CMakeFiles/NST.dir/settingsdialog.cpp.i
+CMakeFiles/NST.dir/updatecontroller.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/updatecontroller.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/updatecontroller.cpp > CMakeFiles/NST.dir/updatecontroller.cpp.i
 
-CMakeFiles/NST.dir/settingsdialog.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/settingsdialog.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/settingsdialog.cpp -o CMakeFiles/NST.dir/settingsdialog.cpp.s
+CMakeFiles/NST.dir/updatecontroller.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/updatecontroller.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/updatecontroller.cpp -o CMakeFiles/NST.dir/updatecontroller.cpp.s
 
 # Object files for target NST
 NST_OBJECTS = \
 "CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/NST.dir/main.cpp.o" \
 "CMakeFiles/NST.dir/mainwindow.cpp.o" \
+"CMakeFiles/NST.dir/menubar.cpp.o" \
+"CMakeFiles/NST.dir/loadprojectdialog.cpp.o" \
+"CMakeFiles/NST.dir/searchdialog.cpp.o" \
+"CMakeFiles/NST.dir/settingsdialog.cpp.o" \
 "CMakeFiles/NST.dir/searchcontroller.cpp.o" \
 "CMakeFiles/NST.dir/shortcutcontroller.cpp.o" \
-"CMakeFiles/NST.dir/searchdialog.cpp.o" \
 "CMakeFiles/NST.dir/bgadatamanager.cpp.o" \
-"CMakeFiles/NST.dir/loadprojectdialog.cpp.o" \
 "CMakeFiles/NST.dir/translationservicemanager.cpp.o" \
 "CMakeFiles/NST.dir/translationcontextmenu.cpp.o" \
-"CMakeFiles/NST.dir/settingsdialog.cpp.o"
+"CMakeFiles/NST.dir/updatecontroller.cpp.o"
 
 # External object files for target NST
 NST_EXTERNAL_OBJECTS =
@@ -253,14 +283,16 @@ NST_EXTERNAL_OBJECTS =
 NST: CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o
 NST: CMakeFiles/NST.dir/main.cpp.o
 NST: CMakeFiles/NST.dir/mainwindow.cpp.o
+NST: CMakeFiles/NST.dir/menubar.cpp.o
+NST: CMakeFiles/NST.dir/loadprojectdialog.cpp.o
+NST: CMakeFiles/NST.dir/searchdialog.cpp.o
+NST: CMakeFiles/NST.dir/settingsdialog.cpp.o
 NST: CMakeFiles/NST.dir/searchcontroller.cpp.o
 NST: CMakeFiles/NST.dir/shortcutcontroller.cpp.o
-NST: CMakeFiles/NST.dir/searchdialog.cpp.o
 NST: CMakeFiles/NST.dir/bgadatamanager.cpp.o
-NST: CMakeFiles/NST.dir/loadprojectdialog.cpp.o
 NST: CMakeFiles/NST.dir/translationservicemanager.cpp.o
 NST: CMakeFiles/NST.dir/translationcontextmenu.cpp.o
-NST: CMakeFiles/NST.dir/settingsdialog.cpp.o
+NST: CMakeFiles/NST.dir/updatecontroller.cpp.o
 NST: CMakeFiles/NST.dir/build.make
 NST: CMakeFiles/NST.dir/compiler_depend.ts
 NST: /usr/lib64/libQt6Widgets.so.6.9.2
@@ -270,9 +302,10 @@ NST: QtLingo/libQtLingo.so
 NST: /usr/lib64/libQt6Gui.so.6.9.2
 NST: /usr/lib64/libGLX.so
 NST: /usr/lib64/libOpenGL.so
+NST: /usr/lib64/libQt6Network.so.6.9.2
 NST: /usr/lib64/libQt6Core.so.6.9.2
 NST: CMakeFiles/NST.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Linking CXX executable NST"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/build/Desktop-Debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Linking CXX executable NST"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/NST.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

@@ -3,9 +3,8 @@
 
 #include <QObject>
 #include <QStringList>
-#include <QMap>
-#include <memory>
-
+#include <QList>
+#include <QPointer> // Add this include
 #include <qtlingo/translationservice.h>
 #include <qtlingo/translationservicefactory.h>
 
@@ -29,7 +28,7 @@ private slots:
     void handleErrorOccurred(const QString &message);
 
 private:
-    std::unique_ptr<qtlingo::ITranslationService> m_currentService;
+    QList<QPointer<qtlingo::ITranslationService>> m_activeServices;
 };
 
 #endif // TRANSLATIONSERVICEMANAGER_H

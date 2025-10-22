@@ -15,7 +15,6 @@ public:
 signals:
 
 private slots:
-    void onResult(QNetworkReply *reply);
     void onManifestDownloaded(QNetworkReply *reply);
 
 private:

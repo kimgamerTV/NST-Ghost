@@ -366,6 +366,10 @@ BGA/tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
  /usr/include/qt6/QtCore/QByteArray /usr/include/qt6/QtCore/qbytearray.h \
  /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/qstring.h \
+ /usr/include/qt6/QtCore/QJsonArray /usr/include/qt6/QtCore/qjsonarray.h \
+ /usr/include/qt6/QtCore/qjsonvalue.h \
+ /usr/include/qt6/QtCore/qjsondocument.h \
+ /usr/include/qt6/QtCore/qjsonparseerror.h \
  /home/jop/work/NST/NST/build/Desktop-Debug/BGA/tests/BGACoreTests_autogen/include/test_analyzer_stub.moc \
  /usr/include/qt6/QtCore/qtmochelpers.h \
  /usr/include/qt6/QtCore/qtmocconstants.h \

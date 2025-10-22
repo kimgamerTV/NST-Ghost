@@ -5,14 +5,16 @@ NST: \
   CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o \
   CMakeFiles/NST.dir/main.cpp.o \
   CMakeFiles/NST.dir/mainwindow.cpp.o \
+  CMakeFiles/NST.dir/menubar.cpp.o \
+  CMakeFiles/NST.dir/loadprojectdialog.cpp.o \
+  CMakeFiles/NST.dir/searchdialog.cpp.o \
+  CMakeFiles/NST.dir/settingsdialog.cpp.o \
   CMakeFiles/NST.dir/searchcontroller.cpp.o \
   CMakeFiles/NST.dir/shortcutcontroller.cpp.o \
-  CMakeFiles/NST.dir/searchdialog.cpp.o \
   CMakeFiles/NST.dir/bgadatamanager.cpp.o \
-  CMakeFiles/NST.dir/loadprojectdialog.cpp.o \
   CMakeFiles/NST.dir/translationservicemanager.cpp.o \
   CMakeFiles/NST.dir/translationcontextmenu.cpp.o \
-  CMakeFiles/NST.dir/settingsdialog.cpp.o \
+  CMakeFiles/NST.dir/updatecontroller.cpp.o \
   /usr/lib64/libQt6Widgets.so.6.9.2 \
   /usr/lib64/libQt6Concurrent.so.6.9.2 \
   BGA/core/libBGACore.so \
@@ -20,6 +22,7 @@ NST: \
   /usr/lib64/libQt6Gui.so.6.9.2 \
   /usr/lib64/libGLX.so \
   /usr/lib64/libOpenGL.so \
+  /usr/lib64/libQt6Network.so.6.9.2 \
   /usr/lib64/libQt6Core.so.6.9.2 \
   /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
@@ -47,7 +50,6 @@ NST: \
   /usr/lib/gcc/x86_64-redhat-linux/15/libgcc.a \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtend.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o \
-  /usr/lib64/libQt6Network.so.6 \
   /usr/lib64/libEGL.so.1 \
   /usr/lib64/libfontconfig.so.1 \
   /usr/lib64/libX11.so.6 \
@@ -60,15 +62,7 @@ NST: \
   /usr/lib64/libz.so.1 \
   /usr/lib64/libXext.so.6 \
   /usr/lib64/libGLdispatch.so.0 \
-  /usr/lib64/libicui18n.so.77 \
-  /usr/lib64/libicuuc.so.77 \
   /usr/lib64/libzstd.so.1 \
-  /usr/lib64/libsystemd.so.0 \
-  /usr/lib64/libdouble-conversion.so.3 \
-  /usr/lib64/libb2.so.1 \
-  /usr/lib64/libpcre2-16.so.0 \
-  /usr/lib64/libcrypto.so.3 \
-  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libgssapi_krb5.so.2 \
   /usr/lib64/libbrotlidec.so.1 \
   /usr/lib64/libproxy.so.1 \
@@ -76,15 +70,20 @@ NST: \
   /lib/libproxy.so.1 \
   /usr/lib/libproxy.so.1 \
   /usr/lib64/libproxy.so.1 \
+  /usr/lib64/libcrypto.so.3 \
+  /usr/lib64/libicui18n.so.77 \
+  /usr/lib64/libicuuc.so.77 \
+  /usr/lib64/libsystemd.so.0 \
+  /usr/lib64/libdouble-conversion.so.3 \
+  /usr/lib64/libb2.so.1 \
+  /usr/lib64/libpcre2-16.so.0 \
+  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libxml2.so.2 \
   /usr/lib64/libxcb.so.1 \
   /usr/lib64/libpcre2-8.so.0 \
   /usr/lib64/libdbus-1.so.3 \
   /usr/lib64/libgraphite2.so.3 \
   /usr/lib64/libbz2.so.1 \
-  /usr/lib64/libicudata.so.77 \
-  /usr/lib64/libcap.so.2 \
-  /usr/lib64/libgomp.so.1 \
   /usr/lib64/libkrb5.so.3 \
   /usr/lib64/libk5crypto.so.3 \
   /usr/lib64/libcom_err.so.2 \
@@ -94,6 +93,9 @@ NST: \
   /usr/lib64/libbrotlicommon.so.1 \
   /usr/lib64/libproxy/libpxbackend-1.0.so \
   /usr/lib64/libgobject-2.0.so.0 \
+  /usr/lib64/libicudata.so.77 \
+  /usr/lib64/libcap.so.2 \
+  /usr/lib64/libgomp.so.1 \
   /usr/lib64/liblzma.so.5 \
   /usr/lib64/libXau.so.6 \
   /usr/lib64/libselinux.so.1 \
@@ -128,21 +130,25 @@ CMakeFiles/NST.dir/main.cpp.o:
 
 CMakeFiles/NST.dir/mainwindow.cpp.o:
 
+CMakeFiles/NST.dir/menubar.cpp.o:
+
+CMakeFiles/NST.dir/loadprojectdialog.cpp.o:
+
+CMakeFiles/NST.dir/searchdialog.cpp.o:
+
+CMakeFiles/NST.dir/settingsdialog.cpp.o:
+
 CMakeFiles/NST.dir/searchcontroller.cpp.o:
 
 CMakeFiles/NST.dir/shortcutcontroller.cpp.o:
 
-CMakeFiles/NST.dir/searchdialog.cpp.o:
-
 CMakeFiles/NST.dir/bgadatamanager.cpp.o:
-
-CMakeFiles/NST.dir/loadprojectdialog.cpp.o:
 
 CMakeFiles/NST.dir/translationservicemanager.cpp.o:
 
 CMakeFiles/NST.dir/translationcontextmenu.cpp.o:
 
-CMakeFiles/NST.dir/settingsdialog.cpp.o:
+CMakeFiles/NST.dir/updatecontroller.cpp.o:
 
 /usr/lib64/libQt6Widgets.so.6.9.2:
 
@@ -157,6 +163,8 @@ QtLingo/libQtLingo.so:
 /usr/lib64/libGLX.so:
 
 /usr/lib64/libOpenGL.so:
+
+/usr/lib64/libQt6Network.so.6.9.2:
 
 /usr/lib64/libQt6Core.so.6.9.2:
 
@@ -212,8 +220,6 @@ QtLingo/libQtLingo.so:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o:
 
-/usr/lib64/libQt6Network.so.6:
-
 /usr/lib64/libEGL.so.1:
 
 /usr/lib64/libfontconfig.so.1:
@@ -238,23 +244,7 @@ QtLingo/libQtLingo.so:
 
 /usr/lib64/libGLdispatch.so.0:
 
-/usr/lib64/libicui18n.so.77:
-
-/usr/lib64/libicuuc.so.77:
-
 /usr/lib64/libzstd.so.1:
-
-/usr/lib64/libsystemd.so.0:
-
-/usr/lib64/libdouble-conversion.so.3:
-
-/usr/lib64/libb2.so.1:
-
-/usr/lib64/libpcre2-16.so.0:
-
-/usr/lib64/libcrypto.so.3:
-
-/lib64/ld-linux-x86-64.so.2:
 
 /usr/lib64/libgssapi_krb5.so.2:
 
@@ -270,6 +260,22 @@ QtLingo/libQtLingo.so:
 
 /usr/lib64/libproxy.so.1:
 
+/usr/lib64/libcrypto.so.3:
+
+/usr/lib64/libicui18n.so.77:
+
+/usr/lib64/libicuuc.so.77:
+
+/usr/lib64/libsystemd.so.0:
+
+/usr/lib64/libdouble-conversion.so.3:
+
+/usr/lib64/libb2.so.1:
+
+/usr/lib64/libpcre2-16.so.0:
+
+/lib64/ld-linux-x86-64.so.2:
+
 /usr/lib64/libxml2.so.2:
 
 /usr/lib64/libxcb.so.1:
@@ -281,12 +287,6 @@ QtLingo/libQtLingo.so:
 /usr/lib64/libgraphite2.so.3:
 
 /usr/lib64/libbz2.so.1:
-
-/usr/lib64/libicudata.so.77:
-
-/usr/lib64/libcap.so.2:
-
-/usr/lib64/libgomp.so.1:
 
 /usr/lib64/libkrb5.so.3:
 
@@ -305,6 +305,12 @@ QtLingo/libQtLingo.so:
 /usr/lib64/libproxy/libpxbackend-1.0.so:
 
 /usr/lib64/libgobject-2.0.so.0:
+
+/usr/lib64/libicudata.so.77:
+
+/usr/lib64/libcap.so.2:
+
+/usr/lib64/libgomp.so.1:
 
 /usr/lib64/liblzma.so.5:
 

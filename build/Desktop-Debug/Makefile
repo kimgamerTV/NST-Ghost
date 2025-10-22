@@ -65,6 +65,26 @@ CMAKE_BINARY_DIR = /home/jop/work/NST/NST/build/Desktop-Debug
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool..."
+	/usr/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+.PHONY : package/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
+	/usr/bin/cpack --config ./CPackSourceConfig.cmake /home/jop/work/NST/NST/build/Desktop-Debug/CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+.PHONY : package_source/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
@@ -477,6 +497,30 @@ mainwindow.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/mainwindow.cpp.s
 .PHONY : mainwindow.cpp.s
 
+menubar.o: menubar.cpp.o
+.PHONY : menubar.o
+
+# target to build an object file
+menubar.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/menubar.cpp.o
+.PHONY : menubar.cpp.o
+
+menubar.i: menubar.cpp.i
+.PHONY : menubar.i
+
+# target to preprocess a source file
+menubar.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/menubar.cpp.i
+.PHONY : menubar.cpp.i
+
+menubar.s: menubar.cpp.s
+.PHONY : menubar.s
+
+# target to generate assembly for a file
+menubar.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/menubar.cpp.s
+.PHONY : menubar.cpp.s
+
 searchcontroller.o: searchcontroller.cpp.o
 .PHONY : searchcontroller.o
 
@@ -621,6 +665,30 @@ translationservicemanager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/translationservicemanager.cpp.s
 .PHONY : translationservicemanager.cpp.s
 
+updatecontroller.o: updatecontroller.cpp.o
+.PHONY : updatecontroller.o
+
+# target to build an object file
+updatecontroller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/updatecontroller.cpp.o
+.PHONY : updatecontroller.cpp.o
+
+updatecontroller.i: updatecontroller.cpp.i
+.PHONY : updatecontroller.i
+
+# target to preprocess a source file
+updatecontroller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/updatecontroller.cpp.i
+.PHONY : updatecontroller.cpp.i
+
+updatecontroller.s: updatecontroller.cpp.s
+.PHONY : updatecontroller.s
+
+# target to generate assembly for a file
+updatecontroller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/updatecontroller.cpp.s
+.PHONY : updatecontroller.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -632,6 +700,8 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
+	@echo "... package"
+	@echo "... package_source"
 	@echo "... rebuild_cache"
 	@echo "... BGACoreTests_autogen"
 	@echo "... BGACoreTests_autogen_timestamp_deps"
@@ -663,6 +733,9 @@ help:
 	@echo "... mainwindow.o"
 	@echo "... mainwindow.i"
 	@echo "... mainwindow.s"
+	@echo "... menubar.o"
+	@echo "... menubar.i"
+	@echo "... menubar.s"
 	@echo "... searchcontroller.o"
 	@echo "... searchcontroller.i"
 	@echo "... searchcontroller.s"
@@ -681,6 +754,9 @@ help:
 	@echo "... translationservicemanager.o"
 	@echo "... translationservicemanager.i"
 	@echo "... translationservicemanager.s"
+	@echo "... updatecontroller.o"
+	@echo "... updatecontroller.i"
+	@echo "... updatecontroller.s"
 .PHONY : help
 
 

@@ -329,16 +329,18 @@ CMakeFiles/NST.dir/translationcontextmenu.cpp.o: \
  /home/jop/work/NST/NST/translationservicemanager.h \
  /usr/include/qt6/QtCore/QObject /usr/include/qt6/QtCore/qobject.h \
  /usr/include/qt6/QtCore/QStringList \
- /usr/include/qt6/QtCore/qstringlist.h /usr/include/qt6/QtCore/QMap \
- /usr/include/qt6/QtCore/qmap.h \
+ /usr/include/qt6/QtCore/qstringlist.h /usr/include/qt6/QtCore/QList \
+ /usr/include/qt6/QtCore/qlist.h /usr/include/qt6/QtCore/QPointer \
+ /usr/include/qt6/QtCore/qpointer.h \
  /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservice.h \
  /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/qstring.h \
  /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservicefactory.h \
  /usr/include/qt6/QtCore/QVariantMap \
  /usr/include/qt6/QtCore/qvariantmap.h /usr/include/qt6/QtCore/QMap \
- /usr/include/qt6/QtCore/QVariant /usr/include/qt6/QtCore/qvariant.h \
- /usr/include/qt6/QtCore/QString /usr/include/qt6/QtGui/QAction \
- /usr/include/qt6/QtGui/qaction.h /usr/include/qt6/QtWidgets/QMessageBox \
+ /usr/include/qt6/QtCore/qmap.h /usr/include/qt6/QtCore/QVariant \
+ /usr/include/qt6/QtCore/qvariant.h /usr/include/qt6/QtCore/QString \
+ /usr/include/qt6/QtGui/QAction /usr/include/qt6/QtGui/qaction.h \
+ /usr/include/qt6/QtWidgets/QMessageBox \
  /usr/include/qt6/QtWidgets/qmessagebox.h \
  /usr/include/qt6/QtWidgets/qdialog.h \
  /usr/include/qt6/QtWidgets/qdialogbuttonbox.h

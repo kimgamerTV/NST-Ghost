@@ -16,11 +16,14 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QStandardPaths> // New include
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/mainwindow_log.txt";
+    QFile logFile(logFilePath);
     ui->setupUi(this);
     resize(1024, 768); // Set a reasonable default size
 
@@ -75,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_searchDialog = new SearchDialog(this);
     connect(m_searchDialog, &SearchDialog::searchRequested, this, &MainWindow::onSearchRequested);
     connect(m_searchDialog, &SearchDialog::resultSelected, this, &MainWindow::onSearchResultSelected);
+    connect(m_searchDialog->lineEdit(), &QLineEdit::textChanged, m_searchController, &SearchController::onSearchQueryChanged);
 
     // Setup shortcut controller
     m_shortcutController = new ShortcutController(this);
@@ -92,20 +96,25 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, this, &MainWindow::onTranslationFinished);
     connect(m_translationServiceManager, &TranslationServiceManager::errorOccurred, this, &MainWindow::onTranslationServiceError);
 
-    // Connect menu actions
-    connect(ui->actionOpen_Mock_Data, &QAction::triggered, this, &MainWindow::onOpenMockData);
-    connect(ui->actionLoad_from_Game_Project, &QAction::triggered, this, &MainWindow::onLoadFromGameProject);
-    connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::onSettingsActionTriggered);
-    connect(ui->action_Exit, &QAction::triggered, this, &QMainWindow::close);
+    m_menuBar = new MenuBar(this);
+    setMenuBar(m_menuBar);
+
+    connect(m_menuBar, &MenuBar::openMockData, this, &MainWindow::onOpenMockData);
+    connect(m_menuBar, &MenuBar::loadFromGameProject, this, &MainWindow::onLoadFromGameProject);
+    connect(m_menuBar, &MenuBar::settings, this, &MainWindow::onSettingsActionTriggered);
+    connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveGameProject); // Connect save action
+    connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
 
     // Enable custom context menu for translation table view
     ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->translationTableView, &QTableView::customContextMenuRequested, this, &MainWindow::onTranslationTableViewCustomContextMenuRequested);
 
+    // Connect dataChanged signal to update m_loadedGameProjectData
+    connect(m_translationModel, &QStandardItemModel::dataChanged, this, &MainWindow::onTranslationDataChanged);
+
     loadSettings();
 
-    // Populate file list with mock data initially
-    onOpenMockData();
+
 
     m_updateController = new UpdateController(this);
     m_updateController->checkForUpdates();
@@ -132,30 +141,35 @@ void MainWindow::on_fileListView_clicked(const QModelIndex &index)
         }
     }
 
+    m_currentLoadedFilePath = fullFilePath; // Store the currently loaded full file path
+
     if (m_loadedGameProjectData.contains(fullFilePath)) {
         QJsonArray textsArray = m_loadedGameProjectData.value(fullFilePath);
         for (const QJsonValue &value : textsArray) {
             if (value.isObject()) {
                 QJsonObject textObject = value.toObject();
-                QString text = textObject["text"].toString();
+                QString sourceText = textObject["source"].toString(); // Original source text
+                QString translatedText = textObject["text"].toString(); // Potentially translated text
 
-                if (!text.isEmpty()) {
+                if (!sourceText.isEmpty()) {
                     QList<QStandardItem *> rowItems;
 
                     // สร้าง Source Text Item
-                    QStandardItem *sourceItem = new QStandardItem(text);
+                    QStandardItem *sourceItem = new QStandardItem(sourceText);
                     sourceItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
                     sourceItem->setFlags(sourceItem->flags() & ~Qt::ItemIsEditable); // ไม่ให้แก้ไข Source
+                    sourceItem->setData(textObject["key"].toString(), Qt::UserRole + 1); // Store the key
 
                     // เพิ่ม padding ด้วย margin (ใช้ data role สำหรับ custom delegate ถ้ามี)
                     QFont font = sourceItem->font();
                     sourceItem->setFont(font);
 
                     // สร้าง Translation Item
-                    QStandardItem *translationItem = new QStandardItem("");
+                    QStandardItem *translationItem = new QStandardItem(translatedText); // Display existing translation
                     translationItem->setTextAlignment(Qt::AlignLeft | Qt::AlignTop);
                     translationItem->setFlags(translationItem->flags() | Qt::ItemIsEditable); // ให้แก้ไขได้
                     translationItem->setFont(font);
+                    translationItem->setData(textObject["key"].toString(), Qt::UserRole + 1); // Store the key
 
                     rowItems << sourceItem << translationItem;
                     m_translationModel->appendRow(rowItems);
@@ -180,6 +194,7 @@ void MainWindow::on_fileListView_clicked(const QModelIndex &index)
 
 void MainWindow::openSearchDialog()
 {
+    m_searchDialog->lineEdit()->clear();
     m_searchDialog->show();
     m_searchDialog->raise();
     m_searchDialog->activateWindow();
@@ -192,6 +207,7 @@ void MainWindow::onSearchResultSelected(const QString &fileName, int row)
     if (!indexes.isEmpty()) {
         ui->fileListView->setCurrentIndex(indexes.first());
         on_fileListView_clicked(indexes.first()); // Load the file data
+        m_currentLoadedFilePath = fileName; // Store the currently loaded file path
 
         // Scroll to the selected row in the translation table view
         ui->translationTableView->scrollTo(m_translationModel->index(row, 0));
@@ -235,9 +251,17 @@ void MainWindow::onOpenMockData()
 
 void MainWindow::onLoadFromGameProject()
 {
+    QFile logFile("mainwindow_log.txt");
+    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream logStream(&logFile);
+
+    logStream << "MainWindow: onLoadFromGameProject started." << "\n";
+
     QStringList availableAnalyzers = m_bgaDataManager->getAvailableAnalyzers();
     if (availableAnalyzers.isEmpty()) {
         QMessageBox::warning(this, "Error", "No game engine analyzers available. Please ensure BGACore is correctly built and linked.");
+        logStream << "MainWindow: No game engine analyzers available." << "\n";
+        logFile.close();
         return;
     }
 
@@ -246,21 +270,30 @@ void MainWindow::onLoadFromGameProject()
         QString engineName = dialog.selectedEngine();
         QString projectPath = dialog.projectPath();
 
+        m_currentEngineName = engineName; // Store engine name
+        m_currentProjectPath = projectPath; // Store project path
+
         if (projectPath.isEmpty()) {
             QMessageBox::warning(this, "Error", "Project path cannot be empty.");
+            logStream << "MainWindow: Project path cannot be empty." << "\n";
+            logFile.close();
             return;
         }
 
+        logStream << "MainWindow: Calling loadStringsFromGameProject for engine: " << engineName << " and path: " << projectPath << "\n";
         QJsonArray extractedTextsArray = m_bgaDataManager->loadStringsFromGameProject(engineName, projectPath);
+        logStream << "MainWindow: loadStringsFromGameProject returned. Array size: " << extractedTextsArray.size() << "\n";
 
         if (!extractedTextsArray.isEmpty()) {
+            logStream << "MainWindow: Extracted texts array size:" << extractedTextsArray.size() << "\n"; // Debug statement
             m_loadedGameProjectData.clear(); // Clear previous data
             QStringList fileNamesForDisplay;
 
             for (const QJsonValue &value : extractedTextsArray) {
+                logStream << "MainWindow: Processing QJsonValue..." << "\n"; // Debug statement
                 if (value.isObject()) {
                     QJsonObject textObject = value.toObject();
-                    QString filePath = textObject["file"].toString();
+                    QString filePath = textObject["path"].toString(); // Use "path" instead of "file"
                     if (!filePath.isEmpty()) {
                         // Store texts grouped by full file path
                         m_loadedGameProjectData[filePath].append(value);
@@ -270,17 +303,23 @@ void MainWindow::onLoadFromGameProject()
                     }
                 }
             }
+            logStream << "MainWindow: Finished processing extracted texts. Number of files: " << fileNamesForDisplay.size() << "\n";
             m_fileListModel->setStringList(fileNamesForDisplay);
 
             if (m_fileListModel->rowCount() > 0) {
                 ui->fileListView->setCurrentIndex(m_fileListModel->index(0, 0));
                 on_fileListView_clicked(m_fileListModel->index(0, 0));
+                m_currentLoadedFilePath = m_fileListModel->data(m_fileListModel->index(0, 0)).toString();
             }
+            logStream << "MainWindow: Finished updating UI." << "\n";
 
         } else {
             QMessageBox::information(this, "Info", "No translatable strings found or extracted.");
+            logStream << "MainWindow: No translatable strings found or extracted." << "\n";
         }
     }
+    logStream << "MainWindow: onLoadFromGameProject finished." << "\n";
+    logFile.close();
 }
 
 void MainWindow::onBGADataError(const QString &message)
@@ -319,9 +358,27 @@ void MainWindow::onTranslateSelectedTextWithService(const QString &serviceName, 
 void MainWindow::onTranslationFinished(const qtlingo::TranslationResult &result)
 {
     // Find all matching entries and update them
-    QList<QModelIndex> indexes = m_pendingTranslations.values(result.sourceText);
+        QList<QModelIndex> indexes = m_pendingTranslations.values(result.sourceText);
     for (const QModelIndex &index : indexes) {
         m_translationModel->setData(index, result.translatedText);
+
+        QString sourceText = m_translationModel->data(m_translationModel->index(index.row(), 0), Qt::DisplayRole).toString();
+        QString key = m_translationModel->data(m_translationModel->index(index.row(), 0), Qt::UserRole + 1).toString();
+
+        // Update m_loadedGameProjectData
+        if (m_loadedGameProjectData.contains(m_currentLoadedFilePath)) {
+            QJsonArray textsArray = m_loadedGameProjectData.value(m_currentLoadedFilePath);
+            for (int i = 0; i < textsArray.size(); ++i) {
+                QJsonObject textObject = textsArray.at(i).toObject();
+                if (textObject["source"].toString() == sourceText && textObject["key"].toString() == key) {
+                    textObject["text"] = result.translatedText;
+                    textsArray.replace(i, textObject);
+                    break;
+                }
+            }
+            m_loadedGameProjectData.insert(m_currentLoadedFilePath, textsArray);
+        }
+
     }
     m_pendingTranslations.remove(result.sourceText);
 
@@ -344,6 +401,7 @@ void MainWindow::onTranslationTableViewCustomContextMenuRequested(const QPoint &
     TranslationContextMenu contextMenu(m_translationServiceManager, index, ui->translationTableView->selectionModel(), this);
     connect(&contextMenu, &TranslationContextMenu::translateRequested, this, &MainWindow::onTranslateSelectedTextWithService);
     connect(&contextMenu, &TranslationContextMenu::translateAllSelected, this, &MainWindow::onTranslateAllSelectedText);
+    connect(&contextMenu, &TranslationContextMenu::undoTranslationRequested, this, &MainWindow::onUndoTranslation);
 
     contextMenu.exec(ui->translationTableView->viewport()->mapToGlobal(pos));
 }
@@ -448,4 +506,53 @@ void MainWindow::saveSettings()
     settings.setValue("llmProvider", m_llmProvider);
     settings.setValue("llmApiKey", m_llmApiKey);
     settings.setValue("llmModel", m_llmModel);
+}
+
+void MainWindow::onUndoTranslation()
+{
+    QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedRows();
+
+    for (const QModelIndex &selectedIndex : selectedIndexes) {
+        QModelIndex sourceIndex = m_translationModel->index(selectedIndex.row(), 0);
+        QString sourceText = m_translationModel->data(sourceIndex, Qt::DisplayRole).toString();
+
+        QModelIndex translationIndex = m_translationModel->index(selectedIndex.row(), 1);
+        m_translationModel->setData(translationIndex, ""); // Set to empty string instead of sourceText
+    }
+}
+
+void MainWindow::onSaveGameProject()
+{
+    if (m_loadedGameProjectData.isEmpty()) {
+        QMessageBox::information(this, "Save Project", "No project data to save.");
+        return;
+    }
+
+    if (m_bgaDataManager->saveStringsToGameProject(m_currentEngineName, m_currentProjectPath, m_loadedGameProjectData)) {
+        QMessageBox::information(this, "Save Project", "Project saved successfully.");
+    } else {
+        QMessageBox::critical(this, "Save Project", "Failed to save project.");
+    }
+}
+
+void MainWindow::onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    if (topLeft.column() == 1) { // Only interested in changes in the translation column
+        QString newTranslation = m_translationModel->data(topLeft, Qt::DisplayRole).toString();
+        QString sourceText = m_translationModel->data(m_translationModel->index(topLeft.row(), 0), Qt::DisplayRole).toString();
+        QString key = m_translationModel->data(m_translationModel->index(topLeft.row(), 0), Qt::UserRole + 1).toString();
+
+        if (m_loadedGameProjectData.contains(m_currentLoadedFilePath)) {
+            QJsonArray textsArray = m_loadedGameProjectData.value(m_currentLoadedFilePath);
+            for (int i = 0; i < textsArray.size(); ++i) {
+                QJsonObject textObject = textsArray.at(i).toObject();
+                if (textObject["source"].toString() == sourceText && textObject["key"].toString() == key) {
+                    textObject["text"] = newTranslation;
+                    textsArray.replace(i, textObject);
+                    break;
+                }
+            }
+            m_loadedGameProjectData.insert(m_currentLoadedFilePath, textsArray);
+        }
+    }
 }

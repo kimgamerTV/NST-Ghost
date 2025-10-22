@@ -16,17 +16,22 @@ public:
 
     void setApiKey(const QString &apiKey) override;
     void setTargetLanguage(const QString &language) override;
+    void setSourceLanguage(const QString &language);
     void setGoogleTranslateMode(bool isApi) override;
 
 private slots:
     void onNetworkReply(QNetworkReply *reply);
 
 private:
+    void translateWithApi(const QString &sourceText);
+    void translateWithFreeApi(const QString &sourceText);
+    QString extractTranslationFromHtml(const QString &html);
+
     QNetworkAccessManager *m_networkManager;
     QString m_apiKey;
     QString m_targetLanguage;
+    QString m_sourceLanguage = "auto"; // Default to auto-detect
     bool m_isApi = false;
-    // Store the source text for the current translation request
     QString m_currentSourceText;
 };
 

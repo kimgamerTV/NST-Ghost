@@ -8,6 +8,7 @@
 #include <QPair>
 #include <QLabel>
 #include <QPropertyAnimation>
+#include <QTimer>
 
 class SearchDialog : public QDialog
 {
@@ -16,26 +17,24 @@ class SearchDialog : public QDialog
 public:
     explicit SearchDialog(QWidget *parent = nullptr);
     void displaySearchResults(const QList<QPair<QString, QPair<int, QString>>> &results, const QString &query);
+    QLineEdit *lineEdit() const { return m_lineEdit; }
 
 signals:
     void searchRequested(const QString &query);
     void resultSelected(const QString &fileName, int row);
 
 private slots:
-    void onSearchQueryChanged(const QString &query);
     void onResultSelected(QTreeWidgetItem *item, int intColumn);
-    void onReturnPressed();
 
 protected:
-    void showEvent(QShowEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
-    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     QLineEdit *m_lineEdit;
     QTreeWidget *m_resultsTreeWidget;
     QLabel *m_placeholderLabel;
     QPropertyAnimation *m_animation;
+    QTimer *m_searchTimer;
 };
 
 #endif // SEARCHDIALOG_H

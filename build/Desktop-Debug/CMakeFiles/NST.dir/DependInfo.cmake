@@ -14,12 +14,14 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/jop/work/NST/NST/loadprojectdialog.cpp" "CMakeFiles/NST.dir/loadprojectdialog.cpp.o" "gcc" "CMakeFiles/NST.dir/loadprojectdialog.cpp.o.d"
   "/home/jop/work/NST/NST/main.cpp" "CMakeFiles/NST.dir/main.cpp.o" "gcc" "CMakeFiles/NST.dir/main.cpp.o.d"
   "/home/jop/work/NST/NST/mainwindow.cpp" "CMakeFiles/NST.dir/mainwindow.cpp.o" "gcc" "CMakeFiles/NST.dir/mainwindow.cpp.o.d"
+  "/home/jop/work/NST/NST/menubar.cpp" "CMakeFiles/NST.dir/menubar.cpp.o" "gcc" "CMakeFiles/NST.dir/menubar.cpp.o.d"
   "/home/jop/work/NST/NST/searchcontroller.cpp" "CMakeFiles/NST.dir/searchcontroller.cpp.o" "gcc" "CMakeFiles/NST.dir/searchcontroller.cpp.o.d"
   "/home/jop/work/NST/NST/searchdialog.cpp" "CMakeFiles/NST.dir/searchdialog.cpp.o" "gcc" "CMakeFiles/NST.dir/searchdialog.cpp.o.d"
   "/home/jop/work/NST/NST/settingsdialog.cpp" "CMakeFiles/NST.dir/settingsdialog.cpp.o" "gcc" "CMakeFiles/NST.dir/settingsdialog.cpp.o.d"
   "/home/jop/work/NST/NST/shortcutcontroller.cpp" "CMakeFiles/NST.dir/shortcutcontroller.cpp.o" "gcc" "CMakeFiles/NST.dir/shortcutcontroller.cpp.o.d"
   "/home/jop/work/NST/NST/translationcontextmenu.cpp" "CMakeFiles/NST.dir/translationcontextmenu.cpp.o" "gcc" "CMakeFiles/NST.dir/translationcontextmenu.cpp.o.d"
   "/home/jop/work/NST/NST/translationservicemanager.cpp" "CMakeFiles/NST.dir/translationservicemanager.cpp.o" "gcc" "CMakeFiles/NST.dir/translationservicemanager.cpp.o.d"
+  "/home/jop/work/NST/NST/updatecontroller.cpp" "CMakeFiles/NST.dir/updatecontroller.cpp.o" "gcc" "CMakeFiles/NST.dir/updatecontroller.cpp.o.d"
   "" "NST" "gcc" "CMakeFiles/NST.dir/link.d"
   )
 

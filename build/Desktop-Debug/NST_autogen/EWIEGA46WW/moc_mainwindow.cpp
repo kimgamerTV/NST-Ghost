@@ -8,6 +8,7 @@
 
 #include "../../../../mainwindow.h"
 #include <QtGui/qtextcursor.h>
+#include <QtNetwork/QSslError>
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>
@@ -65,54 +66,67 @@ template <> constexpr inline auto MainWindow::qt_create_metaobjectdata<qt_meta_t
         "pos",
         "onTranslateAllSelectedText",
         "onSelectAllRequested",
-        "onSettingsActionTriggered"
+        "onSettingsActionTriggered",
+        "onUndoTranslation",
+        "onSaveGameProject",
+        "onTranslationDataChanged",
+        "topLeft",
+        "bottomRight"
     };
 
     QtMocHelpers::UintData qt_methods {
         // Slot 'on_fileListView_clicked'
-        QtMocHelpers::SlotData<void(const QModelIndex &)>(1, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QModelIndex &)>(1, 2, QMC::AccessPublic, QMetaType::Void, {{
             { 0x80000000 | 3, 4 },
         }}),
         // Slot 'openSearchDialog'
-        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'onSearchResultSelected'
-        QtMocHelpers::SlotData<void(const QString &, int)>(6, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QString &, int)>(6, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 7 }, { QMetaType::Int, 8 },
         }}),
         // Slot 'onLoadFromGameProject'
-        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'onOpenMockData'
-        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(10, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'onBGADataError'
-        QtMocHelpers::SlotData<void(const QString &)>(11, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QString &)>(11, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 12 },
         }}),
         // Slot 'onSearchRequested'
-        QtMocHelpers::SlotData<void(const QString &)>(13, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QString &)>(13, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 14 },
         }}),
         // Slot 'onTranslateSelectedTextWithService'
-        QtMocHelpers::SlotData<void(const QString &, const QString &)>(15, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QString &, const QString &)>(15, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 16 }, { QMetaType::QString, 17 },
         }}),
         // Slot 'onTranslationFinished'
-        QtMocHelpers::SlotData<void(const qtlingo::TranslationResult &)>(18, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const qtlingo::TranslationResult &)>(18, 2, QMC::AccessPublic, QMetaType::Void, {{
             { 0x80000000 | 19, 20 },
         }}),
         // Slot 'onTranslationServiceError'
-        QtMocHelpers::SlotData<void(const QString &)>(21, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QString &)>(21, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QString, 12 },
         }}),
         // Slot 'onTranslationTableViewCustomContextMenuRequested'
-        QtMocHelpers::SlotData<void(const QPoint &)>(22, 2, QMC::AccessPrivate, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(const QPoint &)>(22, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::QPoint, 23 },
         }}),
         // Slot 'onTranslateAllSelectedText'
-        QtMocHelpers::SlotData<void()>(24, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(24, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'onSelectAllRequested'
-        QtMocHelpers::SlotData<void()>(25, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(25, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'onSettingsActionTriggered'
-        QtMocHelpers::SlotData<void()>(26, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(26, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'onUndoTranslation'
+        QtMocHelpers::SlotData<void()>(27, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'onSaveGameProject'
+        QtMocHelpers::SlotData<void()>(28, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'onTranslationDataChanged'
+        QtMocHelpers::SlotData<void(const QModelIndex &, const QModelIndex &)>(29, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { 0x80000000 | 3, 30 }, { 0x80000000 | 3, 31 },
+        }}),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -150,6 +164,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 11: _t->onTranslateAllSelectedText(); break;
         case 12: _t->onSelectAllRequested(); break;
         case 13: _t->onSettingsActionTriggered(); break;
+        case 14: _t->onUndoTranslation(); break;
+        case 15: _t->onSaveGameProject(); break;
+        case 16: _t->onTranslationDataChanged((*reinterpret_cast< std::add_pointer_t<QModelIndex>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<QModelIndex>>(_a[2]))); break;
         default: ;
         }
     }
@@ -174,14 +191,14 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 14)
+        if (_id < 17)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 14;
+        _id -= 17;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 14)
+        if (_id < 17)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 14;
+        _id -= 17;
     }
     return _id;
 }

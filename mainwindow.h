@@ -19,6 +19,8 @@
 #include "updatecontroller.h"
 #include <qtlingo/translationservice.h>
 
+#include "menubar.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -33,11 +35,13 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
+public slots:
     void on_fileListView_clicked(const QModelIndex &index);
     void openSearchDialog();
     void onSearchResultSelected(const QString &fileName, int row);
     void onLoadFromGameProject();
+
+
     void onOpenMockData();
     void onBGADataError(const QString &message);
     void onSearchRequested(const QString &query);
@@ -48,6 +52,9 @@ private slots:
     void onTranslateAllSelectedText();
     void onSelectAllRequested();
     void onSettingsActionTriggered();
+    void onUndoTranslation();
+    void onSaveGameProject(); // New slot for saving game project // New slot for undoing translation
+    void onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private:
     void loadSettings();
@@ -55,6 +62,7 @@ private:
 
 private:
     Ui::MainWindow *ui;
+    MenuBar *m_menuBar;
     QStringListModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
     SearchController *m_searchController;
@@ -69,6 +77,9 @@ private:
     QString m_apiKey;
     QString m_targetLanguage;
     QString m_targetLanguageName;
+    QString m_currentEngineName; // New member to store the current engine name
+    QString m_currentProjectPath; // New member to store the current project path
+    QString m_currentLoadedFilePath; // New member to store the currently loaded file path
 
     // Google Translate settings
     bool m_googleApi;
@@ -76,6 +87,7 @@ private:
     // LLM settings
     QString m_llmProvider;
     QString m_llmApiKey;
-    QString m_llmModel;
-};
-#endif // MAINWINDOW_H
+            QString m_llmModel;
+        
+        };
+        #endif // MAINWINDOW_H

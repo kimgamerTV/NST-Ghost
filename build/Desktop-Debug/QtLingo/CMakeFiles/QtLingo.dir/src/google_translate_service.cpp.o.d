@@ -355,4 +355,6 @@ QtLingo/CMakeFiles/QtLingo.dir/src/google_translate_service.cpp.o: \
  /usr/include/qt6/QtCore/qregularexpression.h \
  /usr/include/qt6/QtCore/quuid.h /usr/include/qt6/QtCore/qendian.h \
  /usr/include/qt6/QtCore/qjsondocument.h \
- /usr/include/qt6/QtCore/QJsonArray /usr/include/qt6/QtCore/qjsonarray.h
+ /usr/include/qt6/QtCore/QJsonArray /usr/include/qt6/QtCore/qjsonarray.h \
+ /usr/include/qt6/QtCore/QRegularExpression \
+ /usr/include/qt6/QtCore/qregularexpression.h

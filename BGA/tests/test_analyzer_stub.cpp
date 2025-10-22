@@ -11,6 +11,12 @@ public:
         output.payload = inputPath.toUtf8();
         return output;
     }
+
+    bool save(const QString &outputPath, const QJsonArray &texts) override
+    {
+        Q_UNUSED(outputPath); Q_UNUSED(texts); // Suppress unused parameter warnings
+        return true; // Dummy implementation
+    }
 };
 
 class AnalyzerInterfaceTests : public QObject {

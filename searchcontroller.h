@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QStringListModel>
 #include <QPair>
+#include <QtConcurrent/QtConcurrent>
 
 class SearchController : public QObject
 {
@@ -20,7 +21,6 @@ public:
     void setFileListModel(QStringListModel *model);
 
     QList<QPair<QString, QPair<int, QString>>> searchAllFiles(const QString &query) const;
-    QList<QPair<QString, QPair<int, QString>>> searchCurrentTable(const QString &query) const;
 
 public slots:
     void onSearchQueryChanged(const QString &query);
