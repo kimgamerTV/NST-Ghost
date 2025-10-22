@@ -42,7 +42,6 @@ jobs:
           version: '6.4.0'
           arch: ${{ matrix.qt_arch }}
           cache: true
-          timeout: 600
         
       - name: Configure CMake
         run: |
