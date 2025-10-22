@@ -74,17 +74,33 @@ jobs:
         shell: bash
         run: |
           cd build
+          # Support different OS-produced package types
+          candidates=()
           if [ "${{ runner.os }}" = "Windows" ]; then
-            file=$(ls *.zip 2>/dev/null | head -n 1)
+            candidates=( *.zip *.exe *.msi )
           elif [ "${{ runner.os }}" = "macOS" ]; then
-            file=$(ls *.dmg 2>/dev/null | head -n 1)
+            candidates=( *.dmg *.pkg *.zip )
           else
-            file=$(ls *.zip 2>/dev/null | head -n 1)
+            candidates=( *.zip *.tar.gz *.AppImage )
           fi
+          file=""
+          for pat in "${candidates[@]}"; do
+            f=$(ls $pat 2>/dev/null | head -n 1 || true)
+            if [ -n "$f" ]; then
+              file="$f"
+              break
+            fi
+          done
+          # export (may be empty)
           echo "package_file=$file" >> $GITHUB_OUTPUT
-          echo "Found package: $file"
+          if [ -n "$file" ]; then
+            echo "Found package: $file"
+          else
+            echo "No package found in build/"
+          fi
       
       - name: Upload asset
+        if: steps.find_files.outputs.package_file != ''
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
@@ -124,11 +140,61 @@ jobs:
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
       
-      - name: Create release and upload assets
+      - name: Ensure tools for release upload (jq, file)
         run: |
-          gh release create ${{ steps.version.outputs.tag }} \
-            --title "Release ${{ steps.version.outputs.tag }}" \
-            --notes "Release ${{ steps.version.outputs.tag }}" \
-            artifacts/*/* 
+          sudo apt-get update
+          sudo apt-get install -y jq file
+
+      - name: Create or update release and upload assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/${REPO}"
+          echo "Preparing release for tag: $TAG (repo: $REPO)"
+          # Try to get existing release by tag
+          resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
+          release_id=$(echo "$resp" | jq -r '.id // empty')
+          upload_url=$(echo "$resp" | jq -r '.upload_url // empty')
+          if [ -z "$release_id" ]; then
+            echo "Release with tag ${TAG} not found, creating..."
+            create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" -d "$(jq -n --arg t "$TAG" --arg n "Release $TAG" --arg b "Release $TAG" '{ tag_name: $t, name: $n, body: $b }')" "${API}/releases")
+            release_id=$(echo "$create_resp" | jq -r '.id')
+            upload_url=$(echo "$create_resp" | jq -r '.upload_url')
+            if [ -z "$release_id" ]; then
+              echo "Failed to create release. Response:"
+              echo "$create_resp"
+              exit 1
+            fi
+            echo "Created release id=$release_id"
+          else
+            echo "Found existing release id=$release_id"
+          fi
+
+          if [ -z "$upload_url" ]; then
+            echo "No upload_url found for release id=$release_id"
+            exit 1
+          fi
+
+          # Upload all downloaded artifacts (artifacts/*/*)
+          shopt -s nullglob
+          files=(artifacts/*/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No artifacts found in artifacts/*/* — nothing to upload."
+            exit 0
+          fi
+
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "Skipping non-file $f"
+              continue
+            fi
+            name=$(basename "$f")
+            mime=$(file --brief --mime-type "$f" || echo "application/octet-stream")
+            echo "Uploading $f as $name (Content-Type: $mime)"
+            # Upload via uploads.github.com endpoint
+            upload_endpoint="https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$(echo "$name" | jq -sRr @uri)"
+            curl -s -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: ${mime}" --data-binary @"$f" "$upload_endpoint" | jq -r '.url // "uploaded"'
+          done
