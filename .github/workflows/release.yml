@@ -5,10 +5,18 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.1.2)'
+        required: true
+        type: string
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
@@ -21,52 +29,237 @@ jobs:
           - os: windows-latest
             asset_name: nst-windows
             package_generator: ZIP
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+      
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev
+      
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt@6
+          echo "Qt6_DIR=$(brew --prefix qt@6)/lib/cmake/Qt6" >> $GITHUB_ENV
+          echo "$(brew --prefix qt@6)/bin" >> $GITHUB_PATH
+      
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        uses: jurplel/install-qt-action@v4
         with:
           version: '6.4.0'
-      - name: Build
+          arch: win64_msvc2019_64
+          cache: true
+      
+      - name: Configure CMake (Linux / macOS)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
-          mkdir build
+          mkdir -p build
           cd build
-          cmake ..
-          cmake --build .
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+      
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          if (!(Test-Path -Path 'build')) {
+            New-Item -ItemType Directory -Path 'build' | Out-Null
+          }
+          Set-Location -Path build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+
+      - name: Build BGACore (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Building BGACore first to ensure library is created..."
+          cmake --build build --config Release --target BGACore --parallel || {
+            Write-Host "BGACore build FAILED — printing build/core tree and logs for diagnostics..."
+            if (Test-Path build\BGA\core\Release) { Get-ChildItem -Force build\BGA\core\Release | Format-Table } else { Write-Host "build\\BGA\\core\\Release not found" }
+            if (Test-Path build\core\Release) { Get-ChildItem -Force build\core\Release | Format-Table } else { Write-Host "build\\core\\Release not found" }
+            Write-Host "Printing full build tree (first 500 lines)..."
+            Get-ChildItem -Recurse -Force build | Select-Object -First 500 | Format-Table
+            exit 1
+          }
+          Write-Host "BGACore build reported success — searching for BGACore.lib recursively..."
+          $found = Get-ChildItem -Path build -Recurse -Filter 'BGACore.lib' -ErrorAction SilentlyContinue
+          if ($found -and $found.Count -gt 0) {
+            Write-Host "Found BGACore.lib at:"
+            $found | ForEach-Object { Write-Host $_.FullName }
+          } else {
+            Write-Host "BGACore.lib not found by recursive search. Printing build tree for diagnostics..."
+            Get-ChildItem -Recurse -Force build | Format-Table
+            throw "BGACore.lib missing after BGACore build; see diagnostics above"
+          }
+
+      - name: Build ALL (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Building remaining targets..."
+          cmake --build build --config Release --target ALL_BUILD --parallel
+
+      - name: Build (Linux / macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cmake --build build --config Release --parallel
+      
+      - name: List build tree (Linux / macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          echo "=== build tree (top) ==="
+          ls -la build || true
+          echo "=== build/core content ==="
+          ls -la build/core || true
+          echo "=== build/core/Release content ==="
+          ls -la build/core/Release || true
+      
+      - name: List build tree (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "=== build tree (top) ==="
+          Get-ChildItem -Force build | Format-Table
+          Write-Host "=== build/BGA/core content ==="
+          if (Test-Path build\BGA\core\Release) { Get-ChildItem -Force build\BGA\core\Release | Format-Table } else { Write-Host "build\\BGA\\core\\Release not found" }
+      
       - name: Package
         run: |
           cd build
-          cpack -G ${{ matrix.package_generator }}
+          cpack -G ${{ matrix.package_generator }} -C Release
+      
+      - name: Find package files
+        id: find_files
+        shell: bash
+        run: |
+          cd build
+          # Support different OS-produced package types
+          candidates=()
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            candidates=( *.zip *.exe *.msi )
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            candidates=( *.dmg *.pkg *.zip )
+          else
+            candidates=( *.zip *.tar.gz *.AppImage )
+          fi
+          file=""
+          for pat in "${candidates[@]}"; do
+            f=$(ls $pat 2>/dev/null | head -n 1 || true)
+            if [ -n "$f" ]; then
+              file="$f"
+              break
+            fi
+          done
+          echo "package_file=$file" >> $GITHUB_OUTPUT
+          if [ -n "$file" ]; then
+            echo "Found package: $file"
+          else
+            echo "No package found in build/"
+          fi
+      
       - name: Upload asset
+        if: steps.find_files.outputs.package_file != ''
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: build/${{ matrix.asset_name }}.*
+          path: build/${{ steps.find_files.outputs.package_file }}
+          retention-days: 1
+
   release:
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Download assets
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+      
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install beautifulsoup4
+      
       - name: Generate manifest
         run: |
           python scripts/generate_manifest.py
-      - name: Create release and upload assets
+      
+      - name: Set version tag
+        id: version
         run: |
-          gh release create ${{ github.ref_name }} \
-            --title "Release ${{ github.ref_name }}" \
-            --notes "Release ${{ github.ref_name }}" \
-            artifacts/*/* 
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Ensure tools for release upload (jq, file)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq file
+
+      - name: Create or update release and upload assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/${REPO}"
+          echo "Preparing release for tag: $TAG (repo: $REPO)"
+          # Try to get existing release by tag
+          resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
+          release_id=$(echo "$resp" | jq -r '.id // empty')
+          upload_url=$(echo "$resp" | jq -r '.upload_url // empty')
+          if [ -z "$release_id" ]; then
+            echo "Release with tag ${TAG} not found, creating..."
+            create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" -d "$(jq -n --arg t "$TAG" --arg n "Release $TAG" --arg b "Release $TAG" '{ tag_name: $t, name: $n, body: $b }')" "${API}/releases")
+            release_id=$(echo "$create_resp" | jq -r '.id')
+            upload_url=$(echo "$create_resp" | jq -r '.upload_url')
+            if [ -z "$release_id" ]; then
+              echo "Failed to create release. Response:"
+              echo "$create_resp"
+              exit 1
+            fi
+            echo "Created release id=$release_id"
+          else
+            echo "Found existing release id=$release_id"
+          fi
+
+          if [ -z "$upload_url" ]; then
+            echo "No upload_url found for release id=$release_id"
+            exit 1
+          fi
+
+          # Upload all downloaded artifacts (artifacts/*/*)
+          shopt -s nullglob
+          files=(artifacts/*/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No artifacts found in artifacts/*/* — nothing to upload."
+            exit 0
+          fi
+
+          for f in "${files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "Skipping non-file $f"
+              continue
+            fi
+            name=$(basename "$f")
+            mime=$(file --brief --mime-type "$f" || echo "application/octet-stream")
+            echo "Uploading $f as $name (Content-Type: $mime)"
+            # Upload via uploads.github.com endpoint
+            upload_endpoint="https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$(echo "$name" | jq -sRr @uri)"
+            curl -s -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: ${mime}" --data-binary @"$f" "$upload_endpoint" | jq -r '.url // "uploaded"'
+          done
