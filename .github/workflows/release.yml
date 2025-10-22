@@ -16,33 +16,45 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
         include:
           - os: ubuntu-latest
             asset_name: nst-linux
             package_generator: ZIP
-            qt_arch: gcc_64
           - os: macos-latest
             asset_name: nst-macos
             package_generator: DragNDrop
-            qt_arch: clang_64
           - os: windows-latest
             asset_name: nst-windows
             package_generator: ZIP
-            qt_arch: win64_msvc2019_64
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install Qt
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev
+      
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install qt@6
+          echo "Qt6_DIR=$(brew --prefix qt@6)/lib/cmake/Qt6" >> $GITHUB_ENV
+          echo "$(brew --prefix qt@6)/bin" >> $GITHUB_PATH
+      
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
           version: '6.4.0'
-          arch: ${{ matrix.qt_arch }}
+          arch: win64_msvc2019_64
           cache: true
-        
+      
       - name: Configure CMake
         run: |
           mkdir build
@@ -63,13 +75,14 @@ jobs:
         run: |
           cd build
           if [ "${{ runner.os }}" = "Windows" ]; then
-            file=$(ls ${{ matrix.asset_name }}.zip 2>/dev/null || ls *.zip | head -n 1)
+            file=$(ls *.zip 2>/dev/null | head -n 1)
           elif [ "${{ runner.os }}" = "macOS" ]; then
-            file=$(ls ${{ matrix.asset_name }}.dmg 2>/dev/null || ls *.dmg | head -n 1)
+            file=$(ls *.dmg 2>/dev/null | head -n 1)
           else
-            file=$(ls ${{ matrix.asset_name }}.zip 2>/dev/null || ls *.zip | head -n 1)
+            file=$(ls *.zip 2>/dev/null | head -n 1)
           fi
           echo "package_file=$file" >> $GITHUB_OUTPUT
+          echo "Found package: $file"
       
       - name: Upload asset
         uses: actions/upload-artifact@v4
