@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - 'v*'
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -15,53 +16,87 @@ jobs:
           - os: ubuntu-latest
             asset_name: nst-linux
             package_generator: ZIP
+            qt_arch: gcc_64
           - os: macos-latest
             asset_name: nst-macos
             package_generator: DragNDrop
+            qt_arch: clang_64
           - os: windows-latest
             asset_name: nst-windows
             package_generator: ZIP
+            qt_arch: win64_msvc2019_64
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: '6.4.0'
-      - name: Build
+          arch: ${{ matrix.qt_arch }}
+          cache: true
+          timeout: 600
+        
+      - name: Configure CMake
         run: |
           mkdir build
           cd build
-          cmake ..
-          cmake --build .
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+      
+      - name: Build
+        run: cmake --build build --config Release
+      
       - name: Package
         run: |
           cd build
-          cpack -G ${{ matrix.package_generator }}
+          cpack -G ${{ matrix.package_generator }} -C Release
+      
+      - name: Find package files
+        id: find_files
+        shell: bash
+        run: |
+          cd build
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            file=$(ls ${{ matrix.asset_name }}.zip 2>/dev/null || ls *.zip | head -n 1)
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            file=$(ls ${{ matrix.asset_name }}.dmg 2>/dev/null || ls *.dmg | head -n 1)
+          else
+            file=$(ls ${{ matrix.asset_name }}.zip 2>/dev/null || ls *.zip | head -n 1)
+          fi
+          echo "package_file=$file" >> $GITHUB_OUTPUT
+      
       - name: Upload asset
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset_name }}
-          path: build/${{ matrix.asset_name }}.*
+          path: build/${{ steps.find_files.outputs.package_file }}
+          retention-days: 1
+
   release:
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Download assets
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+      
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install beautifulsoup4
+      
       - name: Generate manifest
         run: |
           python scripts/generate_manifest.py
+      
       - name: Create release and upload assets
         run: |
           gh release create ${{ github.ref_name }} \
