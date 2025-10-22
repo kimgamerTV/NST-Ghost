@@ -1,6 +1,0 @@
-BGAAnalyzerTemplate_autogen/timestamp: \
-	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/template/CMakeLists.txt \
-	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/template/main.cpp \
-	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/template/templateanalyzer.cpp \
-	/home/jop/work/chanomhub/NST_library/BGA/tools/analyzers/template/templateanalyzer.h \
-	/usr/bin/cmake

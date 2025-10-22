@@ -17,6 +17,12 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStandardPaths> // New include
+#include <QStyle>
+#include <QApplication>
+#include <QScreen>
+#include <QStyle>
+#include <QApplication>
+#include <QScreen>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -258,6 +264,8 @@ void MainWindow::onLoadFromGameProject()
     logStream << "MainWindow: onLoadFromGameProject started." << "\n";
 
     QStringList availableAnalyzers = m_bgaDataManager->getAvailableAnalyzers();
+    qDebug() << "MainWindow: Available analyzers size:" << availableAnalyzers.size();
+    qDebug() << "MainWindow: Available analyzers:" << availableAnalyzers;
     if (availableAnalyzers.isEmpty()) {
         QMessageBox::warning(this, "Error", "No game engine analyzers available. Please ensure BGACore is correctly built and linked.");
         logStream << "MainWindow: No game engine analyzers available." << "\n";
@@ -266,6 +274,20 @@ void MainWindow::onLoadFromGameProject()
     }
 
     LoadProjectDialog dialog(availableAnalyzers, this);
+
+    // Center the dialog on the screen
+    dialog.setGeometry(
+        QStyle::alignedRect(
+            Qt::LeftToRight,
+            Qt::AlignCenter,
+            dialog.size(),
+            qApp->primaryScreen()->availableGeometry()
+        )
+    );
+
+    dialog.raise();
+    dialog.activateWindow();
+
     if (dialog.exec() == QDialog::Accepted) {
         QString engineName = dialog.selectedEngine();
         QString projectPath = dialog.projectPath();

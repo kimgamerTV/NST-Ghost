@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(NST VERSION 0.4.1 LANGUAGES CXX)
+project(NST VERSION 0.4.2 LANGUAGES CXX)
 
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
     translationservicemanager.h
     translationcontextmenu.h
     updatecontroller.h
+    resources.qrc
 )
 
 # Add BGA as a subdirectory

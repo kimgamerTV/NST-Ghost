@@ -1,6 +1,0 @@
-set(__QT_DEPLOY_TARGET_BGACore_FILE /home/jop/work/chanomhub/NST_library/BGA/build/core/libBGACore.so)
-set(__QT_DEPLOY_TARGET_BGACore_TYPE SHARED_LIBRARY)
-set(__QT_DEPLOY_TARGET_BGARunner_FILE /home/jop/work/chanomhub/NST_library/BGA/build/tools/runner/BGARunner)
-set(__QT_DEPLOY_TARGET_BGARunner_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_BGACoreTests_FILE /home/jop/work/chanomhub/NST_library/BGA/build/tests/BGACoreTests)
-set(__QT_DEPLOY_TARGET_BGACoreTests_TYPE EXECUTABLE)

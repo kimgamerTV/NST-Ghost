@@ -1,0 +1,32 @@
+# Build directories
+/build/
+/BGA/build/
+/BGA/build-t1/
+
+# Qt Creator user files
+*.user
+*.user.*
+
+# Compiled object files
+*.o
+*.obj
+
+# Compiled dynamic libraries
+*.so
+*.dll
+
+# Executables
+*.exe
+*.app
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Other common ignores
+*.log
+*.bak
+*~
+*.swp
+.DS_Store
+Thumbs.db
