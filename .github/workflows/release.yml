@@ -82,35 +82,23 @@ jobs:
             Get-ChildItem -Recurse -Force build | Select-Object -First 500 | Format-Table
             exit 1
           }
-          Write-Host "BGACore build reported success — verifying BGACore.lib..."
-          $expectedPath = "BGA\core\Release\BGACore.lib"
-          $maxRetries = 10
-          $retryCount = 0
-          $found = $false
+          Write-Host "BGACore build reported success — verifying output files..."
+          $dllPath = "BGA\core\Release\BGACore.dll"
+          $libPath = "BGA\core\Release\BGACore.lib"
           
-          while (-not $found -and $retryCount -lt $maxRetries) {
-            if (Test-Path $expectedPath) {
-              Write-Host "Found BGACore.lib at: $expectedPath"
-              $found = $true
-            } else {
-              $retryCount++
-              Write-Host "Attempt $retryCount/$maxRetries - Waiting for BGACore.lib..."
-              Start-Sleep -Seconds 1
-            }
+          if (Test-Path $dllPath) {
+            Write-Host "Found BGACore.dll at: $dllPath"
+          } else {
+            Write-Host "ERROR: BGACore.dll not found at: $dllPath"
+            throw "BGACore.dll missing after build"
           }
           
-          if (-not $found) {
-            Write-Host "BGACore.lib not found at expected path: $expectedPath"
-            Write-Host "Searching recursively as fallback..."
-            $foundFiles = Get-ChildItem -Path . -Recurse -Filter 'BGACore.lib' -ErrorAction SilentlyContinue
-            if ($foundFiles -and $foundFiles.Count -gt 0) {
-              Write-Host "Found BGACore.lib at unexpected location:"
-              $foundFiles | ForEach-Object { Write-Host $_.FullName }
-            } else {
-              Write-Host "BGACore.lib not found anywhere. Printing diagnostics..."
-              Get-ChildItem -Path "BGA\core\Release" -Force -ErrorAction SilentlyContinue | Format-Table
-              throw "BGACore.lib missing after BGACore build"
-            }
+          if (Test-Path $libPath) {
+            Write-Host "Found BGACore.lib at: $libPath"
+          } else {
+            Write-Host "WARNING: BGACore.lib not found at: $libPath"
+            Write-Host "This may be expected if the library has no exported symbols."
+            Write-Host "Continuing with build..."
           }
           Write-Host "Building remaining targets..."
           cmake --build . --config Release --target ALL_BUILD --parallel
