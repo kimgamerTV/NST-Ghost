@@ -103,10 +103,68 @@ jobs:
           Write-Host "Building remaining targets..."
           cmake --build . --config Release --target ALL_BUILD --parallel
       
+      - name: Verify Windows Build
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying Windows build output ==="
+          $exePath = "build\Release\NST.exe"
+          if (Test-Path $exePath) {
+            Write-Host "✓ NST.exe found at: $exePath"
+            $size = (Get-Item $exePath).Length
+            Write-Host "  Size: $size bytes"
+          } else {
+            Write-Host "✗ ERROR: NST.exe not found at: $exePath"
+            Write-Host "Searching for NST.exe in build directory..."
+            Get-ChildItem -Path build -Filter "NST.exe" -Recurse | ForEach-Object { Write-Host "  Found: $($_.FullName)" }
+            exit 1
+          }
+          
+          Write-Host ""
+          Write-Host "=== Checking required DLLs in Release folder ==="
+          $releaseDir = "build\Release"
+          $requiredDlls = @("BGACore.dll", "QtLingo.dll")
+          foreach ($dll in $requiredDlls) {
+            $dllPath = Join-Path $releaseDir $dll
+            if (Test-Path $dllPath) {
+              Write-Host "✓ $dll found"
+            } else {
+              Write-Host "✗ WARNING: $dll not found in Release folder"
+              Write-Host "  Searching in build directory..."
+              Get-ChildItem -Path build -Filter $dll -Recurse | ForEach-Object { Write-Host "  Found at: $($_.FullName)" }
+            }
+          }
+          
+          Write-Host ""
+          Write-Host "=== Listing all DLLs in Release folder ==="
+          Get-ChildItem -Path $releaseDir -Filter "*.dll" | ForEach-Object { Write-Host "  $($_.Name)" }
+      
       - name: Package
         run: |
           cd build
           cpack -G ${{ matrix.package_generator }} -C Release
+      
+      - name: Verify Package Contents (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying package contents ==="
+          $packageFile = Get-ChildItem -Path build -Filter "NST-*.zip" | Select-Object -First 1
+          if ($packageFile) {
+            Write-Host "Package file: $($packageFile.Name)"
+            Write-Host "Extracting to verify contents..."
+            $tempDir = "build\temp_verify"
+            Expand-Archive -Path $packageFile.FullName -DestinationPath $tempDir -Force
+            Write-Host ""
+            Write-Host "Package contents:"
+            Get-ChildItem -Path $tempDir -Recurse | ForEach-Object { 
+              $relativePath = $_.FullName.Substring($tempDir.Length)
+              Write-Host "  $relativePath"
+            }
+            Remove-Item -Path $tempDir -Recurse -Force
+          } else {
+            Write-Host "WARNING: No package file found"
+          }
       
       - name: Find package files
         id: find_files
