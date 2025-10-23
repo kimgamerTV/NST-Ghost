@@ -30,6 +30,7 @@ add_library(QtLingo SHARED
 target_include_directories(QtLingo
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(QtLingo PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)

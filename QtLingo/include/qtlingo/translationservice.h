@@ -1,6 +1,7 @@
 #ifndef QTLINGO_TRANSLATIONSERVICE_H
 #define QTLINGO_TRANSLATIONSERVICE_H
 
+#include "QtLingo_global.h"
 #include <QString>
 #include <QStringList>
 #include <QObject>
@@ -13,7 +14,7 @@ struct TranslationResult {
     // Potentially add more fields like confidence, error message, etc.
 };
 
-class ITranslationService : public QObject {
+class QTLINGO_EXPORT ITranslationService : public QObject {
     Q_OBJECT
 public:
     explicit ITranslationService(QObject *parent = nullptr) : QObject(parent) {}
