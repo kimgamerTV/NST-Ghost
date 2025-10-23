@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
-
 project(NST VERSION 0.4.2 LANGUAGES CXX)
-
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -55,7 +52,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
-
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
     if(ANDROID)
@@ -67,7 +63,6 @@ else()
             ${PROJECT_SOURCES}
         )
     endif()
-
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
@@ -78,8 +73,8 @@ target_link_libraries(NST PRIVATE
     BGACore
     QtLingo
 )
-target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
 
+target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -87,6 +82,7 @@ target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CM
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.NST)
 endif()
+
 set_target_properties(NST PROPERTIES
     ${BUNDLE_ID_OPTION}
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
@@ -96,6 +92,7 @@ set_target_properties(NST PROPERTIES
 )
 
 include(GNUInstallDirs)
+
 install(TARGETS NST
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -107,6 +104,65 @@ install(FILES packaging/icons/nst.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(NST)
+endif()
+
+# Windows: Deploy Qt dependencies
+if(WIN32)
+    # Find windeployqt
+    get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+    
+    if(WINDEPLOYQT_EXECUTABLE)
+        message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+        
+        # Deploy Qt DLLs after build
+        add_custom_command(TARGET NST POST_BUILD
+            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                --release
+                --no-translations
+                --no-system-d3d-compiler
+                --no-opengl-sw
+                "$<TARGET_FILE:NST>"
+            COMMENT "Deploying Qt dependencies with windeployqt..."
+        )
+        
+        # Install Qt DLLs with CPack
+        install(CODE "
+            execute_process(
+                COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
+                    --release
+                    --no-translations
+                    --no-system-d3d-compiler
+                    --no-opengl-sw
+                    --dir \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\"
+                    \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/NST.exe\"
+            )
+        " COMPONENT Runtime)
+    else()
+        message(WARNING "windeployqt not found. Qt DLLs will not be bundled automatically.")
+        message(WARNING "Please ensure Qt bin directory is in PATH or set Qt6_DIR correctly.")
+    endif()
+endif()
+
+# macOS: Bundle Qt frameworks
+if(APPLE)
+    get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+    
+    if(MACDEPLOYQT_EXECUTABLE)
+        message(STATUS "Found macdeployqt: ${MACDEPLOYQT_EXECUTABLE}")
+        
+        add_custom_command(TARGET NST POST_BUILD
+            COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+                "$<TARGET_BUNDLE_DIR:NST>"
+                -always-overwrite
+            COMMENT "Deploying Qt frameworks with macdeployqt..."
+        )
+    else()
+        message(WARNING "macdeployqt not found. Qt frameworks will not be bundled automatically.")
+    endif()
 endif()
 
 include(CPack)
@@ -133,4 +189,3 @@ if(WIN32)
     set(CPACK_GENERATOR "ZIP")
     set(CPACK_PACKAGE_FILE_NAME "nst-windows")
 endif()
-
