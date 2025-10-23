@@ -145,6 +145,13 @@ jobs:
         with:
           path: artifacts
       
+      - name: Debug - List downloaded artifacts
+        run: |
+          echo "=== Contents of artifacts directory ==="
+          ls -laR artifacts/
+          echo "=== Finding all files ==="
+          find artifacts -type f
+      
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -177,10 +184,12 @@ jobs:
           set -euo pipefail
           API="https://api.github.com/repos/${REPO}"
           echo "Preparing release for tag: $TAG (repo: $REPO)"
+          
           # Try to get existing release by tag
           resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
           release_id=$(echo "$resp" | jq -r '.id // empty')
           upload_url=$(echo "$resp" | jq -r '.upload_url // empty')
+          
           if [ -z "$release_id" ]; then
             echo "Release with tag ${TAG} not found, creating..."
             create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" -d "$(jq -n --arg t "$TAG" --arg n "Release $TAG" --arg b "Release $TAG" '{ tag_name: $t, name: $n, body: $b }')" "${API}/releases")
@@ -201,23 +210,55 @@ jobs:
             exit 1
           fi
 
-          # Upload all downloaded artifacts (artifacts/*/*)
+          # Find all files to upload (looking in artifacts subdirectories)
+          echo "=== Searching for files to upload ==="
           shopt -s nullglob
           files=(artifacts/*/*)
+          
           if [ ${#files[@]} -eq 0 ]; then
-            echo "No artifacts found in artifacts/*/* — nothing to upload."
-            exit 0
+            echo "No artifacts found in artifacts/*/* — checking alternative locations..."
+            files=(artifacts/*)
+            if [ ${#files[@]} -eq 0 ]; then
+              echo "ERROR: No artifacts found in artifacts/ directory at all"
+              exit 1
+            fi
           fi
 
+          echo "Found ${#files[@]} file(s) to upload"
+          
           for f in "${files[@]}"; do
             if [ ! -f "$f" ]; then
-              echo "Skipping non-file $f"
+              echo "Skipping non-file: $f"
               continue
             fi
+            
             name=$(basename "$f")
             mime=$(file --brief --mime-type "$f" || echo "application/octet-stream")
-            echo "Uploading $f as $name (Content-Type: $mime)"
+            echo "=== Uploading: $f ==="
+            echo "  Name: $name"
+            echo "  MIME: $mime"
+            echo "  Size: $(stat -c%s "$f" 2>/dev/null || stat -f%z "$f") bytes"
+            
             # Upload via uploads.github.com endpoint
             upload_endpoint="https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$(echo "$name" | jq -sRr @uri)"
-            curl -s -X POST -H "Authorization: token ${GITHUB_TOKEN}" -H "Content-Type: ${mime}" --data-binary @"$f" "$upload_endpoint" | jq -r '.url // "uploaded"'
+            
+            response=$(curl -s -w "\n%{http_code}" -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Content-Type: ${mime}" \
+              --data-binary @"$f" \
+              "$upload_endpoint")
+            
+            http_code=$(echo "$response" | tail -n1)
+            body=$(echo "$response" | sed '$d')
+            
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              echo "✓ Successfully uploaded $name (HTTP $http_code)"
+              echo "$body" | jq -r '.browser_download_url // "No URL"'
+            else
+              echo "✗ Failed to upload $name (HTTP $http_code)"
+              echo "Response: $body"
+              exit 1
+            fi
           done
+          
+          echo "=== Upload completed ==="
