@@ -83,8 +83,8 @@ jobs:
             exit 1
           }
           Write-Host "BGACore build reported success — verifying output files..."
-          $dllPath = "BGA\core\Release\BGACore.dll"
-          $libPath = "BGA\core\Release\BGACore.lib"
+          $dllPath = "BGA\Release\BGACore.dll"
+          $libPath = "BGA\Release\BGACore.lib"
           
           if (Test-Path $dllPath) {
             Write-Host "Found BGACore.dll at: $dllPath"
