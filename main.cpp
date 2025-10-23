@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // Load the stylesheet
-    QFile file("/home/jop/work/NST/NST/style.qss");
+    QFile file(":/style.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&file);
         a.setStyleSheet(stream.readAll());

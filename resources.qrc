@@ -3,5 +3,6 @@
         <file>style.qss</file>
         <file>icons/rpgm_icon.png</file>
         <file>icons/unity_icon.png</file>
+        <file alias="icons/icon-app.png">packaging/icons/icon-app.png</file>
     </qresource>
 </RCC>

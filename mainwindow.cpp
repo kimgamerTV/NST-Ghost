@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/mainwindow_log.txt";
     QFile logFile(logFilePath);
     ui->setupUi(this);
+    setWindowIcon(QIcon(":/icons/icon-app.png"));
     resize(1024, 768); // Set a reasonable default size
 
     m_fileListModel = new QStringListModel(this);
