@@ -17,18 +17,11 @@ public:
     explicit TranslationServiceManager(QObject *parent = nullptr);
 
     QStringList getAvailableServices() const;
-    void translate(const QString &serviceName, const QString &sourceText, const QVariantMap &settings);
+    void translate(const QString &serviceName, const QStringList &sourceTexts, const QVariantMap &settings);
 
 signals:
     void translationFinished(const qtlingo::TranslationResult &result);
     void errorOccurred(const QString &message);
-
-private slots:
-    void handleTranslationFinished(const qtlingo::TranslationResult &result);
-    void handleErrorOccurred(const QString &message);
-
-private:
-    QList<QPointer<qtlingo::ITranslationService>> m_activeServices;
 };
 
 #endif // TRANSLATIONSERVICEMANAGER_H

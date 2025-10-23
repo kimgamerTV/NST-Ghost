@@ -376,7 +376,7 @@ void MainWindow::onTranslateSelectedTextWithService(const QString &serviceName, 
         settings["llmApiKey"] = m_llmApiKey;
         settings["llmModel"] = m_llmModel;
 
-        m_translationServiceManager->translate(serviceName, sourceText, settings);
+        m_translationServiceManager->translate(serviceName, QStringList() << sourceText, settings);
     }
 }
 
@@ -453,24 +453,26 @@ void MainWindow::onTranslateAllSelectedText()
         return;
     }
 
+    QStringList sourceTexts;
     for (const QModelIndex &selectedIndex : selectedIndexes) {
         QModelIndex sourceIndex = m_translationModel->index(selectedIndex.row(), 0);
         QString sourceText = m_translationModel->data(sourceIndex, Qt::DisplayRole).toString();
-
         if (!sourceText.isEmpty()) {
-            // Store the index for later update
+            sourceTexts.append(sourceText);
             m_pendingTranslations.insert(sourceText, m_translationModel->index(selectedIndex.row(), 1));
-
-            QVariantMap settings;
-            settings["googleApiKey"] = m_apiKey;
-            settings["targetLanguage"] = m_targetLanguage;
-            settings["googleApi"] = m_googleApi;
-            settings["llmProvider"] = m_llmProvider;
-            settings["llmApiKey"] = m_llmApiKey;
-            settings["llmModel"] = m_llmModel;
-
-            m_translationServiceManager->translate(serviceName, sourceText, settings);
         }
+    }
+
+    if (!sourceTexts.isEmpty()) {
+        QVariantMap settings;
+        settings["googleApiKey"] = m_apiKey;
+        settings["targetLanguage"] = m_targetLanguage;
+        settings["googleApi"] = m_googleApi;
+        settings["llmProvider"] = m_llmProvider;
+        settings["llmApiKey"] = m_llmApiKey;
+        settings["llmModel"] = m_llmModel;
+
+        m_translationServiceManager->translate(serviceName, sourceTexts, settings);
     }
 }
 

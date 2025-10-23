@@ -82,24 +82,38 @@ jobs:
             Get-ChildItem -Recurse -Force build | Select-Object -First 500 | Format-Table
             exit 1
           }
-          Write-Host "BGACore build reported success — searching for BGACore.lib recursively..."
-          $found = Get-ChildItem -Path build -Recurse -Filter 'BGACore.lib' -ErrorAction SilentlyContinue
-          if ($found -and $found.Count -gt 0) {
-            Write-Host "Found BGACore.lib at:"
-            $found | ForEach-Object { Write-Host $_.FullName }
-          } else {
-            Write-Host "BGACore.lib not found by recursive search. Printing build tree for diagnostics..."
-            Get-ChildItem -Recurse -Force build | Format-Table
-            throw "BGACore.lib missing after BGACore build; see diagnostics above"
+          Write-Host "BGACore build reported success — verifying BGACore.lib..."
+          $expectedPath = "BGA\core\Release\BGACore.lib"
+          $maxRetries = 10
+          $retryCount = 0
+          $found = $false
+          
+          while (-not $found -and $retryCount -lt $maxRetries) {
+            if (Test-Path $expectedPath) {
+              Write-Host "Found BGACore.lib at: $expectedPath"
+              $found = $true
+            } else {
+              $retryCount++
+              Write-Host "Attempt $retryCount/$maxRetries - Waiting for BGACore.lib..."
+              Start-Sleep -Seconds 1
+            }
+          }
+          
+          if (-not $found) {
+            Write-Host "BGACore.lib not found at expected path: $expectedPath"
+            Write-Host "Searching recursively as fallback..."
+            $foundFiles = Get-ChildItem -Path . -Recurse -Filter 'BGACore.lib' -ErrorAction SilentlyContinue
+            if ($foundFiles -and $foundFiles.Count -gt 0) {
+              Write-Host "Found BGACore.lib at unexpected location:"
+              $foundFiles | ForEach-Object { Write-Host $_.FullName }
+            } else {
+              Write-Host "BGACore.lib not found anywhere. Printing diagnostics..."
+              Get-ChildItem -Path "BGA\core\Release" -Force -ErrorAction SilentlyContinue | Format-Table
+              throw "BGACore.lib missing after BGACore build"
+            }
           }
           Write-Host "Building remaining targets..."
           cmake --build . --config Release --target ALL_BUILD --parallel
-
-
-      
-
-      
-
       
       - name: Package
         run: |

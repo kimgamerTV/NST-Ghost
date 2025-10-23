@@ -1,5 +1,7 @@
 #include "translationservicemanager.h"
 #include <QDebug>
+#include <QThread>
+#include <QEventLoop>
 
 #include <QVariantMap>
 
@@ -13,62 +15,38 @@ QStringList TranslationServiceManager::getAvailableServices() const
     return qtlingo::availableTranslationServices();
 }
 
-void TranslationServiceManager::translate(const QString &serviceName, const QString &sourceText, const QVariantMap &settings)
+void TranslationServiceManager::translate(const QString &serviceName, const QStringList &sourceTexts, const QVariantMap &settings)
 {
-    // Create the service with 'this' as parent, so Qt manages its lifetime
-    std::unique_ptr<qtlingo::ITranslationService> uniqueService = qtlingo::createTranslationService(serviceName, this);
-    if (uniqueService) {
-        qtlingo::ITranslationService* service = uniqueService.release(); // Transfer ownership to Qt's parent-child system
-        m_activeServices.append(service); // Add QPointer to the list of active services
+    for (const QString &sourceText : sourceTexts) {
+        QThread* thread = QThread::create([this, serviceName, sourceText, settings]() {
+            QEventLoop loop;
+            std::unique_ptr<qtlingo::ITranslationService> service = qtlingo::createTranslationService(serviceName, nullptr);
+            if (service) {
+                connect(service.get(), &qtlingo::ITranslationService::translationFinished, this, &TranslationServiceManager::translationFinished);
+                connect(service.get(), &qtlingo::ITranslationService::errorOccurred, this, &TranslationServiceManager::errorOccurred);
+                connect(service.get(), &qtlingo::ITranslationService::translationFinished, &loop, &QEventLoop::quit);
+                connect(service.get(), &qtlingo::ITranslationService::errorOccurred, &loop, &QEventLoop::quit);
 
-        connect(service, &qtlingo::ITranslationService::translationFinished, this, &TranslationServiceManager::handleTranslationFinished);
-        connect(service, &qtlingo::ITranslationService::errorOccurred, this, &TranslationServiceManager::handleErrorOccurred);
+                if (serviceName == "Google Translate") {
+                    service->setTargetLanguage(settings.value("targetLanguage").toString());
+                    service->setGoogleTranslateMode(settings.value("googleApi").toBool());
+                    if (settings.value("googleApi").toBool()) {
+                        service->setApiKey(settings.value("googleApiKey").toString());
+                    }
+                } else if (serviceName == "LLM Translation") {
+                    service->setLlmProvider(settings.value("llmProvider").toString());
+                    service->setApiKey(settings.value("llmApiKey").toString());
+                    service->setLlmModel(settings.value("llmModel").toString());
+                    service->setTargetLanguage(settings.value("targetLanguage").toString());
+                }
 
-        if (serviceName == "Google Translate") {
-            service->setTargetLanguage(settings.value("targetLanguage").toString());
-            service->setGoogleTranslateMode(settings.value("googleApi").toBool());
-            if (settings.value("googleApi").toBool()) {
-                service->setApiKey(settings.value("googleApiKey").toString());
+                service->translate(sourceText);
+                loop.exec();
+            } else {
+                emit errorOccurred(QString("Failed to create translation service: %1").arg(serviceName));
             }
-        } else if (serviceName == "LLM Translation") {
-            service->setLlmProvider(settings.value("llmProvider").toString());
-            service->setApiKey(settings.value("llmApiKey").toString());
-            service->setLlmModel(settings.value("llmModel").toString());
-            service->setTargetLanguage(settings.value("targetLanguage").toString());
-        }
-
-        service->translate(sourceText);
-    } else {
-        emit errorOccurred(QString("Failed to create translation service: %1").arg(serviceName));
+        });
+        connect(thread, &QThread::finished, thread, &QThread::deleteLater);
+        thread->start();
     }
-}
-
-void TranslationServiceManager::handleTranslationFinished(const qtlingo::TranslationResult &result)
-{
-    // Find the service that emitted the signal
-    qtlingo::ITranslationService* service = qobject_cast<qtlingo::ITranslationService*>(sender());
-    if (service) {
-        // Find the corresponding unique_ptr in m_activeServices and remove it
-        for (int i = 0; i < m_activeServices.size(); ++i) {
-            if (m_activeServices.at(i).get() == service) {
-                m_activeServices.removeAt(i);
-                break;
-            }
-        }
-    }
-    emit translationFinished(result);
-}
-
-void TranslationServiceManager::handleErrorOccurred(const QString &message)
-{
-    qtlingo::ITranslationService* service = qobject_cast<qtlingo::ITranslationService*>(sender());
-    if (service) {
-        for (int i = 0; i < m_activeServices.size(); ++i) {
-            if (m_activeServices.at(i).get() == service) {
-                m_activeServices.removeAt(i);
-                break;
-            }
-        }
-    }
-    emit errorOccurred(message);
 }
