@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(NST VERSION 0.4.2 LANGUAGES CXX)
+project(NST VERSION 0.4.3 LANGUAGES CXX)
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
 set(CMAKE_AUTOUIC ON)
@@ -7,6 +7,14 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Fix Linux RPATH to find libraries in same directory
+if(UNIX AND NOT APPLE)
+    set(CMAKE_INSTALL_RPATH "$ORIGIN")
+    set(CMAKE_BUILD_RPATH "$ORIGIN")
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+endif()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
@@ -99,7 +107,14 @@ install(TARGETS NST
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Install BGACore and QtLingo DLLs on Windows
+# Install BGACore and QtLingo libraries
+if(UNIX AND NOT APPLE)
+    install(TARGETS BGACore QtLingo
+        LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
+
 if(WIN32)
     install(TARGETS BGACore QtLingo
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
