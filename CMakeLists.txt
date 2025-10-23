@@ -99,6 +99,14 @@ install(TARGETS NST
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+# Install BGACore and QtLingo DLLs on Windows
+if(WIN32)
+    install(TARGETS BGACore QtLingo
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif()
+
 install(FILES packaging/debian/nst.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 install(FILES packaging/icons/nst.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
@@ -106,7 +114,7 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(NST)
 endif()
 
-# Windows: Deploy Qt dependencies
+# Windows: Deploy all dependencies
 if(WIN32)
     # Find windeployqt
     get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
@@ -127,6 +135,17 @@ if(WIN32)
             COMMENT "Deploying Qt dependencies with windeployqt..."
         )
         
+        # Copy BGACore and QtLingo DLLs to build directory
+        add_custom_command(TARGET NST POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:BGACore>"
+                "$<TARGET_FILE_DIR:NST>"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:QtLingo>"
+                "$<TARGET_FILE_DIR:NST>"
+            COMMENT "Copying BGACore.dll and QtLingo.dll..."
+        )
+        
         # Install Qt DLLs with CPack
         install(CODE "
             execute_process(
@@ -142,6 +161,27 @@ if(WIN32)
     else()
         message(WARNING "windeployqt not found. Qt DLLs will not be bundled automatically.")
         message(WARNING "Please ensure Qt bin directory is in PATH or set Qt6_DIR correctly.")
+        
+        # Still copy BGACore and QtLingo DLLs even without windeployqt
+        add_custom_command(TARGET NST POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:BGACore>"
+                "$<TARGET_FILE_DIR:NST>"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "$<TARGET_FILE:QtLingo>"
+                "$<TARGET_FILE_DIR:NST>"
+            COMMENT "Copying BGACore.dll and QtLingo.dll..."
+        )
+    endif()
+    
+    # Install Visual C++ Runtime (if using MSVC)
+    if(MSVC)
+        set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+        include(InstallRequiredSystemLibraries)
+        install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+            DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT Runtime
+        )
     endif()
 endif()
 
