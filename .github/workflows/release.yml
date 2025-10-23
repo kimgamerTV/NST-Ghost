@@ -55,15 +55,16 @@ jobs:
           arch: win64_msvc2019_64
           cache: true
       
-      - name: Configure CMake (Linux / macOS)
+      - name: Configure and Build (Linux / macOS)
         if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p build
           cd build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+          cmake --build . --config Release --parallel
       
-      - name: Configure CMake (Windows)
+      - name: Configure and Build (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
@@ -72,13 +73,8 @@ jobs:
           }
           Set-Location -Path build
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
-
-      - name: Build BGACore (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
           Write-Host "Building BGACore first to ensure library is created..."
-          cmake --build build --config Release --target BGACore --parallel || {
+          cmake --build . --config Release --target BGACore --parallel || {
             Write-Host "BGACore build FAILED — printing build/core tree and logs for diagnostics..."
             if (Test-Path build\BGA\core\Release) { Get-ChildItem -Force build\BGA\core\Release | Format-Table } else { Write-Host "build\\BGA\\core\\Release not found" }
             if (Test-Path build\core\Release) { Get-ChildItem -Force build\core\Release | Format-Table } else { Write-Host "build\\core\\Release not found" }
@@ -96,39 +92,14 @@ jobs:
             Get-ChildItem -Recurse -Force build | Format-Table
             throw "BGACore.lib missing after BGACore build; see diagnostics above"
           }
-
-      - name: Build ALL (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
           Write-Host "Building remaining targets..."
-          cmake --build build --config Release --target ALL_BUILD --parallel
+          cmake --build . --config Release --target ALL_BUILD --parallel
 
-      - name: Build (Linux / macOS)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          cmake --build build --config Release --parallel
+
       
-      - name: List build tree (Linux / macOS)
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          echo "=== build tree (top) ==="
-          ls -la build || true
-          echo "=== build/core content ==="
-          ls -la build/core || true
-          echo "=== build/core/Release content ==="
-          ls -la build/core/Release || true
+
       
-      - name: List build tree (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "=== build tree (top) ==="
-          Get-ChildItem -Force build | Format-Table
-          Write-Host "=== build/BGA/core content ==="
-          if (Test-Path build\BGA\core\Release) { Get-ChildItem -Force build\BGA\core\Release | Format-Table } else { Write-Host "build\\BGA\\core\\Release not found" }
+
       
       - name: Package
         run: |
@@ -140,28 +111,13 @@ jobs:
         shell: bash
         run: |
           cd build
-          # Support different OS-produced package types
-          candidates=()
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            candidates=( *.zip *.exe *.msi )
-          elif [ "${{ runner.os }}" = "macOS" ]; then
-            candidates=( *.dmg *.pkg *.zip )
+          PACKAGE_FILE=$(ls "NST-"* 2>/dev/null | head -n 1 || true)
+          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          if [ -n "$PACKAGE_FILE" ]; then
+            echo "Found package: $PACKAGE_FILE"
           else
-            candidates=( *.zip *.tar.gz *.AppImage )
-          fi
-          file=""
-          for pat in "${candidates[@]}"; do
-            f=$(ls $pat 2>/dev/null | head -n 1 || true)
-            if [ -n "$f" ]; then
-              file="$f"
-              break
-            fi
-          done
-          echo "package_file=$file" >> $GITHUB_OUTPUT
-          if [ -n "$file" ]; then
-            echo "Found package: $file"
-          else
-            echo "No package found in build/"
+            echo "Error: No package found in build/ for NST-."
+            exit 1
           fi
       
       - name: Upload asset

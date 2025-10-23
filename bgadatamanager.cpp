@@ -12,6 +12,11 @@ BGADataManager::BGADataManager(QObject *parent)
 {
 }
 
+QJsonArray BGADataManager::loadedFonts() const
+{
+    return m_loadedFonts;
+}
+
 QStringList BGADataManager::getAvailableAnalyzers() const
 {
     return core::availableAnalyzers();
@@ -57,14 +62,26 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
     if (output.format == "application/json") {
         QJsonDocument doc = QJsonDocument::fromJson(output.payload);
         logStream << "BGADataManager: After QJsonDocument::fromJson" << "\n";
-        if (doc.isNull() || !doc.isArray()) { // Check if the document is an array
+        if (doc.isNull()) {
             emit errorOccurred("Invalid JSON output from analyzer.");
             logStream << "BGADataManager: Invalid JSON output from analyzer." << "\n";
             logFile.close();
             return extractedTextsArray;
         }
 
-        extractedTextsArray = doc.array(); // Directly get the array from the document
+        if (doc.isObject()) {
+            QJsonObject rootObj = doc.object();
+            if (rootObj.contains("strings") && rootObj["strings"].isArray()) {
+                extractedTextsArray = rootObj["strings"].toArray();
+            }
+            if (rootObj.contains("fonts") && rootObj["fonts"].isArray()) {
+                m_loadedFonts = rootObj["fonts"].toArray();
+                emit fontsLoaded(m_loadedFonts);
+            }
+        } else if (doc.isArray()) {
+            extractedTextsArray = doc.array();
+        }
+
         logStream << "BGADataManager: Extracted " << extractedTextsArray.size() << " entries." << "\n";
         logStream << "BGADataManager: After extracting entries" << "\n";
 

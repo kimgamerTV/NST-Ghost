@@ -1,6 +1,5 @@
-#include "core/engines/rpgm/rpganalyzer.h" // Corrected include path
-#include <QtCore/QDebug> // Add this include for qWarning
-
+#include "core/engines/rpgm/rpganalyzer.h"
+#include <QtCore/QDebug>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -8,7 +7,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QStandardPaths> // New include
+#include <QStandardPaths>
 
 namespace core { namespace engines { namespace rpgm {
 
@@ -19,22 +18,95 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
     logFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream logStream(&logFile);
 
-    logStream << "RPGM Analyzer: Starting analysis for path:" << inputPath << "\n";
+    logStream << "RPGM Analyzer: Starting analysis for path: " << inputPath << "\n";
+
     QDir projectDir(inputPath);
-    logStream << "RPGM Analyzer: Getting JSON file list..." << "\n";
-    const QFileInfoList jsonFiles = projectDir.entryInfoList(QStringList{QStringLiteral("*.json")}, QDir::Files);
-    logStream << "RPGM Analyzer: Found" << jsonFiles.size() << "JSON files." << "\n";
+    QFileInfoList jsonFiles;
 
-    QJsonObject root;
-    root.insert(QStringLiteral("engine"), QStringLiteral("rpgm"));
-    root.insert(QStringLiteral("source"), inputPath);
+    // ตรวจสอบว่าเป็น project root หรือ data folder
+    bool isDataFolder = projectDir.dirName().toLower() == "data";
 
-    QJsonArray entries;
-    logStream << "RPGM Analyzer: Processing JSON files..." << "\n";
-    QJsonArray extractedStrings; // This will store all extracted strings
+    if (isDataFolder) {
+        // ถ้าชี้ไปที่ data folder โดยตรง
+        logStream << "RPGM Analyzer: Input path is data folder\n";
+        jsonFiles = projectDir.entryInfoList(QStringList{QStringLiteral("*.json")}, QDir::Files);
+    } else {
+        // ถ้าชี้ไปที่ project root ให้หาทั้ง root และ data folder
+        logStream << "RPGM Analyzer: Searching in project root\n";
+
+        // ค้นหาในโฟลเดอร์ data (RPG Maker MV/MZ)
+        QDir dataDir(projectDir.filePath("data"));
+        if (dataDir.exists()) {
+            logStream << "RPGM Analyzer: Found 'data' folder\n";
+            jsonFiles += dataDir.entryInfoList(QStringList{QStringLiteral("*.json")}, QDir::Files);
+        }
+
+        // ค้นหาในโฟลเดอร์ Data (case-insensitive)
+        QDir dataDirAlt(projectDir.filePath("Data"));
+        if (dataDirAlt.exists() && dataDirAlt.path() != dataDir.path()) {
+            logStream << "RPGM Analyzer: Found 'Data' folder\n";
+            jsonFiles += dataDirAlt.entryInfoList(QStringList{QStringLiteral("*.json")}, QDir::Files);
+        }
+
+        // ค้นหาไฟล์ JSON ใน root (สำหรับ package.json, plugins.json ฯลฯ)
+        QFileInfoList rootJsonFiles = projectDir.entryInfoList(
+            QStringList{QStringLiteral("*.json")},
+            QDir::Files
+            );
+
+        // กรองเฉพาะไฟล์ที่เกี่ยวข้อง
+        QStringList relevantRootFiles = {
+            "package.json", "plugins.js", "System.json"
+        };
+
+        for (const QFileInfo &info : rootJsonFiles) {
+            if (relevantRootFiles.contains(info.fileName(), Qt::CaseInsensitive)) {
+                jsonFiles.append(info);
+            }
+        }
+
+        // ค้นหาใน js/plugins (สำหรับ RPG Maker MV/MZ)
+        QDir pluginsDir(projectDir.filePath("js/plugins"));
+        if (pluginsDir.exists()) {
+            logStream << "RPGM Analyzer: Found 'js/plugins' folder\n";
+            jsonFiles += pluginsDir.entryInfoList(QStringList{QStringLiteral("*.json")}, QDir::Files);
+        }
+    }
+
+    logStream << "RPGM Analyzer: Found " << jsonFiles.size() << " JSON files.\n";
+
+    // Font searching logic
+    QDir searchDir = isDataFolder ? QDir(inputPath).filePath("..") : inputPath;
+    QDir parentDir(searchDir);
+
+    QDir fontDir(parentDir.filePath("fonts"));
+    if (!fontDir.exists()) {
+        fontDir.setPath(parentDir.filePath("Fonts"));
+    }
+
+    QJsonArray fontEntries;
+    if (fontDir.exists()) {
+        logStream << "RPGM Analyzer: Found fonts folder at: " << fontDir.path() << "\n";
+        const QFileInfoList fontFiles = fontDir.entryInfoList(
+            QStringList() << "*.ttf" << "*.otf" << "*.woff" << "*.woff2",
+            QDir::Files
+            );
+        for (const QFileInfo &info : fontFiles) {
+            QJsonObject fontEntry;
+            fontEntry.insert(QStringLiteral("name"), info.baseName());
+            fontEntry.insert(QStringLiteral("path"), info.absoluteFilePath());
+            fontEntries.append(fontEntry);
+        }
+        logStream << "RPGM Analyzer: Found " << fontFiles.size() << " font files.\n";
+    }
+
+    QJsonArray extractedStrings;
+    logStream << "RPGM Analyzer: Processing JSON files...\n";
+
+    int processedCount = 0;
+    int failedCount = 0;
 
     for (const QFileInfo &info : jsonFiles) {
-        // Read file content
         QFile file(info.absoluteFilePath());
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QTextStream in(&file);
@@ -43,24 +115,48 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
 
             QJsonDocument doc = QJsonDocument::fromJson(content.toUtf8());
             if (!doc.isNull()) {
-                extractStringsFromJsonValue(QJsonValue::fromVariant(doc.toVariant()), extractedStrings, info.absoluteFilePath(), ""); // Pass empty string as initial key path
+                extractStringsFromJsonValue(
+                    QJsonValue::fromVariant(doc.toVariant()),
+                    extractedStrings,
+                    info.absoluteFilePath(),
+                    ""
+                    );
+                processedCount++;
             } else {
-                logStream << "RPGM Analyzer: Failed to parse JSON from file: " << info.absoluteFilePath() << "\\n";
+                logStream << "RPGM Analyzer: Failed to parse JSON from file: "
+                          << info.absoluteFilePath() << "\n";
+                failedCount++;
             }
         } else {
-            logStream << "RPGM Analyzer: Failed to open file for reading: " << info.absoluteFilePath() << "\\n";
+            logStream << "RPGM Analyzer: Failed to open file for reading: "
+                      << info.absoluteFilePath() << "\n";
+            failedCount++;
         }
     }
-    logStream << "RPGM Analyzer: Finished processing JSON files. Total extracted strings:" << extractedStrings.size() << "\\n";
 
-    QJsonDocument doc(extractedStrings); // Create a JSON document from the array of extracted strings
-    logStream << "RPGM Analyzer: Converting to JSON document...";
+    logStream << "RPGM Analyzer: Processing complete.\n";
+    logStream << "  - Processed: " << processedCount << " files\n";
+    logStream << "  - Failed: " << failedCount << " files\n";
+    logStream << "  - Total extracted strings: " << extractedStrings.size() << "\n";
+
+    QJsonObject rootObject;
+    rootObject.insert(QStringLiteral("strings"), extractedStrings);
+    rootObject.insert(QStringLiteral("fonts"), fontEntries);
+    rootObject.insert(QStringLiteral("engine"), QStringLiteral("rpgm"));
+    rootObject.insert(QStringLiteral("source"), inputPath);
+    rootObject.insert(QStringLiteral("filesProcessed"), processedCount);
+    rootObject.insert(QStringLiteral("filesFailed"), failedCount);
+
+    QJsonDocument doc(rootObject);
 
     core::AnalyzerOutput output;
     output.format = QStringLiteral("application/json");
     output.payload = doc.toJson(QJsonDocument::Indented);
-    logStream << "RPGM Analyzer: Finished converting to JSON document. Payload size:" << output.payload.size() << "\\n";
+
+    logStream << "RPGM Analyzer: Analysis complete. Payload size: "
+              << output.payload.size() << " bytes\n";
     logFile.close();
+
     return output;
 }
 
@@ -68,16 +164,15 @@ bool RpgmAnalyzer::save(const QString &outputPath, const QJsonArray &texts)
 {
     QMap<QString, QJsonDocument> filesToUpdate;
 
-    // Group texts by file path and update their content
     for (const QJsonValue &value : texts) {
         QJsonObject textObject = value.toObject();
-        QString filePath = textObject["path"].toString(); // Use "path" from extracted data
-        QString keyPath = textObject["key"].toString(); // Use "key" from extracted data
-        QString translatedText = textObject["text"].toString(); // Use "text" which contains the translated text
+        QString filePath = textObject["path"].toString();
+        QString keyPath = textObject["key"].toString();
+        QString translatedText = textObject["text"].toString();
 
         if (filePath.isEmpty() || keyPath.isEmpty()) {
             qWarning() << "Invalid data for saving: filePath or keyPath is empty.";
-            continue; // Skip this entry
+            continue;
         }
 
         if (!filesToUpdate.contains(filePath)) {
@@ -97,34 +192,10 @@ bool RpgmAnalyzer::save(const QString &outputPath, const QJsonArray &texts)
 
         QJsonDocument currentDoc = filesToUpdate.value(filePath);
 
-        // Update the JSON value at the specified keyPath
-        if (currentDoc.isObject()) {
-            QJsonObject obj = currentDoc.object();
-            obj[keyPath] = translatedText;
-            currentDoc.setObject(obj);
-        } else if (currentDoc.isArray()) {
-            QJsonArray arr = currentDoc.array();
-            // Check if keyPath is an array index (e.g., "0", "1")
-            bool ok;
-            int index = keyPath.toInt(&ok);
-            if (ok && index >= 0 && index < arr.size()) {
-                // If it's a direct string in the array
-                if (arr.at(index).isString()) {
-                    arr.replace(index, translatedText);
-                    currentDoc.setArray(arr);
-                } else if (arr.at(index).isObject()) {
-                    // If it's an object in the array, and keyPath is just the index,
-                    // we can't update a specific key within that object without more info.
-                    // This case needs more complex keyPath parsing (e.g., "0.name")
-                    qWarning() << "Unsupported update for object within array at index" << index << "in file:" << filePath;
-                } else {
-                    qWarning() << "Unsupported array element type for updating at index" << index << "in file:" << filePath;
-                }
-            } else {
-                qWarning() << "Invalid array index or keyPath for updating in file:" << filePath;
-            }
-        } else {
-            qWarning() << "Unsupported JSON document type for updating (not an object or array):" << filePath;
+        // Update JSON value using keyPath
+        if (!updateJsonValue(currentDoc, keyPath, translatedText)) {
+            qWarning() << "Failed to update value at keyPath:" << keyPath
+                       << "in file:" << filePath;
         }
 
         filesToUpdate.insert(filePath, currentDoc);
@@ -144,15 +215,147 @@ bool RpgmAnalyzer::save(const QString &outputPath, const QJsonArray &texts)
     return true;
 }
 
+bool RpgmAnalyzer::updateJsonValue(QJsonDocument &doc, const QString &keyPath, const QString &newValue)
+{
+    QStringList keys = keyPath.split('.');
+
+    if (doc.isObject()) {
+        QJsonObject obj = doc.object();
+        if (updateJsonObject(obj, keys, 0, newValue)) {
+            doc.setObject(obj);
+            return true;
+        }
+    } else if (doc.isArray()) {
+        QJsonArray arr = doc.array();
+        if (updateJsonArray(arr, keys, 0, newValue)) {
+            doc.setArray(arr);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool RpgmAnalyzer::updateJsonObject(QJsonObject &obj, const QStringList &keys, int index, const QString &newValue)
+{
+    if (index >= keys.size()) return false;
+
+    QString currentKey = keys[index];
+
+    // Check if key contains array notation [n]
+    if (currentKey.contains('[')) {
+        int bracketPos = currentKey.indexOf('[');
+        QString baseKey = currentKey.left(bracketPos);
+        int arrayIndex = currentKey.mid(bracketPos + 1, currentKey.indexOf(']') - bracketPos - 1).toInt();
+
+        if (!obj.contains(baseKey) || !obj[baseKey].isArray()) return false;
+
+        QJsonArray arr = obj[baseKey].toArray();
+        if (index == keys.size() - 1) {
+            if (arrayIndex >= 0 && arrayIndex < arr.size()) {
+                arr.replace(arrayIndex, newValue);
+                obj[baseKey] = arr;
+                return true;
+            }
+        } else {
+            if (updateJsonArray(arr, keys, index + 1, newValue)) {
+                obj[baseKey] = arr;
+                return true;
+            }
+        }
+    } else {
+        if (!obj.contains(currentKey)) return false;
+
+        if (index == keys.size() - 1) {
+            obj[currentKey] = newValue;
+            return true;
+        } else {
+            QJsonValue value = obj[currentKey];
+            if (value.isObject()) {
+                QJsonObject nestedObj = value.toObject();
+                if (updateJsonObject(nestedObj, keys, index + 1, newValue)) {
+                    obj[currentKey] = nestedObj;
+                    return true;
+                }
+            } else if (value.isArray()) {
+                QJsonArray nestedArr = value.toArray();
+                if (updateJsonArray(nestedArr, keys, index + 1, newValue)) {
+                    obj[currentKey] = nestedArr;
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+bool RpgmAnalyzer::updateJsonArray(QJsonArray &arr, const QStringList &keys, int index, const QString &newValue)
+{
+    if (index >= keys.size()) return false;
+
+    QString currentKey = keys[index];
+
+    // Check if it's an array index
+    if (currentKey.contains('[')) {
+        int bracketPos = currentKey.indexOf('[');
+        int arrayIndex = currentKey.mid(bracketPos + 1, currentKey.indexOf(']') - bracketPos - 1).toInt();
+
+        if (arrayIndex < 0 || arrayIndex >= arr.size()) return false;
+
+        if (index == keys.size() - 1) {
+            arr.replace(arrayIndex, newValue);
+            return true;
+        } else {
+            QJsonValue value = arr[arrayIndex];
+            if (value.isObject()) {
+                QJsonObject obj = value.toObject();
+                if (updateJsonObject(obj, keys, index + 1, newValue)) {
+                    arr.replace(arrayIndex, obj);
+                    return true;
+                }
+            } else if (value.isArray()) {
+                QJsonArray nestedArr = value.toArray();
+                if (updateJsonArray(nestedArr, keys, index + 1, newValue)) {
+                    arr.replace(arrayIndex, nestedArr);
+                    return true;
+                }
+            }
+        }
+    } else {
+        bool ok;
+        int arrayIndex = currentKey.toInt(&ok);
+
+        if (ok && arrayIndex >= 0 && arrayIndex < arr.size()) {
+            if (index == keys.size() - 1) {
+                arr.replace(arrayIndex, newValue);
+                return true;
+            } else {
+                QJsonValue value = arr[arrayIndex];
+                if (value.isObject()) {
+                    QJsonObject obj = value.toObject();
+                    if (updateJsonObject(obj, keys, index + 1, newValue)) {
+                        arr.replace(arrayIndex, obj);
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJsonArray &extractedStrings, const QString &filePath, const QString &currentKeyPath)
 {
     if (jsonValue.isString()) {
         QString text = jsonValue.toString();
-        if (!text.isEmpty()) {
+        // กรองข้อความที่ไม่ต้องการแปล
+        if (!text.isEmpty() && !isSystemString(text)) {
             QJsonObject entry;
             entry.insert(QStringLiteral("source"), text);
             entry.insert(QStringLiteral("path"), filePath);
-            entry.insert(QStringLiteral("key"), currentKeyPath); // Store the key path
+            entry.insert(QStringLiteral("key"), currentKeyPath);
             extractedStrings.append(entry);
         }
     } else if (jsonValue.isObject()) {
@@ -164,10 +367,49 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
     } else if (jsonValue.isArray()) {
         QJsonArray arr = jsonValue.toArray();
         for (int i = 0; i < arr.size(); ++i) {
-            QString newKeyPath = currentKeyPath.isEmpty() ? QString::number(i) : currentKeyPath + "[" + QString::number(i) + "]";
+            QString newKeyPath = currentKeyPath.isEmpty()
+            ? QString::number(i)
+            : currentKeyPath + "[" + QString::number(i) + "]";
             extractStringsFromJsonValue(arr[i], extractedStrings, filePath, newKeyPath);
         }
     }
+}
+
+bool RpgmAnalyzer::isSystemString(const QString &text)
+{
+    // กรองสตริงที่เป็น system string ไม่ต้องแปล
+    static QStringList systemPrefixes = {
+        "img/", "audio/", "data/", "js/", "fonts/",
+        "Actor", "Class", "Skill", "Item", "Weapon", "Armor",
+        "Enemy", "Troop", "State", "Animation", "Tileset",
+        "CommonEvent", "System", "MapInfo"
+    };
+
+    // ตรวจสอบว่าเป็น path
+    if (text.contains('/') || text.contains('\\')) {
+        return true;
+    }
+
+    // ตรวจสอบว่าเป็น system prefix
+    for (const QString &prefix : systemPrefixes) {
+        if (text.startsWith(prefix)) {
+            return true;
+        }
+    }
+
+    // ตรวจสอบว่าเป็นตัวเลขล้วน
+    bool isNumber;
+    text.toDouble(&isNumber);
+    if (isNumber) {
+        return true;
+    }
+
+    // ตรวจสอบว่ามีแต่ whitespace
+    if (text.trimmed().isEmpty()) {
+        return true;
+    }
+
+    return false;
 }
 
 } // namespace rpgm

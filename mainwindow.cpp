@@ -96,6 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Setup BGA Data Manager
     m_bgaDataManager = new BGADataManager(this);
     connect(m_bgaDataManager, &BGADataManager::errorOccurred, this, &MainWindow::onBGADataError);
+    connect(m_bgaDataManager, &BGADataManager::fontsLoaded, this, &MainWindow::onFontsLoaded);
 
     // Setup Translation Service Manager
     m_translationServiceManager = new TranslationServiceManager(this);
@@ -110,6 +111,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::settings, this, &MainWindow::onSettingsActionTriggered);
     connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveGameProject); // Connect save action
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
+    connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
 
     // Enable custom context menu for translation table view
     ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -528,6 +530,19 @@ void MainWindow::saveSettings()
     settings.setValue("llmProvider", m_llmProvider);
     settings.setValue("llmApiKey", m_llmApiKey);
     settings.setValue("llmModel", m_llmModel);
+}
+
+void MainWindow::onFontsLoaded(const QJsonArray &fonts)
+{
+    m_gameFonts = fonts;
+}
+
+void MainWindow::onFontManagerActionTriggered()
+{
+    FontManagerDialog dialog(m_gameFonts, m_targetLanguageName, this);
+    if (dialog.exec() == QDialog::Accepted) {
+        // Handle accepted dialog
+    }
 }
 
 void MainWindow::onUndoTranslation()

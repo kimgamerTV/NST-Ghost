@@ -12,7 +12,11 @@ public:
     core::AnalyzerOutput analyze(const QString &inputPath) override;
     bool save(const QString &outputPath, const QJsonArray &texts) override; // Implement save method
 private:
-    void extractStringsFromJsonValue(const QJsonValue &jsonValue, QJsonArray &extractedStrings, const QString &filePath, const QString &currentKeyPath = ""); // New helper function
+    void extractStringsFromJsonValue(const QJsonValue &jsonValue, QJsonArray &extractedStrings, const QString &filePath, const QString &currentKeyPath = "");
+    bool updateJsonValue(QJsonDocument &doc, const QString &keyPath, const QString &newValue);
+    bool updateJsonObject(QJsonObject &obj, const QStringList &keys, int index, const QString &newValue);
+    bool updateJsonArray(QJsonArray &arr, const QStringList &keys, int index, const QString &newValue);
+    bool isSystemString(const QString &text);
 };
 
 } // namespace rpgm

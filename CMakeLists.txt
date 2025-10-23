@@ -29,11 +29,13 @@ set(PROJECT_SOURCES
     translationservicemanager.cpp
     translationcontextmenu.cpp
     updatecontroller.cpp
+    fontmanagerdialog.cpp
     mainwindow.h
     menubar.h
     loadprojectdialog.h
     searchdialog.h
     settingsdialog.h
+    fontmanagerdialog.h
     searchcontroller.h
     shortcutcontroller.h
     bgadatamanager.h

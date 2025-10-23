@@ -16,6 +16,7 @@
 #include "translationservicemanager.h"
 #include "translationcontextmenu.h"
 #include "settingsdialog.h"
+#include "fontmanagerdialog.h"
 #include "updatecontroller.h"
 #include <qtlingo/translationservice.h>
 
@@ -55,6 +56,8 @@ public slots:
     void onUndoTranslation();
     void onSaveGameProject(); // New slot for saving game project // New slot for undoing translation
     void onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void onFontManagerActionTriggered();
+    void onFontsLoaded(const QJsonArray &fonts);
 
 private:
     void loadSettings();
@@ -70,6 +73,7 @@ private:
     SearchDialog *m_searchDialog;
     BGADataManager *m_bgaDataManager;
     QMap<QString, QJsonArray> m_loadedGameProjectData;
+    QJsonArray m_gameFonts;
     TranslationServiceManager *m_translationServiceManager;
     UpdateController *m_updateController;
     QMultiMap<QString, QModelIndex> m_pendingTranslations;

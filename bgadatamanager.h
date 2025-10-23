@@ -22,10 +22,13 @@ public:
     QJsonArray loadStringsFromGameProject(const QString &engineName, const QString &projectPath);
     bool saveStringsToGameProject(const QString &engineName, const QString &projectPath, const QMap<QString, QJsonArray> &data); // New method
 
+    QJsonArray loadedFonts() const;
+
 signals:
     void errorOccurred(const QString &message);
+    void fontsLoaded(const QJsonArray &fonts);
 
 private:
-};
+    QJsonArray m_loadedFonts;};
 
 #endif // BGADATAMANAGER_H

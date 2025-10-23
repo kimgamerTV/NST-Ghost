@@ -18,6 +18,9 @@ void MenuBar::createMenus()
     fileMenu->addAction(settingsAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
+
+    toolsMenu = addMenu(tr("&Tools"));
+    toolsMenu->addAction(fontManagerAction);
 }
 
 void MenuBar::createActions()
@@ -36,4 +39,7 @@ void MenuBar::createActions()
 
     exitAction = new QAction(tr("&Exit"), this);
     connect(exitAction, &QAction::triggered, this, &MenuBar::exit);
+
+    fontManagerAction = new QAction(tr("Font Manager..."), this);
+    connect(fontManagerAction, &QAction::triggered, this, &MenuBar::fontManager);
 }

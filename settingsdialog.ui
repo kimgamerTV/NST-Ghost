@@ -30,248 +30,237 @@
     <number>12</number>
    </property>
    <item>
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QGroupBox" name="googleSettingsGroupBox">
+     <property name="title">
+      <string>Google Translate Settings</string>
      </property>
-     <widget class="QWidget" name="googleTranslateTab">
-      <attribute name="title">
-       <string>Google Translate</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>10</number>
-       </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>10</number>
-       </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
-        <number>10</number>
-       </property>
-       <item>
-        <widget class="QGroupBox" name="googleSettingsGroupBox">
-         <property name="title">
-          <string>Google Translate Settings</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout">
-          <property name="horizontalSpacing">
-           <number>15</number>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="horizontalSpacing">
+       <number>15</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Translation Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>10</number>
+        </property>
+        <item>
+         <widget class="QRadioButton" name="googleFreeRadioButton">
+          <property name="toolTip">
+           <string>Uses an unofficial method to translate, may be unstable.</string>
           </property>
-          <property name="verticalSpacing">
-           <number>10</number>
+          <property name="text">
+           <string>Free (Unofficial)</string>
           </property>
-          <property name="leftMargin">
-           <number>10</number>
+          <property name="checked">
+           <bool>true</bool>
           </property>
-          <property name="topMargin">
-           <number>10</number>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="googleApiRadioButton">
+          <property name="toolTip">
+           <string>Uses the official Google Translate API, requires an API key.</string>
           </property>
-          <property name="rightMargin">
-           <number>10</number>
+          <property name="text">
+           <string>API</string>
           </property>
-          <property name="bottomMargin">
-           <number>10</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Translation Type:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <property name="spacing">
-             <number>10</number>
-            </property>
-            <item>
-             <widget class="QRadioButton" name="googleFreeRadioButton">
-              <property name="toolTip">
-               <string>Uses an unofficial method to translate, may be unstable.</string>
-              </property>
-              <property name="text">
-               <string>Free (Unofficial)</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QRadioButton" name="googleApiRadioButton">
-              <property name="toolTip">
-               <string>Uses the official Google Translate API, requires an API key.</string>
-              </property>
-              <property name="text">
-               <string>API</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="apiKeyLabel">
-            <property name="toolTip">
-             <string>Your Google Translate API key.</string>
-            </property>
-            <property name="text">
-             <string>API Key:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="googleApiKeyEdit"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="targetLanguageLabel">
-            <property name="toolTip">
-             <string>The language to translate into.</string>
-            </property>
-            <property name="text">
-             <string>Target Language:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="targetLanguageComboBox"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="llmTab">
-      <attribute name="title">
-       <string>LLM Translation</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="spacing">
-        <number>10</number>
-       </property>
-       <property name="leftMargin">
-        <number>10</number>
-       </property>
-       <property name="topMargin">
-        <number>10</number>
-       </property>
-       <property name="rightMargin">
-        <number>10</number>
-       </property>
-       <property name="bottomMargin">
-        <number>10</number>
-       </property>
-       <item>
-        <widget class="QGroupBox" name="llmSettingsGroupBox">
-         <property name="title">
-          <string>LLM Translation Settings</string>
-         </property>
-         <layout class="QFormLayout" name="formLayout_2">
-          <property name="horizontalSpacing">
-           <number>15</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>10</number>
-          </property>
-          <property name="leftMargin">
-           <number>10</number>
-          </property>
-          <property name="topMargin">
-           <number>10</number>
-          </property>
-          <property name="rightMargin">
-           <number>10</number>
-          </property>
-          <property name="bottomMargin">
-           <number>10</number>
-          </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="llmProviderLabel">
-            <property name="toolTip">
-             <string>The LLM provider to use (e.g., OpenAI, Google AI).</string>
-            </property>
-            <property name="text">
-             <string>Provider:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="llmProviderComboBox">
-            <item>
-             <property name="text">
-              <string>OpenAI</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Google AI</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="llmApiKeyLabel">
-            <property name="toolTip">
-             <string>Your API key for the selected LLM provider.</string>
-            </property>
-            <property name="text">
-             <string>API Key:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="llmApiKeyEdit"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="llmModelLabel">
-            <property name="toolTip">
-             <string>The specific LLM model to use (e.g., gpt-4, gemini-pro).</string>
-            </property>
-            <property name="text">
-             <string>Model:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="llmModelEdit"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="apiKeyLabel">
+        <property name="toolTip">
+         <string>Your Google Translate API key.</string>
+        </property>
+        <property name="text">
+         <string>API Key:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="googleApiKeyEdit"/>
+      </item>
+     </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_google_llm">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="generalSettingsGroupBox">
+     <property name="title">
+      <string>General Settings</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_3">
+      <property name="horizontalSpacing">
+       <number>15</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="targetLanguageLabel">
+        <property name="toolTip">
+         <string>The language to translate into.</string>
+        </property>
+        <property name="text">
+         <string>Target Language:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="targetLanguageComboBox"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_general_llm">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="llmSettingsGroupBox">
+     <property name="title">
+      <string>LLM Translation Settings</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="horizontalSpacing">
+       <number>15</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="llmProviderLabel">
+        <property name="toolTip">
+         <string>The LLM provider to use (e.g., OpenAI, Google AI).</string>
+        </property>
+        <property name="text">
+         <string>Provider:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="llmProviderComboBox">
+        <item>
+         <property name="text">
+          <string>OpenAI</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Google AI</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="llmApiKeyLabel">
+        <property name="toolTip">
+         <string>Your API key for the selected LLM provider.</string>
+        </property>
+        <property name="text">
+         <string>API Key:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="llmApiKeyEdit"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="llmModelLabel">
+        <property name="toolTip">
+         <string>The specific LLM model to use (e.g., gpt-4, gemini-pro).</string>
+        </property>
+        <property name="text">
+         <string>Model:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="llmModelEdit"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_llm_bottom">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
