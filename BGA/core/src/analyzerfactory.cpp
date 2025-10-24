@@ -3,6 +3,7 @@
 #include "core/engines/rpgm/rpganalyzer.h"
 #include "core/engines/unity/unityanalyzer.h"
 
+
 namespace core {
 
 std::unique_ptr<IGameAnalyzer> createAnalyzer(const QString &engineName)
