@@ -51,7 +51,7 @@ jobs:
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.5.3'
+          version: '6.9.2'
           arch: win64_msvc2019_64
           cache: true
       
