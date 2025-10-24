@@ -130,10 +130,9 @@ void FontManagerDialog::onFontSelectionChanged(const QModelIndex &current, const
         int fontId = QFontDatabase::addApplicationFont(fontPath);
         if (fontId != -1) {
             QStringList fontFamilies = QFontDatabase::applicationFontFamilies(fontId);
-            if (!fontFamilies.isEmpty()) {
-                QFont font(fontFamilies.at(0), 24);
-                ui->fontPreviewLabel->setFont(font);
-            }
+            QString fontName = fontFamilies.isEmpty() ? QStringLiteral("Arial") : fontFamilies.at(0);
+            QFont font(fontName, 24);
+            ui->fontPreviewLabel->setFont(font);
         }
 
         if (m_targetLanguageName.toLower() == "thai") {
