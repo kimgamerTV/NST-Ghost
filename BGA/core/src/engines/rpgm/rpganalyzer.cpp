@@ -8,6 +8,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QStandardPaths>
+#include <QOperatingSystemVersion>
 
 namespace core { namespace engines { namespace rpgm {
 
@@ -94,7 +95,11 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
         for (const QFileInfo &info : fontFiles) {
             QJsonObject fontEntry;
             fontEntry.insert(QStringLiteral("name"), info.baseName());
-            fontEntry.insert(QStringLiteral("path"), info.absoluteFilePath());
+            QString fontFilePath = info.absoluteFilePath();
+#ifdef Q_OS_WIN
+            fontFilePath.replace(QStringLiteral("/"), QStringLiteral("\\"));
+#endif
+            fontEntry.insert(QStringLiteral("path"), fontFilePath);
             fontEntries.append(fontEntry);
         }
         logStream << "RPGM Analyzer: Found " << fontFiles.size() << " font files.\n";
