@@ -47,6 +47,8 @@ set(PROJECT_SOURCES
     translationservicemanager.h
     translationcontextmenu.h
     updatecontroller.h
+    customprogressdialog.cpp
+    customprogressdialog.h
     resources.qrc
 )
 

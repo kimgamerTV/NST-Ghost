@@ -12,17 +12,26 @@ class LLMTranslationService : public ITranslationService {
 public:
     LLMTranslationService(QObject *parent = nullptr);
     QString serviceName() const override { return "LLM Translation"; }
-    TranslationResult translate(const QString &sourceText) override;
+    void translate(const QString &sourceText) override;
 
     void setApiKey(const QString &apiKey) override;
     void setLlmProvider(const QString &provider) override;
     void setLlmModel(const QString &model) override;
+    void setLlmBaseUrl(const QString &baseUrl);
     void setTargetLanguage(const QString &language) override;
 
 private slots:
     void onNetworkReply(QNetworkReply *reply);
 
 private:
+    void buildOpenAIRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText);
+    void buildAnthropicRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText);
+    void buildGoogleRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText);
+
+    QString parseOpenAIResponse(const QJsonObject &jsonObj);
+    QString parseAnthropicResponse(const QJsonObject &jsonObj);
+    QString parseGoogleResponse(const QJsonObject &jsonObj);
+
     QNetworkAccessManager *m_networkManager;
     QString m_apiKey;
     QString m_provider;

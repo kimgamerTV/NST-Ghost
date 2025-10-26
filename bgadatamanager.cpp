@@ -1,4 +1,5 @@
 #include "bgadatamanager.h"
+#include <QThread> // Required for QThread::currentThreadId()
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -24,6 +25,9 @@ QStringList BGADataManager::getAvailableAnalyzers() const
 
 QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName, const QString &projectPath)
 {
+    qDebug() << "BGADataManager: loadStringsFromGameProject called in thread:" << QThread::currentThreadId();
+    emit progressUpdated(0, "Starting project analysis...");
+
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/bgadatamanager_log.txt";
     QFile logFile(logFilePath);
     logFile.open(QIODevice::WriteOnly | QIODevice::Append);
@@ -37,9 +41,11 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
         emit errorOccurred(QString("Failed to create analyzer for engine: %1").arg(engineName));
         logStream << "BGADataManager: Failed to create analyzer." << "\n";
         logFile.close();
+        emit loadingFinished();
         return extractedTextsArray;
     }
 
+    emit progressUpdated(25, "Analyzing game project...");
     logStream << "BGADataManager: Calling analyzer->analyze for project: " << projectPath << "\n";
     core::AnalyzerOutput output = analyzer->analyze(projectPath);
     logStream << "BGADataManager: Analyzer output payload size:" << output.payload.size() << "bytes" << "\n";
@@ -48,6 +54,7 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
         emit errorOccurred(output.errorMessage);
         logStream << "BGADataManager: Analyzer returned error: " << output.errorMessage << "\n";
         logFile.close();
+        emit loadingFinished();
         return extractedTextsArray; // Return empty array on error
     }
 
@@ -55,9 +62,11 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
         emit errorOccurred(QString("No data extracted from project: %1").arg(projectPath));
         logStream << "BGADataManager: No data extracted from project." << "\n";
         logFile.close();
+        emit loadingFinished();
         return extractedTextsArray;
     }
 
+    emit progressUpdated(75, "Parsing extracted data...");
     logStream << "BGADataManager: Before QJsonDocument::fromJson" << "\n";
     if (output.format == "application/json") {
         QJsonDocument doc = QJsonDocument::fromJson(output.payload);
@@ -66,6 +75,7 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
             emit errorOccurred("Invalid JSON output from analyzer.");
             logStream << "BGADataManager: Invalid JSON output from analyzer." << "\n";
             logFile.close();
+            emit loadingFinished();
             return extractedTextsArray;
         }
 
@@ -82,6 +92,7 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
             extractedTextsArray = doc.array();
         }
 
+        emit progressUpdated(90, QString("Extracted %1 entries.").arg(extractedTextsArray.size()));
         logStream << "BGADataManager: Extracted " << extractedTextsArray.size() << " entries." << "\n";
         logStream << "BGADataManager: After extracting entries" << "\n";
 
@@ -90,10 +101,13 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
         emit errorOccurred(QString("Unsupported analyzer output format: %1").arg(output.format));
         logStream << "BGADataManager: Unsupported analyzer output format." << "\n";
         logFile.close();
+        emit loadingFinished();
         return extractedTextsArray;
     }
     logStream << "BGADataManager: loadStringsFromGameProject returning." << "\n";
     logFile.close();
+    emit loadingFinished();
+    qDebug() << "BGADataManager: loadStringsFromGameProject finished in thread:" << QThread::currentThreadId();
     return extractedTextsArray;
 }
     

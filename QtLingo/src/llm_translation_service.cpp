@@ -35,58 +35,161 @@ void LLMTranslationService::setTargetLanguage(const QString &language)
     m_targetLanguage = language;
 }
 
-TranslationResult LLMTranslationService::translate(const QString &sourceText)
+void LLMTranslationService::translate(const QString &sourceText)
 {
     m_currentSourceText = sourceText;
 
-    if (m_apiKey.isEmpty()) {
-        TranslationResult result;
-        result.sourceText = sourceText;
-        result.translatedText = "[Error: API key is not set]";
-        emit errorOccurred("API key is not set for LLM Translation.");
-        return result;
+    if (m_apiKey.isEmpty() || m_provider.isEmpty() || m_model.isEmpty() || m_targetLanguage.isEmpty()) {
+        emit errorOccurred("Missing required configuration for LLM translation (API Key, Provider, Model, or Target Language).");
+        return;
     }
 
     QJsonObject requestBody;
-    requestBody["model"] = m_model;
-    QJsonArray messages;
-    QJsonObject message;
-    message["role"] = "user";
-    message["content"] = QString("Translate the following text to %1: %2").arg(m_targetLanguage, sourceText);
-    messages.append(message);
-    requestBody["messages"] = messages;
-
-    QNetworkRequest request(QUrl("https://api.openai.com/v1/chat/completions"));
+    QNetworkRequest request;
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    request.setRawHeader("Authorization", ("Bearer " + m_apiKey).toUtf8());
+    request.setTransferTimeout(30000); // 30 second timeout
+
+    try {
+        if (m_provider == "OpenAI") {
+            buildOpenAIRequest(request, requestBody, sourceText);
+        } else if (m_provider == "Anthropic") {
+            buildAnthropicRequest(request, requestBody, sourceText);
+        } else if (m_provider == "Google") {
+            buildGoogleRequest(request, requestBody, sourceText);
+        } else {
+            emit errorOccurred("Unknown LLM provider: " + m_provider);
+            return;
+        }
+    } catch (const std::exception& e) {
+        emit errorOccurred(QString("Failed to build request: %1").arg(e.what()));
+        return;
+    }
 
     m_networkManager->post(request, QJsonDocument(requestBody).toJson());
-
-    // Return a temporary result, the actual result will be emitted when the network reply is finished
-    TranslationResult result;
-    result.sourceText = sourceText;
-    result.translatedText = "[Translating...]";
-    return result;
 }
 
 void LLMTranslationService::onNetworkReply(QNetworkReply *reply)
 {
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray responseData = reply->readAll();
-        qDebug() << "LLM API Response:" << responseData;
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
-        QJsonObject jsonObj = jsonDoc.object();
-        QJsonArray choices = jsonObj["choices"].toArray();
-        QString translatedText = choices[0].toObject()["message"].toObject()["content"].toString();
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "Network Error:" << reply->errorString();
+        qDebug() << "Response:" << reply->readAll();
+        emit errorOccurred(reply->errorString());
+        reply->deleteLater();
+        return;
+    }
 
+    QByteArray responseData = reply->readAll();
+    qDebug() << "LLM API Response:" << responseData;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+    QJsonObject jsonObj = jsonDoc.object();
+    QString translatedText;
+
+    try {
+        if (m_provider == "OpenAI") {
+            translatedText = parseOpenAIResponse(jsonObj);
+        } else if (m_provider == "Anthropic") {
+            translatedText = parseAnthropicResponse(jsonObj);
+        } else if (m_provider == "Google") {
+            translatedText = parseGoogleResponse(jsonObj);
+        }
+    } catch (const std::exception& e) {
+        emit errorOccurred(QString("Failed to parse response: %1").arg(e.what()));
+        reply->deleteLater();
+        return;
+    }
+
+    if (translatedText.isEmpty() || translatedText.startsWith("[Error:")) {
+        emit errorOccurred(translatedText.isEmpty() ? "[Error: Empty response from API]" : translatedText);
+    } else {
         TranslationResult result;
         result.sourceText = m_currentSourceText;
         result.translatedText = translatedText;
         emit translationFinished(result);
-    } else {
-        emit errorOccurred(reply->errorString());
     }
+
     reply->deleteLater();
+}
+
+void LLMTranslationService::buildOpenAIRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText)
+{
+    request.setUrl(QUrl("https://api.openai.com/v1/chat/completions"));
+    request.setRawHeader("Authorization", ("Bearer " + m_apiKey).toUtf8());
+    requestBody["model"] = m_model;
+    QJsonArray messages;
+    QJsonObject message;
+    message["role"] = "user";
+    message["content"] = QString("Translate the following text to %1. Return only the translated text without any explanation:\n\n%2").arg(m_targetLanguage, sourceText);
+    messages.append(message);
+    requestBody["messages"] = messages;
+}
+
+void LLMTranslationService::buildAnthropicRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText)
+{
+    request.setUrl(QUrl("https://api.anthropic.com/v1/messages"));
+    request.setRawHeader("x-api-key", m_apiKey.toUtf8());
+    request.setRawHeader("anthropic-version", "2023-06-01");
+    requestBody["model"] = m_model;
+    requestBody["max_tokens"] = 1024;
+    QJsonArray messages;
+    QJsonObject message;
+    message["role"] = "user";
+    message["content"] = QString("Translate the following text to %1. Return only the translated text without any explanation:\n\n%2").arg(m_targetLanguage, sourceText);
+    messages.append(message);
+    requestBody["messages"] = messages;
+}
+
+void LLMTranslationService::buildGoogleRequest(QNetworkRequest &request, QJsonObject &requestBody, const QString &sourceText)
+{
+    QUrl url(QString("https://generativelanguage.googleapis.com/v1beta/models/%1:generateContent").arg(m_model));
+    QUrlQuery query;
+    query.addQueryItem("key", m_apiKey);
+    url.setQuery(query);
+    request.setUrl(url);
+    QJsonObject content;
+    QJsonObject part;
+    part["text"] = QString("Translate the following text to %1. Return only the translated text without any explanation:\n\n%2").arg(m_targetLanguage, sourceText);
+    QJsonArray parts;
+    parts.append(part);
+    content["parts"] = parts;
+    QJsonArray contents;
+    contents.append(content);
+    requestBody["contents"] = contents;
+}
+
+QString LLMTranslationService::parseOpenAIResponse(const QJsonObject &jsonObj)
+{
+    if (jsonObj.contains("error")) {
+        return "[Error: " + jsonObj["error"].toObject()["message"].toString() + "]";
+    }
+    QJsonArray choices = jsonObj["choices"].toArray();
+    if (choices.isEmpty()) {
+        return "[Error: No response from API]";
+    }
+    return choices[0].toObject()["message"].toObject()["content"].toString();
+}
+
+QString LLMTranslationService::parseAnthropicResponse(const QJsonObject &jsonObj)
+{
+    if (jsonObj.contains("error")) {
+        return "[Error: " + jsonObj["error"].toObject()["message"].toString() + "]";
+    }
+    QJsonArray content = jsonObj["content"].toArray();
+    if (content.isEmpty()) {
+        return "[Error: No response from API]";
+    }
+    return content[0].toObject()["text"].toString();
+}
+
+QString LLMTranslationService::parseGoogleResponse(const QJsonObject &jsonObj)
+{
+    if (jsonObj.contains("error")) {
+        return "[Error: " + jsonObj["error"].toObject()["message"].toString() + "]";
+    }
+    QJsonArray candidates = jsonObj["candidates"].toArray();
+    if (candidates.isEmpty()) {
+        return "[Error: No response from API]";
+    }
+    return candidates[0].toObject()["content"].toObject()["parts"].toArray()[0].toObject()["text"].toString();
 }
 
 } // namespace qtlingo

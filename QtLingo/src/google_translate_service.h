@@ -12,7 +12,7 @@ class GoogleTranslateService : public ITranslationService {
 public:
     GoogleTranslateService(QObject *parent = nullptr);
     QString serviceName() const override { return "Google Translate"; }
-    TranslationResult translate(const QString &sourceText) override;
+    void translate(const QString &sourceText) override;
 
     void setApiKey(const QString &apiKey) override;
     void setTargetLanguage(const QString &language) override;

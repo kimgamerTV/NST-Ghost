@@ -27,6 +27,8 @@ public:
 signals:
     void errorOccurred(const QString &message);
     void fontsLoaded(const QJsonArray &fonts);
+    void progressUpdated(int percentage, const QString &message);
+    void loadingFinished();
 
 private:
     QJsonArray m_loadedFonts;};

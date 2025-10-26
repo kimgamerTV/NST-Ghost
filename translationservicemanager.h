@@ -15,6 +15,7 @@ class TranslationServiceManager : public QObject
     Q_OBJECT
 public:
     explicit TranslationServiceManager(QObject *parent = nullptr);
+    ~TranslationServiceManager();
 
     QStringList getAvailableServices() const;
     void translate(const QString &serviceName, const QStringList &sourceTexts, const QVariantMap &settings);
@@ -22,6 +23,9 @@ public:
 signals:
     void translationFinished(const qtlingo::TranslationResult &result);
     void errorOccurred(const QString &message);
+
+private:
+    QList<qtlingo::ITranslationService*> m_services;
 };
 
 #endif // TRANSLATIONSERVICEMANAGER_H

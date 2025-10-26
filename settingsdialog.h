@@ -24,6 +24,7 @@ public:
     QString llmProvider() const;
     QString llmApiKey() const;
     QString llmModel() const;
+    QString llmBaseUrl() const;
 
     void setGoogleApiKey(const QString &apiKey);
     void setTargetLanguage(const QString &language);
@@ -31,9 +32,11 @@ public:
     void setLlmProvider(const QString &provider);
     void setLlmApiKey(const QString &apiKey);
     void setLlmModel(const QString &model);
+    void setLlmBaseUrl(const QString &baseUrl);
 
 private slots:
-    void updateGoogleApiFields();
+    void updateConfigPanel();
+    void updateLlmModelComboBox();
 
 private:
     Ui::SettingsDialog *ui;

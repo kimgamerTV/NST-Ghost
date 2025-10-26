@@ -1,6 +1,8 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 
+#include <QMap>
+
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::SettingsDialog)
@@ -22,10 +24,13 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     ui->targetLanguageComboBox->addItem("Hindi", "hi");
     ui->targetLanguageComboBox->addItem("Thai", "th");
 
-    connect(ui->googleApiRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateGoogleApiFields);
-    connect(ui->googleFreeRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateGoogleApiFields);
+    connect(ui->quickTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
+    connect(ui->professionalTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
+    connect(ui->aiPoweredTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
+    connect(ui->llmProviderComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateLlmModelComboBox);
 
-    updateGoogleApiFields();
+    updateConfigPanel();
+    updateLlmModelComboBox();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -48,14 +53,11 @@ QString SettingsDialog::targetLanguageName() const
     return ui->targetLanguageComboBox->currentText();
 }
 
-bool SettingsDialog::isGoogleApi() const
-{
-    return ui->googleApiRadioButton->isChecked();
-}
-
 QString SettingsDialog::llmProvider() const
 {
-    return ui->llmProviderComboBox->currentText();
+    QString provider = ui->llmProviderComboBox->currentText();
+    if (provider == "Google") return "Google";
+    return provider;
 }
 
 QString SettingsDialog::llmApiKey() const
@@ -63,9 +65,14 @@ QString SettingsDialog::llmApiKey() const
     return ui->llmApiKeyEdit->text();
 }
 
+QString SettingsDialog::llmBaseUrl() const
+{
+    return ui->llmBaseUrlEdit->text();
+}
+
 QString SettingsDialog::llmModel() const
 {
-    return ui->llmModelEdit->text();
+    return ui->llmModelComboBox->currentText();
 }
 
 void SettingsDialog::setGoogleApiKey(const QString &apiKey)
@@ -81,15 +88,11 @@ void SettingsDialog::setTargetLanguage(const QString &language)
     }
 }
 
-void SettingsDialog::setGoogleApi(bool isApi)
-{
-    ui->googleApiRadioButton->setChecked(isApi);
-    ui->googleFreeRadioButton->setChecked(!isApi);
-}
-
 void SettingsDialog::setLlmProvider(const QString &provider)
 {
-    int index = ui->llmProviderComboBox->findText(provider);
+    QString providerText = provider;
+    if (provider == "Google") providerText = "Google AI";
+    int index = ui->llmProviderComboBox->findText(providerText);
     if (index != -1) {
         ui->llmProviderComboBox->setCurrentIndex(index);
     }
@@ -100,13 +103,56 @@ void SettingsDialog::setLlmApiKey(const QString &apiKey)
     ui->llmApiKeyEdit->setText(apiKey);
 }
 
-void SettingsDialog::setLlmModel(const QString &model)
+void SettingsDialog::setLlmBaseUrl(const QString &baseUrl)
 {
-    ui->llmModelEdit->setText(model);
+    ui->llmBaseUrlEdit->setText(baseUrl);
 }
 
-void SettingsDialog::updateGoogleApiFields()
+void SettingsDialog::setLlmModel(const QString &model)
 {
-    bool isApi = ui->googleApiRadioButton->isChecked();
-    ui->googleApiKeyEdit->setEnabled(isApi);
+    updateLlmModelComboBox(); // Ensure the models are populated for the current provider
+    if (ui->llmModelComboBox->isEditable()) {
+        ui->llmModelComboBox->setCurrentText(model);
+    } else {
+        int index = ui->llmModelComboBox->findText(model);
+        if (index != -1) {
+            ui->llmModelComboBox->setCurrentIndex(index);
+        }
+    }
+}
+
+bool SettingsDialog::isGoogleApi() const
+{
+    return ui->professionalTranslateRadioButton->isChecked();
+}
+
+void SettingsDialog::setGoogleApi(bool isApi)
+{
+    ui->professionalTranslateRadioButton->setChecked(isApi);
+    ui->quickTranslateRadioButton->setChecked(!isApi);
+}
+
+void SettingsDialog::updateConfigPanel()
+{
+    if (ui->quickTranslateRadioButton->isChecked()) {
+        ui->configStackedWidget->setCurrentIndex(0); // Page for Quick Translate
+    } else if (ui->professionalTranslateRadioButton->isChecked()) {
+        ui->configStackedWidget->setCurrentIndex(1); // Page for Professional (Google API)
+    } else if (ui->aiPoweredTranslateRadioButton->isChecked()) {
+        ui->configStackedWidget->setCurrentIndex(2); // Page for AI-Powered (LLM)
+    }
+}
+
+void SettingsDialog::updateLlmModelComboBox()
+{
+    QString provider = ui->llmProviderComboBox->currentText();
+    ui->llmModelComboBox->clear();
+
+    if (provider == "OpenAI") {
+        ui->llmModelComboBox->addItems({"gpt-4o", "gpt-4-turbo", "gpt-4", "gpt-3.5-turbo"});
+    } else if (provider == "Anthropic") {
+        ui->llmModelComboBox->addItems({"claude-3-opus-20240229", "claude-3-sonnet-20240229", "claude-3-haiku-20240307"});
+    } else if (provider == "Google AI") {
+        ui->llmModelComboBox->addItems({"gemini-1.5-pro-latest", "gemini-pro"});
+    }
 }

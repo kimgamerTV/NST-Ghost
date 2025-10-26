@@ -20,7 +20,7 @@ public:
     explicit ITranslationService(QObject *parent = nullptr) : QObject(parent) {}
     virtual ~ITranslationService() = default;
     virtual QString serviceName() const = 0;
-    virtual TranslationResult translate(const QString &sourceText) = 0;
+    virtual void translate(const QString &sourceText) = 0;
 
     virtual void setApiKey(const QString &apiKey) { Q_UNUSED(apiKey); }
     virtual void setTargetLanguage(const QString &language) { Q_UNUSED(language); }
@@ -31,6 +31,7 @@ public:
     // LLM specific
     virtual void setLlmProvider(const QString &provider) { Q_UNUSED(provider); }
     virtual void setLlmModel(const QString &model) { Q_UNUSED(model); }
+    virtual void setLlmEndpoint(const QString &endpoint) { Q_UNUSED(endpoint); }
 
 signals:
     void translationFinished(const TranslationResult &result);

@@ -16,7 +16,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
-#include <QStandardPaths> // New include
+#include <QStandardPaths>
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
@@ -24,9 +24,13 @@
 #include <QApplication>
 #include <QScreen>
 
+#include "customprogressdialog.h"
+#include "loadprojectdialog.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_progressDialog(nullptr)
 {
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/mainwindow_log.txt";
     QFile logFile(logFilePath);
@@ -260,92 +264,285 @@ void MainWindow::onOpenMockData()
 
 void MainWindow::onLoadFromGameProject()
 {
-    QFile logFile("mainwindow_log.txt");
-    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream logStream(&logFile);
+    qDebug() << "=== onLoadFromGameProject START ===";
 
-    logStream << "MainWindow: onLoadFromGameProject started." << "\n";
-
-    QStringList availableAnalyzers = m_bgaDataManager->getAvailableAnalyzers();
-    qDebug() << "MainWindow: Available analyzers size:" << availableAnalyzers.size();
-    qDebug() << "MainWindow: Available analyzers:" << availableAnalyzers;
-    if (availableAnalyzers.isEmpty()) {
-        QMessageBox::warning(this, "Error", "No game engine analyzers available. Please ensure BGACore is correctly built and linked.");
-        logStream << "MainWindow: No game engine analyzers available." << "\n";
-        logFile.close();
+    // ตรวจสอบ m_bgaDataManager ก่อน
+    if (!m_bgaDataManager) {
+        qDebug() << "ERROR: m_bgaDataManager is NULL!";
+        QMessageBox::critical(this, "Error", "BGADataManager is not initialized!");
         return;
     }
 
-    LoadProjectDialog dialog(availableAnalyzers, this);
+    qDebug() << "BGADataManager OK";
 
-    // Center the dialog on the screen
-    dialog.setGeometry(
-        QStyle::alignedRect(
-            Qt::LeftToRight,
-            Qt::AlignCenter,
-            dialog.size(),
-            qApp->primaryScreen()->availableGeometry()
-        )
-    );
+    QStringList availableAnalyzers;
+    try {
+        availableAnalyzers = m_bgaDataManager->getAvailableAnalyzers();
+        qDebug() << "Available analyzers:" << availableAnalyzers;
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION in getAvailableAnalyzers:" << e.what();
+        QMessageBox::critical(this, "Error", QString("Failed to get analyzers: %1").arg(e.what()));
+        return;
+    } catch (...) {
+        qDebug() << "UNKNOWN EXCEPTION in getAvailableAnalyzers";
+        QMessageBox::critical(this, "Error", "Unknown error getting analyzers");
+        return;
+    }
 
-    dialog.raise();
-    dialog.activateWindow();
+    if (availableAnalyzers.isEmpty()) {
+        QMessageBox::warning(this, "Error", "No game engine analyzers available.");
+        return;
+    }
 
-    if (dialog.exec() == QDialog::Accepted) {
-        QString engineName = dialog.selectedEngine();
-        QString projectPath = dialog.projectPath();
+    qDebug() << "Creating LoadProjectDialog...";
 
-        m_currentEngineName = engineName; // Store engine name
-        m_currentProjectPath = projectPath; // Store project path
+    LoadProjectDialog *dialog = nullptr;
+    try {
+        dialog = new LoadProjectDialog(availableAnalyzers, this);
+        qDebug() << "Dialog created successfully";
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION creating dialog:" << e.what();
+        QMessageBox::critical(this, "Error", QString("Failed to create dialog: %1").arg(e.what()));
+        return;
+    } catch (...) {
+        qDebug() << "UNKNOWN EXCEPTION creating dialog";
+        QMessageBox::critical(this, "Error", "Unknown error creating dialog");
+        return;
+    }
 
-        if (projectPath.isEmpty()) {
-            QMessageBox::warning(this, "Error", "Project path cannot be empty.");
-            logStream << "MainWindow: Project path cannot be empty." << "\n";
-            logFile.close();
-            return;
+    if (!dialog) {
+        qDebug() << "ERROR: Dialog is NULL after creation!";
+        QMessageBox::critical(this, "Error", "Failed to create project dialog");
+        return;
+    }
+
+    qDebug() << "Setting dialog geometry...";
+    try {
+        dialog->setGeometry(
+            QStyle::alignedRect(
+                Qt::LeftToRight,
+                Qt::AlignCenter,
+                dialog->size(),
+                qApp->primaryScreen()->availableGeometry()
+                )
+            );
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION setting geometry:" << e.what();
+        delete dialog;
+        QMessageBox::critical(this, "Error", QString("Dialog error: %1").arg(e.what()));
+        return;
+    }
+
+    dialog->raise();
+    dialog->activateWindow();
+
+    qDebug() << "Executing dialog...";
+    int dialogResult = QDialog::Rejected;
+    try {
+        dialogResult = dialog->exec();
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION in dialog exec:" << e.what();
+        delete dialog;
+        QMessageBox::critical(this, "Error", QString("Dialog execution failed: %1").arg(e.what()));
+        return;
+    } catch (...) {
+        qDebug() << "UNKNOWN EXCEPTION in dialog exec";
+        delete dialog;
+        QMessageBox::critical(this, "Error", "Unknown error in dialog");
+        return;
+    }
+
+    qDebug() << "Dialog result:" << dialogResult;
+
+    if (dialogResult != QDialog::Accepted) {
+        qDebug() << "Dialog was not accepted";
+        delete dialog;
+        return;
+    }
+
+    QString engineName;
+    QString projectPath;
+
+    try {
+        engineName = dialog->selectedEngine();
+        projectPath = dialog->projectPath();
+        qDebug() << "Engine:" << engineName << "Path:" << projectPath;
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION getting dialog data:" << e.what();
+        delete dialog;
+        QMessageBox::critical(this, "Error", QString("Failed to get dialog data: %1").arg(e.what()));
+        return;
+    }
+
+    delete dialog; // ลบ dialog ทิ้งก่อนจะทำงานต่อ
+    dialog = nullptr;
+
+    if (projectPath.isEmpty()) {
+        QMessageBox::warning(this, "Error", "Project path cannot be empty.");
+        return;
+    }
+
+    m_currentEngineName = engineName;
+    m_currentProjectPath = projectPath;
+
+    qDebug() << "Creating progress dialog...";
+
+    // ลบ progress dialog เก่า
+    if (m_progressDialog) {
+        m_progressDialog->close();
+        delete m_progressDialog;
+        m_progressDialog = nullptr;
+    }
+
+    m_progressDialog = new CustomProgressDialog(this);
+    m_progressDialog->show();
+
+    qDebug() << "Progress dialog shown";
+
+    // ยกเลิก connections เก่า
+    disconnect(&m_loadFutureWatcher, nullptr, this, nullptr);
+
+    // Connect signals
+    connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::finished,
+            this, &MainWindow::onLoadingFinished);
+
+    connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::canceled,
+            this, [this]() {
+                qDebug() << "Future was CANCELED";
+                if (m_progressDialog) {
+                    m_progressDialog->close();
+                    delete m_progressDialog;
+                    m_progressDialog = nullptr;
+                }
+            });
+
+
+
+    connect(m_bgaDataManager, &BGADataManager::progressUpdated,
+            m_progressDialog, &CustomProgressDialog::setValue);
+    connect(m_bgaDataManager, &BGADataManager::progressUpdated,
+            this, [this](int, const QString &message) {
+        if (m_progressDialog) {
+            m_progressDialog->setLabelText(message);
         }
+    });
 
-        logStream << "MainWindow: Calling loadStringsFromGameProject for engine: " << engineName << " and path: " << projectPath << "\n";
-        QJsonArray extractedTextsArray = m_bgaDataManager->loadStringsFromGameProject(engineName, projectPath);
-        logStream << "MainWindow: loadStringsFromGameProject returned. Array size: " << extractedTextsArray.size() << "\n";
+    qDebug() << "Starting QtConcurrent::run...";
 
-        if (!extractedTextsArray.isEmpty()) {
-            logStream << "MainWindow: Extracted texts array size:" << extractedTextsArray.size() << "\n"; // Debug statement
-            m_loadedGameProjectData.clear(); // Clear previous data
-            QStringList fileNamesForDisplay;
+    // ใช้ lambda ที่ capture by value เพื่อความปลอดภัย
+    QFuture<QJsonArray> future = QtConcurrent::run(
+        [bgaManager = this->m_bgaDataManager, engine = engineName, path = projectPath]() -> QJsonArray {
+            qDebug() << "*** WORKER THREAD STARTED ***";
 
-            for (const QJsonValue &value : extractedTextsArray) {
-                logStream << "MainWindow: Processing QJsonValue..." << "\n"; // Debug statement
-                if (value.isObject()) {
-                    QJsonObject textObject = value.toObject();
-                    QString filePath = textObject["path"].toString(); // Use "path" instead of "file"
-                    if (!filePath.isEmpty()) {
-                        // Store texts grouped by full file path
-                        m_loadedGameProjectData[filePath].append(value);
-                        if (!fileNamesForDisplay.contains(QFileInfo(filePath).fileName())) {
-                            fileNamesForDisplay.append(QFileInfo(filePath).fileName());
-                        }
-                    }
+            if (!bgaManager) {
+                qDebug() << "ERROR: bgaManager is NULL in worker thread!";
+                return QJsonArray();
+            }
+
+            QJsonArray result;
+            try {
+                result = bgaManager->loadStringsFromGameProject(engine, path);
+                qDebug() << "*** WORKER FINISHED *** Result size:" << result.size();
+            } catch (const std::exception &e) {
+                qDebug() << "*** WORKER EXCEPTION ***" << e.what();
+            } catch (...) {
+                qDebug() << "*** WORKER UNKNOWN EXCEPTION ***";
+            }
+
+            return result;
+        }
+        );
+
+    qDebug() << "Future created - isValid:" << future.isValid();
+
+    if (!future.isValid()) {
+        qDebug() << "ERROR: Future is not valid!";
+        if (m_progressDialog) {
+            m_progressDialog->close();
+            delete m_progressDialog;
+            m_progressDialog = nullptr;
+        }
+        QMessageBox::critical(this, "Error", "Failed to start loading task");
+        return;
+    }
+
+    m_loadFutureWatcher.setFuture(future);
+
+    qDebug() << "=== onLoadFromGameProject END ===";
+}
+
+void MainWindow::onLoadingFinished()
+{
+    qDebug() << "=== onLoadingFinished START ===";
+    qDebug() << "isFinished:" << m_loadFutureWatcher.isFinished()
+             << "isCanceled:" << m_loadFutureWatcher.isCanceled();
+
+    // ปิด progress dialog
+    if (m_progressDialog) {
+        m_progressDialog->close();
+        m_progressDialog->deleteLater();
+        m_progressDialog = nullptr;
+    }
+
+    if (m_loadFutureWatcher.isCanceled()) {
+        qDebug() << "Loading was canceled";
+        QMessageBox::information(this, "Canceled", "Loading was canceled.");
+        return;
+    }
+
+    QJsonArray extractedTextsArray;
+    try {
+        extractedTextsArray = m_loadFutureWatcher.result();
+        qDebug() << "Result array size:" << extractedTextsArray.size();
+    } catch (const std::exception &e) {
+        qDebug() << "EXCEPTION getting result:" << e.what();
+        QMessageBox::critical(this, "Error", QString("Error loading data: %1").arg(e.what()));
+        return;
+    } catch (...) {
+        qDebug() << "UNKNOWN EXCEPTION getting result";
+        QMessageBox::critical(this, "Error", "Unknown error loading data");
+        return;
+    }
+
+    if (extractedTextsArray.isEmpty()) {
+        QMessageBox::information(this, "Info", "No translatable strings found.");
+        return;
+    }
+
+    m_loadedGameProjectData.clear();
+    QStringList fileNamesForDisplay;
+
+    for (const QJsonValue &value : extractedTextsArray) {
+        if (value.isObject()) {
+            QJsonObject textObject = value.toObject();
+            QString filePath = textObject["path"].toString();
+            if (!filePath.isEmpty()) {
+                m_loadedGameProjectData[filePath].append(value);
+                QString fileName = QFileInfo(filePath).fileName();
+                if (!fileNamesForDisplay.contains(fileName)) {
+                    fileNamesForDisplay.append(fileName);
                 }
             }
-            logStream << "MainWindow: Finished processing extracted texts. Number of files: " << fileNamesForDisplay.size() << "\n";
-            m_fileListModel->setStringList(fileNamesForDisplay);
-
-            if (m_fileListModel->rowCount() > 0) {
-                ui->fileListView->setCurrentIndex(m_fileListModel->index(0, 0));
-                on_fileListView_clicked(m_fileListModel->index(0, 0));
-                m_currentLoadedFilePath = m_fileListModel->data(m_fileListModel->index(0, 0)).toString();
-            }
-            logStream << "MainWindow: Finished updating UI." << "\n";
-
-        } else {
-            QMessageBox::information(this, "Info", "No translatable strings found or extracted.");
-            logStream << "MainWindow: No translatable strings found or extracted." << "\n";
         }
     }
-    logStream << "MainWindow: onLoadFromGameProject finished." << "\n";
-    logFile.close();
+
+    m_fileListModel->setStringList(fileNamesForDisplay);
+
+    if (m_fileListModel->rowCount() > 0) {
+        ui->fileListView->setCurrentIndex(m_fileListModel->index(0, 0));
+        on_fileListView_clicked(m_fileListModel->index(0, 0));
+    }
+
+    QMessageBox::information(this, "Success",
+                             QString("Loaded %1 files with %2 strings.")
+                                 .arg(fileNamesForDisplay.size())
+                                 .arg(extractedTextsArray.size()));
+
+    qDebug() << "=== onLoadingFinished END ===";
 }
+
+
+
 
 void MainWindow::onBGADataError(const QString &message)
 {
@@ -375,6 +572,7 @@ void MainWindow::onTranslateSelectedTextWithService(const QString &serviceName, 
         settings["llmProvider"] = m_llmProvider;
         settings["llmApiKey"] = m_llmApiKey;
         settings["llmModel"] = m_llmModel;
+        settings["llmBaseUrl"] = m_llmBaseUrl;
 
         m_translationServiceManager->translate(serviceName, QStringList() << sourceText, settings);
     }
@@ -467,12 +665,13 @@ void MainWindow::onTranslateAllSelectedText()
         QVariantMap settings;
         settings["googleApiKey"] = m_apiKey;
         settings["targetLanguage"] = m_targetLanguage;
-        settings["googleApi"] = m_googleApi;
-        settings["llmProvider"] = m_llmProvider;
-        settings["llmApiKey"] = m_llmApiKey;
-        settings["llmModel"] = m_llmModel;
-
-        m_translationServiceManager->translate(serviceName, sourceTexts, settings);
+                settings["googleApi"] = m_googleApi;
+                settings["llmProvider"] = m_llmProvider;
+                settings["llmApiKey"] = m_llmApiKey;
+                settings["llmModel"] = m_llmModel;
+                settings["llmBaseUrl"] = m_llmBaseUrl;
+        
+                m_translationServiceManager->translate(serviceName, sourceTexts, settings);
     }
 }
 
@@ -490,6 +689,7 @@ void MainWindow::onSettingsActionTriggered()
     dialog.setLlmProvider(m_llmProvider);
     dialog.setLlmApiKey(m_llmApiKey);
     dialog.setLlmModel(m_llmModel);
+    dialog.setLlmBaseUrl(m_llmBaseUrl);
 
     QFile file(":/style.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
@@ -507,6 +707,7 @@ void MainWindow::onSettingsActionTriggered()
         m_llmProvider = dialog.llmProvider();
         m_llmApiKey = dialog.llmApiKey();
         m_llmModel = dialog.llmModel();
+        m_llmBaseUrl = dialog.llmBaseUrl();
         saveSettings();
     }
 }
@@ -521,6 +722,7 @@ void MainWindow::loadSettings()
     m_llmProvider = settings.value("llmProvider", "OpenAI").toString();
     m_llmApiKey = settings.value("llmApiKey").toString();
     m_llmModel = settings.value("llmModel").toString();
+    m_llmBaseUrl = settings.value("llmBaseUrl").toString();
 }
 
 void MainWindow::saveSettings()
@@ -533,6 +735,7 @@ void MainWindow::saveSettings()
     settings.setValue("llmProvider", m_llmProvider);
     settings.setValue("llmApiKey", m_llmApiKey);
     settings.setValue("llmModel", m_llmModel);
+    settings.setValue("llmBaseUrl", m_llmBaseUrl);
 }
 
 void MainWindow::onFontsLoaded(const QJsonArray &fonts)

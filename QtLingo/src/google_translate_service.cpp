@@ -37,7 +37,7 @@ void GoogleTranslateService::setGoogleTranslateMode(bool isApi)
     m_isApi = isApi;
 }
 
-TranslationResult GoogleTranslateService::translate(const QString &sourceText)
+void GoogleTranslateService::translate(const QString &sourceText)
 {
     m_currentSourceText = sourceText;
 
@@ -46,12 +46,6 @@ TranslationResult GoogleTranslateService::translate(const QString &sourceText)
     } else {
         translateWithFreeApi(sourceText);
     }
-
-    // Return temporary result
-    TranslationResult result;
-    result.sourceText = sourceText;
-    result.translatedText = "[Translating...]";
-    return result;
 }
 
 void GoogleTranslateService::translateWithApi(const QString &sourceText)
