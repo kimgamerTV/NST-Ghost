@@ -57,26 +57,29 @@ jobs:
           cd build
           cmake --install .
 
-      - name: Locate windeployqt
+      - name: Debug windeployqt
         shell: msys2 {0}
         run: |
-          echo "Listing /mingw64/qt6/bin:"
-          ls /mingw64/qt6/bin
-          echo "Listing /mingw64/bin:"
-          ls /mingw64/bin | grep windeployqt || true
-          DEPLOY_TOOL=$(find /mingw64 -type f -name "windeployqt*.exe" 2>/dev/null | head -n 1)
-          echo "Found windeployqt at $DEPLOY_TOOL"
-          if [ -z "$DEPLOY_TOOL" ]; then
-            echo "ERROR: windeployqt not found!"
+          echo "Contents of /mingw64/bin:"
+          ls /mingw64/bin | grep windeployqt || echo "windeployqt not found"
+          DEPLOY_TOOL="/mingw64/bin/windeployqt.exe"
+          if [ ! -f "$DEPLOY_TOOL" ]; then
+            echo "ERROR: windeployqt not found in /mingw64/bin!"
             exit 1
           fi
-          echo "::set-output name=path::$DEPLOY_TOOL"
+          echo "Found windeployqt at $DEPLOY_TOOL"
 
       - name: Deploy Qt Runtime
         shell: msys2 {0}
         run: |
-          DEPLOY_TOOL="${{ steps.locate-windeployqt.outputs.path }}"
           Bin=$(realpath build/install/bin)
+          DEPLOY_TOOL="/mingw64/bin/windeployqt.exe"
+
+          if [ ! -f "$DEPLOY_TOOL" ]; then
+            echo "ERROR: windeployqt not found in /mingw64/bin!"
+            exit 1
+          fi
+
           "$DEPLOY_TOOL" \
             --no-translations \
             --compiler-runtime \
