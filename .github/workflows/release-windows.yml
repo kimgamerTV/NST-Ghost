@@ -142,6 +142,28 @@ jobs:
           Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
           Write-Host "QT_PLUGIN_PATH: $env:QT_PLUGIN_PATH"
           
+          # Check critical platform plugin
+          $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindowsd.dll"
+          if ("${{ matrix.build_type }}" -eq "Release") {
+            $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
+          }
+          
+          Write-Host ""
+          Write-Host "Checking platform plugin..."
+          if (Test-Path $platformPlugin) {
+            Write-Host "✓ Found: $platformPlugin"
+          } else {
+            Write-Host "✗ ERROR: Platform plugin not found: $platformPlugin"
+            Write-Host ""
+            Write-Host "Contents of platforms directory:"
+            if (Test-Path "$env:QT_ROOT_DIR\plugins\platforms") {
+              Get-ChildItem "$env:QT_ROOT_DIR\plugins\platforms" | Select-Object Name, Length | Format-Table
+            } else {
+              Write-Host "Platforms directory doesn't exist!"
+            }
+            exit 1
+          }
+          
           # Use QT_ROOT_DIR environment variable set by install-qt-action
           $qtBin = Join-Path $env:QT_ROOT_DIR "bin\windeployqt.exe"
           
@@ -150,6 +172,7 @@ jobs:
             exit 1
           }
 
+          Write-Host ""
           Write-Host "Running windeployqt from: $qtBin"
           
           # Set Qt plugin path explicitly for windeployqt
@@ -164,22 +187,83 @@ jobs:
           }
           
           if ($LASTEXITCODE -ne 0) {
+            Write-Host ""
             Write-Host "✗ ERROR: windeployqt failed with exit code $LASTEXITCODE"
             Write-Host ""
-            Write-Host "Checking Qt installation..."
-            Write-Host "Qt bin directory contents:"
-            Get-ChildItem "$env:QT_ROOT_DIR\bin" | Select-Object Name | Format-Table
-            Write-Host ""
-            Write-Host "Qt plugins directory:"
-            if (Test-Path "$env:QT_ROOT_DIR\plugins") {
-              Get-ChildItem "$env:QT_ROOT_DIR\plugins" -Directory | Select-Object Name | Format-Table
-            } else {
-              Write-Host "Plugins directory not found!"
+            Write-Host "Attempting manual deployment..."
+            
+            # Manually copy essential DLLs
+            $qtBinDir = "$env:QT_ROOT_DIR\bin"
+            $buildDir = "build"
+            
+            Write-Host "Copying Qt DLLs..."
+            $qtDlls = @(
+              "Qt6Core.dll",
+              "Qt6Gui.dll", 
+              "Qt6Widgets.dll",
+              "Qt6Network.dll",
+              "Qt6Concurrent.dll"
+            )
+            
+            if ("${{ matrix.build_type }}" -eq "Debug") {
+              $qtDlls = $qtDlls | ForEach-Object { $_.Replace(".dll", "d.dll") }
             }
-            exit 1
+            
+            foreach ($dll in $qtDlls) {
+              $src = Join-Path $qtBinDir $dll
+              if (Test-Path $src) {
+                Copy-Item $src $buildDir -Force
+                Write-Host "  ✓ Copied $dll"
+              } else {
+                Write-Host "  ⚠ $dll not found, trying without 'd' suffix..."
+                $dllNoD = $dll.Replace("d.dll", ".dll")
+                $src = Join-Path $qtBinDir $dllNoD
+                if (Test-Path $src) {
+                  Copy-Item $src $buildDir -Force
+                  Write-Host "  ✓ Copied $dllNoD"
+                }
+              }
+            }
+            
+            # Copy platform plugin
+            Write-Host "Copying platform plugins..."
+            $platformsDir = Join-Path $buildDir "platforms"
+            New-Item -ItemType Directory -Path $platformsDir -Force | Out-Null
+            
+            $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
+            if ("${{ matrix.build_type }}" -eq "Debug") {
+              $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindowsd.dll"
+            }
+            
+            if (Test-Path $platformSrc) {
+              Copy-Item $platformSrc $platformsDir -Force
+              Write-Host "  ✓ Copied platform plugin"
+            } else {
+              # Try without 'd' suffix
+              $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
+              if (Test-Path $platformSrc) {
+                Copy-Item $platformSrc $platformsDir -Force
+                Write-Host "  ✓ Copied platform plugin (release version)"
+              }
+            }
+            
+            # Copy styles plugin
+            Write-Host "Copying style plugins..."
+            $stylesDir = Join-Path $buildDir "styles"
+            New-Item -ItemType Directory -Path $stylesDir -Force | Out-Null
+            
+            Get-ChildItem "$env:QT_ROOT_DIR\plugins\styles" -Filter "*.dll" | ForEach-Object {
+              Copy-Item $_.FullName $stylesDir -Force
+              Write-Host "  ✓ Copied $($_.Name)"
+            }
+            
+            Write-Host ""
+            Write-Host "✓ Manual deployment completed"
+          } else {
+            Write-Host ""
+            Write-Host "✓ windeployqt completed successfully"
           }
-
-          Write-Host "✓ windeployqt completed successfully"
+          
           Write-Host ""
           Write-Host "Deployed files in build directory:"
           Get-ChildItem "build" -Filter "*.dll" | Select-Object Name, Length | Format-Table
