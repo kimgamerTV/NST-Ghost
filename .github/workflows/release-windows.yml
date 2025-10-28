@@ -265,20 +265,37 @@ jobs:
         run: |
           cd build
           
-          # Set package name based on build type
-          if [ "${{ matrix.build_type }}" = "Debug" ]; then
-            export CPACK_PACKAGE_FILE_NAME="NST-Debug"
-          fi
+          echo "=== Creating package ==="
+          echo "Build type: ${{ matrix.build_type }}"
           
+          # Run CPack - the package name is already set by CMakeLists.txt based on CMAKE_BUILD_TYPE
           cpack -G ZIP -C ${{ matrix.build_type }}
+          
+          echo ""
+          echo "Generated packages:"
+          ls -lh *.zip
       
       - name: Verify Package
         shell: pwsh
         run: |
           Write-Host "=== Verifying package ==="
           $buildType = "${{ matrix.build_type }}"
-          $packagePattern = if ($buildType -eq "Debug") { "NST-Debug*.zip" } else { "NST-*.zip" }
-          $packageFile = Get-ChildItem -Path build -Filter $packagePattern | Select-Object -First 1
+          
+          # Adjust pattern to match the CMakeLists.txt naming convention
+          $packagePattern = if ($buildType -eq "Debug") { 
+            "NST-Debug-*.zip" 
+          } else { 
+            "NST-[0-9]*.zip" 
+          }
+          
+          Write-Host "Looking for pattern: $packagePattern"
+          $packageFile = Get-ChildItem -Path build -Filter $packagePattern | Where-Object { 
+            if ($buildType -eq "Release") { 
+              $_.Name -notlike "*Debug*" 
+            } else { 
+              $true 
+            }
+          } | Select-Object -First 1
           
           if ($packageFile) {
             Write-Host "Package: $($packageFile.Name) ($('{0:N2}' -f ($packageFile.Length / 1MB)) MB)"
@@ -298,6 +315,8 @@ jobs:
             }
             
             Remove-Item -Path $tempDir -Recurse -Force
+            Write-Host ""
+            Write-Host "✓ Package verification completed"
           } else {
             Write-Host "✗ ERROR: No package file found matching: $packagePattern"
             Write-Host "Files in build directory:"
@@ -313,17 +332,20 @@ jobs:
         run: |
           cd build
           if [ "${{ matrix.build_type }}" = "Debug" ]; then
-            PACKAGE_FILE=$(ls NST-Debug*.zip 2>/dev/null | head -n 1 || true)
+            PACKAGE_FILE=$(ls NST-Debug-*.zip 2>/dev/null | head -n 1 || true)
           else
-            PACKAGE_FILE=$(ls NST-*.zip 2>/dev/null | grep -v Debug | head -n 1 || true)
+            PACKAGE_FILE=$(ls NST-[0-9]*.zip 2>/dev/null | grep -v Debug | head -n 1 || true)
           fi
-          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
-          if [ -n "$PACKAGE_FILE" ]; then
-            echo "Found package: $PACKAGE_FILE"
-          else
-            echo "Error: No package found"
+          
+          if [ -z "$PACKAGE_FILE" ]; then
+            echo "Error: No package found for build type ${{ matrix.build_type }}"
+            echo "Available zip files:"
+            ls -l *.zip 2>/dev/null || echo "No zip files found"
             exit 1
           fi
+          
+          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          echo "Found package: $PACKAGE_FILE"
       
       - name: Upload artifact
         if: steps.find_files.outputs.package_file != ''
