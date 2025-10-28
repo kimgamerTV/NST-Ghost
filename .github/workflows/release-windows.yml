@@ -25,7 +25,7 @@ jobs:
           version: '6.7.3'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2019_64'
+          arch: 'win64_mingw'
           cache: true
           setup-python: false
       
@@ -36,10 +36,12 @@ jobs:
             New-Item -ItemType Directory -Path 'build' | Out-Null
           }
           Set-Location -Path build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+          
+          # MinGW requires explicit generator
+          cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
           
           Write-Host "Building BGACore first..."
-          cmake --build . --config Release --target BGACore --parallel
+          cmake --build . --target BGACore --parallel
           if ($LASTEXITCODE -ne 0) {
             Write-Host "BGACore build FAILED"
             Write-Host "Printing build tree for diagnostics..."
@@ -48,30 +50,27 @@ jobs:
           }
           
           Write-Host "Verifying BGACore output..."
-          $dllPath = "BGA\Release\BGACore.dll"
-          $libPath = "BGA\Release\BGACore.lib"
+          $dllPath = "BGA\libBGACore.dll"
           
           if (Test-Path $dllPath) {
-            Write-Host "✓ Found BGACore.dll at: $dllPath"
+            Write-Host "✓ Found libBGACore.dll at: $dllPath"
           } else {
-            Write-Host "✗ ERROR: BGACore.dll not found at: $dllPath"
-            throw "BGACore.dll missing after build"
-          }
-          
-          if (Test-Path $libPath) {
-            Write-Host "✓ Found BGACore.lib at: $libPath"
-          } else {
-            Write-Host "⚠ WARNING: BGACore.lib not found (may be expected)"
+            Write-Host "✗ ERROR: libBGACore.dll not found at: $dllPath"
+            Write-Host "Searching for BGACore library files..."
+            Get-ChildItem -Path . -Filter "*BGACore*" -Recurse | ForEach-Object { 
+              Write-Host "  Found: $($_.FullName)" 
+            }
+            throw "BGACore library missing after build"
           }
           
           Write-Host "Building remaining targets..."
-          cmake --build . --config Release --target ALL_BUILD --parallel
+          cmake --build . --parallel
       
       - name: Verify Build Output
         shell: pwsh
         run: |
           Write-Host "=== Verifying build output ==="
-          $exePath = "build\Release\NST.exe"
+          $exePath = "build\NST.exe"
           
           if (Test-Path $exePath) {
             $size = (Get-Item $exePath).Length
@@ -86,32 +85,32 @@ jobs:
           }
           
           Write-Host ""
-          Write-Host "=== Checking DLLs in Release folder ==="
-          $releaseDir = "build\Release"
-          $requiredDlls = @("BGACore.dll", "QtLingo.dll")
+          Write-Host "=== Checking DLLs in build folder ==="
+          $buildDir = "build"
+          $requiredDlls = @("libBGACore.dll", "QtLingo.dll")
           
           foreach ($dll in $requiredDlls) {
-            $dllPath = Join-Path $releaseDir $dll
-            if (Test-Path $dllPath) {
-              Write-Host "✓ $dll found"
-            } else {
-              Write-Host "⚠ WARNING: $dll not in Release folder"
-              Get-ChildItem -Path build -Filter $dll -Recurse | ForEach-Object { 
-                Write-Host "  Found at: $($_.FullName)" 
-              }
+            $found = $false
+            Get-ChildItem -Path $buildDir -Filter $dll -Recurse | ForEach-Object {
+              Write-Host "✓ $dll found at: $($_.FullName)"
+              $found = $true
+            }
+            if (-not $found) {
+              Write-Host "⚠ WARNING: $dll not found"
             }
           }
           
           Write-Host ""
-          Write-Host "=== All DLLs in Release folder ==="
-          Get-ChildItem -Path $releaseDir -Filter "*.dll" | ForEach-Object { 
-            Write-Host "  $($_.Name)" 
+          Write-Host "=== All DLLs in build folder ==="
+          Get-ChildItem -Path $buildDir -Filter "*.dll" -Recurse | ForEach-Object { 
+            $relativePath = $_.FullName.Replace((Get-Location).Path + "\build\", "")
+            Write-Host "  $relativePath"
           }
 
       - name: Deploy Qt dependencies
         shell: pwsh
         run: |
-          $exePath = "build\\Release\\NST.exe"
+          $exePath = "build\NST.exe"
           
           if (-not (Test-Path $exePath)) {
             Write-Host "✗ ERROR: NST.exe not found at $exePath"
@@ -136,7 +135,7 @@ jobs:
           }
 
           Write-Host "✓ windeployqt completed successfully"
-          Write-Host "DLLs deployed to build\\Release"
+          Write-Host "DLLs deployed to build folder"
 
       - name: Package
         run: |
