@@ -281,19 +281,14 @@ jobs:
           Write-Host "=== Verifying package ==="
           $buildType = "${{ matrix.build_type }}"
           
-          # Adjust pattern to match the CMakeLists.txt naming convention
-          $packagePattern = if ($buildType -eq "Debug") { 
-            "NST-Debug-*.zip" 
-          } else { 
-            "NST-[0-9]*.zip" 
-          }
+          Write-Host "Looking for $buildType package..."
           
-          Write-Host "Looking for pattern: $packagePattern"
-          $packageFile = Get-ChildItem -Path build -Filter $packagePattern | Where-Object { 
-            if ($buildType -eq "Release") { 
-              $_.Name -notlike "*Debug*" 
+          # Get all zip files and filter appropriately
+          $packageFile = Get-ChildItem -Path build -Filter "*.zip" | Where-Object { 
+            if ($buildType -eq "Debug") { 
+              $_.Name -like "NST-Debug-*.zip"
             } else { 
-              $true 
+              $_.Name -like "NST-*.zip" -and $_.Name -notlike "*Debug*"
             }
           } | Select-Object -First 1
           
@@ -318,7 +313,7 @@ jobs:
             Write-Host ""
             Write-Host "✓ Package verification completed"
           } else {
-            Write-Host "✗ ERROR: No package file found matching: $packagePattern"
+            Write-Host "✗ ERROR: No package file found for build type: $buildType"
             Write-Host "Files in build directory:"
             Get-ChildItem -Path build -Filter "*.zip" | ForEach-Object {
               Write-Host "  $($_.Name)"
