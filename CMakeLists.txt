@@ -251,8 +251,6 @@ if(APPLE)
     endif()
 endif()
 
-include(CPack)
-
 # CPack configuration
 set(CPACK_PACKAGE_NAME "NST")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
@@ -260,9 +258,13 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A tool for translating video games.")
 set(CPACK_PACKAGE_VENDOR "NST Ghost")
 set(CPACK_PACKAGE_CONTACT "you@example.com")
 
-# Linux (ZIP)
+# Default generator
 set(CPACK_GENERATOR "ZIP")
-set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Linux")
+
+# Linux
+if(UNIX AND NOT APPLE)
+    set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Linux")
+endif()
 
 # macOS (DMG)
 if(APPLE)
@@ -272,11 +274,12 @@ endif()
 
 # Windows (ZIP)
 if(WIN32)
-    set(CPACK_GENERATOR "ZIP")
-    # Package name will include build type if Debug
+    # Check if this is a Debug build
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Windows-Debug")
+        set(CPACK_PACKAGE_FILE_NAME "NST-Debug-${PROJECT_VERSION}-win64")
     else()
-        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Windows")
+        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-win64")
     endif()
 endif()
+
+include(CPack)
