@@ -7,57 +7,41 @@ on:
     branches: [ main ]
 
 jobs:
-  build-windows:
+  build:
     runs-on: windows-latest
-    env:
-      # 1. แก้ไขเวอร์ชัน Qt เป็นเวอร์ชันที่มีจริง
-      QT_VERSION: 6.7.1
-      QT_ARCH: win64_msvc2022_64
-      BUILD_TYPE: Release
-
+    
+    strategy:
+      matrix:
+        # สามารถเพิ่มเวอร์ชัน Qt หรือ Build Type ได้หลากหลาย
+        qt-version: [6.6.3]
+        build_type: [Release]
+        
     steps:
-      # Checkout repository
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # Setup Python
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      # Install aqt (Qt installer)
-      - name: Install aqtinstall
-        run: python -m pip install --upgrade pip && pip install aqtinstall
-
-      # Install Qt
-      - name: Install Qt
-        run: python -m aqt install-qt windows desktop $Env:QT_VERSION $Env:QT_ARCH --outputdir Qt
-
-      # 2. เพิ่ม Qt bin folder เข้าไปใน PATH เพื่อให้ใช้ windeployqt ได้
-      - name: Add Qt to PATH
-        run: |
-          echo "$PWD/Qt/$Env:QT_VERSION/$Env:QT_ARCH/bin" >> $GITHUB_ENV
-
-      # Configure CMake
-      - name: Configure CMake
-        # ระบุ Generator ให้ชัดเจนเพื่อความมั่นใจ
-        run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=$Env:BUILD_TYPE
-
-      # Build project
-      - name: Build Project
-        run: cmake --build build --config $Env:BUILD_TYPE
-
-      # 3. ใช้ windeployqt เพื่อคัดลอกไฟล์ DLL ที่จำเป็น
-      - name: Deploy Qt Application
-        run: |
-          # ชื่อ executable ต้องตรงกับที่ตั้งไว้ใน CMakeLists.txt (NST-Ghost.exe)
-          windeployqt.exe --release --no-translations build/Release/NST-Ghost.exe
-
-      # 4. อัปโหลดโฟลเดอร์ที่ Build เสร็จแล้วเป็น Artifact
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: NST-Ghost-Windows-Portable
-          # อัปโหลดทุกอย่างในโฟลเดอร์ build/Release
-          path: build/Release/
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ matrix.qt-version }}
+        host: windows
+        target: desktop
+        arch: win64_msvc2022_64
+        # จะติดตั้ง Qt และตั้งค่า PATH ให้โดยอัตโนมัติ
+        
+    - name: Configure CMake
+      run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+      
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }}
+      
+    - name: Deploy
+      run: |
+        # ใช้ windeployqt ที่มาพร้อมกับ Qt ที่ติดตั้งโดย jurplel/install-qt-action
+        windeployqt --release --no-translations build/${{ matrix.build_type }}/NST-Ghost.exe
+        
+    - name: Package
+      uses: actions/upload-artifact@v4
+      with:
+        name: NST-Ghost-Windows-${{ matrix.build_type }}
+        path: build/${{ matrix.build_type }}/
