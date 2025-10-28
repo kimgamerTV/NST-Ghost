@@ -108,20 +108,22 @@ jobs:
             Write-Host "  $($_.Name)" 
           }
 
-      #  windeployqt
       - name: Deploy Qt dependencies
         shell: pwsh
         run: |
           $exePath = "build\\Release\\NST.exe"
-          $qtBin = (Get-ChildItem -Path "C:\Qt" -Recurse -Filter "windeployqt.exe" | Select-Object -First 1).FullName
           
           if (-not (Test-Path $exePath)) {
             Write-Host "✗ ERROR: NST.exe not found at $exePath"
             exit 1
           }
 
-          if (-not $qtBin) {
-            Write-Host "✗ ERROR: Could not find windeployqt.exe"
+          # Use QT_ROOT_DIR environment variable set by install-qt-action
+          $qtBin = Join-Path $env:QT_ROOT_DIR "bin\windeployqt.exe"
+          
+          if (-not (Test-Path $qtBin)) {
+            Write-Host "✗ ERROR: Could not find windeployqt.exe at $qtBin"
+            Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
             exit 1
           }
 
