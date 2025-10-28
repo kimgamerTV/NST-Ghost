@@ -19,6 +19,11 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 
+# Use qt_standard_project_setup for Qt 6.3+
+if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
+    qt_standard_project_setup()
+endif()
+
 set(TS_FILES NST_en_US.ts)
 
 set(PROJECT_SOURCES
@@ -103,6 +108,7 @@ set_target_properties(NST PROPERTIES
 
 include(GNUInstallDirs)
 
+# Install executable
 install(TARGETS NST
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -127,128 +133,94 @@ endif()
 install(FILES packaging/debian/nst.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 install(FILES packaging/icons/nst.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
+# Use Qt's official deployment API (Qt 6.3+)
+if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
+    qt_generate_deploy_app_script(
+        TARGET NST
+        OUTPUT_SCRIPT deploy_script
+        NO_UNSUPPORTED_PLATFORM_ERROR
+    )
+    install(SCRIPT ${deploy_script})
+else()
+    # Fallback for older Qt versions
+    if(WIN32)
+        # Find windeployqt
+        get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+        get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+        find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
+        
+        if(WINDEPLOYQT_EXECUTABLE)
+            message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+            
+            # Install Qt DLLs with CPack
+            install(CODE "
+                execute_process(
+                    COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
+                        --release
+                        --no-translations
+                        --no-system-d3d-compiler
+                        --no-opengl-sw
+                        --dir \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\"
+                        \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/NST.exe\"
+                )
+            " COMPONENT Runtime)
+        endif()
+        
+        # Install MinGW Runtime (if using MinGW)
+        if(MINGW)
+            get_filename_component(MINGW_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
+            
+            set(MINGW_DLLS
+                "libgcc_s_seh-1.dll"
+                "libstdc++-6.dll"
+                "libwinpthread-1.dll"
+            )
+            
+            foreach(dll ${MINGW_DLLS})
+                set(dll_path "${MINGW_BIN_DIR}/${dll}")
+                if(EXISTS "${dll_path}")
+                    install(FILES "${dll_path}"
+                        DESTINATION ${CMAKE_INSTALL_BINDIR}
+                        COMPONENT Runtime
+                    )
+                endif()
+            endforeach()
+        endif()
+        
+        # Install Visual C++ Runtime (if using MSVC)
+        if(MSVC)
+            set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+            include(InstallRequiredSystemLibraries)
+            install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+                DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT Runtime
+            )
+        endif()
+    endif()
+    
+    # macOS: Bundle Qt frameworks
+    if(APPLE)
+        get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+        get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
+        find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+        
+        if(MACDEPLOYQT_EXECUTABLE)
+            message(STATUS "Found macdeployqt: ${MACDEPLOYQT_EXECUTABLE}")
+            
+            add_custom_command(TARGET NST POST_BUILD
+                COMMAND "${MACDEPLOYQT_EXECUTABLE}"
+                    "$<TARGET_BUNDLE_DIR:NST>"
+                    -always-overwrite
+                COMMENT "Deploying Qt frameworks with macdeployqt..."
+            )
+        else()
+            message(WARNING "macdeployqt not found. Qt frameworks will not be bundled automatically.")
+        endif()
+    endif()
+endif()
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(NST)
-endif()
-
-# Windows: Deploy all dependencies
-if(WIN32)
-    # Option to skip windeployqt during build (useful for CI/CD)
-    option(SKIP_WINDEPLOYQT_BUILD "Skip running windeployqt during build" OFF)
-    
-    # Always copy BGACore and QtLingo DLLs to build directory
-    add_custom_command(TARGET NST POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:BGACore>"
-            "$<TARGET_FILE_DIR:NST>"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<TARGET_FILE:QtLingo>"
-            "$<TARGET_FILE_DIR:NST>"
-        COMMENT "Copying BGACore.dll and QtLingo.dll..."
-    )
-    
-    # Find windeployqt
-    get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
-    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
-    find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
-    
-    if(WINDEPLOYQT_EXECUTABLE AND NOT SKIP_WINDEPLOYQT_BUILD)
-        message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
-        
-        # Deploy Qt DLLs after build (only if not skipped)
-        add_custom_command(TARGET NST POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                $<$<CONFIG:Debug>:--debug>
-                $<$<CONFIG:Release>:--release>
-                --no-translations
-                --no-system-d3d-compiler
-                --no-opengl-sw
-                "$<TARGET_FILE:NST>"
-            COMMENT "Deploying Qt dependencies with windeployqt..."
-        )
-    elseif(SKIP_WINDEPLOYQT_BUILD)
-        message(STATUS "Skipping windeployqt during build (SKIP_WINDEPLOYQT_BUILD=ON)")
-    else()
-        message(WARNING "windeployqt not found. Qt DLLs will not be bundled automatically.")
-        message(WARNING "Please ensure Qt bin directory is in PATH or set Qt6_DIR correctly.")
-    endif()
-    
-    # Install Qt DLLs with CPack (for 'make install' or 'cpack')
-    if(WINDEPLOYQT_EXECUTABLE)
-        install(CODE "
-            execute_process(
-                COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
-                    $<$<CONFIG:Debug>:--debug>
-                    $<$<CONFIG:Release>:--release>
-                    --no-translations
-                    --no-system-d3d-compiler
-                    --no-opengl-sw
-                    --dir \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\"
-                    \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/NST.exe\"
-            )
-        " COMPONENT Runtime)
-    endif()
-    
-    # Install MinGW Runtime (if using MinGW)
-    if(MINGW)
-        # Get MinGW runtime DLLs
-        get_filename_component(MINGW_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
-        
-        # Common MinGW runtime DLLs
-        set(MINGW_DLLS
-            "libgcc_s_seh-1.dll"
-            "libstdc++-6.dll"
-            "libwinpthread-1.dll"
-        )
-        
-        foreach(dll ${MINGW_DLLS})
-            set(dll_path "${MINGW_BIN_DIR}/${dll}")
-            if(EXISTS "${dll_path}")
-                # Copy to build directory
-                add_custom_command(TARGET NST POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                        "${dll_path}"
-                        "$<TARGET_FILE_DIR:NST>"
-                    COMMENT "Copying ${dll}..."
-                )
-                # Install with CPack
-                install(FILES "${dll_path}"
-                    DESTINATION ${CMAKE_INSTALL_BINDIR}
-                    COMPONENT Runtime
-                )
-            endif()
-        endforeach()
-    endif()
-    
-    # Install Visual C++ Runtime (if using MSVC)
-    if(MSVC)
-        set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-        include(InstallRequiredSystemLibraries)
-        install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
-        )
-    endif()
-endif()
-
-# macOS: Bundle Qt frameworks
-if(APPLE)
-    get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
-    get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
-    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
-    
-    if(MACDEPLOYQT_EXECUTABLE)
-        message(STATUS "Found macdeployqt: ${MACDEPLOYQT_EXECUTABLE}")
-        
-        add_custom_command(TARGET NST POST_BUILD
-            COMMAND "${MACDEPLOYQT_EXECUTABLE}"
-                "$<TARGET_BUNDLE_DIR:NST>"
-                -always-overwrite
-            COMMENT "Deploying Qt frameworks with macdeployqt..."
-        )
-    else()
-        message(WARNING "macdeployqt not found. Qt frameworks will not be bundled automatically.")
-    endif()
 endif()
 
 # CPack configuration
