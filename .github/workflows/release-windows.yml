@@ -12,7 +12,6 @@ jobs:
     
     strategy:
       matrix:
-        # สามารถเพิ่มเวอร์ชัน Qt หรือ Build Type ได้หลากหลาย
         qt-version: [6.6.3]
         build_type: [Release]
         
@@ -20,6 +19,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    # ติดตั้ง Python แยก เพื่อความยืดหยุ่น
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
@@ -27,7 +32,13 @@ jobs:
         host: windows
         target: desktop
         arch: win64_msvc2022_64
-        # จะติดตั้ง Qt และตั้งค่า PATH ให้โดยอัตโนมัติ
+        
+        # เปิดใช้งานการแคชเพื่อเร่งความเร็วในการ Build ครั้งถัดไป
+        cache: 'true'
+        
+        # ถ้าโปรเจคของคุณใช้ Module อื่นๆ เช่น Qt Charts หรือ Qt SVG
+        # ให้เพิ่มบรรทัดนี้แล้วระบุ modules ที่ต้องการ
+        # modules: 'qtcharts qtsvg'
         
     - name: Configure CMake
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
@@ -37,7 +48,6 @@ jobs:
       
     - name: Deploy
       run: |
-        # ใช้ windeployqt ที่มาพร้อมกับ Qt ที่ติดตั้งโดย jurplel/install-qt-action
         windeployqt --release --no-translations build/${{ matrix.build_type }}/NST-Ghost.exe
         
     - name: Package
