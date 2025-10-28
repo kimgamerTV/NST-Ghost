@@ -210,7 +210,7 @@ QPixmap LoadProjectDialog::loadEngineIcon(const QString &engine) const
     if (engine == "RPGM") return QPixmap(":/icons/rpgm_icon.png");
     if (engine == "UNITY") return QPixmap(":/icons/unity_icon.png");
     if (engine == "REN'PY") return QPixmap(":/icons/renpy_icon.png");
-    return style()->standardIcon(QStyle::SP_FileIcon).pixmap(150, 150);
+    return QPixmap(); // Return an empty pixmap as a safe fallback
 }
 
 QString LoadProjectDialog::engineFileTypes(const QString &engine) const
