@@ -254,6 +254,7 @@ jobs:
           name: nst-windows-release
           path: build/*.zip
           retention-days: 1
+
   release-windows:
     needs: build-windows
     runs-on: ubuntu-latest
