@@ -22,12 +22,12 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.0'
+          version: '6.7.3'
           host: 'windows'
           target: 'desktop'
           arch: 'win64_msvc2019_64'
           cache: true
-          modules: 'qtcharts qtnetworkauth'
+          setup-python: false
       
       - name: Configure and Build
         shell: pwsh
