@@ -58,33 +58,26 @@ jobs:
           cmake --install .
 
       - name: Deploy Qt Runtime (windeployqt)
-        shell: pwsh
+        shell: msys2 {0}
         run: |
-          $Bin = Resolve-Path "build/install/bin"
-          $Deploy = "C:\msys64\mingw64\bin\windeployqt.exe"
-          if (!(Test-Path $Deploy)) {
-            Write-Host "ERROR: windeployqt.exe not found!" -ForegroundColor Red
-            exit 1
-          }
-
-          & $Deploy `
-            --no-translations `
-            --compiler-runtime `
-            --plugindir "$Bin/plugins" `
+          Bin=$(realpath build/install/bin)
+          windeployqt \
+            --no-translations \
+            --compiler-runtime \
+            --plugindir "$Bin/plugins" \
             "$Bin/NST.exe"
 
       - name: Create qt.conf
-        shell: pwsh
+        shell: msys2 {0}
         run: |
-          $conf = "build/install/bin/qt.conf"
-          if (!(Test-Path $conf)) {
-            Set-Content $conf "[Paths]`nPlugins = plugins`nPrefix = .."
-          }
+          echo "[Paths]" > build/install/bin/qt.conf
+          echo "Plugins = plugins" >> build/install/bin/qt.conf
+          echo "Prefix = .." >> build/install/bin/qt.conf
 
       - name: Show install tree
-        shell: pwsh
+        shell: msys2 {0}
         run: |
-          Get-ChildItem -Recurse build/install
+          ls -R build/install
 
       - name: Package ZIP
         shell: msys2 {0}
