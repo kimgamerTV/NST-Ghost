@@ -38,7 +38,7 @@ jobs:
     # 5. List available Qt packages (show architectures)
     - name: List available Qt versions and architectures
       run: |
-        python -m aqt list-qt windows desktop --version $Env:QT_VERSION --arch
+        python -m aqt list-qt windows desktop --arch ${{ env.QT_VERSION }}
 
     # 6. Install Qt using jurplel/install-qt-action
     - name: Install Qt
