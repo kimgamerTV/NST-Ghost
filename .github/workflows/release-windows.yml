@@ -57,15 +57,27 @@ jobs:
           cd build
           cmake --install .
 
-      - name: Deploy Qt Runtime (windeployqt)
+      - name: Locate windeployqt
         shell: msys2 {0}
         run: |
-          # ensure Qt deploy tool is in PATH
-          export PATH="/mingw64/qt6/bin:/mingw64/bin:$PATH"
-          which windeployqt || { echo "windeployqt missing"; exit 1; }
+          echo "Listing /mingw64/qt6/bin:"
+          ls /mingw64/qt6/bin
+          echo "Listing /mingw64/bin:"
+          ls /mingw64/bin | grep windeployqt || true
+          DEPLOY_TOOL=$(find /mingw64 -type f -name "windeployqt*.exe" 2>/dev/null | head -n 1)
+          echo "Found windeployqt at $DEPLOY_TOOL"
+          if [ -z "$DEPLOY_TOOL" ]; then
+            echo "ERROR: windeployqt not found!"
+            exit 1
+          fi
+          echo "::set-output name=path::$DEPLOY_TOOL"
 
+      - name: Deploy Qt Runtime
+        shell: msys2 {0}
+        run: |
+          DEPLOY_TOOL="${{ steps.locate-windeployqt.outputs.path }}"
           Bin=$(realpath build/install/bin)
-          windeployqt \
+          "$DEPLOY_TOOL" \
             --no-translations \
             --compiler-runtime \
             --plugindir "$Bin/plugins" \
@@ -119,7 +131,6 @@ jobs:
             echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
           else
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-          fi
 
       - name: Upload Release Assets
         env:
