@@ -1,76 +1,43 @@
-name: Build NST (Windows)
+name: Build NST-Ghost (MSVC)
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  build-windows:
+  build-windows-msvc:
     runs-on: windows-latest
 
     env:
       QT_VERSION: 6.9.2
-      QT_ARCH: win64_mingw
+      QT_ARCH: win64_msvc
       BUILD_TYPE: Release
 
     steps:
-    # 1. Checkout repository
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    # 2. Setup Python
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.12
-        architecture: x64
+        python-version: "3.12"
 
-    # 3. Upgrade pip
-    - name: Upgrade pip
-      run: python -m pip install --upgrade pip
-
-    # 4. Install aqtinstall
     - name: Install aqtinstall
-      run: python -m pip install aqtinstall==3.3.*
+      run: python -m pip install --upgrade pip
+    - run: python -m pip install aqtinstall==3.3.*
 
-    # 5. List available Qt packages (show architectures)
-    - name: List available Qt versions and architectures
+    - name: Install Qt (MSVC)
       run: |
-        python -m aqt list-qt windows desktop --arch ${{ env.QT_VERSION }}
+        python -m aqt install-qt windows desktop $Env:QT_VERSION $Env:QT_ARCH --outputdir Qt --autodesktop
 
-    # 6. Install Qt using jurplel/install-qt-action
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ env.QT_VERSION }}
-        host: windows
-        target: desktop
-        arch: ${{ env.QT_ARCH }}
-        outputdir: ${{ github.workspace }}/Qt
+    - name: Configure CMake (MSVC)
+      run: |
+        cmake -S . -B build -G "Visual Studio 17 2022" `
+          -A x64 `
+          -DCMAKE_BUILD_TYPE=$Env:BUILD_TYPE `
+          -DCMAKE_PREFIX_PATH="$PWD\Qt\$Env:QT_VERSION\$Env:QT_ARCH"
 
-    # 7. Configure CMake
-    - name: Configure CMake
-      run: cmake -S . -B build `
-           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
-           -DCMAKE_PREFIX_PATH="${{ github.workspace }}/Qt/${{ env.QT_VERSION }}/${{ env.QT_ARCH }}"
-
-    # 8. Build with CMake
     - name: Build
-      run: cmake --build build --config ${{ env.BUILD_TYPE }}
-
-    # 9. Install to dist folder
-    - name: Install to dist
-      run: cmake --install build --prefix dist --config ${{ env.BUILD_TYPE }}
-
-    # 10. Package with CPack (ZIP)
-    - name: Run CPack
-      run: cmake --build build --config ${{ env.BUILD_TYPE }} --target package
-
-    # 11. Upload ZIP artifact
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-Windows-${{ env.QT_VERSION }}
-        path: dist/*.zip
+      run: cmake --build build --config $Env:BUILD_TYPE
