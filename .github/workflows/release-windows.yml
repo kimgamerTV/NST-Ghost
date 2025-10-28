@@ -60,6 +60,10 @@ jobs:
       - name: Deploy Qt Runtime (windeployqt)
         shell: msys2 {0}
         run: |
+          # ensure Qt deploy tool is in PATH
+          export PATH="/mingw64/qt6/bin:/mingw64/bin:$PATH"
+          which windeployqt || { echo "windeployqt missing"; exit 1; }
+
           Bin=$(realpath build/install/bin)
           windeployqt \
             --no-translations \
