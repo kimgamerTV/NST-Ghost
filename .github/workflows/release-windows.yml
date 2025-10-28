@@ -16,19 +16,31 @@ jobs:
       BUILD_TYPE: Release
 
     steps:
+    # 1. Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    # 2. Setup Python
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: 3.12
         architecture: x64
 
+    # 3. Upgrade pip
     - name: Upgrade pip
       run: python -m pip install --upgrade pip
 
-    - name: Install Qt (via aqt)
+    # 4. Install aqtinstall (latest)
+    - name: Install aqtinstall
+      run: python -m pip install aqtinstall==3.3.*
+
+    # 5. List available Qt packages (show architectures)
+    - name: List available Qt packages
+      run: python -m aqt list-qt windows desktop ${{ env.QT_VERSION }}
+
+    # 6. Install Qt
+    - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
         version: ${{ env.QT_VERSION }}
@@ -37,26 +49,29 @@ jobs:
         arch: ${{ env.QT_ARCH }}
         outputdir: ${{ github.workspace }}/Qt
 
-    - name: List installed Qt packages
-      run: python -m aqt list-qt windows desktop --arch ${{ env.QT_ARCH }}
-
+    # 7. Show Qt installation path
     - name: Show Qt path
       run: echo Qt installed at $Env:QTDIR
 
+    # 8. Configure CMake
     - name: Configure CMake
       run: cmake -S . -B build `
            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
            -DCMAKE_PREFIX_PATH="$Env:QTDIR"
 
+    # 9. Build with CMake
     - name: Build
       run: cmake --build build --config ${{ env.BUILD_TYPE }}
 
+    # 10. Install to dist folder
     - name: Install to dist
       run: cmake --install build --prefix dist --config ${{ env.BUILD_TYPE }}
 
-    - name: Run CPack (ZIP)
+    # 11. Package with CPack (ZIP)
+    - name: Run CPack
       run: cmake --build build --config ${{ env.BUILD_TYPE }} --target package
 
+    # 12. Upload ZIP artifact
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
