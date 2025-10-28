@@ -88,6 +88,76 @@ jobs:
           echo ""
           echo "=== Installed files ==="
           find install -type f | head -50
+          
+          echo ""
+          echo "=== Checking critical files ==="
+          
+          # Check for NST.exe
+          if [ -f "install/bin/NST.exe" ]; then
+            echo "✓ NST.exe found"
+          else
+            echo "✗ NST.exe NOT FOUND!"
+            exit 1
+          fi
+          
+          # Check for custom DLLs
+          if [ -f "install/bin/libBGACore.dll" ]; then
+            echo "✓ libBGACore.dll found"
+          else
+            echo "✗ libBGACore.dll NOT FOUND!"
+            exit 1
+          fi
+          
+          if [ -f "install/bin/QtLingo.dll" ]; then
+            echo "✓ QtLingo.dll found"
+          else
+            echo "✗ QtLingo.dll NOT FOUND!"
+            exit 1
+          fi
+          
+          # Check for Qt DLLs
+          echo ""
+          echo "Qt DLLs in bin:"
+          ls -lh install/bin/Qt6*.dll 2>/dev/null || echo "No Qt6 DLLs found"
+          
+          # Check for plugins
+          echo ""
+          echo "Plugins directory:"
+          if [ -d "install/bin/plugins" ]; then
+            echo "✓ plugins directory exists"
+            find install/bin/plugins -name "*.dll"
+          else
+            echo "✗ plugins directory NOT FOUND!"
+          fi
+          
+          # Check for platform plugin (critical!)
+          if [ -f "install/bin/plugins/platforms/qwindows.dll" ]; then
+            echo "✓ qwindows.dll (platform plugin) found"
+          else
+            echo "✗ qwindows.dll (platform plugin) NOT FOUND!"
+            echo "This will cause the application to crash!"
+          fi
+          
+          # Check for qt.conf
+          if [ -f "install/bin/qt.conf" ]; then
+            echo "✓ qt.conf found"
+            echo "Contents:"
+            cat install/bin/qt.conf
+          else
+            echo "⚠ qt.conf NOT FOUND - creating one"
+            cat > install/bin/qt.conf << 'EOF'
+[Paths]
+Plugins = plugins
+Prefix = .
+EOF
+            echo "Created qt.conf with content:"
+            cat install/bin/qt.conf
+          fi
+          
+          # Check for MinGW runtime
+          echo ""
+          echo "MinGW runtime DLLs:"
+          ls -lh install/bin/libgcc*.dll install/bin/libstdc++*.dll install/bin/libwinpthread*.dll 2>/dev/null || echo "Some MinGW DLLs may be missing"
       
       - name: Package
         shell: msys2 {0}
@@ -130,7 +200,18 @@ jobs:
             }
             
             # Check for essential files
-            $requiredFiles = @("bin\NST.exe", "bin\libBGACore.dll", "bin\QtLingo.dll")
+            $requiredFiles = @(
+              "bin\NST.exe",
+              "bin\libBGACore.dll",
+              "bin\QtLingo.dll",
+              "bin\Qt6Core.dll",
+              "bin\Qt6Gui.dll",
+              "bin\Qt6Widgets.dll",
+              "bin\Qt6Network.dll",
+              "bin\Qt6Concurrent.dll",
+              "bin\plugins\platforms\qwindows.dll",
+              "bin\qt.conf"
+            )
             $missing = @()
             
             foreach ($file in $requiredFiles) {
@@ -142,15 +223,28 @@ jobs:
             
             if ($missing.Count -gt 0) {
               Write-Host ""
-              Write-Host "WARNING: Missing files:" -ForegroundColor Red
+              Write-Host "ERROR: Missing critical files:" -ForegroundColor Red
               $missing | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
+              exit 1
             } else {
               Write-Host ""
-              Write-Host "All essential files present!" -ForegroundColor Green
+              Write-Host "✓ All essential files present!" -ForegroundColor Green
+            }
+            
+            # Verify qt.conf content
+            $qtConfPath = Join-Path $tempDir "bin\qt.conf"
+            if (Test-Path $qtConfPath) {
+              $qtConfContent = Get-Content $qtConfPath -Raw
+              Write-Host ""
+              Write-Host "qt.conf content:" -ForegroundColor Cyan
+              Write-Host $qtConfContent
             }
             
             Remove-Item -Path $tempDir -Recurse -Force
           }
+          
+          Write-Host ""
+          Write-Host "=== Package verification complete ===" -ForegroundColor Green
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
