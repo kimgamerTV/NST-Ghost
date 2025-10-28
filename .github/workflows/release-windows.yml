@@ -12,7 +12,7 @@ jobs:
 
     env:
       QT_VERSION: 6.9.2
-      QT_ARCH: win64_msvc
+      QT_ARCH: win64_mingw
       BUILD_TYPE: Release
 
     steps:
@@ -25,7 +25,10 @@ jobs:
         python-version: 3.12
         architecture: x64
 
-    - name: Install Qt
+    - name: Upgrade pip
+      run: python -m pip install --upgrade pip
+
+    - name: Install Qt (via aqt)
       uses: jurplel/install-qt-action@v4
       with:
         version: ${{ env.QT_VERSION }}
@@ -33,6 +36,9 @@ jobs:
         target: desktop
         arch: ${{ env.QT_ARCH }}
         outputdir: ${{ github.workspace }}/Qt
+
+    - name: List installed Qt packages
+      run: python -m aqt list-qt windows desktop --arch ${{ env.QT_ARCH }}
 
     - name: Show Qt path
       run: echo Qt installed at $Env:QTDIR
