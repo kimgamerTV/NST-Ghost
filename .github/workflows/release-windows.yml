@@ -173,14 +173,14 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "=== Verifying package ===" -ForegroundColor Cyan
-        
+          
           $zipFiles = Get-ChildItem -Path build -Filter "*.zip"
-        
+          
           if ($zipFiles.Count -eq 0) {
             Write-Host "ERROR: No ZIP files found!" -ForegroundColor Red
             exit 1
           }
-        
+          
           foreach ($zip in $zipFiles) {
             Write-Host ""
             Write-Host "Package: $($zip.Name)" -ForegroundColor Green
@@ -189,15 +189,19 @@ jobs:
             # Extract and verify contents
             $tempDir = "build\verify_$($zip.BaseName)"
             Expand-Archive -Path $zip.FullName -DestinationPath $tempDir -Force
+            
+            # Compute full temp dir path for relative calculations
+            $tempDirFull = (Resolve-Path $tempDir -ErrorAction Stop).Path
+            $packageRoot = Join-Path $tempDirFull $zip.BaseName
           
             Write-Host ""
             Write-Host "Contents:" -ForegroundColor Yellow
             Get-ChildItem -Path $tempDir -Recurse -File | ForEach-Object {
-              $relativePath = $_.FullName.Replace($tempDir, "").TrimStart("\")
+              $relativePath = $_.FullName.Substring($tempDirFull.Length).TrimStart('\')
               Write-Host " $relativePath"
             }
           
-            # Check for essential files
+            # Check for essential files (now under package root)
             $requiredFiles = @(
               "bin\NST.exe",
               "bin\libBGACore.dll",
@@ -213,7 +217,7 @@ jobs:
             $missing = @()
           
             foreach ($file in $requiredFiles) {
-              $fullPath = Join-Path $tempDir $file
+              $fullPath = Join-Path $packageRoot $file
               if (-not (Test-Path $fullPath)) {
                 $missing += $file
               }
@@ -229,8 +233,8 @@ jobs:
               Write-Host "✓ All essential files present!" -ForegroundColor Green
             }
           
-            # Verify qt.conf content
-            $qtConfPath = Join-Path $tempDir "bin\qt.conf"
+            # Verify qt.conf content (under package root)
+            $qtConfPath = Join-Path $packageRoot "bin\qt.conf"
             if (Test-Path $qtConfPath) {
               $qtConfContent = Get-Content $qtConfPath -Raw
               Write-Host ""
@@ -240,7 +244,7 @@ jobs:
           
             Remove-Item -Path $tempDir -Recurse -Force
           }
-        
+          
           Write-Host ""
           Write-Host "=== Package verification complete ===" -ForegroundColor Green
     
