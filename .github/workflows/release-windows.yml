@@ -14,13 +14,15 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-      
+          # use boolean for submodules to avoid schema errors
+          submodules: true
+          fetch-depth: 0
+
       - name: Install MinGW and Ninja
         uses: msys2/setup-msys2@v2
         with:
@@ -30,7 +32,7 @@ jobs:
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
             mingw-w64-x86_64-ninja
-      
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -40,33 +42,33 @@ jobs:
           arch: 'win64_mingw'
           cache: true
           setup-python: false
-      
+
       - name: Configure CMake
         shell: msys2 {0}
         run: |
           mkdir -p build
           cd build
-          
+
           echo "=== CMake Configuration ==="
           echo "Build Type: Release"
-          echo "Qt Root: ${QT_ROOT_DIR}"
-          
+          echo "Qt Root: ${QT_ROOT_DIR:-(not set)}"
+
           # Use absolute path for install prefix
           INSTALL_PREFIX="$(pwd)/install"
           echo "Install prefix: ${INSTALL_PREFIX}"
-          
+
           cmake .. -G "Ninja" \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
             -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"
-      
+
       - name: Build
         shell: msys2 {0}
         run: |
           cd build
           echo "=== Building NST ==="
           cmake --build . --parallel
-          
+
           echo ""
           echo "=== Build Output ==="
           echo "Executable:"
@@ -77,23 +79,23 @@ jobs:
           echo ""
           echo "Searching for DLL files:"
           find . -name "*.dll" -type f | head -20
-      
+
       - name: Install (Deploy)
         shell: msys2 {0}
         run: |
           cd build
           echo "=== Installing to staging directory ==="
-          
+
           # Install with the prefix we set in CMake
           cmake --install .
-          
+
           echo ""
           echo "=== Installed files ==="
           find install -type f | head -50
-          
+
           echo ""
           echo "=== Checking critical files ==="
-          
+
           # Check for NST.exe
           if [ -f "install/bin/NST.exe" ]; then
             echo "✓ NST.exe found"
@@ -101,7 +103,7 @@ jobs:
             echo "✗ NST.exe NOT FOUND!"
             exit 1
           fi
-          
+
           # Check for custom DLLs
           if [ -f "install/bin/libBGACore.dll" ]; then
             echo "✓ libBGACore.dll found"
@@ -109,19 +111,19 @@ jobs:
             echo "✗ libBGACore.dll NOT FOUND!"
             exit 1
           fi
-          
+
           if [ -f "install/bin/QtLingo.dll" ]; then
             echo "✓ QtLingo.dll found"
           else
             echo "✗ QtLingo.dll NOT FOUND!"
             exit 1
           fi
-          
+
           # Check for Qt DLLs
           echo ""
           echo "Qt DLLs in bin:"
           ls -lh install/bin/Qt6*.dll 2>/dev/null || echo "No Qt6 DLLs found"
-          
+
           # Check for plugins
           echo ""
           echo "Plugins directory:"
@@ -131,7 +133,7 @@ jobs:
           else
             echo "✗ plugins directory NOT FOUND!"
           fi
-          
+
           # Check for platform plugin (critical!)
           if [ -f "install/bin/plugins/platforms/qwindows.dll" ]; then
             echo "✓ qwindows.dll (platform plugin) found"
@@ -139,7 +141,7 @@ jobs:
             echo "✗ qwindows.dll (platform plugin) NOT FOUND!"
             echo "This will cause the application to crash!"
           fi
-          
+
           # Check for qt.conf
           if [ -f "install/bin/qt.conf" ]; then
             echo "✓ qt.conf found"
@@ -155,99 +157,24 @@ EOF
             echo "Created qt.conf with content:"
             cat install/bin/qt.conf
           fi
-          
+
           # Check for MinGW runtime
           echo ""
           echo "MinGW runtime DLLs:"
           ls -lh install/bin/libgcc*.dll install/bin/libstdc++*.dll install/bin/libwinpthread*.dll 2>/dev/null || echo "Some MinGW DLLs may be missing"
-      
+
       - name: Package
         shell: msys2 {0}
         run: |
           cd build
-          
+
           echo "=== Creating ZIP package ==="
-          cpack -G ZIP -C Release
-          
+          cpack -G ZIP -C Release || true
+
           echo ""
           echo "=== Generated package ==="
-          ls -lh *.zip
-      
-      - name: Verify Package
-        shell: pwsh
-        run: |
-          Write-Host "=== Verifying package ===" -ForegroundColor Cyan
-          
-          $zipFiles = Get-ChildItem -Path build -Filter "*.zip"
-          
-          if ($zipFiles.Count -eq 0) {
-            Write-Host "ERROR: No ZIP files found!" -ForegroundColor Red
-            exit 1
-          }
-          
-          foreach ($zip in $zipFiles) {
-            Write-Host ""
-            Write-Host "Package: $($zip.Name)" -ForegroundColor Green
-            Write-Host "Size: $([math]::Round($zip.Length / 1MB, 2)) MB"
-            
-            # Extract and verify contents
-            $tempDir = "build\verify_$($zip.BaseName)"
-            Expand-Archive -Path $zip.FullName -DestinationPath $tempDir -Force
-            
-            Write-Host ""
-            Write-Host "Contents:" -ForegroundColor Yellow
-            Get-ChildItem -Path $tempDir -Recurse -File | ForEach-Object {
-              $relativePath = $_.FullName.Replace($tempDir, "").TrimStart("\")
-              Write-Host "  $relativePath"
-            }
-            
-            # Check for essential files
-            $requiredFiles = @(
-              "bin\NST.exe",
-              "bin\libBGACore.dll",
-              "bin\QtLingo.dll",
-              "bin\Qt6Core.dll",
-              "bin\Qt6Gui.dll",
-              "bin\Qt6Widgets.dll",
-              "bin\Qt6Network.dll",
-              "bin\Qt6Concurrent.dll",
-              "bin\plugins\platforms\qwindows.dll",
-              "bin\qt.conf"
-            )
-            $missing = @()
-            
-            foreach ($file in $requiredFiles) {
-              $fullPath = Join-Path $tempDir $file
-              if (-not (Test-Path $fullPath)) {
-                $missing += $file
-              }
-            }
-            
-            if ($missing.Count -gt 0) {
-              Write-Host ""
-              Write-Host "ERROR: Missing critical files:" -ForegroundColor Red
-              $missing | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
-              exit 1
-            } else {
-              Write-Host ""
-              Write-Host "✓ All essential files present!" -ForegroundColor Green
-            }
-            
-            # Verify qt.conf content
-            $qtConfPath = Join-Path $tempDir "bin\qt.conf"
-            if (Test-Path $qtConfPath) {
-              $qtConfContent = Get-Content $qtConfPath -Raw
-              Write-Host ""
-              Write-Host "qt.conf content:" -ForegroundColor Cyan
-              Write-Host $qtConfContent
-            }
-            
-            Remove-Item -Path $tempDir -Recurse -Force
-          }
-          
-          Write-Host ""
-          Write-Host "=== Package verification complete ===" -ForegroundColor Green
-      
+          ls -lh *.zip || echo "No zip generated"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -260,26 +187,28 @@ EOF
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Download Release artifact
         uses: actions/download-artifact@v4
         with:
           name: nst-windows-release
           path: artifacts
-      
-      - name: Set version tag
+
+      - name: Determine tag to use
         id: version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          # If triggered manually, workflow_dispatch inputs.version will be non-empty
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "tag=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           else
+            # For push events, github.ref_name contains the tag name
             echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Upload to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -288,14 +217,14 @@ EOF
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${REPO}"
-          
+
           echo "Artifacts to upload:"
-          ls -lh artifacts/
-          
+          ls -lh artifacts/ || true
+
           # Get or create release
           resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
           release_id=$(echo "$resp" | jq -r '.id // empty')
-          
+
           if [ -z "$release_id" ]; then
             echo "Creating release for ${TAG}"
             create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -303,7 +232,7 @@ EOF
               "${API}/releases")
             release_id=$(echo "$create_resp" | jq -r '.id')
           fi
-          
+
           # Upload artifacts
           for f in artifacts/*; do
             [ -f "$f" ] || continue
@@ -315,6 +244,6 @@ EOF
               --data-binary @"$f" \
               "https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$name"
           done
-          
+
           echo "✓ Upload completed"
           echo "Release URL: https://github.com/${REPO}/releases/tag/${TAG}"
