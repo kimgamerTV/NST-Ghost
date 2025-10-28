@@ -19,6 +19,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Install MinGW
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-make
+      
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -30,53 +40,37 @@ jobs:
           setup-python: false
       
       - name: Configure and Build
-        shell: pwsh
+        shell: msys2 {0}
         run: |
-          if (!(Test-Path -Path 'build')) {
-            New-Item -ItemType Directory -Path 'build' | Out-Null
-          }
-          Set-Location -Path build
+          mkdir -p build
+          cd build
           
-          # Use MinGW from Qt installation
-          $mingwPath = Join-Path $env:QT_ROOT_DIR "bin"
-          $env:PATH = "$mingwPath;$env:PATH"
-          
-          Write-Host "Using MinGW from: $mingwPath"
-          Write-Host "g++ version:"
-          & "$mingwPath\g++.exe" --version
-          
-          # MinGW requires explicit generator and compiler paths
-          cmake .. -G "MinGW Makefiles" `
-            -DCMAKE_C_COMPILER="$mingwPath\gcc.exe" `
-            -DCMAKE_CXX_COMPILER="$mingwPath\g++.exe" `
-            -DCMAKE_MAKE_PROGRAM="$mingwPath\mingw32-make.exe" `
-            -DCMAKE_BUILD_TYPE=Release `
+          echo "Configuring with CMake..."
+          cmake .. -G "MinGW Makefiles" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
             -DCMAKE_VERBOSE_MAKEFILE=ON
           
-          Write-Host "Building BGACore first..."
+          echo "Building BGACore first..."
           cmake --build . --target BGACore --parallel
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host "BGACore build FAILED"
-            Write-Host "Printing build tree for diagnostics..."
-            Get-ChildItem -Recurse -Force | Select-Object -First 500 | Format-Table
+          if [ $? -ne 0 ]; then
+            echo "BGACore build FAILED"
+            echo "Printing build tree for diagnostics..."
+            find . -type f | head -n 100
             exit 1
-          }
+          fi
           
-          Write-Host "Verifying BGACore output..."
-          $dllPath = "BGA\libBGACore.dll"
+          echo "Verifying BGACore output..."
+          if [ -f "BGA/libBGACore.dll" ]; then
+            echo "✓ Found libBGACore.dll"
+          else
+            echo "✗ ERROR: libBGACore.dll not found"
+            echo "Searching for BGACore library files..."
+            find . -name "*BGACore*" -type f
+            exit 1
+          fi
           
-          if (Test-Path $dllPath) {
-            Write-Host "✓ Found libBGACore.dll at: $dllPath"
-          } else {
-            Write-Host "✗ ERROR: libBGACore.dll not found at: $dllPath"
-            Write-Host "Searching for BGACore library files..."
-            Get-ChildItem -Path . -Filter "*BGACore*" -Recurse | ForEach-Object { 
-              Write-Host "  Found: $($_.FullName)" 
-            }
-            throw "BGACore library missing after build"
-          }
-          
-          Write-Host "Building remaining targets..."
+          echo "Building remaining targets..."
           cmake --build . --parallel
       
       - name: Verify Build Output
