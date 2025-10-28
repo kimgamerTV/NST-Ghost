@@ -1,0 +1,118 @@
+name: Release Linux
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.1.2)'
+        required: true
+        type: string
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Install Qt
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev
+      
+      - name: Configure and Build
+        shell: bash
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+          cmake --build . --config Release --parallel
+      
+      - name: Package
+        run: |
+          cd build
+          cpack -G ZIP -C Release
+      
+      - name: Find package file
+        id: find_files
+        shell: bash
+        run: |
+          cd build
+          PACKAGE_FILE=$(ls NST-*.zip 2>/dev/null | head -n 1 || true)
+          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
+          if [ -n "$PACKAGE_FILE" ]; then
+            echo "Found package: $PACKAGE_FILE"
+          else
+            echo "Error: No package found"
+            exit 1
+          fi
+      
+      - name: Upload artifact
+        if: steps.find_files.outputs.package_file != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: nst-linux
+          path: build/${{ steps.find_files.outputs.package_file }}
+          retention-days: 1
+
+  release-linux:
+    needs: build-linux
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nst-linux
+          path: artifacts
+      
+      - name: Set version tag
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Upload to release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          API="https://api.github.com/repos/${REPO}"
+          
+          # Get or create release
+          resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
+          release_id=$(echo "$resp" | jq -r '.id // empty')
+          
+          if [ -z "$release_id" ]; then
+            echo "Creating release for ${TAG}"
+            create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
+              -d "$(jq -n --arg t "$TAG" --arg n "Release $TAG" '{ tag_name: $t, name: $n }')" \
+              "${API}/releases")
+            release_id=$(echo "$create_resp" | jq -r '.id')
+          fi
+          
+          # Upload artifact
+          for f in artifacts/*; do
+            [ -f "$f" ] || continue
+            name=$(basename "$f")
+            echo "Uploading $name"
+            curl -s -X POST \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -H "Content-Type: application/zip" \
+              --data-binary @"$f" \
+              "https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$name"
+          done
