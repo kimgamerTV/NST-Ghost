@@ -19,7 +19,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    # ติดตั้ง Python แยก เพื่อความยืดหยุ่น
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -32,13 +31,7 @@ jobs:
         host: windows
         target: desktop
         arch: win64_msvc2022_64
-        
-        # เปิดใช้งานการแคชเพื่อเร่งความเร็วในการ Build ครั้งถัดไป
         cache: 'true'
-        
-        # ถ้าโปรเจคของคุณใช้ Module อื่นๆ เช่น Qt Charts หรือ Qt SVG
-        # ให้เพิ่มบรรทัดนี้แล้วระบุ modules ที่ต้องการ
-        # modules: 'qtcharts qtsvg'
         
     - name: Configure CMake
       run: cmake -B build -S . -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
@@ -48,10 +41,12 @@ jobs:
       
     - name: Deploy
       run: |
-        windeployqt --release --no-translations build/${{ matrix.build_type }}/NST-Ghost.exe
+        # เปลี่ยนจาก NST-Ghost.exe เป็น NST.exe
+        windeployqt --release --no-translations build/${{ matrix.build_type }}/NST.exe
         
     - name: Package
       uses: actions/upload-artifact@v4
       with:
-        name: NST-Ghost-Windows-${{ matrix.build_type }}
+        # เปลี่ยนชื่อ Artifact ให้ตรงกับชื่อตัวจริงเพื่อความเป็นระเบียบ
+        name: NST-Windows-${{ matrix.build_type }}
         path: build/${{ matrix.build_type }}/
