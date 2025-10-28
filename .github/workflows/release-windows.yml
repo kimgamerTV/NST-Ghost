@@ -1,4 +1,4 @@
-name: Build NST
+name: Build NST (Windows)
 
 on:
   push:
@@ -7,26 +7,52 @@ on:
     branches: [main]
 
 jobs:
-  build:
-    runs-on: windows-latest  # หรือ ubuntu-latest/macOS-latest
+  build-windows:
+    runs-on: windows-latest
+
+    env:
+      QT_VERSION: 6.9.2
+      QT_ARCH: win64_msvc
+      BUILD_TYPE: Release
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Setup Qt
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+        architecture: x64
+
+    - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.9.3'
-        host: 'windows'  # 'linux' หรือ 'mac'
-        target: 'desktop'  # สำหรับ Windows/Linux/macOS
-        arch: 'win64_msvc' # หรือ 'win64_mingw', 'linux64', 'mac'
-    
+        version: ${{ env.QT_VERSION }}
+        host: windows
+        target: desktop
+        arch: ${{ env.QT_ARCH }}
+        outputdir: ${{ github.workspace }}/Qt
+
+    - name: Show Qt path
+      run: echo Qt installed at $Env:QTDIR
+
     - name: Configure CMake
-      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      run: cmake -S . -B build `
+           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} `
+           -DCMAKE_PREFIX_PATH="$Env:QTDIR"
 
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config ${{ env.BUILD_TYPE }}
 
-    - name: Run CPack
-      run: cmake --install build --prefix dist && cpack -G ZIP --config build/CPackConfig.cmake
+    - name: Install to dist
+      run: cmake --install build --prefix dist --config ${{ env.BUILD_TYPE }}
+
+    - name: Run CPack (ZIP)
+      run: cmake --build build --config ${{ env.BUILD_TYPE }} --target package
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: NST-Windows-${{ env.QT_VERSION }}
+        path: dist/*.zip
