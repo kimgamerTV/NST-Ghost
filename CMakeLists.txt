@@ -230,11 +230,6 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A tool for translating video games.")
 set(CPACK_PACKAGE_VENDOR "NST Ghost")
 set(CPACK_PACKAGE_CONTACT "you@example.com")
 
-# Install to clean directory structure for CPack
-if(WIN32)
-    set(CMAKE_INSTALL_PREFIX "NST" CACHE PATH "Install prefix" FORCE)
-endif()
-
 # Default generator
 set(CPACK_GENERATOR "ZIP")
 
