@@ -107,7 +107,35 @@ jobs:
           Get-ChildItem -Path $releaseDir -Filter "*.dll" | ForEach-Object { 
             Write-Host "  $($_.Name)" 
           }
-      
+
+      #  windeployqt
+      - name: Deploy Qt dependencies
+        shell: pwsh
+        run: |
+          $exePath = "build\\Release\\NST.exe"
+          $qtBin = (Get-ChildItem -Path "C:\Qt" -Recurse -Filter "windeployqt.exe" | Select-Object -First 1).FullName
+          
+          if (-not (Test-Path $exePath)) {
+            Write-Host "✗ ERROR: NST.exe not found at $exePath"
+            exit 1
+          }
+
+          if (-not $qtBin) {
+            Write-Host "✗ ERROR: Could not find windeployqt.exe"
+            exit 1
+          }
+
+          Write-Host "Running windeployqt from: $qtBin"
+          & $qtBin --release --compiler-runtime --no-opengl-sw $exePath
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "✗ ERROR: windeployqt failed"
+            exit 1
+          }
+
+          Write-Host "✓ windeployqt completed successfully"
+          Write-Host "DLLs deployed to build\\Release"
+
       - name: Package
         run: |
           cd build
