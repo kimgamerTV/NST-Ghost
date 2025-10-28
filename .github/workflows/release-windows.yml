@@ -138,35 +138,51 @@ jobs:
             exit 1
           }
 
+          # Verify Qt environment
+          Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
+          Write-Host "QT_PLUGIN_PATH: $env:QT_PLUGIN_PATH"
+          
           # Use QT_ROOT_DIR environment variable set by install-qt-action
           $qtBin = Join-Path $env:QT_ROOT_DIR "bin\windeployqt.exe"
           
           if (-not (Test-Path $qtBin)) {
             Write-Host "✗ ERROR: Could not find windeployqt.exe at $qtBin"
-            Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
             exit 1
           }
 
           Write-Host "Running windeployqt from: $qtBin"
-          $deployArgs = @("--compiler-runtime", "--no-opengl-sw", $exePath)
+          
+          # Set Qt plugin path explicitly for windeployqt
+          $env:QT_PLUGIN_PATH = "$env:QT_ROOT_DIR\plugins"
           
           if ("${{ matrix.build_type }}" -eq "Debug") {
-            $deployArgs = @("--debug") + $deployArgs
             Write-Host "Deploying in DEBUG mode"
+            & $qtBin --debug --compiler-runtime --no-opengl-sw --verbose 1 $exePath
           } else {
-            $deployArgs = @("--release") + $deployArgs
             Write-Host "Deploying in RELEASE mode"
+            & $qtBin --release --compiler-runtime --no-opengl-sw --verbose 1 $exePath
           }
           
-          & $qtBin $deployArgs
-          
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "✗ ERROR: windeployqt failed"
+            Write-Host "✗ ERROR: windeployqt failed with exit code $LASTEXITCODE"
+            Write-Host ""
+            Write-Host "Checking Qt installation..."
+            Write-Host "Qt bin directory contents:"
+            Get-ChildItem "$env:QT_ROOT_DIR\bin" | Select-Object Name | Format-Table
+            Write-Host ""
+            Write-Host "Qt plugins directory:"
+            if (Test-Path "$env:QT_ROOT_DIR\plugins") {
+              Get-ChildItem "$env:QT_ROOT_DIR\plugins" -Directory | Select-Object Name | Format-Table
+            } else {
+              Write-Host "Plugins directory not found!"
+            }
             exit 1
           }
 
           Write-Host "✓ windeployqt completed successfully"
-          Write-Host "DLLs deployed to build folder"
+          Write-Host ""
+          Write-Host "Deployed files in build directory:"
+          Get-ChildItem "build" -Filter "*.dll" | Select-Object Name, Length | Format-Table
 
       - name: Package
         shell: msys2 {0}
