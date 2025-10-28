@@ -98,6 +98,9 @@ void LoadProjectDialog::setupMainLayout(const QStringList &availableEngines)
 void LoadProjectDialog::setupPathSection()
 {
     QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(ui->contentWidget->layout());
+    if (!layout) {
+        layout = new QVBoxLayout(ui->contentWidget);
+    }
 
     QLabel *pathLabel = new QLabel("Project Directory");
     pathLabel->setStyleSheet("font-size: 16px; font-weight: bold; color: #ffffff;");
