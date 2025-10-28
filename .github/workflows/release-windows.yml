@@ -42,312 +42,112 @@ jobs:
           cache: true
           setup-python: false
       
-      - name: Configure and Build
+      - name: Configure CMake
         shell: msys2 {0}
         run: |
           mkdir -p build
           cd build
           
-          echo "=== Build Configuration ==="
+          echo "=== CMake Configuration ==="
           echo "Build Type: ${{ matrix.build_type }}"
           echo "Qt Root: ${QT_ROOT_DIR}"
-          echo "GCC Version:"
-          gcc --version
-          echo "Ninja Version:"
-          ninja --version
-          echo ""
           
-          echo "Configuring with CMake..."
           cmake .. -G "Ninja" \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
-            -DSKIP_WINDEPLOYQT_BUILD=ON \
-            -DCMAKE_VERBOSE_MAKEFILE=ON
-          
-          echo ""
-          echo "Building BGACore first..."
-          cmake --build . --target BGACore --parallel
-          if [ $? -ne 0 ]; then
-            echo "✗ BGACore build FAILED"
-            echo "Printing build tree for diagnostics..."
-            find . -type f | head -n 100
-            exit 1
-          fi
-          
-          echo ""
-          echo "Verifying BGACore output..."
-          if [ -f "BGA/libBGACore.dll" ]; then
-            echo "✓ Found libBGACore.dll"
-            ls -lh BGA/libBGACore.dll
-          else
-            echo "✗ ERROR: libBGACore.dll not found"
-            echo "Searching for BGACore library files..."
-            find . -name "*BGACore*" -type f
-            exit 1
-          fi
-          
-          echo ""
-          echo "Building remaining targets..."
+            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}"
+      
+      - name: Build
+        shell: msys2 {0}
+        run: |
+          cd build
+          echo "=== Building NST ==="
           cmake --build . --parallel
           
           echo ""
-          echo "✓ Build completed successfully"
+          echo "=== Build Output ==="
+          ls -lh NST.exe BGA/libBGACore.dll QtLingo/libQtLingo.dll
       
-      - name: Verify Build Output
+      - name: Install (Deploy)
         shell: msys2 {0}
         run: |
-          echo "=== Verifying build output ==="
+          cd build
+          echo "=== Installing to staging directory ==="
           
-          if [ -f "build/NST.exe" ]; then
-            size=$(stat -c%s "build/NST.exe")
-            echo "✓ NST.exe found ($size bytes)"
-            ls -lh build/NST.exe
-          else
-            echo "✗ ERROR: NST.exe not found"
-            echo "Searching for NST.exe..."
-            find build -name "NST.exe" -type f
-            exit 1
-          fi
+          # Install to a staging directory
+          DESTDIR="${PWD}/package" cmake --install . --prefix ""
           
           echo ""
-          echo "=== Checking DLLs in build folder ==="
-          required_dlls="libBGACore.dll QtLingo.dll"
-          
-          for dll in $required_dlls; do
-            found=$(find build -name "$dll" -type f)
-            if [ -n "$found" ]; then
-              echo "✓ $dll found at: $found"
-            else
-              echo "⚠ WARNING: $dll not found"
-            fi
-          done
-          
-          echo ""
-          echo "=== All DLLs in build folder ==="
-          find build -name "*.dll" -type f | while read f; do
-            echo "  $(basename $f) - $(stat -c%s $f) bytes"
-          done
-
-      - name: Deploy Qt dependencies
-        shell: pwsh
-        run: |
-          $exePath = "build\NST.exe"
-          
-          if (-not (Test-Path $exePath)) {
-            Write-Host "✗ ERROR: NST.exe not found at $exePath"
-            exit 1
-          }
-
-          # Verify Qt environment
-          Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
-          Write-Host "QT_PLUGIN_PATH: $env:QT_PLUGIN_PATH"
-          
-          # Check critical platform plugin (MinGW only has release versions)
-          $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
-          
-          Write-Host ""
-          Write-Host "Checking platform plugin..."
-          if (Test-Path $platformPlugin) {
-            Write-Host "✓ Found: $platformPlugin"
-          } else {
-            Write-Host "✗ ERROR: Platform plugin not found: $platformPlugin"
-            Write-Host ""
-            Write-Host "Contents of platforms directory:"
-            if (Test-Path "$env:QT_ROOT_DIR\plugins\platforms") {
-              Get-ChildItem "$env:QT_ROOT_DIR\plugins\platforms" | Select-Object Name, Length | Format-Table
-            } else {
-              Write-Host "Platforms directory doesn't exist!"
-            }
-            exit 1
-          }
-          
-          Write-Host ""
-          Write-Host "=== Manual Qt Deployment ==="
-          Write-Host "Note: MinGW Qt doesn't include debug versions of plugins, using release versions for both builds"
-          
-          # Manually copy essential DLLs
-          $qtBinDir = "$env:QT_ROOT_DIR\bin"
-          $buildDir = "build"
-          
-          Write-Host ""
-          Write-Host "Copying Qt DLLs..."
-          $qtDlls = @(
-            "Qt6Core.dll",
-            "Qt6Gui.dll", 
-            "Qt6Widgets.dll",
-            "Qt6Network.dll",
-            "Qt6Concurrent.dll"
-          )
-          
-          foreach ($dll in $qtDlls) {
-            $src = Join-Path $qtBinDir $dll
-            if (Test-Path $src) {
-              Copy-Item $src $buildDir -Force
-              Write-Host "  ✓ Copied $dll"
-            } else {
-              Write-Host "  ✗ ERROR: $dll not found"
-              exit 1
-            }
-          }
-          
-          # Copy MinGW runtime DLLs
-          Write-Host ""
-          Write-Host "Copying MinGW runtime DLLs..."
-          $mingwDlls = @(
-            "libgcc_s_seh-1.dll",
-            "libstdc++-6.dll",
-            "libwinpthread-1.dll"
-          )
-          
-          foreach ($dll in $mingwDlls) {
-            $src = Join-Path $qtBinDir $dll
-            if (Test-Path $src) {
-              Copy-Item $src $buildDir -Force
-              Write-Host "  ✓ Copied $dll"
-            } else {
-              Write-Host "  ⚠ WARNING: $dll not found"
-            }
-          }
-          
-          # Copy platform plugins
-          Write-Host ""
-          Write-Host "Copying platform plugins..."
-          $platformsDir = Join-Path $buildDir "platforms"
-          New-Item -ItemType Directory -Path $platformsDir -Force | Out-Null
-          
-          Get-ChildItem "$env:QT_ROOT_DIR\plugins\platforms" -Filter "*.dll" | ForEach-Object {
-            Copy-Item $_.FullName $platformsDir -Force
-            Write-Host "  ✓ Copied $($_.Name)"
-          }
-          
-          # Copy styles plugins
-          Write-Host ""
-          Write-Host "Copying style plugins..."
-          $stylesDir = Join-Path $buildDir "styles"
-          New-Item -ItemType Directory -Path $stylesDir -Force | Out-Null
-          
-          Get-ChildItem "$env:QT_ROOT_DIR\plugins\styles" -Filter "*.dll" | ForEach-Object {
-            Copy-Item $_.FullName $stylesDir -Force
-            Write-Host "  ✓ Copied $($_.Name)"
-          }
-          
-          # Copy imageformats plugins
-          Write-Host ""
-          Write-Host "Copying imageformats plugins..."
-          $imageformatsDir = Join-Path $buildDir "imageformats"
-          New-Item -ItemType Directory -Path $imageformatsDir -Force | Out-Null
-          
-          Get-ChildItem "$env:QT_ROOT_DIR\plugins\imageformats" -Filter "*.dll" | ForEach-Object {
-            Copy-Item $_.FullName $imageformatsDir -Force
-            Write-Host "  ✓ Copied $($_.Name)"
-          }
-          
-          # Copy iconengines plugins
-          Write-Host ""
-          Write-Host "Copying iconengines plugins..."
-          $iconenginesDir = Join-Path $buildDir "iconengines"
-          New-Item -ItemType Directory -Path $iconenginesDir -Force | Out-Null
-          
-          Get-ChildItem "$env:QT_ROOT_DIR\plugins\iconengines" -Filter "*.dll" | ForEach-Object {
-            Copy-Item $_.FullName $iconenginesDir -Force
-            Write-Host "  ✓ Copied $($_.Name)"
-          }
-          
-          Write-Host ""
-          Write-Host "✓ Manual deployment completed"
-          
-          Write-Host ""
-          Write-Host "Deployed files in build directory:"
-          Get-ChildItem "build" -Filter "*.dll" -Recurse | Select-Object Name, Length, DirectoryName | Format-Table -AutoSize
-
+          echo "=== Installed files ==="
+          find package -type f | head -50
+      
       - name: Package
         shell: msys2 {0}
         run: |
           cd build
           
-          echo "=== Creating package ==="
-          echo "Build type: ${{ matrix.build_type }}"
-          
-          # Run CPack - the package name is already set by CMakeLists.txt based on CMAKE_BUILD_TYPE
+          echo "=== Creating ZIP package ==="
           cpack -G ZIP -C ${{ matrix.build_type }}
           
           echo ""
-          echo "Generated packages:"
+          echo "=== Generated package ==="
           ls -lh *.zip
       
       - name: Verify Package
         shell: pwsh
         run: |
-          Write-Host "=== Verifying package ==="
-          $buildType = "${{ matrix.build_type }}"
+          Write-Host "=== Verifying package ===" -ForegroundColor Cyan
           
-          Write-Host "Looking for $buildType package..."
+          $zipFiles = Get-ChildItem -Path build -Filter "*.zip"
           
-          # Get all zip files and filter appropriately
-          $packageFile = Get-ChildItem -Path build -Filter "*.zip" | Where-Object { 
-            if ($buildType -eq "Debug") { 
-              $_.Name -like "NST-Debug-*.zip"
-            } else { 
-              $_.Name -like "NST-*.zip" -and $_.Name -notlike "*Debug*"
+          if ($zipFiles.Count -eq 0) {
+            Write-Host "ERROR: No ZIP files found!" -ForegroundColor Red
+            exit 1
+          }
+          
+          foreach ($zip in $zipFiles) {
+            Write-Host ""
+            Write-Host "Package: $($zip.Name)" -ForegroundColor Green
+            Write-Host "Size: $([math]::Round($zip.Length / 1MB, 2)) MB"
+            
+            # Extract and verify contents
+            $tempDir = "build\verify_$($zip.BaseName)"
+            Expand-Archive -Path $zip.FullName -DestinationPath $tempDir -Force
+            
+            Write-Host ""
+            Write-Host "Contents:" -ForegroundColor Yellow
+            Get-ChildItem -Path $tempDir -Recurse -File | ForEach-Object {
+              $relativePath = $_.FullName.Replace($tempDir, "").TrimStart("\")
+              Write-Host "  $relativePath"
             }
-          } | Select-Object -First 1
-          
-          if ($packageFile) {
-            Write-Host "Package: $($packageFile.Name) ($('{0:N2}' -f ($packageFile.Length / 1MB)) MB)"
-            Write-Host "Build Type: $buildType"
             
-            Write-Host ""
-            Write-Host "Extracting to verify contents..."
-            $tempDir = "build\temp_verify"
-            Expand-Archive -Path $packageFile.FullName -DestinationPath $tempDir -Force
+            # Check for essential files
+            $requiredFiles = @("bin\NST.exe", "bin\libBGACore.dll", "bin\QtLingo.dll")
+            $missing = @()
             
-            Write-Host ""
-            Write-Host "Package contents:"
-            Get-ChildItem -Path $tempDir -Recurse | ForEach-Object { 
-              $relativePath = $_.FullName.Substring($tempDir.Length)
-              $size = if ($_.PSIsContainer) { "DIR" } else { "{0:N0} bytes" -f $_.Length }
-              Write-Host "  $relativePath ($size)"
+            foreach ($file in $requiredFiles) {
+              $fullPath = Join-Path $tempDir $file
+              if (-not (Test-Path $fullPath)) {
+                $missing += $file
+              }
+            }
+            
+            if ($missing.Count -gt 0) {
+              Write-Host ""
+              Write-Host "WARNING: Missing files:" -ForegroundColor Red
+              $missing | ForEach-Object { Write-Host "  - $_" -ForegroundColor Red }
+            } else {
+              Write-Host ""
+              Write-Host "All essential files present!" -ForegroundColor Green
             }
             
             Remove-Item -Path $tempDir -Recurse -Force
-            Write-Host ""
-            Write-Host "✓ Package verification completed"
-          } else {
-            Write-Host "✗ ERROR: No package file found for build type: $buildType"
-            Write-Host "Files in build directory:"
-            Get-ChildItem -Path build -Filter "*.zip" | ForEach-Object {
-              Write-Host "  $($_.Name)"
-            }
-            exit 1
           }
       
-      - name: Find package file
-        id: find_files
-        shell: bash
-        run: |
-          cd build
-          if [ "${{ matrix.build_type }}" = "Debug" ]; then
-            PACKAGE_FILE=$(ls NST-Debug-*.zip 2>/dev/null | head -n 1 || true)
-          else
-            PACKAGE_FILE=$(ls NST-[0-9]*.zip 2>/dev/null | grep -v Debug | head -n 1 || true)
-          fi
-          
-          if [ -z "$PACKAGE_FILE" ]; then
-            echo "Error: No package found for build type ${{ matrix.build_type }}"
-            echo "Available zip files:"
-            ls -l *.zip 2>/dev/null || echo "No zip files found"
-            exit 1
-          fi
-          
-          echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
-          echo "Found package: $PACKAGE_FILE"
-      
       - name: Upload artifact
-        if: steps.find_files.outputs.package_file != ''
         uses: actions/upload-artifact@v4
         with:
           name: nst-windows-${{ matrix.build_type }}
-          path: build/${{ steps.find_files.outputs.package_file }}
+          path: build/*.zip
           retention-days: 1
 
   release-windows:
@@ -389,6 +189,9 @@ jobs:
         run: |
           set -euo pipefail
           API="https://api.github.com/repos/${REPO}"
+          
+          echo "Artifacts to upload:"
+          ls -lh artifacts/
           
           # Get or create release
           resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
