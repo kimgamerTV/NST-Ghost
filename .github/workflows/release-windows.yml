@@ -211,7 +211,7 @@ jobs:
               "bin\Qt6Widgets.dll",
               "bin\Qt6Network.dll",
               "bin\Qt6Concurrent.dll",
-              "bin\plugins\platforms\qwindows.dll",
+              "plugins\platforms\qwindows.dll",
               "bin\qt.conf"
             )
             $missing = @()
