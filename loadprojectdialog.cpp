@@ -30,12 +30,12 @@ LoadProjectDialog::LoadProjectDialog(const QStringList &availableEngines, QWidge
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &LoadProjectDialog::reject);
 
     // Global background style
-    setStyleSheet(
+    /*setStyleSheet(
         "QDialog { background-color: #2d2d2d; }"
         "QScrollBar:vertical { background: #2d2d2d; width: 12px; border-radius: 6px; }"
         "QScrollBar::handle:vertical { background: #3a3d41; border-radius: 6px; min-height: 20px; }"
         "QScrollBar::handle:vertical:hover { background: #4a4d51; }"
-        );
+        );*/
 }
 
 LoadProjectDialog::~LoadProjectDialog()
@@ -150,7 +150,7 @@ QFrame *LoadProjectDialog::createEngineFrame(const QString &engine, int index)
     frame->setMinimumHeight(120);
     frame->setStyleSheet(defaultEngineFrameStyle());
     frame->setCursor(Qt::PointingHandCursor);
-    frame->installEventFilter(this);
+    //frame->installEventFilter(this);
 
     QHBoxLayout *layout = new QHBoxLayout(frame);
     layout->setSpacing(0);
@@ -247,7 +247,7 @@ void LoadProjectDialog::updateFrameSelection(QAbstractButton *button)
     }
 }
 
-bool LoadProjectDialog::eventFilter(QObject *obj, QEvent *event)
+/*bool LoadProjectDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
         if (auto *frame = qobject_cast<QFrame *>(obj)) {
@@ -258,7 +258,7 @@ bool LoadProjectDialog::eventFilter(QObject *obj, QEvent *event)
         }
     }
     return QDialog::eventFilter(obj, event);
-}
+}*/
 
 /* =========================================================================
  *  PUBLIC ACCESSORS

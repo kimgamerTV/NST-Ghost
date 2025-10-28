@@ -9,6 +9,7 @@
 #include <QtCore/QJsonObject>
 #include <QStandardPaths>
 #include <QOperatingSystemVersion>
+#include <QRegularExpression>
 
 namespace core { namespace engines { namespace rpgm {
 
@@ -16,9 +17,13 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
 {
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/rpgm_analyzer_log.txt";
     QFile logFile(logFilePath);
-    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream logStream(&logFile);
 
+    // ตรวจสอบว่าเปิดไฟล์สำเร็จหรือไม่
+    if (!logFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        qWarning() << "Failed to open log file:" << logFilePath;
+    }
+
+    QTextStream logStream(&logFile);
     logStream << "RPGM Analyzer: Starting analysis for path: " << inputPath << "\n";
 
     QDir projectDir(inputPath);
@@ -76,9 +81,14 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
 
     logStream << "RPGM Analyzer: Found " << jsonFiles.size() << " JSON files.\n";
 
-    // Font searching logic
-    QDir searchDir = isDataFolder ? QDir(inputPath).filePath("..") : inputPath;
-    QDir parentDir(searchDir);
+    // Font searching logic (แก้ไขให้ดีขึ้น)
+    QDir parentDir;
+    if (isDataFolder) {
+        parentDir = QDir(inputPath);
+        parentDir.cdUp(); // ย้อนขึ้นไปหา parent directory
+    } else {
+        parentDir = QDir(inputPath);
+    }
 
     QDir fontDir(parentDir.filePath("fonts"));
     if (!fontDir.exists()) {
@@ -103,6 +113,8 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
             fontEntries.append(fontEntry);
         }
         logStream << "RPGM Analyzer: Found " << fontFiles.size() << " font files.\n";
+    } else {
+        logStream << "RPGM Analyzer: No fonts folder found\n";
     }
 
     QJsonArray extractedStrings;
@@ -114,11 +126,12 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
     for (const QFileInfo &info : jsonFiles) {
         QFile file(info.absoluteFilePath());
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QTextStream in(&file);
-            QString content = in.readAll();
+            QByteArray content = file.readAll();
             file.close();
 
-            QJsonDocument doc = QJsonDocument::fromJson(content.toUtf8());
+            QJsonParseError parseError;
+            QJsonDocument doc = QJsonDocument::fromJson(content, &parseError);
+
             if (!doc.isNull()) {
                 extractStringsFromJsonValue(
                     QJsonValue::fromVariant(doc.toVariant()),
@@ -129,7 +142,8 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
                 processedCount++;
             } else {
                 logStream << "RPGM Analyzer: Failed to parse JSON from file: "
-                          << info.absoluteFilePath() << "\n";
+                          << info.absoluteFilePath()
+                          << " Error: " << parseError.errorString() << "\n";
                 failedCount++;
             }
         } else {
@@ -167,7 +181,8 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
 
 bool RpgmAnalyzer::save(const QString &outputPath, const QJsonArray &texts)
 {
-    QMap<QString, QJsonDocument> filesToUpdate;
+    // จัดกลุ่มข้อมูลตาม file path เพื่อลด I/O operations
+    QMap<QString, QVector<QPair<QString, QString>>> fileUpdates; // filePath -> [(keyPath, newValue)]
 
     for (const QJsonValue &value : texts) {
         QJsonObject textObject = value.toObject();
@@ -180,41 +195,78 @@ bool RpgmAnalyzer::save(const QString &outputPath, const QJsonArray &texts)
             continue;
         }
 
-        if (!filesToUpdate.contains(filePath)) {
-            QFile file(filePath);
-            if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                qWarning() << "Failed to open file for reading:" << filePath;
-                return false;
-            }
-            QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-            file.close();
-            if (doc.isNull()) {
-                qWarning() << "Failed to parse JSON from file:" << filePath;
-                return false;
-            }
-            filesToUpdate.insert(filePath, doc);
-        }
-
-        QJsonDocument currentDoc = filesToUpdate.value(filePath);
-
-        // Update JSON value using keyPath
-        if (!updateJsonValue(currentDoc, keyPath, translatedText)) {
-            qWarning() << "Failed to update value at keyPath:" << keyPath
-                       << "in file:" << filePath;
-        }
-
-        filesToUpdate.insert(filePath, currentDoc);
+        fileUpdates[filePath].append(qMakePair(keyPath, translatedText));
     }
 
-    // Write updated content back to files
-    for (const QString &filePath : filesToUpdate.keys()) {
+    // อ่านและอัพเดทแต่ละไฟล์
+    QMap<QString, QJsonDocument> filesToUpdate;
+
+    for (auto it = fileUpdates.constBegin(); it != fileUpdates.constEnd(); ++it) {
+        const QString &filePath = it.key();
+
+        QFile file(filePath);
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            qWarning() << "Failed to open file for reading:" << filePath;
+            return false;
+        }
+
+        QJsonParseError parseError;
+        QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
+        file.close();
+
+        if (doc.isNull()) {
+            qWarning() << "Failed to parse JSON from file:" << filePath
+                       << "Error:" << parseError.errorString();
+            return false;
+        }
+
+        // อัพเดทค่าทั้งหมดสำหรับไฟล์นี้
+        for (const auto &update : it.value()) {
+            const QString &keyPath = update.first;
+            const QString &newValue = update.second;
+
+            if (!updateJsonValue(doc, keyPath, newValue)) {
+                qWarning() << "Failed to update value at keyPath:" << keyPath
+                           << "in file:" << filePath;
+            }
+        }
+
+        filesToUpdate.insert(filePath, doc);
+    }
+
+    // เขียนกลับไปยังไฟล์ทั้งหมด (transaction-like approach)
+    for (auto it = filesToUpdate.constBegin(); it != filesToUpdate.constEnd(); ++it) {
+        const QString &filePath = it.key();
+        const QJsonDocument &doc = it.value();
+
+        // สร้าง backup ก่อน (optional)
+        QString backupPath = filePath + ".backup";
+        QFile::remove(backupPath); // ลบ backup เก่าถ้ามี
+        QFile::copy(filePath, backupPath);
+
         QFile file(filePath);
         if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
             qWarning() << "Failed to open file for writing:" << filePath;
+            // พยายาม restore จาก backup
+            QFile::remove(filePath);
+            QFile::copy(backupPath, filePath);
             return false;
         }
-        file.write(filesToUpdate.value(filePath).toJson(QJsonDocument::Indented));
+
+        QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
+        if (file.write(jsonData) != jsonData.size()) {
+            qWarning() << "Failed to write complete data to file:" << filePath;
+            file.close();
+            // พยายาม restore จาก backup
+            QFile::remove(filePath);
+            QFile::copy(backupPath, filePath);
+            return false;
+        }
+
         file.close();
+
+        // ลบ backup เมื่อสำเร็จ
+        QFile::remove(backupPath);
     }
 
     return true;
@@ -343,6 +395,12 @@ bool RpgmAnalyzer::updateJsonArray(QJsonArray &arr, const QStringList &keys, int
                         arr.replace(arrayIndex, obj);
                         return true;
                     }
+                } else if (value.isArray()) {
+                    QJsonArray nestedArr = value.toArray();
+                    if (updateJsonArray(nestedArr, keys, index + 1, newValue)) {
+                        arr.replace(arrayIndex, nestedArr);
+                        return true;
+                    }
                 }
             }
         }
@@ -382,24 +440,9 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
 
 bool RpgmAnalyzer::isSystemString(const QString &text)
 {
-    // กรองสตริงที่เป็น system string ไม่ต้องแปล
-    static QStringList systemPrefixes = {
-        "img/", "audio/", "data/", "js/", "fonts/",
-        "Actor", "Class", "Skill", "Item", "Weapon", "Armor",
-        "Enemy", "Troop", "State", "Animation", "Tileset",
-        "CommonEvent", "System", "MapInfo"
-    };
-
-    // ตรวจสอบว่าเป็น path
-    if (text.contains('/') || text.contains('\\')) {
+    // ตรวจสอบว่ามีแต่ whitespace
+    if (text.trimmed().isEmpty()) {
         return true;
-    }
-
-    // ตรวจสอบว่าเป็น system prefix
-    for (const QString &prefix : systemPrefixes) {
-        if (text.startsWith(prefix)) {
-            return true;
-        }
     }
 
     // ตรวจสอบว่าเป็นตัวเลขล้วน
@@ -409,9 +452,59 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
         return true;
     }
 
-    // ตรวจสอบว่ามีแต่ whitespace
-    if (text.trimmed().isEmpty()) {
+    // ตรวจสอบว่าเป็น path (มี / หรือ \)
+    if (text.contains('/') || text.contains('\\')) {
         return true;
+    }
+
+    // ตรวจสอบ URL patterns
+    static QRegularExpression urlPattern(
+        QStringLiteral("^(https?|ftp|file)://"),
+        QRegularExpression::CaseInsensitiveOption
+        );
+    if (urlPattern.match(text).hasMatch()) {
+        return true;
+    }
+
+    // กรองสตริงที่เป็น system string ไม่ต้องแปล
+    static QStringList systemPrefixes = {
+        "img/", "audio/", "data/", "js/", "fonts/",
+        "Actor", "Class", "Skill", "Item", "Weapon", "Armor",
+        "Enemy", "Troop", "State", "Animation", "Tileset",
+        "CommonEvent", "System", "MapInfo"
+    };
+
+    for (const QString &prefix : systemPrefixes) {
+        if (text.startsWith(prefix)) {
+            return true;
+        }
+    }
+
+    // ตรวจสอบ RPG Maker control codes (เช่น \c[1], \n[1], \v[1])
+    static QRegularExpression controlCodePattern(
+        QStringLiteral("^\\\\[a-z]\\[\\d+\\]$"),
+        QRegularExpression::CaseInsensitiveOption
+        );
+    if (controlCodePattern.match(text.trimmed()).hasMatch()) {
+        return true;
+    }
+
+    // ตรวจสอบว่ามีแต่ special characters หรือ symbols
+    static QRegularExpression symbolOnlyPattern(
+        QStringLiteral("^[^a-zA-Z0-9\\u0E00-\\u0E7F\\u4E00-\\u9FFF\\u3040-\\u309F\\u30A0-\\u30FF]+$")
+        );
+    if (symbolOnlyPattern.match(text).hasMatch()) {
+        return true;
+    }
+
+    // ตรวจสอบสตริงที่สั้นเกินไป (น้อยกว่า 2 ตัวอักษร) และไม่ใช่ภาษาที่ต้องการแปล
+    if (text.length() < 2) {
+        static QRegularExpression nonTranslatableShort(
+            QStringLiteral("^[a-zA-Z0-9!@#$%^&*()_+=\\-\\[\\]{}|;:'\",.<>?/\\\\]+$")
+            );
+        if (nonTranslatableShort.match(text).hasMatch()) {
+            return true;
+        }
     }
 
     return false;
