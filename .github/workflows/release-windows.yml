@@ -1,169 +1,32 @@
-name: Release Windows
+name: Build NST
 
 on:
   push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version tag (e.g., v0.4.3)'
-        required: true
-        default: 'v0.4.3'
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    runs-on: windows-latest  # หรือ ubuntu-latest/macOS-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Install MSYS2, MinGW, Ninja, Qt
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: true
-          install: >-
-            mingw-w64-x86_64-gcc
-            mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-qt6-base
-            mingw-w64-x86_64-qt6-tools
-            mingw-w64-x86_64-qt6-declarative
-            mingw-w64-x86_64-qt6-svg
+    - name: Setup Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.9.3'
+        host: 'windows'  # 'linux' หรือ 'mac'
+        target: 'desktop'  # สำหรับ Windows/Linux/macOS
+        arch: 'win64_msvc' # หรือ 'win64_mingw', 'linux64', 'mac'
+    
+    - name: Configure CMake
+      run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Configure CMake
-        shell: msys2 {0}
-        run: |
-          mkdir -p build
-          cd build
-          INSTALL_PREFIX="$(pwd)/install"
-          cmake .. -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"
+    - name: Build
+      run: cmake --build build --config Release
 
-      - name: Build
-        shell: msys2 {0}
-        run: |
-          cd build
-          cmake --build . --parallel
-
-      - name: Install
-        shell: msys2 {0}
-        run: |
-          cd build
-          cmake --install .
-
-      - name: Debug windeployqt
-        shell: msys2 {0}
-        run: |
-          echo "Contents of /mingw64/bin:"
-          ls /mingw64/bin | grep windeployqt || echo "windeployqt not found"
-          DEPLOY_TOOL="/mingw64/bin/windeployqt.exe"
-          if [ ! -f "$DEPLOY_TOOL" ]; then
-            echo "ERROR: windeployqt not found in /mingw64/bin!"
-            exit 1
-          fi
-          echo "Found windeployqt at $DEPLOY_TOOL"
-
-      - name: Deploy Qt Runtime
-        shell: msys2 {0}
-        run: |
-          Bin=$(realpath build/install/bin)
-          DEPLOY_TOOL="/mingw64/bin/windeployqt.exe"
-
-          if [ ! -f "$DEPLOY_TOOL" ]; then
-            echo "ERROR: windeployqt not found in /mingw64/bin!"
-            exit 1
-          fi
-
-          "$DEPLOY_TOOL" \
-            --no-translations \
-            --compiler-runtime \
-            --plugindir "$Bin/plugins" \
-            "$Bin/NST.exe"
-
-      - name: Create qt.conf
-        shell: msys2 {0}
-        run: |
-          echo "[Paths]" > build/install/bin/qt.conf
-          echo "Plugins = plugins" >> build/install/bin/qt.conf
-          echo "Prefix = .." >> build/install/bin/qt.conf
-
-      - name: Show install tree
-        shell: msys2 {0}
-        run: |
-          ls -R build/install
-
-      - name: Package ZIP
-        shell: msys2 {0}
-        run: |
-          cd build
-          cpack -G ZIP -C Release
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nst-windows-release
-          path: build/*.zip
-          retention-days: 7
-
-  release-windows:
-    needs: build-windows
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nst-windows-release
-          path: artifacts
-
-      - name: Determine version tag
-        id: version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "tag=${{ inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag=${{ github.ref_name }}" >> $GITHUB_OUTPUT
-
-      - name: Upload Release Assets
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.version.outputs.tag }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          API="https://api.github.com/repos/${REPO}"
-
-          resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "${API}/releases/tags/${TAG}" || true)
-          release_id=$(echo "$resp" | jq -r '.id // empty')
-
-          if [ -z "$release_id" ]; then
-            echo "Creating release $TAG"
-            create_resp=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
-              -d "$(jq -n --arg t "$TAG" --arg n "Release $TAG" '{ tag_name: $t, name: $n }')" \
-              "${API}/releases")
-            release_id=$(echo "$create_resp" | jq -r '.id')
-          fi
-
-          for f in artifacts/*; do
-            name=$(basename "$f")
-            echo "Uploading $name"
-            curl -s -X POST \
-              -H "Authorization: token ${GITHUB_TOKEN}" \
-              -H "Content-Type: application/zip" \
-              --data-binary @"$f" \
-              "https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$name"
-          done
-
-          echo "Release ready:"
-          echo "https://github.com/${REPO}/releases/tag/${TAG}"
+    - name: Run CPack
+      run: cmake --install build --prefix dist && cpack -G ZIP --config build/CPackConfig.cmake
