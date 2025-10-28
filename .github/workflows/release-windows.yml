@@ -12,8 +12,8 @@ jobs:
     
     strategy:
       matrix:
-        qt-version: [6.8.3]
-        build_type: [Release]
+        # สร้างทั้ง Release และ Debug
+        build_type: [Release, Debug]
         
     steps:
     - name: Checkout code
@@ -27,7 +27,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: ${{ matrix.qt-version }}
+        version: '6.8.3'
         host: windows
         target: desktop
         arch: win64_msvc2022_64
@@ -39,14 +39,14 @@ jobs:
     - name: Build
       run: cmake --build build --config ${{ matrix.build_type }}
       
-    - name: Deploy
+    - name: Deploy (Skip for Debug)
+      # ข้ามขั้นตอน Deploy สำหรับ Debug เพราะเราต้องการไฟล์ .pdb ด้วย
+      if: matrix.build_type == 'Release'
       run: |
-        # เปลี่ยนจาก NST-Ghost.exe เป็น NST.exe
         windeployqt --release --no-translations build/${{ matrix.build_type }}/NST.exe
         
     - name: Package
       uses: actions/upload-artifact@v4
       with:
-        # เปลี่ยนชื่อ Artifact ให้ตรงกับชื่อตัวจริงเพื่อความเป็นระเบียบ
         name: NST-Windows-${{ matrix.build_type }}
         path: build/${{ matrix.build_type }}/
