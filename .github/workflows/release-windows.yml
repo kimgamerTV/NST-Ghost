@@ -37,8 +37,21 @@ jobs:
           }
           Set-Location -Path build
           
-          # MinGW requires explicit generator
-          cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
+          # Use MinGW from Qt installation
+          $mingwPath = Join-Path $env:QT_ROOT_DIR "bin"
+          $env:PATH = "$mingwPath;$env:PATH"
+          
+          Write-Host "Using MinGW from: $mingwPath"
+          Write-Host "g++ version:"
+          & "$mingwPath\g++.exe" --version
+          
+          # MinGW requires explicit generator and compiler paths
+          cmake .. -G "MinGW Makefiles" `
+            -DCMAKE_C_COMPILER="$mingwPath\gcc.exe" `
+            -DCMAKE_CXX_COMPILER="$mingwPath\g++.exe" `
+            -DCMAKE_MAKE_PROGRAM="$mingwPath\mingw32-make.exe" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_VERBOSE_MAKEFILE=ON
           
           Write-Host "Building BGACore first..."
           cmake --build . --target BGACore --parallel
