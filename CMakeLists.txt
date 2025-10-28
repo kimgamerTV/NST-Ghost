@@ -230,6 +230,11 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A tool for translating video games.")
 set(CPACK_PACKAGE_VENDOR "NST Ghost")
 set(CPACK_PACKAGE_CONTACT "you@example.com")
 
+# Install to clean directory structure for CPack
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX "NST" CACHE PATH "Install prefix" FORCE)
+endif()
+
 # Default generator
 set(CPACK_GENERATOR "ZIP")
 
@@ -246,12 +251,7 @@ endif()
 
 # Windows (ZIP)
 if(WIN32)
-    # Check if this is a Debug build
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CPACK_PACKAGE_FILE_NAME "NST-Debug-${PROJECT_VERSION}-win64")
-    else()
-        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-win64")
-    endif()
+    set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-win64")
 endif()
 
 include(CPack)
