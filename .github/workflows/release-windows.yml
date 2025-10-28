@@ -14,12 +14,15 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    strategy:
+      matrix:
+        build_type: [Release, Debug]
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Install MinGW
+      - name: Install MinGW and Ninja
         uses: msys2/setup-msys2@v2
         with:
           msystem: MINGW64
@@ -27,7 +30,7 @@ jobs:
           install: >-
             mingw-w64-x86_64-gcc
             mingw-w64-x86_64-cmake
-            mingw-w64-x86_64-make
+            mingw-w64-x86_64-ninja
       
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
@@ -45,24 +48,37 @@ jobs:
           mkdir -p build
           cd build
           
+          echo "=== Build Configuration ==="
+          echo "Build Type: ${{ matrix.build_type }}"
+          echo "Qt Root: ${QT_ROOT_DIR}"
+          echo "GCC Version:"
+          gcc --version
+          echo "Ninja Version:"
+          ninja --version
+          echo ""
+          
           echo "Configuring with CMake..."
-          cmake .. -G "MinGW Makefiles" \
-            -DCMAKE_BUILD_TYPE=Release \
+          cmake .. -G "Ninja" \
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
+            -DSKIP_WINDEPLOYQT_BUILD=ON \
             -DCMAKE_VERBOSE_MAKEFILE=ON
           
+          echo ""
           echo "Building BGACore first..."
           cmake --build . --target BGACore --parallel
           if [ $? -ne 0 ]; then
-            echo "BGACore build FAILED"
+            echo "✗ BGACore build FAILED"
             echo "Printing build tree for diagnostics..."
             find . -type f | head -n 100
             exit 1
           fi
           
+          echo ""
           echo "Verifying BGACore output..."
           if [ -f "BGA/libBGACore.dll" ]; then
             echo "✓ Found libBGACore.dll"
+            ls -lh BGA/libBGACore.dll
           else
             echo "✗ ERROR: libBGACore.dll not found"
             echo "Searching for BGACore library files..."
@@ -70,49 +86,47 @@ jobs:
             exit 1
           fi
           
+          echo ""
           echo "Building remaining targets..."
           cmake --build . --parallel
+          
+          echo ""
+          echo "✓ Build completed successfully"
       
       - name: Verify Build Output
-        shell: pwsh
+        shell: msys2 {0}
         run: |
-          Write-Host "=== Verifying build output ==="
-          $exePath = "build\NST.exe"
+          echo "=== Verifying build output ==="
           
-          if (Test-Path $exePath) {
-            $size = (Get-Item $exePath).Length
-            Write-Host "✓ NST.exe found ($size bytes)"
-          } else {
-            Write-Host "✗ ERROR: NST.exe not found at: $exePath"
-            Write-Host "Searching for NST.exe..."
-            Get-ChildItem -Path build -Filter "NST.exe" -Recurse | ForEach-Object { 
-              Write-Host "  Found: $($_.FullName)" 
-            }
+          if [ -f "build/NST.exe" ]; then
+            size=$(stat -c%s "build/NST.exe")
+            echo "✓ NST.exe found ($size bytes)"
+            ls -lh build/NST.exe
+          else
+            echo "✗ ERROR: NST.exe not found"
+            echo "Searching for NST.exe..."
+            find build -name "NST.exe" -type f
             exit 1
-          }
+          fi
           
-          Write-Host ""
-          Write-Host "=== Checking DLLs in build folder ==="
-          $buildDir = "build"
-          $requiredDlls = @("libBGACore.dll", "QtLingo.dll")
+          echo ""
+          echo "=== Checking DLLs in build folder ==="
+          required_dlls="libBGACore.dll QtLingo.dll"
           
-          foreach ($dll in $requiredDlls) {
-            $found = $false
-            Get-ChildItem -Path $buildDir -Filter $dll -Recurse | ForEach-Object {
-              Write-Host "✓ $dll found at: $($_.FullName)"
-              $found = $true
-            }
-            if (-not $found) {
-              Write-Host "⚠ WARNING: $dll not found"
-            }
-          }
+          for dll in $required_dlls; do
+            found=$(find build -name "$dll" -type f)
+            if [ -n "$found" ]; then
+              echo "✓ $dll found at: $found"
+            else
+              echo "⚠ WARNING: $dll not found"
+            fi
+          done
           
-          Write-Host ""
-          Write-Host "=== All DLLs in build folder ==="
-          Get-ChildItem -Path $buildDir -Filter "*.dll" -Recurse | ForEach-Object { 
-            $relativePath = $_.FullName.Replace((Get-Location).Path + "\build\", "")
-            Write-Host "  $relativePath"
-          }
+          echo ""
+          echo "=== All DLLs in build folder ==="
+          find build -name "*.dll" -type f | while read f; do
+            echo "  $(basename $f) - $(stat -c%s $f) bytes"
+          done
 
       - name: Deploy Qt dependencies
         shell: pwsh
@@ -134,7 +148,17 @@ jobs:
           }
 
           Write-Host "Running windeployqt from: $qtBin"
-          & $qtBin --release --compiler-runtime --no-opengl-sw $exePath
+          $deployArgs = @("--compiler-runtime", "--no-opengl-sw", $exePath)
+          
+          if ("${{ matrix.build_type }}" -eq "Debug") {
+            $deployArgs = @("--debug") + $deployArgs
+            Write-Host "Deploying in DEBUG mode"
+          } else {
+            $deployArgs = @("--release") + $deployArgs
+            Write-Host "Deploying in RELEASE mode"
+          }
+          
+          & $qtBin $deployArgs
           
           if ($LASTEXITCODE -ne 0) {
             Write-Host "✗ ERROR: windeployqt failed"
@@ -145,19 +169,30 @@ jobs:
           Write-Host "DLLs deployed to build folder"
 
       - name: Package
+        shell: msys2 {0}
         run: |
           cd build
-          cpack -G ZIP -C Release
+          
+          # Set package name based on build type
+          if [ "${{ matrix.build_type }}" = "Debug" ]; then
+            export CPACK_PACKAGE_FILE_NAME="NST-Debug"
+          fi
+          
+          cpack -G ZIP -C ${{ matrix.build_type }}
       
       - name: Verify Package
         shell: pwsh
         run: |
           Write-Host "=== Verifying package ==="
-          $packageFile = Get-ChildItem -Path build -Filter "NST-*.zip" | Select-Object -First 1
+          $buildType = "${{ matrix.build_type }}"
+          $packagePattern = if ($buildType -eq "Debug") { "NST-Debug*.zip" } else { "NST-*.zip" }
+          $packageFile = Get-ChildItem -Path build -Filter $packagePattern | Select-Object -First 1
           
           if ($packageFile) {
             Write-Host "Package: $($packageFile.Name) ($('{0:N2}' -f ($packageFile.Length / 1MB)) MB)"
+            Write-Host "Build Type: $buildType"
             
+            Write-Host ""
             Write-Host "Extracting to verify contents..."
             $tempDir = "build\temp_verify"
             Expand-Archive -Path $packageFile.FullName -DestinationPath $tempDir -Force
@@ -172,7 +207,11 @@ jobs:
             
             Remove-Item -Path $tempDir -Recurse -Force
           } else {
-            Write-Host "✗ ERROR: No package file found"
+            Write-Host "✗ ERROR: No package file found matching: $packagePattern"
+            Write-Host "Files in build directory:"
+            Get-ChildItem -Path build -Filter "*.zip" | ForEach-Object {
+              Write-Host "  $($_.Name)"
+            }
             exit 1
           }
       
@@ -181,7 +220,11 @@ jobs:
         shell: bash
         run: |
           cd build
-          PACKAGE_FILE=$(ls NST-*.zip 2>/dev/null | head -n 1 || true)
+          if [ "${{ matrix.build_type }}" = "Debug" ]; then
+            PACKAGE_FILE=$(ls NST-Debug*.zip 2>/dev/null | head -n 1 || true)
+          else
+            PACKAGE_FILE=$(ls NST-*.zip 2>/dev/null | grep -v Debug | head -n 1 || true)
+          fi
           echo "package_file=$PACKAGE_FILE" >> $GITHUB_OUTPUT
           if [ -n "$PACKAGE_FILE" ]; then
             echo "Found package: $PACKAGE_FILE"
@@ -194,7 +237,7 @@ jobs:
         if: steps.find_files.outputs.package_file != ''
         uses: actions/upload-artifact@v4
         with:
-          name: nst-windows
+          name: nst-windows-${{ matrix.build_type }}
           path: build/${{ steps.find_files.outputs.package_file }}
           retention-days: 1
 
@@ -208,10 +251,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Download artifact
+      - name: Download Release artifact
         uses: actions/download-artifact@v4
         with:
-          name: nst-windows
+          name: nst-windows-Release
+          path: artifacts
+      
+      - name: Download Debug artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nst-windows-Debug
           path: artifacts
       
       - name: Set version tag
@@ -244,7 +293,7 @@ jobs:
             release_id=$(echo "$create_resp" | jq -r '.id')
           fi
           
-          # Upload artifact
+          # Upload artifacts
           for f in artifacts/*; do
             [ -f "$f" ] || continue
             name=$(basename "$f")
@@ -255,3 +304,6 @@ jobs:
               --data-binary @"$f" \
               "https://uploads.github.com/repos/${REPO}/releases/${release_id}/assets?name=$name"
           done
+          
+          echo "✓ Upload completed"
+          echo "Release URL: https://github.com/${REPO}/releases/tag/${TAG}"
