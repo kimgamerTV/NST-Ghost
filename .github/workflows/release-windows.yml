@@ -142,11 +142,8 @@ jobs:
           Write-Host "QT_ROOT_DIR: $env:QT_ROOT_DIR"
           Write-Host "QT_PLUGIN_PATH: $env:QT_PLUGIN_PATH"
           
-          # Check critical platform plugin
-          $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindowsd.dll"
-          if ("${{ matrix.build_type }}" -eq "Release") {
-            $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
-          }
+          # Check critical platform plugin (MinGW only has release versions)
+          $platformPlugin = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
           
           Write-Host ""
           Write-Host "Checking platform plugin..."
@@ -164,109 +161,104 @@ jobs:
             exit 1
           }
           
-          # Use QT_ROOT_DIR environment variable set by install-qt-action
-          $qtBin = Join-Path $env:QT_ROOT_DIR "bin\windeployqt.exe"
-          
-          if (-not (Test-Path $qtBin)) {
-            Write-Host "✗ ERROR: Could not find windeployqt.exe at $qtBin"
-            exit 1
-          }
-
           Write-Host ""
-          Write-Host "Running windeployqt from: $qtBin"
+          Write-Host "=== Manual Qt Deployment ==="
+          Write-Host "Note: MinGW Qt doesn't include debug versions of plugins, using release versions for both builds"
           
-          # Set Qt plugin path explicitly for windeployqt
-          $env:QT_PLUGIN_PATH = "$env:QT_ROOT_DIR\plugins"
+          # Manually copy essential DLLs
+          $qtBinDir = "$env:QT_ROOT_DIR\bin"
+          $buildDir = "build"
           
-          if ("${{ matrix.build_type }}" -eq "Debug") {
-            Write-Host "Deploying in DEBUG mode"
-            & $qtBin --debug --compiler-runtime --no-opengl-sw --verbose 1 $exePath
-          } else {
-            Write-Host "Deploying in RELEASE mode"
-            & $qtBin --release --compiler-runtime --no-opengl-sw --verbose 1 $exePath
-          }
+          Write-Host ""
+          Write-Host "Copying Qt DLLs..."
+          $qtDlls = @(
+            "Qt6Core.dll",
+            "Qt6Gui.dll", 
+            "Qt6Widgets.dll",
+            "Qt6Network.dll",
+            "Qt6Concurrent.dll"
+          )
           
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host ""
-            Write-Host "✗ ERROR: windeployqt failed with exit code $LASTEXITCODE"
-            Write-Host ""
-            Write-Host "Attempting manual deployment..."
-            
-            # Manually copy essential DLLs
-            $qtBinDir = "$env:QT_ROOT_DIR\bin"
-            $buildDir = "build"
-            
-            Write-Host "Copying Qt DLLs..."
-            $qtDlls = @(
-              "Qt6Core.dll",
-              "Qt6Gui.dll", 
-              "Qt6Widgets.dll",
-              "Qt6Network.dll",
-              "Qt6Concurrent.dll"
-            )
-            
-            if ("${{ matrix.build_type }}" -eq "Debug") {
-              $qtDlls = $qtDlls | ForEach-Object { $_.Replace(".dll", "d.dll") }
-            }
-            
-            foreach ($dll in $qtDlls) {
-              $src = Join-Path $qtBinDir $dll
-              if (Test-Path $src) {
-                Copy-Item $src $buildDir -Force
-                Write-Host "  ✓ Copied $dll"
-              } else {
-                Write-Host "  ⚠ $dll not found, trying without 'd' suffix..."
-                $dllNoD = $dll.Replace("d.dll", ".dll")
-                $src = Join-Path $qtBinDir $dllNoD
-                if (Test-Path $src) {
-                  Copy-Item $src $buildDir -Force
-                  Write-Host "  ✓ Copied $dllNoD"
-                }
-              }
-            }
-            
-            # Copy platform plugin
-            Write-Host "Copying platform plugins..."
-            $platformsDir = Join-Path $buildDir "platforms"
-            New-Item -ItemType Directory -Path $platformsDir -Force | Out-Null
-            
-            $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
-            if ("${{ matrix.build_type }}" -eq "Debug") {
-              $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindowsd.dll"
-            }
-            
-            if (Test-Path $platformSrc) {
-              Copy-Item $platformSrc $platformsDir -Force
-              Write-Host "  ✓ Copied platform plugin"
+          foreach ($dll in $qtDlls) {
+            $src = Join-Path $qtBinDir $dll
+            if (Test-Path $src) {
+              Copy-Item $src $buildDir -Force
+              Write-Host "  ✓ Copied $dll"
             } else {
-              # Try without 'd' suffix
-              $platformSrc = "$env:QT_ROOT_DIR\plugins\platforms\qwindows.dll"
-              if (Test-Path $platformSrc) {
-                Copy-Item $platformSrc $platformsDir -Force
-                Write-Host "  ✓ Copied platform plugin (release version)"
-              }
+              Write-Host "  ✗ ERROR: $dll not found"
+              exit 1
             }
-            
-            # Copy styles plugin
-            Write-Host "Copying style plugins..."
-            $stylesDir = Join-Path $buildDir "styles"
-            New-Item -ItemType Directory -Path $stylesDir -Force | Out-Null
-            
-            Get-ChildItem "$env:QT_ROOT_DIR\plugins\styles" -Filter "*.dll" | ForEach-Object {
-              Copy-Item $_.FullName $stylesDir -Force
-              Write-Host "  ✓ Copied $($_.Name)"
-            }
-            
-            Write-Host ""
-            Write-Host "✓ Manual deployment completed"
-          } else {
-            Write-Host ""
-            Write-Host "✓ windeployqt completed successfully"
           }
+          
+          # Copy MinGW runtime DLLs
+          Write-Host ""
+          Write-Host "Copying MinGW runtime DLLs..."
+          $mingwDlls = @(
+            "libgcc_s_seh-1.dll",
+            "libstdc++-6.dll",
+            "libwinpthread-1.dll"
+          )
+          
+          foreach ($dll in $mingwDlls) {
+            $src = Join-Path $qtBinDir $dll
+            if (Test-Path $src) {
+              Copy-Item $src $buildDir -Force
+              Write-Host "  ✓ Copied $dll"
+            } else {
+              Write-Host "  ⚠ WARNING: $dll not found"
+            }
+          }
+          
+          # Copy platform plugins
+          Write-Host ""
+          Write-Host "Copying platform plugins..."
+          $platformsDir = Join-Path $buildDir "platforms"
+          New-Item -ItemType Directory -Path $platformsDir -Force | Out-Null
+          
+          Get-ChildItem "$env:QT_ROOT_DIR\plugins\platforms" -Filter "*.dll" | ForEach-Object {
+            Copy-Item $_.FullName $platformsDir -Force
+            Write-Host "  ✓ Copied $($_.Name)"
+          }
+          
+          # Copy styles plugins
+          Write-Host ""
+          Write-Host "Copying style plugins..."
+          $stylesDir = Join-Path $buildDir "styles"
+          New-Item -ItemType Directory -Path $stylesDir -Force | Out-Null
+          
+          Get-ChildItem "$env:QT_ROOT_DIR\plugins\styles" -Filter "*.dll" | ForEach-Object {
+            Copy-Item $_.FullName $stylesDir -Force
+            Write-Host "  ✓ Copied $($_.Name)"
+          }
+          
+          # Copy imageformats plugins
+          Write-Host ""
+          Write-Host "Copying imageformats plugins..."
+          $imageformatsDir = Join-Path $buildDir "imageformats"
+          New-Item -ItemType Directory -Path $imageformatsDir -Force | Out-Null
+          
+          Get-ChildItem "$env:QT_ROOT_DIR\plugins\imageformats" -Filter "*.dll" | ForEach-Object {
+            Copy-Item $_.FullName $imageformatsDir -Force
+            Write-Host "  ✓ Copied $($_.Name)"
+          }
+          
+          # Copy iconengines plugins
+          Write-Host ""
+          Write-Host "Copying iconengines plugins..."
+          $iconenginesDir = Join-Path $buildDir "iconengines"
+          New-Item -ItemType Directory -Path $iconenginesDir -Force | Out-Null
+          
+          Get-ChildItem "$env:QT_ROOT_DIR\plugins\iconengines" -Filter "*.dll" | ForEach-Object {
+            Copy-Item $_.FullName $iconenginesDir -Force
+            Write-Host "  ✓ Copied $($_.Name)"
+          }
+          
+          Write-Host ""
+          Write-Host "✓ Manual deployment completed"
           
           Write-Host ""
           Write-Host "Deployed files in build directory:"
-          Get-ChildItem "build" -Filter "*.dll" | Select-Object Name, Length | Format-Table
+          Get-ChildItem "build" -Filter "*.dll" -Recurse | Select-Object Name, Length, DirectoryName | Format-Table -AutoSize
 
       - name: Package
         shell: msys2 {0}
