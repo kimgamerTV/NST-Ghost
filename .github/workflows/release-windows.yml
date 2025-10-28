@@ -14,9 +14,6 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
-    strategy:
-      matrix:
-        build_type: [Release, Debug]
     
     steps:
       - name: Checkout code
@@ -49,12 +46,13 @@ jobs:
           cd build
           
           echo "=== CMake Configuration ==="
-          echo "Build Type: ${{ matrix.build_type }}"
+          echo "Build Type: Release"
           echo "Qt Root: ${QT_ROOT_DIR}"
           
           cmake .. -G "Ninja" \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}"
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}" \
+            -DCMAKE_INSTALL_PREFIX=install
       
       - name: Build
         shell: msys2 {0}
@@ -80,12 +78,12 @@ jobs:
           cd build
           echo "=== Installing to staging directory ==="
           
-          # Install to a staging directory
-          DESTDIR="${PWD}/package" cmake --install . --prefix ""
+          # Install with the prefix we set in CMake
+          cmake --install .
           
           echo ""
           echo "=== Installed files ==="
-          find package -type f | head -50
+          find install -type f | head -50
       
       - name: Package
         shell: msys2 {0}
@@ -93,7 +91,7 @@ jobs:
           cd build
           
           echo "=== Creating ZIP package ==="
-          cpack -G ZIP -C ${{ matrix.build_type }}
+          cpack -G ZIP -C Release
           
           echo ""
           echo "=== Generated package ==="
@@ -153,7 +151,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nst-windows-${{ matrix.build_type }}
+          name: nst-windows-release
           path: build/*.zip
           retention-days: 1
 
@@ -170,13 +168,7 @@ jobs:
       - name: Download Release artifact
         uses: actions/download-artifact@v4
         with:
-          name: nst-windows-Release
-          path: artifacts
-      
-      - name: Download Debug artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nst-windows-Debug
+          name: nst-windows-release
           path: artifacts
       
       - name: Set version tag
