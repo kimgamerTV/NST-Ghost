@@ -133,41 +133,53 @@ endif()
 
 # Windows: Deploy all dependencies
 if(WIN32)
+    # Option to skip windeployqt during build (useful for CI/CD)
+    option(SKIP_WINDEPLOYQT_BUILD "Skip running windeployqt during build" OFF)
+    
+    # Always copy BGACore and QtLingo DLLs to build directory
+    add_custom_command(TARGET NST POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:BGACore>"
+            "$<TARGET_FILE_DIR:NST>"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:QtLingo>"
+            "$<TARGET_FILE_DIR:NST>"
+        COMMENT "Copying BGACore.dll and QtLingo.dll..."
+    )
+    
     # Find windeployqt
     get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
     get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
     
-    if(WINDEPLOYQT_EXECUTABLE)
+    if(WINDEPLOYQT_EXECUTABLE AND NOT SKIP_WINDEPLOYQT_BUILD)
         message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
         
-        # Deploy Qt DLLs after build
+        # Deploy Qt DLLs after build (only if not skipped)
         add_custom_command(TARGET NST POST_BUILD
             COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                --release
+                $<$<CONFIG:Debug>:--debug>
+                $<$<CONFIG:Release>:--release>
                 --no-translations
                 --no-system-d3d-compiler
                 --no-opengl-sw
                 "$<TARGET_FILE:NST>"
             COMMENT "Deploying Qt dependencies with windeployqt..."
         )
-        
-        # Copy BGACore and QtLingo DLLs to build directory
-        add_custom_command(TARGET NST POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:BGACore>"
-                "$<TARGET_FILE_DIR:NST>"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:QtLingo>"
-                "$<TARGET_FILE_DIR:NST>"
-            COMMENT "Copying BGACore.dll and QtLingo.dll..."
-        )
-        
-        # Install Qt DLLs with CPack
+    elseif(SKIP_WINDEPLOYQT_BUILD)
+        message(STATUS "Skipping windeployqt during build (SKIP_WINDEPLOYQT_BUILD=ON)")
+    else()
+        message(WARNING "windeployqt not found. Qt DLLs will not be bundled automatically.")
+        message(WARNING "Please ensure Qt bin directory is in PATH or set Qt6_DIR correctly.")
+    endif()
+    
+    # Install Qt DLLs with CPack (for 'make install' or 'cpack')
+    if(WINDEPLOYQT_EXECUTABLE)
         install(CODE "
             execute_process(
                 COMMAND \"${WINDEPLOYQT_EXECUTABLE}\"
-                    --release
+                    $<$<CONFIG:Debug>:--debug>
+                    $<$<CONFIG:Release>:--release>
                     --no-translations
                     --no-system-d3d-compiler
                     --no-opengl-sw
@@ -175,20 +187,37 @@ if(WIN32)
                     \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/NST.exe\"
             )
         " COMPONENT Runtime)
-    else()
-        message(WARNING "windeployqt not found. Qt DLLs will not be bundled automatically.")
-        message(WARNING "Please ensure Qt bin directory is in PATH or set Qt6_DIR correctly.")
+    endif()
+    
+    # Install MinGW Runtime (if using MinGW)
+    if(MINGW)
+        # Get MinGW runtime DLLs
+        get_filename_component(MINGW_BIN_DIR ${CMAKE_CXX_COMPILER} DIRECTORY)
         
-        # Still copy BGACore and QtLingo DLLs even without windeployqt
-        add_custom_command(TARGET NST POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:BGACore>"
-                "$<TARGET_FILE_DIR:NST>"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "$<TARGET_FILE:QtLingo>"
-                "$<TARGET_FILE_DIR:NST>"
-            COMMENT "Copying BGACore.dll and QtLingo.dll..."
+        # Common MinGW runtime DLLs
+        set(MINGW_DLLS
+            "libgcc_s_seh-1.dll"
+            "libstdc++-6.dll"
+            "libwinpthread-1.dll"
         )
+        
+        foreach(dll ${MINGW_DLLS})
+            set(dll_path "${MINGW_BIN_DIR}/${dll}")
+            if(EXISTS "${dll_path}")
+                # Copy to build directory
+                add_custom_command(TARGET NST POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        "${dll_path}"
+                        "$<TARGET_FILE_DIR:NST>"
+                    COMMENT "Copying ${dll}..."
+                )
+                # Install with CPack
+                install(FILES "${dll_path}"
+                    DESTINATION ${CMAKE_INSTALL_BINDIR}
+                    COMPONENT Runtime
+                )
+            endif()
+        endforeach()
     endif()
     
     # Install Visual C++ Runtime (if using MSVC)
@@ -233,16 +262,21 @@ set(CPACK_PACKAGE_CONTACT "you@example.com")
 
 # Linux (ZIP)
 set(CPACK_GENERATOR "ZIP")
-set(CPACK_PACKAGE_FILE_NAME "nst-linux")
+set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Linux")
 
 # macOS (DMG)
 if(APPLE)
     set(CPACK_GENERATOR "DragNDrop")
-    set(CPACK_PACKAGE_FILE_NAME "nst-macos")
+    set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-macOS")
 endif()
 
 # Windows (ZIP)
 if(WIN32)
     set(CPACK_GENERATOR "ZIP")
-    set(CPACK_PACKAGE_FILE_NAME "nst-windows")
+    # Package name will include build type if Debug
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Windows-Debug")
+    else()
+        set(CPACK_PACKAGE_FILE_NAME "NST-${PROJECT_VERSION}-Windows")
+    endif()
 endif()
