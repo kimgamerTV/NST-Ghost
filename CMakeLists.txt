@@ -160,10 +160,29 @@ else()
                         --no-translations
                         --no-system-d3d-compiler
                         --no-opengl-sw
+                        --compiler-runtime
                         --dir \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\"
                         \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/NST.exe\"
+                    RESULT_VARIABLE windeployqt_result
+                    OUTPUT_VARIABLE windeployqt_output
+                    ERROR_VARIABLE windeployqt_error
                 )
+                
+                if(NOT windeployqt_result EQUAL 0)
+                    message(WARNING \"windeployqt failed: \${windeployqt_error}\")
+                else()
+                    message(STATUS \"windeployqt output: \${windeployqt_output}\")
+                endif()
             " COMPONENT Runtime)
+            
+            # Create qt.conf to ensure Qt finds plugins
+            install(CODE "
+                set(qt_conf_content \"[Paths]\\nPlugins = plugins\\nPrefix = .\\n\")
+                file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}/qt.conf\" \"\${qt_conf_content}\")
+                message(STATUS \"Created qt.conf in \${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\")
+            " COMPONENT Runtime)
+        else()
+            message(WARNING "windeployqt not found. Qt dependencies will not be deployed automatically.")
         endif()
         
         # Install MinGW Runtime (if using MinGW)
@@ -183,6 +202,9 @@ else()
                         DESTINATION ${CMAKE_INSTALL_BINDIR}
                         COMPONENT Runtime
                     )
+                    message(STATUS "Will install MinGW runtime: ${dll}")
+                else()
+                    message(WARNING "MinGW runtime not found: ${dll_path}")
                 endif()
             endforeach()
         endif()
