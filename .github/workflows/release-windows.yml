@@ -65,7 +65,14 @@ jobs:
           
           echo ""
           echo "=== Build Output ==="
-          ls -lh NST.exe BGA/libBGACore.dll QtLingo/libQtLingo.dll
+          echo "Executable:"
+          ls -lh NST.exe || echo "NST.exe not found"
+          echo ""
+          echo "Libraries:"
+          ls -lh *.dll || echo "No DLL files in root"
+          echo ""
+          echo "Searching for DLL files:"
+          find . -name "*.dll" -type f | head -20
       
       - name: Install (Deploy)
         shell: msys2 {0}
