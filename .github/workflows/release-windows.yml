@@ -14,10 +14,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install MXE dependencies
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y autoconf automake bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libtool libtool-bin libssl-dev make patch perl pkg-config python3 python3-pip ruby sed unzip wget xz-utils
+        sudo apt-get install -y build-essential autoconf automake bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libtool libtool-bin libssl-dev patch perl pkg-config python3 python3-pip ruby sed unzip wget xz-utils
 
     - name: Clone MXE
       run: |
@@ -28,7 +28,7 @@ jobs:
         cd ~/mxe
         make MXE_TARGETS='x86_64-w64-mingw32.static' qt6
       env:
-        PATH: "$HOME/mxe/usr/bin:$PATH"
+        PATH: "${HOME}/mxe/usr/bin:${PATH}"
 
     - name: Configure CMake
       run: |
@@ -36,12 +36,14 @@ jobs:
         cd build
         cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/mxe/usr/x86_64-w64-mingw32.static/share/cmake/mxe-conf.cmake -DCMAKE_BUILD_TYPE=Release
       env:
-        PATH: "$HOME/mxe/usr/bin:$PATH"
+        PATH: "${HOME}/mxe/usr/bin:${PATH}"
 
     - name: Build
       run: |
         cd build
         cmake --build . --config Release
+      env:
+        PATH: "${HOME}/mxe/usr/bin:${PATH}"
 
     - name: Package
       uses: actions/upload-artifact@v4
