@@ -24,15 +24,27 @@ jobs:
         gettext --version
         autopoint --version
     
+    - name: Cache MXE build
+      uses: actions/cache@v4
+      with:
+        path: ~/mxe
+        key: mxe-qt6-static-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
+        restore-keys: |
+          mxe-qt6-static-${{ runner.os }}-
+    
     - name: Clone MXE
       run: |
-        git clone https://github.com/mxe/mxe.git ~/mxe
+        if [ ! -d ~/mxe ]; then
+          git clone https://github.com/mxe/mxe.git ~/mxe
+        fi
     
     - name: Build MXE toolchain and Qt6
       run: |
         cd ~/mxe
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        make MXE_TARGETS='x86_64-w64-mingw32.static' qt6
+        # Build with multiple cores to speed up
+        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) qt6
+      timeout-minutes: 360
     
     - name: Configure CMake
       run: |
