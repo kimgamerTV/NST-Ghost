@@ -1,26 +1,21 @@
 name: Build NST Windows (MXE)
-
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      PATH: "${HOME}/mxe/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+    
     - name: Install dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential p7zip-full autoconf automake bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libtool libtool-bin libssl-dev libxml-parser-perl openssl patch perl pkg-config python3 python3-pip ruby scons sed unzip wget xz-utils libgdk-pixbuf-2.0-dev lzip python3-mako
-
+    
     - name: Debug autopoint
       run: |
         echo "Checking for autopoint and gettext..."
@@ -28,27 +23,30 @@ jobs:
         which gettext
         gettext --version
         autopoint --version
-
+    
     - name: Clone MXE
       run: |
         git clone https://github.com/mxe/mxe.git ~/mxe
-
+    
     - name: Build MXE toolchain and Qt6
       run: |
         cd ~/mxe
+        export PATH="$HOME/mxe/usr/bin:$PATH"
         make MXE_TARGETS='x86_64-w64-mingw32.static' qt6
-
+    
     - name: Configure CMake
       run: |
         mkdir build
         cd build
+        export PATH="$HOME/mxe/usr/bin:$PATH"
         cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/mxe/usr/x86_64-w64-mingw32.static/share/cmake/mxe-conf.cmake -DCMAKE_BUILD_TYPE=Release
-
+    
     - name: Build
       run: |
         cd build
+        export PATH="$HOME/mxe/usr/bin:$PATH"
         cmake --build . --config Release
-
+    
     - name: Package
       uses: actions/upload-artifact@v4
       with:
