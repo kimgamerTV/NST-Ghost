@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      PATH: "${HOME}/mxe/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
     steps:
     - name: Checkout code
@@ -26,24 +28,18 @@ jobs:
     - name: Build MXE toolchain and Qt6
       run: |
         cd ~/mxe
-        sudo make MXE_TARGETS='x86_64-w64-mingw32.static' qt6
-      env:
-        PATH: "${HOME}/mxe/usr/bin:${PATH}"
+        make MXE_TARGETS='x86_64-w64-mingw32.static' qt6
 
     - name: Configure CMake
       run: |
         mkdir build
         cd build
         cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/mxe/usr/x86_64-w64-mingw32.static/share/cmake/mxe-conf.cmake -DCMAKE_BUILD_TYPE=Release
-      env:
-        PATH: "${HOME}/mxe/usr/bin:${PATH}"
 
     - name: Build
       run: |
         cd build
         cmake --build . --config Release
-      env:
-        PATH: "${HOME}/mxe/usr/bin:${PATH}"
 
     - name: Package
       uses: actions/upload-artifact@v4
