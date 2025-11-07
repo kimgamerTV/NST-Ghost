@@ -100,16 +100,12 @@ jobs:
       run: |
         mkdir -p $GITHUB_WORKSPACE/package
         cd build/install
-        
         echo "=== Searching for NST.exe ==="
         find . -name "NST.exe" -type f
         echo ""
-        
         echo "=== Directory structure ==="
         ls -la
         echo ""
-        
-        # ลองหาใน directory ต่างๆ
         if [ -f ./bin/NST.exe ]; then
           echo "Found NST.exe at ./bin/NST.exe"
           cp ./bin/NST.exe $GITHUB_WORKSPACE/package/
@@ -125,11 +121,9 @@ jobs:
           find . -type f -name "*.exe"
           exit 1
         fi
-        
         echo ""
         echo "=== Copying DLL files ==="
         find . -name "*.dll" -type f -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
-        
         echo ""
         echo "=== Files copied to package ==="
         ls -lh $GITHUB_WORKSPACE/package/
@@ -138,15 +132,11 @@ jobs:
       run: |
         export PATH="$HOME/mxe/usr/bin:$PATH"
         cd $GITHUB_WORKSPACE/package
-        
-        # Copy Qt6 DLLs
         QT_BIN="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin"
         if [ -d "$QT_BIN" ]; then
           echo "Copying Qt6 DLLs from $QT_BIN"
           cp "$QT_BIN"/Qt6*.dll . 2>/dev/null || true
         fi
-        
-        # Copy Qt6 plugins
         QT_PLUGINS="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/plugins"
         if [ -d "$QT_PLUGINS" ]; then
           echo "Copying Qt6 plugins"
@@ -154,14 +144,9 @@ jobs:
           cp -r "$QT_PLUGINS"/platforms plugins/ 2>/dev/null || true
           cp -r "$QT_PLUGINS"/styles plugins/ 2>/dev/null || true
         fi
-        
-        # Create qt.conf
-        cat > qt.conf << 'QTCONF'
-[Paths]
-Plugins = plugins
-Prefix = .
-QTCONF
-        
+        echo "[Paths]" > qt.conf
+        echo "Plugins = plugins" >> qt.conf
+        echo "Prefix = ." >> qt.conf
         echo ""
         echo "=== Final package contents ==="
         ls -lah
