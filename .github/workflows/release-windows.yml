@@ -43,17 +43,12 @@ jobs:
       if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        # สร้าง settings.mk เพื่อกำหนดค่า
-        cat > settings.mk << 'EOF'
-MXE_TARGETS := x86_64-w64-mingw32.static
-MXE_PLUGIN_DIRS := plugins/gcc13
-LOCAL_PKG_LIST := gcc qt6-qtbase qt6-qttools
-.DEFAULT_GOAL := local-pkg-list
-local-pkg-list: $(LOCAL_PKG_LIST)
-EOF
-        
-        # Build เฉพาะ packages ที่ต้องการ
-        make JOBS=$(nproc) local-pkg-list
+        # Build only Windows target with specific packages
+        make MXE_TARGETS='x86_64-w64-mingw32.static' \
+             MXE_PLUGIN_DIRS=plugins/gcc13 \
+             JOBS=$(nproc) \
+             qt6-qtbase.x86_64-w64-mingw32.static \
+             qt6-qttools.x86_64-w64-mingw32.static
       timeout-minutes: 360
     
     - name: Verify MXE installation
@@ -70,8 +65,6 @@ EOF
         mkdir -p build
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        
-        # ใช้ CMake wrapper ของ MXE
         x86_64-w64-mingw32.static-cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32.static \
@@ -94,12 +87,8 @@ EOF
       run: |
         mkdir -p $GITHUB_WORKSPACE/package
         cd build/install
-        
-        # ค้นหา NST.exe
         echo "=== Searching for NST.exe ==="
         find . -name "NST.exe" -type f
-        
-        # Copy executable
         if [ -f ./bin/NST.exe ]; then
           cp ./bin/NST.exe $GITHUB_WORKSPACE/package/
           echo "Found at ./bin/NST.exe"
@@ -111,16 +100,12 @@ EOF
           find . -type f -name "*.exe"
           exit 1
         fi
-        
-        # Copy DLLs ถ้ามี
         find . -name "*.dll" -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
     
     - name: Deploy Qt dependencies
       run: |
         export PATH="$HOME/mxe/usr/bin:$PATH"
         cd $GITHUB_WORKSPACE/package
-        
-        # ใช้ MXE's windeploy script ถ้ามี
         if [ -f "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" ]; then
           wine "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" NST.exe || true
         fi
