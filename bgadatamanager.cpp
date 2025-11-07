@@ -28,7 +28,7 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
     qDebug() << "BGADataManager: loadStringsFromGameProject called in thread:" << QThread::currentThreadId();
     emit progressUpdated(0, "Starting project analysis...");
 
-    QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/bgadatamanager_log.txt";
+    QString logFilePath = "bgadatamanager_log.txt";
     QFile logFile(logFilePath);
     logFile.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream logStream(&logFile);

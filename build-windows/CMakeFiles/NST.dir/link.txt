@@ -1,0 +1,3 @@
+/usr/bin/cmake -E rm -f CMakeFiles/NST.dir/objects.a
+/usr/bin/x86_64-w64-mingw32-ar qc CMakeFiles/NST.dir/objects.a @CMakeFiles/NST.dir/objects1.rsp
+/usr/bin/x86_64-w64-mingw32-g++ -mwindows -Wl,--whole-archive CMakeFiles/NST.dir/objects.a -Wl,--no-whole-archive -o NST.exe -Wl,--out-implib,libNST.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles/NST.dir/linkLibs.rsp

@@ -1,6 +1,3 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 #include "customprogressdialog.h"
 #include <QMainWindow>
 #include <QStandardItemModel>
@@ -21,6 +18,7 @@
 #include "fontmanagerdialog.h"
 #include "updatecontroller.h"
 #include "translationcontextmenu.h"
+#include "projectdatamanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,17 +36,16 @@ public slots:
     void onLoadFromGameProject();
 
 private slots:
-    void on_fileListView_clicked(const QModelIndex &index);
+    void onLoadingFinished();
     void openSearchDialog();
     void onSearchResultSelected(const QString &fileName, int row);
     void onOpenMockData();
-    void onLoadingFinished();
     void onBGADataError(const QString &message);
     void onSearchRequested(const QString &query);
     void onTranslationFinished(const qtlingo::TranslationResult &result);
     void onTranslationServiceError(const QString &message);
     void onTranslationTableViewCustomContextMenuRequested(const QPoint &pos);
-    void onTranslateSelectedTextWithService(const QString &serviceName, const QString &sourceText);
+    void onTranslateSelectedTextWithService();
     void onTranslateAllSelectedText();
     void onSelectAllRequested();
     void onSettingsActionTriggered();
@@ -66,7 +63,6 @@ private:
     Ui::MainWindow *ui;
     QStringListModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
-    QMap<QString, QJsonArray> m_loadedGameProjectData;
     SearchController *m_searchController;
     SearchDialog *m_searchDialog;
     ShortcutController *m_shortcutController;
@@ -74,6 +70,7 @@ private:
     TranslationServiceManager *m_translationServiceManager;
     MenuBar *m_menuBar;
     UpdateController *m_updateController;
+    ProjectDataManager *m_projectDataManager;
 
     QString m_apiKey;
     QString m_targetLanguage;
@@ -85,7 +82,6 @@ private:
     QString m_llmBaseUrl;
 
     QMultiMap<QString, QModelIndex> m_pendingTranslations;
-    QString m_currentLoadedFilePath;
 
     QJsonArray m_gameFonts;
 
@@ -95,4 +91,4 @@ private:
     QFutureWatcher<QJsonArray> m_loadFutureWatcher;
     CustomProgressDialog *m_progressDialog;
 };
-        #endif // MAINWINDOW_H
+

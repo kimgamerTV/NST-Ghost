@@ -40,6 +40,7 @@ set(PROJECT_SOURCES
     translationcontextmenu.cpp
     updatecontroller.cpp
     fontmanagerdialog.cpp
+    projectdatamanager.cpp # New file
     mainwindow.h
     menubar.h
     loadprojectdialog.h
@@ -54,6 +55,7 @@ set(PROJECT_SOURCES
     updatecontroller.h
     customprogressdialog.cpp
     customprogressdialog.h
+    projectdatamanager.h # New file
     resources.qrc
 )
 
