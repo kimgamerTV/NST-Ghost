@@ -4,6 +4,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -29,9 +30,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/mxe
-        key: mxe-qt6-static-v2-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
+        key: mxe-qt6-static-v3-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
         restore-keys: |
-          mxe-qt6-static-v2-${{ runner.os }}-
+          mxe-qt6-static-v3-${{ runner.os }}-
     
     - name: Clone MXE
       if: steps.cache-mxe.outputs.cache-hit != 'true'
@@ -42,61 +43,94 @@ jobs:
       if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        # Only build for Windows target, not host
-        make MXE_TARGETS='x86_64-w64-mingw32.static' \
-             MXE_PLUGIN_DIRS=plugins/gcc13 \
-             JOBS=$(nproc) \
-             qt6-qtbase qt6-qttools
+        # สร้าง settings.mk เพื่อกำหนดค่า
+        cat > settings.mk << 'EOF'
+MXE_TARGETS := x86_64-w64-mingw32.static
+MXE_PLUGIN_DIRS := plugins/gcc13
+LOCAL_PKG_LIST := gcc qt6-qtbase qt6-qttools
+.DEFAULT_GOAL := local-pkg-list
+local-pkg-list: $(LOCAL_PKG_LIST)
+EOF
+        
+        # Build เฉพาะ packages ที่ต้องการ
+        make JOBS=$(nproc) local-pkg-list
       timeout-minutes: 360
     
     - name: Verify MXE installation
       run: |
-        ls -la ~/mxe/usr/bin/ | grep -E '(x86_64-w64-mingw32|qmake)' || true
-        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/bin/ || true
+        echo "=== Checking MXE binaries ==="
+        ls -la ~/mxe/usr/bin/ | grep x86_64-w64-mingw32 || true
+        echo "=== Checking Qt installation ==="
+        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ || true
+        echo "=== Checking for qmake ==="
+        find ~/mxe -name "*qmake*" -type f || true
     
     - name: Configure CMake
       run: |
         mkdir -p build
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
+        
+        # ใช้ CMake wrapper ของ MXE
         x86_64-w64-mingw32.static-cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32.static
+          -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32.static \
+          -DQt6_DIR=$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/lib/cmake/Qt6 \
+          -DCMAKE_PREFIX_PATH=$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6
     
     - name: Build
       run: |
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        cmake --build . --config Release -j$(nproc)
+        cmake --build . --config Release -j$(nproc) -- VERBOSE=1
     
     - name: Install to staging directory
       run: |
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        DESTDIR=$PWD/install cmake --install .
+        DESTDIR=$PWD/install cmake --install . --prefix /
     
-    - name: Create package
+    - name: Collect binaries
       run: |
-        cd build/install
-        # Find where the exe is installed
-        find . -name "NST.exe" -o -name "*.dll"
-        # Create a clean package directory
         mkdir -p $GITHUB_WORKSPACE/package
-        # Copy the executable and any DLLs
-        if [ -f ./usr/x86_64-w64-mingw32.static/bin/NST.exe ]; then
-          cp -r ./usr/x86_64-w64-mingw32.static/bin/* $GITHUB_WORKSPACE/package/
-        elif [ -f ./bin/NST.exe ]; then
-          cp -r ./bin/* $GITHUB_WORKSPACE/package/
+        cd build/install
+        
+        # ค้นหา NST.exe
+        echo "=== Searching for NST.exe ==="
+        find . -name "NST.exe" -type f
+        
+        # Copy executable
+        if [ -f ./bin/NST.exe ]; then
+          cp ./bin/NST.exe $GITHUB_WORKSPACE/package/
+          echo "Found at ./bin/NST.exe"
+        elif [ -f ./usr/x86_64-w64-mingw32.static/bin/NST.exe ]; then
+          cp ./usr/x86_64-w64-mingw32.static/bin/NST.exe $GITHUB_WORKSPACE/package/
+          echo "Found at ./usr/x86_64-w64-mingw32.static/bin/NST.exe"
         else
           echo "Error: NST.exe not found!"
-          find . -name "*.exe"
+          find . -type f -name "*.exe"
           exit 1
+        fi
+        
+        # Copy DLLs ถ้ามี
+        find . -name "*.dll" -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
+    
+    - name: Deploy Qt dependencies
+      run: |
+        export PATH="$HOME/mxe/usr/bin:$PATH"
+        cd $GITHUB_WORKSPACE/package
+        
+        # ใช้ MXE's windeploy script ถ้ามี
+        if [ -f "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" ]; then
+          wine "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" NST.exe || true
         fi
     
     - name: List package contents
       run: |
-        echo "Package contents:"
+        echo "=== Package contents ==="
         ls -lah package/
+        echo "=== File types ==="
+        file package/*
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
