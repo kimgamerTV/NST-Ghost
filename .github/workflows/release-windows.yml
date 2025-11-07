@@ -10,57 +10,97 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
     
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential p7zip-full autoconf automake autopoint bash bison bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev libtool libtool-bin libssl-dev libxml-parser-perl openssl patch perl pkg-config python3 python3-pip ruby scons sed unzip wget xz-utils libgdk-pixbuf-2.0-dev lzip python3-mako
-    
-    - name: Debug autopoint
-      run: |
-        echo "Checking for autopoint and gettext..."
-        which autopoint
-        which gettext
-        gettext --version
-        autopoint --version
+        sudo apt-get install -y \
+          build-essential p7zip-full autoconf automake autopoint bash bison \
+          bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev \
+          libgdk-pixbuf-2.0-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev \
+          libtool libtool-bin libssl-dev libxml-parser-perl lzip openssl patch \
+          perl pkg-config python3 python3-pip python3-mako ruby scons sed \
+          unzip wget xz-utils
     
     - name: Cache MXE build
+      id: cache-mxe
       uses: actions/cache@v4
       with:
         path: ~/mxe
-        key: mxe-qt6-static-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
+        key: mxe-qt6-static-v2-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
         restore-keys: |
-          mxe-qt6-static-${{ runner.os }}-
+          mxe-qt6-static-v2-${{ runner.os }}-
     
     - name: Clone MXE
+      if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
-        if [ ! -d ~/mxe ]; then
-          git clone https://github.com/mxe/mxe.git ~/mxe
-        fi
+        git clone https://github.com/mxe/mxe.git ~/mxe
     
     - name: Build MXE toolchain and Qt6
+      if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        export PATH="$HOME/mxe/usr/bin:$PATH"
-        # Build with multiple cores to speed up
-        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) qt6
+        # Only build for Windows target, not host
+        make MXE_TARGETS='x86_64-w64-mingw32.static' \
+             MXE_PLUGIN_DIRS=plugins/gcc13 \
+             JOBS=$(nproc) \
+             qt6-qtbase qt6-qttools
       timeout-minutes: 360
+    
+    - name: Verify MXE installation
+      run: |
+        ls -la ~/mxe/usr/bin/ | grep -E '(x86_64-w64-mingw32|qmake)' || true
+        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/bin/ || true
     
     - name: Configure CMake
       run: |
-        mkdir build
+        mkdir -p build
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/mxe/usr/x86_64-w64-mingw32.static/share/cmake/mxe-conf.cmake -DCMAKE_BUILD_TYPE=Release
+        x86_64-w64-mingw32.static-cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32.static
     
     - name: Build
       run: |
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        cmake --build . --config Release
+        cmake --build . --config Release -j$(nproc)
     
-    - name: Package
+    - name: Install to staging directory
+      run: |
+        cd build
+        export PATH="$HOME/mxe/usr/bin:$PATH"
+        DESTDIR=$PWD/install cmake --install .
+    
+    - name: Create package
+      run: |
+        cd build/install
+        # Find where the exe is installed
+        find . -name "NST.exe" -o -name "*.dll"
+        # Create a clean package directory
+        mkdir -p $GITHUB_WORKSPACE/package
+        # Copy the executable and any DLLs
+        if [ -f ./usr/x86_64-w64-mingw32.static/bin/NST.exe ]; then
+          cp -r ./usr/x86_64-w64-mingw32.static/bin/* $GITHUB_WORKSPACE/package/
+        elif [ -f ./bin/NST.exe ]; then
+          cp -r ./bin/* $GITHUB_WORKSPACE/package/
+        else
+          echo "Error: NST.exe not found!"
+          find . -name "*.exe"
+          exit 1
+        fi
+    
+    - name: List package contents
+      run: |
+        echo "Package contents:"
+        ls -lah package/
+    
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NST-Windows-Release
-        path: build/NST.exe
+        name: NST-Windows-MXE-x64
+        path: package/
+        if-no-files-found: error
