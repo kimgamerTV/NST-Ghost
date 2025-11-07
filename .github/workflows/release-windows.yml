@@ -39,26 +39,41 @@ jobs:
       run: |
         git clone https://github.com/mxe/mxe.git ~/mxe
     
-    - name: Build MXE toolchain and Qt6
+    - name: Configure MXE settings
       if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        # Build only Windows target with specific packages
-        make MXE_TARGETS='x86_64-w64-mingw32.static' \
-             MXE_PLUGIN_DIRS=plugins/gcc13 \
-             JOBS=$(nproc) \
-             qt6-qtbase.x86_64-w64-mingw32.static \
-             qt6-qttools.x86_64-w64-mingw32.static
-      timeout-minutes: 360
+        echo "MXE_TARGETS := x86_64-w64-mingw32.static" > settings.mk
+        echo "MXE_PLUGIN_DIRS := plugins/gcc13" >> settings.mk
+        cat settings.mk
+    
+    - name: Build MXE GCC toolchain
+      if: steps.cache-mxe.outputs.cache-hit != 'true'
+      run: |
+        cd ~/mxe
+        make JOBS=$(nproc) gcc
+      timeout-minutes: 90
+    
+    - name: Build Qt6 for Windows
+      if: steps.cache-mxe.outputs.cache-hit != 'true'
+      run: |
+        cd ~/mxe
+        make JOBS=$(nproc) qt6-qtbase qt6-qttools
+      timeout-minutes: 300
     
     - name: Verify MXE installation
       run: |
         echo "=== Checking MXE binaries ==="
         ls -la ~/mxe/usr/bin/ | grep x86_64-w64-mingw32 || true
-        echo "=== Checking Qt installation ==="
-        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ || true
-        echo "=== Checking for qmake ==="
-        find ~/mxe -name "*qmake*" -type f || true
+        echo ""
+        echo "=== Checking Qt6 installation ==="
+        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ 2>/dev/null || echo "Qt6 directory not found"
+        echo ""
+        echo "=== Looking for cmake wrapper ==="
+        find ~/mxe/usr/bin -name "*cmake*" -type f 2>/dev/null || true
+        echo ""
+        echo "=== Checking installed packages ==="
+        ls ~/mxe/usr/x86_64-w64-mingw32.static/installed/ 2>/dev/null || true
     
     - name: Configure CMake
       run: |
@@ -67,55 +82,103 @@ jobs:
         export PATH="$HOME/mxe/usr/bin:$PATH"
         x86_64-w64-mingw32.static-cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=/usr/x86_64-w64-mingw32.static \
-          -DQt6_DIR=$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/lib/cmake/Qt6 \
-          -DCMAKE_PREFIX_PATH=$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6
+          -DCMAKE_INSTALL_PREFIX=/
     
     - name: Build
       run: |
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        cmake --build . --config Release -j$(nproc) -- VERBOSE=1
+        cmake --build . --config Release -j$(nproc)
     
     - name: Install to staging directory
       run: |
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
-        DESTDIR=$PWD/install cmake --install . --prefix /
+        DESTDIR=$PWD/install cmake --install .
     
     - name: Collect binaries
       run: |
         mkdir -p $GITHUB_WORKSPACE/package
         cd build/install
+        
         echo "=== Searching for NST.exe ==="
         find . -name "NST.exe" -type f
+        echo ""
+        
+        echo "=== Directory structure ==="
+        ls -la
+        echo ""
+        
+        # ลองหาใน directory ต่างๆ
         if [ -f ./bin/NST.exe ]; then
+          echo "Found NST.exe at ./bin/NST.exe"
           cp ./bin/NST.exe $GITHUB_WORKSPACE/package/
-          echo "Found at ./bin/NST.exe"
+        elif [ -f ./usr/bin/NST.exe ]; then
+          echo "Found NST.exe at ./usr/bin/NST.exe"
+          cp ./usr/bin/NST.exe $GITHUB_WORKSPACE/package/
         elif [ -f ./usr/x86_64-w64-mingw32.static/bin/NST.exe ]; then
+          echo "Found NST.exe at ./usr/x86_64-w64-mingw32.static/bin/NST.exe"
           cp ./usr/x86_64-w64-mingw32.static/bin/NST.exe $GITHUB_WORKSPACE/package/
-          echo "Found at ./usr/x86_64-w64-mingw32.static/bin/NST.exe"
         else
-          echo "Error: NST.exe not found!"
+          echo "ERROR: NST.exe not found!"
+          echo "Searching entire directory tree:"
           find . -type f -name "*.exe"
           exit 1
         fi
-        find . -name "*.dll" -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
+        
+        echo ""
+        echo "=== Copying DLL files ==="
+        find . -name "*.dll" -type f -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
+        
+        echo ""
+        echo "=== Files copied to package ==="
+        ls -lh $GITHUB_WORKSPACE/package/
     
-    - name: Deploy Qt dependencies
+    - name: Copy Qt dependencies manually
       run: |
         export PATH="$HOME/mxe/usr/bin:$PATH"
         cd $GITHUB_WORKSPACE/package
-        if [ -f "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" ]; then
-          wine "$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin/windeployqt.exe" NST.exe || true
+        
+        # Copy Qt6 DLLs
+        QT_BIN="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin"
+        if [ -d "$QT_BIN" ]; then
+          echo "Copying Qt6 DLLs from $QT_BIN"
+          cp "$QT_BIN"/Qt6*.dll . 2>/dev/null || true
         fi
+        
+        # Copy Qt6 plugins
+        QT_PLUGINS="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/plugins"
+        if [ -d "$QT_PLUGINS" ]; then
+          echo "Copying Qt6 plugins"
+          mkdir -p plugins
+          cp -r "$QT_PLUGINS"/platforms plugins/ 2>/dev/null || true
+          cp -r "$QT_PLUGINS"/styles plugins/ 2>/dev/null || true
+        fi
+        
+        # Create qt.conf
+        cat > qt.conf << 'QTCONF'
+[Paths]
+Plugins = plugins
+Prefix = .
+QTCONF
+        
+        echo ""
+        echo "=== Final package contents ==="
+        ls -lah
+        echo ""
+        echo "=== Plugins directory ==="
+        ls -lah plugins/ 2>/dev/null || echo "No plugins directory"
     
     - name: List package contents
       run: |
         echo "=== Package contents ==="
         ls -lah package/
+        echo ""
         echo "=== File types ==="
-        file package/*
+        file package/* 2>/dev/null || true
+        echo ""
+        echo "=== Total package size ==="
+        du -sh package/
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
