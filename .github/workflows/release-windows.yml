@@ -44,28 +44,46 @@ jobs:
       run: |
         Write-Host "=== Qt Version ==="
         qmake --version
-        Write-Host "`n=== Compiler ==="
-        gcc --version
-        g++ --version
+        
+        Write-Host "`n=== Checking MinGW locations ==="
+        Write-Host "Tools MinGW:"
+        $toolsGcc = "${{ github.workspace }}\Tools\mingw900_64\bin\gcc.exe"
+        if (Test-Path $toolsGcc) {
+          & $toolsGcc --version
+          Write-Host "Location: $toolsGcc"
+        }
+        
+        Write-Host "`nSystem MinGW (will be ignored):"
+        if (Test-Path "C:\mingw64\bin\gcc.exe") {
+          & "C:\mingw64\bin\gcc.exe" --version
+        }
+        
         Write-Host "`n=== Ninja ==="
         ninja --version
+        
         Write-Host "`n=== CMake ==="
         cmake --version
-        Write-Host "`n=== Paths ==="
-        Write-Host "PATH entries:"
-        $env:PATH -split ';' | Where-Object { $_ -match 'mingw|Qt' }
       shell: pwsh
     
     - name: Configure CMake
       run: |
-        # Don't set CC/CXX explicitly, let CMake find from PATH
-        # MinGW 15.2.0 is already in PATH and compatible
+        # Force CMake to use the correct MinGW by using full path
+        $mingwBin = "${{ github.workspace }}\Tools\mingw900_64\bin"
+        $gccPath = Join-Path $mingwBin "gcc.exe"
+        $gxxPath = Join-Path $mingwBin "g++.exe"
+        
+        Write-Host "Using compiler: $gxxPath"
+        if (-not (Test-Path $gxxPath)) {
+          Write-Error "Compiler not found at $gxxPath"
+          exit 1
+        }
+        
         cmake -S . -B build `
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64" `
-          -DCMAKE_C_COMPILER=gcc `
-          -DCMAKE_CXX_COMPILER=g++
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.8.1\mingw_64" `
+          -DCMAKE_C_COMPILER="$gccPath" `
+          -DCMAKE_CXX_COMPILER="$gxxPath"
       shell: pwsh
     
     - name: Build
