@@ -14,15 +14,14 @@ jobs:
       with:
         submodules: recursive
     
-    - name: Install dependencies
+    - name: Install basic dependencies
       run: |
         sudo apt-get update
+        sudo apt-get install -y build-essential cmake ninja-build libgl1-mesa-dev libglu1-mesa-dev
+    
+    - name: Install X11 dependencies
+      run: |
         sudo apt-get install -y \
-          build-essential \
-          cmake \
-          ninja-build \
-          libgl1-mesa-dev \
-          libglu1-mesa-dev \
           libxkbcommon-x11-0 \
           libxcb-icccm4 \
           libxcb-image0 \
@@ -31,11 +30,6 @@ jobs:
           libxcb-xinerama0 \
           libxcb-cursor0 \
           libxcb-shape0 \
-          libfuse2 \
-          file \
-          rpm \
-          patchelf \
-          desktop-file-utils \
           libfontconfig1-dev \
           libfreetype6-dev \
           libx11-dev \
@@ -48,12 +42,42 @@ jobs:
           libxcb-glx0-dev \
           libxcb-util0-dev \
           libxkbcommon-dev \
-          libxkbcommon-x11-dev \
-          librsvg2-bin \
-          # Correct Wayland development packages for Ubuntu 22.04
-          libwayland-dev \
-          wayland-protocols \
-          pkg-config
+          libxkbcommon-x11-dev
+    
+    - name: Install Wayland dependencies
+      run: |
+        # Check if Wayland packages are available
+        if apt-cache search libwayland-dev | grep -q "libwayland-dev"; then
+          echo "Installing libwayland-dev"
+          sudo apt-get install -y libwayland-dev
+        else
+          echo "libwayland-dev not found, trying alternative package names"
+          # Try alternative package names if needed
+          if apt-cache search wayland-dev | grep -q "wayland-dev"; then
+            sudo apt-get install -y wayland-dev
+          fi
+        fi
+        
+        # Install wayland-protocols
+        if apt-cache search wayland-protocols | grep -q "wayland-protocols"; then
+          echo "Installing wayland-protocols"
+          sudo apt-get install -y wayland-protocols
+        else
+          echo "wayland-protocols not found"
+        fi
+        
+        # Install pkg-config
+        sudo apt-get install -y pkg-config
+    
+    - name: Install additional dependencies
+      run: |
+        sudo apt-get install -y \
+          libfuse2 \
+          file \
+          rpm \
+          patchelf \
+          desktop-file-utils \
+          librsvg2-bin
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
