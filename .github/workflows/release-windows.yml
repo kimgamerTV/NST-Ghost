@@ -58,13 +58,14 @@ jobs:
     
     - name: Configure CMake
       run: |
-        # Use MinGW from Tools directory
-        $env:CC = "${{ github.workspace }}/Tools/mingw900_64/bin/gcc.exe"
-        $env:CXX = "${{ github.workspace }}/Tools/mingw900_64/bin/g++.exe"
+        # Don't set CC/CXX explicitly, let CMake find from PATH
+        # MinGW 15.2.0 is already in PATH and compatible
         cmake -S . -B build `
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64"
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64" `
+          -DCMAKE_C_COMPILER=gcc `
+          -DCMAKE_CXX_COMPILER=g++
       shell: pwsh
     
     - name: Build
