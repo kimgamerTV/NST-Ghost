@@ -24,8 +24,15 @@ jobs:
         pip install aqtinstall
         # Install Qt 6.8.1
         aqt install-qt windows desktop 6.8.1 win64_mingw
-        # Install MinGW separately (it's not in Qt's bin on Windows)
+        # Install MinGW separately
         aqt install-tool windows desktop tools_mingw90 qt.tools.win64_mingw900
+        
+        # Debug: Show what was installed
+        Write-Host "=== Directory structure after aqt installation ==="
+        Get-ChildItem -Path . -Directory | Select-Object Name
+        if (Test-Path "Tools") {
+          Get-ChildItem -Path "Tools" -Recurse -Depth 2 | Select-Object FullName
+        }
       shell: pwsh
     
     - name: Install Ninja
@@ -34,10 +41,35 @@ jobs:
     
     - name: Set environment variables
       run: |
+        # Determine actual MinGW path
+        $mingwPath = ""
+        $possiblePaths = @(
+          "${{ github.workspace }}/Tools/mingw900_64",
+          "${{ github.workspace }}/Tools/mingw90",
+          "${{ github.workspace }}/6.8.1/mingw_64"
+        )
+        
+        foreach ($path in $possiblePaths) {
+          $gccPath = Join-Path $path "bin\gcc.exe"
+          if (Test-Path $gccPath) {
+            $mingwPath = $path
+            Write-Host "Found MinGW at: $mingwPath"
+            break
+          }
+        }
+        
+        if (-not $mingwPath) {
+          Write-Error "MinGW not found in any expected location"
+          Write-Host "Searching entire workspace..."
+          Get-ChildItem -Path "${{ github.workspace }}" -Recurse -Filter "gcc.exe" | Select-Object FullName
+          exit 1
+        }
+        
+        echo "MINGW_PATH=$mingwPath" >> $env:GITHUB_ENV
         echo "Qt6_DIR=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
         echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
         echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "${{ github.workspace }}/Tools/mingw900_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "$mingwPath/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: pwsh
     
     - name: Verify installation
@@ -45,17 +77,14 @@ jobs:
         Write-Host "=== Qt Version ==="
         qmake --version
         
-        Write-Host "`n=== Checking MinGW locations ==="
-        Write-Host "Tools MinGW:"
-        $toolsGcc = "${{ github.workspace }}\Tools\mingw900_64\bin\gcc.exe"
-        if (Test-Path $toolsGcc) {
-          & $toolsGcc --version
-          Write-Host "Location: $toolsGcc"
-        }
-        
-        Write-Host "`nSystem MinGW (will be ignored):"
-        if (Test-Path "C:\mingw64\bin\gcc.exe") {
-          & "C:\mingw64\bin\gcc.exe" --version
+        Write-Host "`n=== MinGW Compiler ==="
+        $gccPath = Join-Path $env:MINGW_PATH "bin\gcc.exe"
+        if (Test-Path $gccPath) {
+          & $gccPath --version
+          Write-Host "Location: $gccPath"
+        } else {
+          Write-Error "GCC not found at $gccPath"
+          exit 1
         }
         
         Write-Host "`n=== Ninja ==="
@@ -67,8 +96,8 @@ jobs:
     
     - name: Configure CMake
       run: |
-        # Force CMake to use the correct MinGW by using full path
-        $mingwBin = "${{ github.workspace }}\Tools\mingw900_64\bin"
+        # Use the MinGW path we discovered
+        $mingwBin = Join-Path $env:MINGW_PATH "bin"
         $gccPath = Join-Path $mingwBin "gcc.exe"
         $gxxPath = Join-Path $mingwBin "g++.exe"
         
