@@ -55,10 +55,11 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.7.3'
-        host: 'linux'
         target: 'desktop'
-        arch: 'gcc_64'
+        arch: 'linux_gcc_64'
         cache: true
+        install-deps: true
+        modules: 'qtbase qtsvg'
     
     - name: Verify installation
       run: |
@@ -480,7 +481,7 @@ jobs:
         %changelog
         * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
         - Release version 0.4.3
-        - Built with Qt 6.8.1
+        - Built with Qt 6.7.3
         SPECEOF
         
         # Build RPM
