@@ -24,13 +24,19 @@ jobs:
           libtool libtool-bin libssl-dev libxml-parser-perl lzip openssl patch \
           perl pkg-config python3 python3-pip python3-mako ruby scons sed \
           unzip wget xz-utils
-    
+
+
+
+    - name: Set cache key date
+      id: cache-date
+      run: echo "month=$(date +'%Y-%m')" >> $GITHUB_OUTPUT
+      
     - name: Cache MXE build
       id: cache-mxe
       uses: actions/cache@v4
       with:
         path: ~/mxe
-        key: mxe-qt6-static-v3-${{ runner.os }}-${{ hashFiles('.github/workflows/*.yml') }}
+        key: mxe-qt6-static-v3-${{ runner.os }}-${{ steps.cache-date.outputs.month }}
         restore-keys: |
           mxe-qt6-static-v3-${{ runner.os }}-
     
