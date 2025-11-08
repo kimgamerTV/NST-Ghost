@@ -51,23 +51,14 @@ jobs:
           libxkbcommon-x11-dev \
           librsvg2-bin
     
-    - name: Setup Python
-      uses: actions/setup-python@v5
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
       with:
-        python-version: '3.11'
-    
-    - name: Install Qt with aqtinstall
-      run: |
-        pip install aqtinstall
-        # Install Qt 6.8.1 for Linux (6.10.0 not available yet)
-        aqt install-qt linux desktop 6.8.1 gcc_64
-    
-    - name: Set environment variables
-      run: |
-        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/gcc_64" >> $GITHUB_ENV
-        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/gcc_64" >> $GITHUB_ENV
-        echo "${{ github.workspace }}/6.8.1/gcc_64/bin" >> $GITHUB_PATH
-        echo "LD_LIBRARY_PATH=${{ github.workspace }}/6.8.1/gcc_64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        version: '6.8.1'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        cache: true
     
     - name: Verify installation
       run: |
@@ -88,7 +79,7 @@ jobs:
         cmake -S . -B build \
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/gcc_64" \
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
           -DCMAKE_INSTALL_PREFIX=/usr
         
         echo -e "\n=== CMake Configuration ==="
@@ -177,11 +168,7 @@ jobs:
         wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
         chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
         
-        # Set Qt path for the plugin
-        export QMAKE=${{ github.workspace }}/6.8.1/gcc_64/bin/qmake
-        export LD_LIBRARY_PATH=${{ github.workspace }}/6.8.1/gcc_64/lib:$LD_LIBRARY_PATH
-        
-        # Deploy Qt dependencies
+        # Deploy Qt dependencies (Qt paths are already set by install-qt-action)
         echo "Deploying Qt dependencies..."
         ./linuxdeploy-x86_64.AppImage --appdir . --plugin qt || true
         
