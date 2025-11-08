@@ -19,20 +19,16 @@ jobs:
       with:
         python-version: '3.11'
     
+    - name: Setup MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+    
     - name: Install Qt with aqtinstall
       run: |
         pip install aqtinstall
-        # Install Qt 6.8.1
-        aqt install-qt windows desktop 6.8.1 win64_mingw
-        # Install MinGW separately
-        aqt install-tool windows desktop tools_mingw90 qt.tools.win64_mingw900
-        
-        # Debug: Show what was installed
-        Write-Host "=== Directory structure after aqt installation ==="
-        Get-ChildItem -Path . -Directory | Select-Object Name
-        if (Test-Path "Tools") {
-          Get-ChildItem -Path "Tools" -Recurse -Depth 2 | Select-Object FullName
-        }
+        # Install Qt 6.8.1 with MSVC 2022 (win64_msvc2022_64)
+        aqt install-qt windows desktop 6.8.1 win64_msvc2022_64
       shell: pwsh
     
     - name: Install Ninja
@@ -41,35 +37,9 @@ jobs:
     
     - name: Set environment variables
       run: |
-        # Determine actual MinGW path
-        $mingwPath = ""
-        $possiblePaths = @(
-          "${{ github.workspace }}/Tools/mingw900_64",
-          "${{ github.workspace }}/Tools/mingw90",
-          "${{ github.workspace }}/6.8.1/mingw_64"
-        )
-        
-        foreach ($path in $possiblePaths) {
-          $gccPath = Join-Path $path "bin\gcc.exe"
-          if (Test-Path $gccPath) {
-            $mingwPath = $path
-            Write-Host "Found MinGW at: $mingwPath"
-            break
-          }
-        }
-        
-        if (-not $mingwPath) {
-          Write-Error "MinGW not found in any expected location"
-          Write-Host "Searching entire workspace..."
-          Get-ChildItem -Path "${{ github.workspace }}" -Recurse -Filter "gcc.exe" | Select-Object FullName
-          exit 1
-        }
-        
-        echo "MINGW_PATH=$mingwPath" >> $env:GITHUB_ENV
-        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
-        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
-        echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "$mingwPath/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/msvc2022_64" >> $env:GITHUB_ENV
+        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/msvc2022_64" >> $env:GITHUB_ENV
+        echo "${{ github.workspace }}/6.8.1/msvc2022_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: pwsh
     
     - name: Verify installation
@@ -77,15 +47,8 @@ jobs:
         Write-Host "=== Qt Version ==="
         qmake --version
         
-        Write-Host "`n=== MinGW Compiler ==="
-        $gccPath = Join-Path $env:MINGW_PATH "bin\gcc.exe"
-        if (Test-Path $gccPath) {
-          & $gccPath --version
-          Write-Host "Location: $gccPath"
-        } else {
-          Write-Error "GCC not found at $gccPath"
-          exit 1
-        }
+        Write-Host "`n=== MSVC Compiler ==="
+        cl.exe
         
         Write-Host "`n=== Ninja ==="
         ninja --version
@@ -96,23 +59,10 @@ jobs:
     
     - name: Configure CMake
       run: |
-        # Use the MinGW path we discovered
-        $mingwBin = Join-Path $env:MINGW_PATH "bin"
-        $gccPath = Join-Path $mingwBin "gcc.exe"
-        $gxxPath = Join-Path $mingwBin "g++.exe"
-        
-        Write-Host "Using compiler: $gxxPath"
-        if (-not (Test-Path $gxxPath)) {
-          Write-Error "Compiler not found at $gxxPath"
-          exit 1
-        }
-        
         cmake -S . -B build `
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.8.1\mingw_64" `
-          -DCMAKE_C_COMPILER="$gccPath" `
-          -DCMAKE_CXX_COMPILER="$gxxPath"
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.8.1\msvc2022_64"
       shell: pwsh
     
     - name: Build
@@ -136,7 +86,7 @@ jobs:
           $exeDir = $exePath.DirectoryName
           
           # Run windeployqt
-          $windeployqt = "${{ github.workspace }}/6.8.1/mingw_64/bin/windeployqt.exe"
+          $windeployqt = "${{ github.workspace }}/6.8.1/msvc2022_64/bin/windeployqt.exe"
           & $windeployqt --release --no-translations --compiler-runtime "$($exePath.FullName)"
           
           # Create package directory
@@ -168,6 +118,6 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NST-Windows-x64
+        name: NST-Windows-x64-MSVC
         path: package/
         if-no-files-found: error
