@@ -180,20 +180,10 @@ jobs:
           merge-multiple: false
         continue-on-error: true
       
-      - name: Extract zip files
+      - name: List downloaded artifacts
         run: |
-          echo "=== Extracting zip files ==="
-          mkdir -p extracted
-          
-          # Find all zip files in artifacts directory
-          find artifacts -type f -name "*.zip" | while read zipfile; do
-            echo "Extracting: $zipfile"
-            unzip -o "$zipfile" -d extracted/
-          done
-          
-          echo ""
-          echo "=== Extracted files ==="
-          find extracted -type f -ls || echo "No files found"
+          echo "=== Downloaded artifacts ==="
+          find artifacts -type f -ls || echo "No artifacts found"
       
       - name: Install dependencies
         run: |
@@ -237,10 +227,10 @@ jobs:
           - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
           
           ### Linux
-          - NST-${VERSION}-x86_64.AppImage - Universal Linux package (recommended)
-          - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
-          - NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
-          - NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
+          - NST-${VERSION}-x86_64-AppImage.zip - Universal Linux package (AppImage inside zip)
+          - NST-${VERSION}-Linux-x86_64-tar.zip - Portable archive with install scripts
+          - NST-${VERSION}-Linux-x86_64-deb.zip - Debian/Ubuntu package (inside zip)
+          - NST-${VERSION}-Linux-x86_64-rpm.zip - Fedora/RHEL/CentOS package (inside zip)
           
           ## Installation
           
@@ -249,14 +239,16 @@ jobs:
           2. Run NST.exe
           
           ### Linux
-          **AppImage (recommended):**
+          **AppImage:**
           \\\`\\\`\\\`bash
+          unzip NST-${VERSION}-x86_64-AppImage.zip
           chmod +x NST-${VERSION}-x86_64.AppImage
           ./NST-${VERSION}-x86_64.AppImage
           \\\`\\\`\\\`
           
           **tar.gz:**
           \\\`\\\`\\\`bash
+          unzip NST-${VERSION}-Linux-x86_64-tar.zip
           tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
           cd NST-${VERSION}
           sudo ./install.sh
@@ -264,12 +256,14 @@ jobs:
           
           **DEB:**
           \\\`\\\`\\\`bash
+          unzip NST-${VERSION}-Linux-x86_64-deb.zip
           sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
           sudo apt-get install -f
           \\\`\\\`\\\`
           
           **RPM:**
           \\\`\\\`\\\`bash
+          unzip NST-${VERSION}-Linux-x86_64-rpm.zip
           sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
           \\\`\\\`\\\`
           
@@ -300,12 +294,12 @@ jobs:
             echo "Created release ID: ${RELEASE_ID}"
           fi
           
-          # Upload extracted artifacts
+          # Upload zip artifacts directly
           shopt -s nullglob
-          files=(extracted/*)
+          files=(artifacts/*/*.zip)
           
           if [ ${#files[@]} -eq 0 ]; then
-            echo "Warning: No extracted artifacts found to upload"
+            echo "Warning: No artifacts found to upload"
             exit 0
           fi
           
@@ -315,9 +309,8 @@ jobs:
             fi
             
             filename=$(basename "$file")
-            mime_type=$(file --brief --mime-type "$file" || echo "application/octet-stream")
             
-            echo "Uploading ${filename} (${mime_type})..."
+            echo "Uploading ${filename}..."
             
             # Check if asset already exists
             existing_assets=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -337,7 +330,7 @@ jobs:
             
             upload_response=$(curl -s -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
-              -H "Content-Type: ${mime_type}" \
+              -H "Content-Type: application/zip" \
               --data-binary "@${file}" \
               "$upload_url")
             
