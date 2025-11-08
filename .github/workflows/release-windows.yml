@@ -63,6 +63,10 @@ jobs:
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.8.1\msvc2022_64"
+        
+        Write-Host "`n=== CMake Configuration ==="
+        Write-Host "Compiler ID: MSVC"
+        Write-Host "Build Type: Release"
       shell: pwsh
     
     - name: Build
@@ -71,12 +75,14 @@ jobs:
     
     - name: Install to staging directory
       run: |
-        cmake --install build --prefix build/install
+        # Use absolute path for install prefix
+        $installPrefix = "${{ github.workspace }}\build\install"
+        cmake --install build --prefix "$installPrefix"
       shell: pwsh
     
     - name: Deploy Qt dependencies
       run: |
-        $installDir = "build/install"
+        $installDir = "${{ github.workspace }}\build\install"
         
         # Find NST.exe
         $exePath = Get-ChildItem -Path $installDir -Recurse -Filter "NST.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -87,16 +93,22 @@ jobs:
           
           # Run windeployqt
           $windeployqt = "${{ github.workspace }}/6.8.1/msvc2022_64/bin/windeployqt.exe"
+          Write-Host "Running windeployqt..."
           & $windeployqt --release --no-translations --compiler-runtime "$($exePath.FullName)"
+          
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "windeployqt failed with exit code $LASTEXITCODE"
+            exit 1
+          }
           
           # Create package directory
           New-Item -ItemType Directory -Force -Path "package" | Out-Null
           
           # Copy everything
-          Copy-Item -Path "$exeDir/*" -Destination "package/" -Recurse -Force
+          Copy-Item -Path "$exeDir\*" -Destination "package\" -Recurse -Force
           
           Write-Host "`nPackage contents:"
-          Get-ChildItem "package/" | Format-Table Name, Length
+          Get-ChildItem "package\" | Format-Table Name, Length
         } else {
           Write-Error "NST.exe not found in $installDir"
           Write-Host "Directory contents:"
