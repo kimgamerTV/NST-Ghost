@@ -22,8 +22,10 @@ jobs:
     - name: Install Qt with aqtinstall
       run: |
         pip install aqtinstall
+        # Qt 6.8.1 requires MinGW 11.2.0
         aqt install-qt windows desktop 6.8.1 win64_mingw
-        aqt install-tool windows desktop tools_mingw90 qt.tools.win64_mingw900
+        # Install MATCHING MinGW 11.2.0 toolchain
+        aqt install-tool windows desktop tools_mingw1120 qt.tools.win64_mingw1120
       shell: pwsh
     
     - name: Install Ninja
