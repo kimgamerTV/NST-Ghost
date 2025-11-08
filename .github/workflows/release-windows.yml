@@ -1,4 +1,4 @@
-name: Build NST Windows (MXE)
+name: Build NST Windows
 on:
   push:
     branches: [ main ]
@@ -6,183 +6,90 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-windows:
+    runs-on: windows-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         submodules: recursive
     
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          build-essential p7zip-full autoconf automake autopoint bash bison \
-          bzip2 flex g++ g++-multilib gettext git gperf intltool libffi-dev \
-          libgdk-pixbuf-2.0-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev \
-          libtool libtool-bin libssl-dev libxml-parser-perl lzip openssl patch \
-          perl pkg-config python3 python3-pip python3-mako ruby scons sed \
-          unzip wget xz-utils
-
-    - name: Set cache key date
-      id: cache-date
-      run: echo "month=$(date +'%Y-%m')" >> $GITHUB_OUTPUT
-      
-    - name: Cache MXE build
-      id: cache-mxe
-      uses: actions/cache@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
       with:
-        path: ~/mxe
-        key: mxe-qt6-host-static-v1-${{ runner.os }}-${{ steps.cache-date.outputs.month }}
-        restore-keys: |
-          mxe-qt6-host-static-v1-${{ runner.os }}-
+        python-version: '3.11'
     
-    - name: Clone MXE
-      if: steps.cache-mxe.outputs.cache-hit != 'true'
+    - name: Install Qt with aqtinstall
       run: |
-        git clone https://github.com/mxe/mxe.git ~/mxe
+        pip install aqtinstall
+        aqt install-qt windows desktop 6.8.1 win64_mingw
+        echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "${{ github.workspace }}/Tools/mingw1310_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     
-    - name: Configure MXE settings
-      if: steps.cache-mxe.outputs.cache-hit != 'true'
+    - name: Install MinGW
       run: |
-        cd ~/mxe
-        echo "MXE_TARGETS := x86_64-w64-mingw32.static" > settings.mk
-        echo "MXE_PLUGIN_DIRS := plugins/gcc13" >> settings.mk
-        cat settings.mk
+        aqt install-tool windows desktop tools_mingw90 qt.tools.win64_mingw900
     
-    - name: Build MXE toolchain
-      if: steps.cache-mxe.outputs.cache-hit != 'true'
+    - name: Verify Qt installation
       run: |
-        cd ~/mxe
-        # Build GCC first
-        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) gcc
-      timeout-minutes: 90
-    
-    - name: Build Qt6 (includes host build automatically)
-      if: steps.cache-mxe.outputs.cache-hit != 'true'
-      run: |
-        cd ~/mxe
-        # MXE will automatically build Qt6 for host first, then cross-compile
-        # This is required for Qt6 cross-compilation
-        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) qt6-qtbase qt6-qttools
-      timeout-minutes: 360
-    
-    - name: Verify MXE installation
-      run: |
-        echo "=== Checking MXE target binaries ==="
-        ls -la ~/mxe/usr/bin/ | grep x86_64-w64-mingw32 || true
-        echo ""
-        echo "=== Checking Qt6 target installation ==="
-        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ 2>/dev/null || echo "Qt6 target directory not found"
-        echo ""
-        echo "=== Checking Qt6 host installation (required for cross-compile) ==="
-        ls -la ~/mxe/usr/x86_64-pc-linux-gnu/qt6/ 2>/dev/null || echo "Qt6 host directory not found"
-        echo ""
-        echo "=== Checking cmake wrapper ==="
-        which x86_64-w64-mingw32.static-cmake || echo "CMake wrapper not found"
-        echo ""
-        echo "=== Checking installed packages ==="
-        echo "Target packages:"
-        ls ~/mxe/usr/x86_64-w64-mingw32.static/installed/ 2>/dev/null || true
-        echo ""
-        echo "Host packages:"
-        ls ~/mxe/usr/x86_64-pc-linux-gnu/installed/ 2>/dev/null || true
+        qmake --version
+        where qmake
+        gcc --version
     
     - name: Configure CMake
       run: |
-        mkdir -p build
+        mkdir build
         cd build
-        export PATH="$HOME/mxe/usr/bin:$PATH"
-        # MXE's cmake wrapper handles QT_HOST_PATH automatically
-        x86_64-w64-mingw32.static-cmake .. \
-          -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX=/
+        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64"
     
     - name: Build
       run: |
         cd build
-        export PATH="$HOME/mxe/usr/bin:$PATH"
-        cmake --build . --config Release -j$(nproc)
+        cmake --build . --config Release -j4
     
     - name: Install to staging directory
       run: |
         cd build
-        export PATH="$HOME/mxe/usr/bin:$PATH"
-        DESTDIR=$PWD/install cmake --install .
+        $env:DESTDIR = "$PWD/install"
+        cmake --install .
     
-    - name: Collect binaries
+    - name: Deploy Qt dependencies
       run: |
-        mkdir -p $GITHUB_WORKSPACE/package
         cd build/install
-        echo "=== Searching for NST.exe ==="
-        find . -name "NST.exe" -type f
-        echo ""
-        echo "=== Directory structure ==="
-        ls -la
-        echo ""
-        if [ -f ./bin/NST.exe ]; then
-          echo "Found NST.exe at ./bin/NST.exe"
-          cp ./bin/NST.exe $GITHUB_WORKSPACE/package/
-        elif [ -f ./usr/bin/NST.exe ]; then
-          echo "Found NST.exe at ./usr/bin/NST.exe"
-          cp ./usr/bin/NST.exe $GITHUB_WORKSPACE/package/
-        elif [ -f ./usr/x86_64-w64-mingw32.static/bin/NST.exe ]; then
-          echo "Found NST.exe at ./usr/x86_64-w64-mingw32.static/bin/NST.exe"
-          cp ./usr/x86_64-w64-mingw32.static/bin/NST.exe $GITHUB_WORKSPACE/package/
-        else
-          echo "ERROR: NST.exe not found!"
-          echo "Searching entire directory tree:"
-          find . -type f -name "*.exe"
+        # Find NST.exe
+        $exePath = Get-ChildItem -Recurse -Filter "NST.exe" | Select-Object -First 1
+        if ($exePath) {
+          Write-Host "Found NST.exe at: $($exePath.FullName)"
+          $exeDir = $exePath.DirectoryName
+          
+          # Run windeployqt
+          windeployqt --release --no-translations "$($exePath.FullName)"
+          
+          # Create package directory
+          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/package"
+          
+          # Copy everything from exe directory
+          Copy-Item -Path "$exeDir/*" -Destination "${{ github.workspace }}/package/" -Recurse -Force
+          
+          Write-Host "Package contents:"
+          Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Select-Object FullName
+        } else {
+          Write-Error "NST.exe not found!"
           exit 1
-        fi
-        echo ""
-        echo "=== Copying DLL files ==="
-        find . -name "*.dll" -type f -exec cp {} $GITHUB_WORKSPACE/package/ \; || true
-        echo ""
-        echo "=== Files copied to package ==="
-        ls -lh $GITHUB_WORKSPACE/package/
-    
-    - name: Copy Qt dependencies manually
-      run: |
-        export PATH="$HOME/mxe/usr/bin:$PATH"
-        cd $GITHUB_WORKSPACE/package
-        QT_BIN="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/bin"
-        if [ -d "$QT_BIN" ]; then
-          echo "Copying Qt6 DLLs from $QT_BIN"
-          cp "$QT_BIN"/Qt6*.dll . 2>/dev/null || true
-        fi
-        QT_PLUGINS="$HOME/mxe/usr/x86_64-w64-mingw32.static/qt6/plugins"
-        if [ -d "$QT_PLUGINS" ]; then
-          echo "Copying Qt6 plugins"
-          mkdir -p plugins
-          cp -r "$QT_PLUGINS"/platforms plugins/ 2>/dev/null || true
-          cp -r "$QT_PLUGINS"/styles plugins/ 2>/dev/null || true
-        fi
-        echo "[Paths]" > qt.conf
-        echo "Plugins = plugins" >> qt.conf
-        echo "Prefix = ." >> qt.conf
-        echo ""
-        echo "=== Final package contents ==="
-        ls -lah
-        echo ""
-        echo "=== Plugins directory ==="
-        ls -lah plugins/ 2>/dev/null || echo "No plugins directory"
+        }
     
     - name: List package contents
       run: |
-        echo "=== Package contents ==="
-        ls -lah package/
-        echo ""
-        echo "=== File types ==="
-        file package/* 2>/dev/null || true
-        echo ""
-        echo "=== Total package size ==="
-        du -sh package/
+        Write-Host "=== Package contents ==="
+        Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Format-Table Name, Length
+        
+        Write-Host "`n=== Total package size ==="
+        $size = (Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+        Write-Host ("{0:N2} MB" -f $size)
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: NST-Windows-MXE-x64
+        name: NST-Windows-x64
         path: package/
         if-no-files-found: error
