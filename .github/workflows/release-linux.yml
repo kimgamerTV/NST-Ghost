@@ -256,6 +256,47 @@ jobs:
           tar -czf ~/rpmbuild/SOURCES/nst-${{ inputs.version }}.tar.gz nst-${{ inputs.version }}/
           cd ..
           
+          echo "=== Checking AppDir structure for RPM ==="
+          ls -la AppDir/usr/ || true
+          
+          # Build files list dynamically based on what exists
+          FILES_LIST="/usr/bin/*
+          /usr/share/applications/nst.desktop
+          /usr/share/icons/hicolor/*/apps/nst.*"
+          
+          # Check for optional directories
+          if [ -d "AppDir/usr/lib" ] && [ "$(ls -A AppDir/usr/lib 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/lib
+          /usr/lib/*"
+          fi
+          
+          if [ -d "AppDir/usr/plugins" ] && [ "$(ls -A AppDir/usr/plugins 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/plugins
+          /usr/plugins/*"
+          fi
+          
+          if [ -d "AppDir/usr/qml" ] && [ "$(ls -A AppDir/usr/qml 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/qml
+          /usr/qml/*"
+          fi
+          
+          if [ -d "AppDir/usr/translations" ] && [ "$(ls -A AppDir/usr/translations 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/translations
+          /usr/translations/*"
+          fi
+          
+          if [ -d "AppDir/usr/share/doc" ] && [ "$(ls -A AppDir/usr/share/doc 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          /usr/share/doc/*"
+          fi
+          
+          echo "=== Files to include in RPM ==="
+          echo "$FILES_LIST"
+          
           cat > ~/rpmbuild/SPECS/nst.spec << EOF
           Name: nst
           Version: ${{ inputs.version }}
@@ -300,17 +341,7 @@ jobs:
           fi
           
           %files
-          /usr/bin/*
-          /usr/share/applications/nst.desktop
-          /usr/share/icons/hicolor/*/apps/nst.*
-          %dir /usr/lib
-          /usr/lib/*
-          %dir /usr/plugins
-          /usr/plugins/*
-          %dir /usr/qml
-          /usr/qml/*
-          %dir /usr/translations
-          /usr/translations/*
+          $FILES_LIST
           
           %changelog
           * $(date "+%a %b %d %Y") NST Team <you@example.com> - ${{ inputs.version }}-1
