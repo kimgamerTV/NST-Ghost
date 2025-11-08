@@ -180,10 +180,20 @@ jobs:
           merge-multiple: false
         continue-on-error: true
       
-      - name: List downloaded artifacts
+      - name: Extract zip files
         run: |
-          echo "=== Downloaded artifacts ==="
-          find artifacts -type f -ls || echo "No artifacts found"
+          echo "=== Extracting zip files ==="
+          mkdir -p extracted
+          
+          # Find all zip files in artifacts directory
+          find artifacts -type f -name "*.zip" | while read zipfile; do
+            echo "Extracting: $zipfile"
+            unzip -o "$zipfile" -d extracted/
+          done
+          
+          echo ""
+          echo "=== Extracted files ==="
+          find extracted -type f -ls || echo "No files found"
       
       - name: Install dependencies
         run: |
@@ -290,12 +300,12 @@ jobs:
             echo "Created release ID: ${RELEASE_ID}"
           fi
           
-          # Upload artifacts
+          # Upload extracted artifacts
           shopt -s nullglob
-          files=(artifacts/*/*)
+          files=(extracted/*)
           
           if [ ${#files[@]} -eq 0 ]; then
-            echo "Warning: No artifacts found to upload"
+            echo "Warning: No extracted artifacts found to upload"
             exit 0
           fi
           
