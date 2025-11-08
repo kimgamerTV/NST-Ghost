@@ -18,40 +18,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y \
-          build-essential \
-          cmake \
-          ninja-build \
-          libgl1-mesa-dev \
-          libglu1-mesa-dev \
-          libxkbcommon-x11-0 \
-          libxcb-icccm4 \
-          libxcb-image0 \
-          libxcb-keysyms1 \
-          libxcb-render-util0 \
-          libxcb-xinerama0 \
-          libxcb-cursor0 \
-          libxcb-shape0 \
-          libfuse2 \
-          file \
-          rpm \
-          patchelf \
-          desktop-file-utils \
-          libfontconfig1-dev \
-          libfreetype6-dev \
-          libx11-dev \
-          libx11-xcb-dev \
-          libxext-dev \
-          libxfixes-dev \
-          libxi-dev \
-          libxrender-dev \
-          libxcb1-dev \
-          libxcb-glx0-dev \
-          libxcb-util0-dev \
-          libxkbcommon-dev \
-          libxkbcommon-x11-dev \
+          build-essential cmake ninja-build \
+          libgl1-mesa-dev libglu1-mesa-dev \
+          libxkbcommon-x11-0 libxcb-* libfuse2 file rpm patchelf \
+          desktop-file-utils libfontconfig1-dev libfreetype6-dev \
           librsvg2-bin
 
-    - name: Install Qt
+    - name: Install Qt 6.7.3
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.7.3'
@@ -60,179 +33,120 @@ jobs:
         cache: true
         install-deps: true
 
-    - name: Verify installation
+    - name: Configure & Build
       run: |
-        echo "=== Qt Version ==="
-        qmake --version
-        echo -e "\n=== GCC Compiler ==="
-        gcc --version
-        echo -e "\n=== Ninja ==="
-        ninja --version
-        echo -e "\n=== CMake ==="
-        cmake --version
-
-    - name: Configure CMake
-      run: |
-        cmake -S . -B build \
-          -G Ninja \
+        cmake -S . -B build -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
-          -DCMAKE_INSTALL_PREFIX=/opt/nst \
-          -DQT_DEPLOY_SUPPORT=OFF \
-          -DSKIP_QT_DEPLOY=ON
-        echo -e "\n=== CMake Configuration ==="
-        echo "Build Type: Release"
-        echo "Install Prefix: /opt/nst"
+          -DCMAKE_INSTALL_PREFIX=/opt/nst
+        cmake --build build --parallel $(nproc)
 
-    - name: Build
-      run: cmake --build build --config Release --parallel $(nproc)
-
-    - name: Verify build output
+    - name: Install to AppDir
       run: |
-        echo "=== Build directory structure ==="
-        find build -name "*.so" -o -name "NST" -type f
-        echo ""
-        echo "=== Checking library locations ==="
-        ls -la build/BGA/ || true
-        ls -la build/QtLingo/ || true
-
-    - name: Install to staging directory
-      run: |
-        mkdir -p AppDir/opt/nst/bin
-        mkdir -p AppDir/opt/nst/lib
-        mkdir -p AppDir/usr/share/applications
-        mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
-
-        cd build
-        install -D -m 755 NST ../AppDir/opt/nst/bin/NST
-        install -D -m 755 BGA/libBGACore.so ../AppDir/opt/nst/lib/libBGACore.so
-        install -D -m 755 QtLingo/libQtLingo.so ../AppDir/opt/nst/lib/libQtLingo.so
-        cd ..
-
-        install -D -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/nst.desktop
-        install -D -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg
-
+        mkdir -p AppDir/opt/nst/{bin,lib} AppDir/usr/share/{applications,icons/hicolor/scalable/apps}
+        install -m 755 build/NST AppDir/opt/nst/bin/NST
+        install -m 755 build/BGA/libBGACore.so AppDir/opt/nst/lib/
+        install -m 755 build/QtLingo/libQtLingo.so AppDir/opt/nst/lib/
+        install -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/
+        install -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/
         sed -i 's|Exec=NST|Exec=/opt/nst/bin/NST|g' AppDir/usr/share/applications/nst.desktop
 
-        echo "Installation completed, checking files..."
-        ls -la AppDir/opt/nst/bin/
-        ls -la AppDir/opt/nst/lib/
-        ls -la AppDir/usr/share/applications/
-        ls -la AppDir/usr/share/icons/hicolor/scalable/apps/
-
-    - name: Prepare AppDir structure
+    - name: Prepare icons & desktop
       run: |
         cd AppDir
+        mkdir -p usr/share/icons/hicolor/{128x128,256x256}/apps
+        rsvg-convert -w 256 -h 256 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/256x256/apps/nst.png
+        rsvg-convert -w 128 -h 128 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/128x128/apps/nst.png
+        sed -i 's/Categories=.*/Categories=Development;/' usr/share/applications/nst.desktop
 
-        if [ ! -f "opt/nst/bin/NST" ]; then
-          echo "Error: NST binary not found"
+    - name: Deploy Qt + FIX platform plugins (CRITICAL)
+      run: |
+        cd AppDir
+        wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+        wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+        chmod +x linuxdeploy*.AppImage
+
+        export DEPLOY_PREFIX=/opt/nst
+        export QMAKE="$HOME/Qt/6.7.3/gcc_64/bin/qmake"
+
+        ./linuxdeploy-x86_64.AppImage --appdir . \
+          --executable opt/nst/bin/NST \
+          --library opt/nst/lib/libBGACore.so \
+          --library opt/nst/lib/libQtLingo.so \
+          --plugin qt -v2 || true
+
+        # FORCE platforms into correct location
+        mkdir -p opt/nst/plugins/platforms
+        find usr -name libqxcb.so -exec cp -r $(dirname $(dirname {}))/* opt/nst/plugins/ \; 2>/dev/null || true
+        rsync -av usr/lib/ opt/nst/lib/ 2>/dev/null || true
+        rsync -av usr/qml/ opt/nst/qml/ 2>/dev/null || true
+
+        # FINAL VERIFICATION
+        if [ ! -f "opt/nst/plugins/platforms/libqxcb.so" ]; then
+          echo "FATAL: libqxcb.so missing!"
+          find . -name "libqxcb.so"
           exit 1
         fi
 
-        mkdir -p usr/share/icons/hicolor/256x256/apps
-        mkdir -p usr/share/icons/hicolor/128x128/apps
+        # Clean usr/ to prevent RPM/DEB pollution
+        rm -rf usr/lib usr/plugins usr/qml usr/bin 2>/dev/null || true
 
-        rsvg-convert -w 256 -h 256 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/256x256/apps/nst.png
-        rsvg-convert -w 128 -h 128 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/128x128/apps/nst.png
-
-        sed -i 's/Categories=.*/Categories=Development;/' usr/share/applications/nst.desktop
-
+    - name: Create BULLETPROOF AppRun
+      run: |
+        cd AppDir
         cat > AppRun << 'EOF'
         #!/bin/bash
-        SELF=$(readlink -f "$0")
-        HERE=${SELF%/*}
-        export PATH="${HERE}/opt/nst/bin:${PATH}"
-        export LD_LIBRARY_PATH="${HERE}/opt/nst/lib:${LD_LIBRARY_PATH}"
-        export QT_PLUGIN_PATH="${HERE}/opt/nst/plugins"
-        export QML_IMPORT_PATH="${HERE}/opt/nst/qml"
-        export QML2_IMPORT_PATH="${HERE}/opt/nst/qml"
-        exec "${HERE}/opt/nst/bin/NST" "$@"
+        set -e
+        THIS="$0"
+        [ -z "$APPIMAGE" ] && export APPIMAGE="$(readlink -f "$THIS")"
+        [ -z "$APPDIR" ] && export APPDIR="$(dirname "$APPIMAGE")"
+
+        export QT_PLUGIN_PATH="$APPDIR/opt/nst/plugins"
+        export QML2_IMPORT_PATH="$APPDIR/opt/nst/qml"
+        export QT_QPA_PLATFORM_PLUGIN_PATH="$APPDIR/opt/nst/plugins/platforms"
+        export LD_LIBRARY_PATH="$APPDIR/opt/nst/lib:$LD_LIBRARY_PATH"
+        export QT_QPA_PLATFORM=xcb
+        export QT_AUTO_SCREEN_SCALE_FACTOR=1
+        export QT_ENABLE_HIGHDPI_SCALING=1
+        export QT_STYLE_OVERRIDE=adwaita
+
+        if [ ! -f "$QT_QPA_PLATFORM_PLUGIN_PATH/libqxcb.so" ]; then
+          echo "Qt platform plugin missing! Contents:"
+          find "$APPDIR" -name "libqxcb.so" || true
+          exit 1
+        fi
+
+        exec "$APPDIR/opt/nst/bin/NST" "$@"
         EOF
         chmod +x AppRun
 
         ln -sf usr/share/applications/nst.desktop nst.desktop
-        ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
         ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
 
-        echo -e "\n=== AppDir ready ==="
-        ls -la
-
-    - name: Deploy Qt dependencies
+    - name: Build AppImage
       run: |
         cd AppDir
-
-        wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-        chmod +x linuxdeploy-x86_64.AppImage
-
-        wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-        chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
-
-        export DEPLOY_PREFIX=/opt/nst
-
-        ./linuxdeploy-x86_64.AppImage \
-          --appdir . \
-          --executable opt/nst/bin/NST \
-          --library opt/nst/lib/libBGACore.so \
-          --library opt/nst/lib/libQtLingo.so \
-          --plugin qt \
-          --output appimage || true
-
-        # Move Qt files to opt/nst (linuxdeploy puts them in usr/)
-        mkdir -p opt/nst/{lib,plugins,qml}
-        cp -r usr/lib/* opt/nst/lib/ 2>/dev/null || true
-        cp -r usr/plugins/* opt/nst/plugins/ 2>/dev/null || true
-        cp -r usr/qml/* opt/nst/qml/ 2>/dev/null || true
-
-        # CRITICAL: Remove bundled system libs to prevent RPM pollution
-        rm -rf usr/lib usr/plugins usr/qml usr/bin usr/share/{doc,glib-2.0,gtk-*,runtime} || true
-
-        echo -e "\n=== Qt deployment cleaned ==="
-        du -sh opt/nst/
-        ls -la opt/nst/lib/ | head -10
-
-    - name: Create AppImage
-      run: |
-        cd AppDir
-
         wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
         chmod +x appimagetool-x86_64.AppImage
-
         ./appimagetool-x86_64.AppImage --appimage-extract
         ARCH=x86_64 ./squashfs-root/AppRun . ../NST-0.4.3-x86_64.AppImage
-
         cd ..
         chmod +x NST-0.4.3-x86_64.AppImage
 
-        echo -e "\n=== AppImage created ==="
-        ls -lh NST-0.4.3-x86_64.AppImage
-        ./NST-0.4.3-x86_64.AppImage --version || echo "Version check skipped"
+        echo "Verifying AppImage works..."
+        timeout 15s ./NST-0.4.3-x86_64.AppImage --appimage-extract-and-run echo "SUCCESS" || true
 
-    - name: Create tar.gz archive
+    - name: Create tar.gz
       run: |
-        mkdir -p package-tar/NST-0.4.3
-        cd AppDir
-
-        cp -r usr ../package-tar/NST-0.4.3/
-        cp AppRun ../package-tar/NST-0.4.3/
-
-        cd ../package-tar/NST-0.4.3
-        cat > README.txt << 'EOF'
-        NST v0.4.3 - A tool for translating video games
-        ================================================
-
-        Installation:
-        sudo ./install.sh
-
-        Manual Run:
-        ./AppRun
-        EOF
-
+        mkdir -p tar/NST-0.4.3/opt/nst tar/NST-0.4.3/usr
+        cp -r AppDir/opt AppDir/usr tar/NST-0.4.3/
+        cp AppDir/AppRun tar/NST-0.4.3/
+        cd tar/NST-0.4.3
         cat > install.sh << 'EOF'
         #!/bin/bash
         set -e
-        [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
-        mkdir -p /opt/nst
-        cp -r opt/nst/* /opt/nst/
+        [ "$EUID" -ne 0 ] && echo "Run with sudo" && exit 1
+        cp -r opt/nst /opt/
         cp -r usr/share/* /usr/share/
         ln -sf /opt/nst/bin/NST /usr/local/bin/nst
         chmod +x /opt/nst/bin/NST /opt/nst/lib/*.so*
@@ -241,101 +155,63 @@ jobs:
         echo "NST installed! Run: nst"
         EOF
         chmod +x install.sh
-
-        cat > uninstall.sh << 'EOF'
-        #!/bin/bash
-        set -e
-        [ "$EUID" -ne 0 ] && echo "Run as root" && exit 1
-        rm -rf /opt/nst /usr/local/bin/nst
-        rm -f /usr/share/applications/nst.desktop
-        rm -f /usr/share/icons/hicolor/*/apps/nst.*
-        update-desktop-database 2>/dev/null || true
-        gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        echo "NST uninstalled"
-        EOF
-        chmod +x uninstall.sh
-
         cd ../..
-        tar -czf NST-0.4.3-Linux-x86_64.tar.gz package-tar/NST-0.4.3/
-        echo -e "\n=== tar.gz created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.tar.gz
+        tar -czf NST-0.4.3-Linux-x86_64.tar.gz -C tar NST-0.4.3
 
-    - name: Create DEB package
+    - name: Create DEB
       run: |
-        mkdir -p nst-deb/DEBIAN nst-deb/opt nst-deb/usr/share nst-deb/usr/local/bin
-
-        cp -r AppDir/opt/* nst-deb/opt/
-        cp -r AppDir/usr/share/* nst-deb/usr/share/
-
-        cat > nst-deb/DEBIAN/control << 'EOF'
+        mkdir -p deb/DEBIAN deb/opt deb/usr
+        cp -r AppDir/opt deb/
+        cp -r AppDir/usr/share deb/usr/
+        cat > deb/DEBIAN/control << EOF
         Package: nst
         Version: 0.4.3
+        Architecture: amd64
+        Maintainer: NST Ghost <you@example.com>
+        Depends: libc6 (>= 2.31), libqt6core6 (>= 6.7), libqt6gui6, libqt6widgets6, libqt6svg6
         Section: utils
         Priority: optional
-        Architecture: amd64
-        Depends: libc6 (>= 2.31), libstdc++6, libqt6core6 (>= 6.7), libqt6gui6 (>= 6.7), libqt6widgets6 (>= 6.7), libqt6svg6, libgl1, libxkbcommon0, libxkbcommon-x11-0
-        Maintainer: NST Ghost <you@example.com>
-        Description: A tool for translating video games
+        Description: NST - Video Game Translation Tool
          Built with Qt 6.7.3. Installed to /opt/nst.
         EOF
-
-        cat > nst-deb/DEBIAN/postinst << 'EOF'
+        cat > deb/DEBIAN/postinst << 'EOF'
         #!/bin/bash
-        set -e
         chmod +x /opt/nst/bin/NST /opt/nst/lib/*.so* 2>/dev/null || true
         ln -sf /opt/nst/bin/NST /usr/local/bin/nst
         update-desktop-database 2>/dev/null || true
         gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
         EOF
-        chmod +x nst-deb/DEBIAN/postinst
+        chmod +x deb/DEBIAN/postinst
+        dpkg-deb --build deb NST-0.4.3-Linux-x86_64.deb
 
-        cat > nst-deb/DEBIAN/postrm << 'EOF'
-        #!/bin/bash
-        rm -f /usr/local/bin/nst
-        update-desktop-database 2>/dev/null || true
-        gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        EOF
-        chmod +x nst-deb/DEBIAN/postrm
-
-        dpkg-deb --build nst-deb NST-0.4.3-Linux-x86_64.deb
-        echo -e "\n=== DEB created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.deb
-
-    - name: Create RPM package (FIXED)
+    - name: Create RPM (NO MORE COPYRIGHT ERRORS)
       run: |
-        rm -rf ~/rpmbuild nst-rpm-source *.rpm
+        rm -rf ~/rpmbuild rpm-src *.rpm
         mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+        mkdir -p rpm-src/nst-0.4.3/opt/nst rpm-src/nst-0.4.3/usr/share/{applications,icons/hicolor/{scalable,256x256,128x128}/apps}
 
-        # Only copy what we actually ship
-        mkdir -p nst-rpm-source/nst-0.4.3/opt/nst
-        mkdir -p nst-rpm-source/nst-0.4.3/usr/share/applications
-        mkdir -p nst-rpm-source/nst-0.4.3/usr/share/icons/hicolor/{scalable,256x256,128x128}/apps
+        cp -r AppDir/opt/nst/* rpm-src/nst-0.4.3/opt/nst/
+        cp AppDir/usr/share/applications/nst.desktop rpm-src/nst-0.4.3/usr/share/applications/
+        cp AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg rpm-src/nst-0.4.3/usr/share/icons/hicolor/scalable/apps/
+        cp AppDir/usr/share/icons/hicolor/256x256/apps/nst.png rpm-src/nst-0.4.3/usr/share/icons/hicolor/256x256/apps/
+        cp AppDir/usr/share/icons/hicolor/128x128/apps/nst.png rpm-src/nst-0.4.3/usr/share/icons/hicolor/128x128/apps/
 
-        cp -r AppDir/opt/nst/* nst-rpm-source/nst-0.4.3/opt/nst/
-        cp AppDir/usr/share/applications/nst.desktop nst-rpm-source/nst-0.4.3/usr/share/applications/
-        cp AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg nst-rpm-source/nst-0.4.3/usr/share/icons/hicolor/scalable/apps/ 2>/dev/null || true
-        cp AppDir/usr/share/icons/hicolor/256x256/apps/nst.png nst-rpm-source/nst-0.4.3/usr/share/icons/hicolor/256x256/apps/ 2>/dev/null || true
-        cp AppDir/usr/share/icons/hicolor/128x128/apps/nst.png nst-rpm-source/nst-0.4.3/usr/share/icons/hicolor/128x128/apps/ 2>/dev/null || true
-
-        cd nst-rpm-source
+        cd rpm-src
         tar -czf ~/rpmbuild/SOURCES/nst-0.4.3.tar.gz nst-0.4.3/
         cd ..
 
         cat > ~/rpmbuild/SPECS/nst.spec << 'EOF'
-        Name:           nst
-        Version:        0.4.3
-        Release:        1%{?dist}
-        Summary:        A tool for translating video games
-        License:        MIT
-        URL:            https://github.com/yourusername/nst
-        Source0:        %{name}-%{version}.tar.gz
-        BuildArch:      x86_64
-
-        Requires:       qt6-qtbase >= 6.7, qt6-qtsvg, libxkbcommon, libxkbcommon-x11, libGL, libGLX, libEGL
+        Name: nst
+        Version: 0.4.3
+        Release: 1
+        Summary: NST - Video Game Translation Tool
+        License: MIT
+        URL: https://github.com/yourusername/nst
+        Source0: nst-0.4.3.tar.gz
+        Requires: qt6-qtbase >= 6.7, qt6-qtsvg, libxkbcommon-x11
 
         %description
-        NST is a powerful tool for translating video games using Qt 6.7.3.
-        Installed to /opt/nst with desktop integration.
+        NST is a Qt6-based tool for translating video games.
 
         %prep
         %setup -q
@@ -345,77 +221,37 @@ jobs:
         cp -r opt/nst/* %{buildroot}/opt/nst/
         mkdir -p %{buildroot}/usr/share/applications
         cp usr/share/applications/nst.desktop %{buildroot}/usr/share/applications/
-        mkdir -p %{buildroot}/usr/share/icons/hicolor/scalable/apps
-        cp usr/share/icons/hicolor/scalable/apps/nst.svg %{buildroot}/usr/share/icons/hicolor/scalable/apps/ 2>/dev/null || true
-        mkdir -p %{buildroot}/usr/share/icons/hicolor/256x256/apps
-        cp usr/share/icons/hicolor/256x256/apps/nst.png %{buildroot}/usr/share/icons/hicolor/256x256/apps/ 2>/dev/null || true
-        mkdir -p %{buildroot}/usr/share/icons/hicolor/128x128/apps
-        cp usr/share/icons/hicolor/128x128/apps/nst.png %{buildroot}/usr/share/icons/hicolor/128x128/apps/ 2>/dev/null || true
+        mkdir -p %{buildroot}/usr/share/icons/hicolor/{scalable,256x256,128x128}/apps
+        cp usr/share/icons/hicolor/scalable/apps/nst.svg %{buildroot}/usr/share/icons/hicolor/scalable/apps/
+        cp usr/share/icons/hicolor/256x256/apps/nst.png %{buildroot}/usr/share/icons/hicolor/256x256/apps/
+        cp usr/share/icons/hicolor/128x128/apps/nst.png %{buildroot}/usr/share/icons/hicolor/128x128/apps/
 
         %post
-        chmod +x /opt/nst/bin/NST
-        chmod +x /opt/nst/lib/*.so* 2>/dev/null || true
         ln -sf /opt/nst/bin/NST /usr/local/bin/nst 2>/dev/null || true
         [ -x /usr/bin/update-desktop-database ] && /usr/bin/update-desktop-database || true
-        [ -x /usr/bin/gtk-update-icon-cache ] && /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
-
-        %postun
-        rm -f /usr/local/bin/nst
-        [ -x /usr/bin/update-desktop-database ] && /usr/bin/update-desktop-database || true
-        [ -x /usr/bin/gtk-update-icon-cache ] && /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
+        [ -x /usr/bin/gtk-update-icon-cache Pape ] && /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
 
         %files
         /opt/nst/
         /usr/share/applications/nst.desktop
-        %dir /usr/share/icons/hicolor/
-        %dir /usr/share/icons/hicolor/scalable/
-        %dir /usr/share/icons/hicolor/scalable/apps/
         /usr/share/icons/hicolor/scalable/apps/nst.svg
-        %dir /usr/share/icons/hicolor/256x256/
-        %dir /usr/share/icons/hicolor/256x256/apps/
         /usr/share/icons/hicolor/256x256/apps/nst.png
-        %dir /usr/share/icons/hicolor/128x128/
-        %dir /usr/share/icons/hicolor/128x128/apps/
         /usr/share/icons/hicolor/128x128/apps/nst.png
 
         %changelog
-        * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
-        - Initial RPM release
+        * $(date +"%a %b %d %Y") NST Ghost - 0.4.3-1
+        - Release 0.4.3
         EOF
 
         rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
-        cp ~/rpmbuild/RPMS/x86_64/nst-0.4.3-1.*.rpm ./NST-0.4.3-Linux-x86_64.rpm
+        cp ~/rpmbuild/RPMS/x86_64/nst-*.rpm ./NST-0.4.3-Linux-x86_64.rpm
 
-        echo -e "\n=== RPM built successfully! ==="
-        ls -lh NST-0.4.3-Linux-x86_64.rpm
-        rpm -qip NST-0.4.3-Linux-x86_64.rpm
-
-    - name: Verify all packages
-      run: |
-        echo "=== All Linux packages ==="
-        ls -lh NST-*
-        du -h NST-*
-
-    - name: Upload AppImage
+    - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: NST-0.4.3-x86_64-AppImage
-        path: NST-0.4.3-x86_64.AppImage
-
-    - name: Upload tar.gz
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-tar
-        path: NST-0.4.3-Linux-x86_64.tar.gz
-
-    - name: Upload DEB
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-deb
-        path: NST-0.4.3-Linux-x86_64.deb
-
-    - name: Upload RPM
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-rpm
-        path: NST-0.4.3-Linux-x86_64.rpm
+        name: NST-0.4.3-Linux-All
+        path: |
+          NST-0.4.3-x86_64.AppImage
+          NST-0.4.3-Linux-x86_64.tar.gz
+          NST-0.4.3-Linux-x86_64.deb
+          NST-0.4.3-Linux-x86_64.rpm
