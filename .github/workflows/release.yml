@@ -219,71 +219,67 @@ jobs:
           else
             echo "Creating new release..."
             
-            RELEASE_BODY="# Release ${VERSION}
+            RELEASE_BODY=$(cat <<'EOFBODY'
+# Release ${VERSION}
 
 ## Downloads
 
 ### Windows
-- \`NST-${VERSION}-Windows-x64-MSVC.zip\` - Windows x64 package with MSVC runtime
+- NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
 
 ### Linux
-- \`NST-${VERSION}-x86_64.AppImage\` - Universal Linux package (recommended)
-- \`NST-${VERSION}-Linux-x86_64.tar.gz\` - Portable archive with install scripts
-- \`NST-${VERSION}-Linux-x86_64.deb\` - Debian/Ubuntu package
-- \`NST-${VERSION}-Linux-x86_64.rpm\` - Fedora/RHEL/CentOS package
+- NST-${VERSION}-x86_64.AppImage - Universal Linux package (recommended)
+- NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
+- NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
+- NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
 
 ## Installation
 
 ### Windows
 1. Extract the ZIP file
-2. Run \`NST.exe\`
+2. Run NST.exe
 
 ### Linux
 **AppImage (recommended):**
-\`\`\`bash
+```bash
 chmod +x NST-${VERSION}-x86_64.AppImage
 ./NST-${VERSION}-x86_64.AppImage
-\`\`\`
+```
 
 **tar.gz:**
-\`\`\`bash
+```bash
 tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
 cd NST-${VERSION}
 sudo ./install.sh
-\`\`\`
+```
 
 **DEB:**
-\`\`\`bash
+```bash
 sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
-sudo apt-get install -f  # Fix dependencies if needed
-\`\`\`
+sudo apt-get install -f
+```
 
 **RPM:**
-\`\`\`bash
+```bash
 sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
-# or
-sudo dnf install NST-${VERSION}-Linux-x86_64.rpm
-\`\`\`
+```
 
 ## What's New
 
-See [CHANGELOG.md](CHANGELOG.md) for details.
-"
+See CHANGELOG.md for details.
+EOFBODY
+)
             
             create_resp=$(curl -s -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               -H "Content-Type: application/json" \
-              -d "$(jq -n \
-                --arg tag "$VERSION_TAG" \
-                --arg name "Release $VERSION" \
-                --arg body "$RELEASE_BODY" \
-                '{
-                  tag_name: $tag,
-                  name: $name,
-                  body: $body,
-                  draft: false,
-                  prerelease: false
-                }')" \
+              -d "{
+                \"tag_name\": \"${VERSION_TAG}\",
+                \"name\": \"Release ${VERSION}\",
+                \"body\": $(echo "$RELEASE_BODY" | jq -Rs .),
+                \"draft\": false,
+                \"prerelease\": false
+              }" \
               "${API}/releases")
             
             RELEASE_ID=$(echo "$create_resp" | jq -r '.id // empty')
