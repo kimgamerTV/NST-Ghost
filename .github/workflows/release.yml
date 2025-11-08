@@ -6,7 +6,6 @@ on:
     paths:
       - 'CMakeLists.txt'
       - '.github/workflows/release*.yml'
-  push:
     tags:
       - 'v*'
   workflow_dispatch:
@@ -219,53 +218,54 @@ jobs:
           else
             echo "Creating new release..."
             
+            # Create release body
             RELEASE_BODY="# Release ${VERSION}
-
-## Downloads
-
-### Windows
-- NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
-
-### Linux
-- NST-${VERSION}-x86_64.AppImage - Universal Linux package (recommended)
-- NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
-- NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
-- NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
-
-## Installation
-
-### Windows
-1. Extract the ZIP file
-2. Run NST.exe
-
-### Linux
-**AppImage (recommended):**
-\`\`\`bash
-chmod +x NST-${VERSION}-x86_64.AppImage
-./NST-${VERSION}-x86_64.AppImage
-\`\`\`
-
-**tar.gz:**
-\`\`\`bash
-tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
-cd NST-${VERSION}
-sudo ./install.sh
-\`\`\`
-
-**DEB:**
-\`\`\`bash
-sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
-sudo apt-get install -f
-\`\`\`
-
-**RPM:**
-\`\`\`bash
-sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
-\`\`\`
-
-## What's New
-
-See CHANGELOG.md for details."
+          
+          ## Downloads
+          
+          ### Windows
+          - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
+          
+          ### Linux
+          - NST-${VERSION}-x86_64.AppImage - Universal Linux package (recommended)
+          - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
+          - NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
+          - NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
+          
+          ## Installation
+          
+          ### Windows
+          1. Extract the ZIP file
+          2. Run NST.exe
+          
+          ### Linux
+          **AppImage (recommended):**
+          \\\`\\\`\\\`bash
+          chmod +x NST-${VERSION}-x86_64.AppImage
+          ./NST-${VERSION}-x86_64.AppImage
+          \\\`\\\`\\\`
+          
+          **tar.gz:**
+          \\\`\\\`\\\`bash
+          tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
+          cd NST-${VERSION}
+          sudo ./install.sh
+          \\\`\\\`\\\`
+          
+          **DEB:**
+          \\\`\\\`\\\`bash
+          sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
+          sudo apt-get install -f
+          \\\`\\\`\\\`
+          
+          **RPM:**
+          \\\`\\\`\\\`bash
+          sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
+          \\\`\\\`\\\`
+          
+          ## What's New
+          
+          See CHANGELOG.md for details."
             
             create_resp=$(curl -s -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
@@ -345,7 +345,7 @@ See CHANGELOG.md for details."
           echo "Release URL: https://github.com/${REPO}/releases/tag/${VERSION_TAG}"
 
   cleanup:
-    needs: [check-version, create-release]
+    needs: [check-version, build-linux, build-windows, create-release]
     if: always()
     runs-on: ubuntu-latest
     
