@@ -294,9 +294,9 @@ jobs:
             echo "Created release ID: ${RELEASE_ID}"
           fi
           
-          # Upload zip artifacts directly
+          # Upload artifacts with proper content type detection
           shopt -s nullglob
-          files=(artifacts/*/*.zip)
+          files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb artifacts/*/*.rpm artifacts/*/*.AppImage)
           
           if [ ${#files[@]} -eq 0 ]; then
             echo "Warning: No artifacts found to upload"
@@ -312,6 +312,30 @@ jobs:
             
             echo "Uploading ${filename}..."
             
+            # Determine content type based on file extension
+            case "$filename" in
+              *.zip)
+                content_type="application/zip"
+                ;;
+              *.tar.gz)
+                content_type="application/gzip"
+                ;;
+              *.deb)
+                content_type="application/vnd.debian.binary-package"
+                ;;
+              *.rpm)
+                content_type="application/x-rpm"
+                ;;
+              *.AppImage)
+                content_type="application/x-executable"
+                ;;
+              *)
+                content_type="application/octet-stream"
+                ;;
+            esac
+            
+            echo "Content-Type: ${content_type}"
+            
             # Check if asset already exists
             existing_assets=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
               "${API}/releases/${RELEASE_ID}/assets")
@@ -323,6 +347,7 @@ jobs:
               curl -s -X DELETE \
                 -H "Authorization: token ${GITHUB_TOKEN}" \
                 "${API}/releases/assets/${asset_id}"
+              sleep 1
             fi
             
             # Upload new asset
@@ -330,7 +355,7 @@ jobs:
             
             upload_response=$(curl -s -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
-              -H "Content-Type: application/zip" \
+              -H "Content-Type: ${content_type}" \
               --data-binary "@${file}" \
               "$upload_url")
             
@@ -340,8 +365,16 @@ jobs:
               echo "✓ Successfully uploaded ${filename}"
             else
               echo "✗ Failed to upload ${filename}"
+              echo "Response:"
               echo "$upload_response" | jq .
+              
+              # Check file size
+              file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "unknown")
+              echo "File size: ${file_size} bytes"
             fi
+            
+            # Add a small delay between uploads to avoid rate limiting
+            sleep 2
           done
           
           echo ""
