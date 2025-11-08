@@ -227,44 +227,41 @@ jobs:
           - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
           
           ### Linux
-          - NST-${VERSION}-x86_64-AppImage.zip - Universal Linux package (AppImage inside zip)
-          - NST-${VERSION}-Linux-x86_64-tar.zip - Portable archive with install scripts
-          - NST-${VERSION}-Linux-x86_64-deb.zip - Debian/Ubuntu package (inside zip)
-          - NST-${VERSION}-Linux-x86_64-rpm.zip - Fedora/RHEL/CentOS package (inside zip)
+          - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
+          - NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
+          - NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
+          - NST-${VERSION}-x86_64.AppImage - Universal Linux package (if available)
           
           ## Installation
           
           ### Windows
-          1. Extract the ZIP file
-          2. Run NST.exe
+          1. Download NST-${VERSION}-Windows-x64-MSVC.zip
+          2. Extract the ZIP file
+          3. Run NST.exe
           
           ### Linux
-          **AppImage:**
-          \\\`\\\`\\\`bash
-          unzip NST-${VERSION}-x86_64-AppImage.zip
-          chmod +x NST-${VERSION}-x86_64.AppImage
-          ./NST-${VERSION}-x86_64.AppImage
-          \\\`\\\`\\\`
-          
           **tar.gz:**
           \\\`\\\`\\\`bash
-          unzip NST-${VERSION}-Linux-x86_64-tar.zip
           tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
           cd NST-${VERSION}
           sudo ./install.sh
           \\\`\\\`\\\`
           
-          **DEB:**
+          **DEB (Debian/Ubuntu):**
           \\\`\\\`\\\`bash
-          unzip NST-${VERSION}-Linux-x86_64-deb.zip
           sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
           sudo apt-get install -f
           \\\`\\\`\\\`
           
-          **RPM:**
+          **RPM (Fedora/RHEL/CentOS):**
           \\\`\\\`\\\`bash
-          unzip NST-${VERSION}-Linux-x86_64-rpm.zip
           sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
+          \\\`\\\`\\\`
+          
+          **AppImage:**
+          \\\`\\\`\\\`bash
+          chmod +x NST-${VERSION}-x86_64.AppImage
+          ./NST-${VERSION}-x86_64.AppImage
           \\\`\\\`\\\`
           
           ## What's New
@@ -294,7 +291,7 @@ jobs:
             echo "Created release ID: ${RELEASE_ID}"
           fi
           
-          # Upload artifacts with proper content type detection
+          # Use GitHub CLI for uploading (more reliable than curl for large files)
           shopt -s nullglob
           files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb artifacts/*/*.rpm artifacts/*/*.AppImage)
           
@@ -303,82 +300,96 @@ jobs:
             exit 0
           fi
           
+          # Install gh CLI if not available
+          if ! command -v gh &> /dev/null; then
+            echo "Installing GitHub CLI..."
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt-get update
+            sudo apt-get install -y gh
+          fi
+          
+          echo "Uploading ${#files[@]} artifacts..."
+          
+          upload_success=0
+          upload_fail=0
+          
           for file in "${files[@]}"; do
             if [ ! -f "$file" ]; then
               continue
             fi
             
             filename=$(basename "$file")
+            file_size=$(stat -c%s "$file" 2>/dev/null || stat -f%z "$file" 2>/dev/null || echo "unknown")
             
-            echo "Uploading ${filename}..."
+            echo ""
+            echo "=== Uploading ${filename} (${file_size} bytes) ==="
             
-            # Determine content type based on file extension
-            case "$filename" in
-              *.zip)
-                content_type="application/zip"
-                ;;
-              *.tar.gz)
-                content_type="application/gzip"
-                ;;
-              *.deb)
-                content_type="application/vnd.debian.binary-package"
-                ;;
-              *.rpm)
-                content_type="application/x-rpm"
-                ;;
-              *.AppImage)
-                content_type="application/x-executable"
-                ;;
-              *)
-                content_type="application/octet-stream"
-                ;;
-            esac
-            
-            echo "Content-Type: ${content_type}"
-            
-            # Check if asset already exists
+            # Check if asset already exists and delete it
             existing_assets=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
               "${API}/releases/${RELEASE_ID}/assets")
             
             asset_id=$(echo "$existing_assets" | jq -r ".[] | select(.name == \"$filename\") | .id")
             
             if [ -n "$asset_id" ]; then
-              echo "Asset ${filename} already exists (ID: ${asset_id}), deleting..."
-              curl -s -X DELETE \
-                -H "Authorization: token ${GITHUB_TOKEN}" \
-                "${API}/releases/assets/${asset_id}"
-              sleep 1
+              echo "Deleting existing asset (ID: ${asset_id})..."
+              gh release delete-asset "${VERSION_TAG}" "${filename}" --yes --repo "${REPO}" 2>/dev/null || true
+              sleep 2
             fi
             
-            # Upload new asset
-            upload_url="https://uploads.github.com/repos/${REPO}/releases/${RELEASE_ID}/assets?name=$(echo "$filename" | jq -sRr @uri)"
-            
-            upload_response=$(curl -s -X POST \
-              -H "Authorization: token ${GITHUB_TOKEN}" \
-              -H "Content-Type: ${content_type}" \
-              --data-binary "@${file}" \
-              "$upload_url")
-            
-            upload_status=$(echo "$upload_response" | jq -r '.state // "unknown"')
-            
-            if [ "$upload_status" = "uploaded" ]; then
+            # Upload with gh CLI (handles large files better)
+            if gh release upload "${VERSION_TAG}" "${file}" --repo "${REPO}" --clobber; then
               echo "✓ Successfully uploaded ${filename}"
+              ((upload_success++))
             else
               echo "✗ Failed to upload ${filename}"
-              echo "Response:"
-              echo "$upload_response" | jq .
+              ((upload_fail++))
               
-              # Check file size
-              file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo "unknown")
-              echo "File size: ${file_size} bytes"
+              # Try with curl as fallback
+              echo "Attempting fallback upload with curl..."
+              
+              content_type="application/octet-stream"
+              case "$filename" in
+                *.zip) content_type="application/zip" ;;
+                *.tar.gz) content_type="application/gzip" ;;
+                *.deb) content_type="application/vnd.debian.binary-package" ;;
+                *.rpm) content_type="application/x-rpm" ;;
+                *.AppImage) content_type="application/x-executable" ;;
+              esac
+              
+              upload_url="https://uploads.github.com/repos/${REPO}/releases/${RELEASE_ID}/assets?name=$(printf %s "$filename" | jq -sRr @uri)"
+              
+              if curl -X POST \
+                -H "Authorization: token ${GITHUB_TOKEN}" \
+                -H "Content-Type: ${content_type}" \
+                --data-binary "@${file}" \
+                --max-time 300 \
+                -w "\nHTTP Status: %{http_code}\n" \
+                "$upload_url" | tee /tmp/upload_response.txt; then
+                
+                if grep -q '"state".*"uploaded"' /tmp/upload_response.txt; then
+                  echo "✓ Fallback upload succeeded for ${filename}"
+                  ((upload_success++))
+                  ((upload_fail--))
+                fi
+              fi
             fi
             
-            # Add a small delay between uploads to avoid rate limiting
-            sleep 2
+            sleep 3
           done
           
           echo ""
+          echo "=== Upload Summary ==="
+          echo "Success: ${upload_success}"
+          echo "Failed: ${upload_fail}"
+          echo ""
           echo "Release URL: https://github.com/${REPO}/releases/tag/${VERSION_TAG}"
+          
+          # Exit with error if all uploads failed
+          if [ ${upload_success} -eq 0 ] && [ ${upload_fail} -gt 0 ]; then
+            echo "ERROR: All uploads failed!"
+            exit 1
+          fi
 
   cleanup:
     needs: [check-version, build-linux, build-windows, create-release]
