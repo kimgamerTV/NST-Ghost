@@ -14,14 +14,15 @@ jobs:
       with:
         submodules: recursive
     
-    - name: Install basic dependencies
+    - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential cmake ninja-build libgl1-mesa-dev libglu1-mesa-dev
-    
-    - name: Install X11 dependencies
-      run: |
         sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          libgl1-mesa-dev \
+          libglu1-mesa-dev \
           libxkbcommon-x11-0 \
           libxcb-icccm4 \
           libxcb-image0 \
@@ -30,6 +31,11 @@ jobs:
           libxcb-xinerama0 \
           libxcb-cursor0 \
           libxcb-shape0 \
+          libfuse2 \
+          file \
+          rpm \
+          patchelf \
+          desktop-file-utils \
           libfontconfig1-dev \
           libfreetype6-dev \
           libx11-dev \
@@ -42,41 +48,7 @@ jobs:
           libxcb-glx0-dev \
           libxcb-util0-dev \
           libxkbcommon-dev \
-          libxkbcommon-x11-dev
-    
-    - name: Install Wayland dependencies
-      run: |
-        # Check if Wayland packages are available
-        if apt-cache search libwayland-dev | grep -q "libwayland-dev"; then
-          echo "Installing libwayland-dev"
-          sudo apt-get install -y libwayland-dev
-        else
-          echo "libwayland-dev not found, trying alternative package names"
-          # Try alternative package names if needed
-          if apt-cache search wayland-dev | grep -q "wayland-dev"; then
-            sudo apt-get install -y wayland-dev
-          fi
-        fi
-        
-        # Install wayland-protocols
-        if apt-cache search wayland-protocols | grep -q "wayland-protocols"; then
-          echo "Installing wayland-protocols"
-          sudo apt-get install -y wayland-protocols
-        else
-          echo "wayland-protocols not found"
-        fi
-        
-        # Install pkg-config
-        sudo apt-get install -y pkg-config
-    
-    - name: Install additional dependencies
-      run: |
-        sudo apt-get install -y \
-          libfuse2 \
-          file \
-          rpm \
-          patchelf \
-          desktop-file-utils \
+          libxkbcommon-x11-dev \
           librsvg2-bin
     
     - name: Install Qt
@@ -87,8 +59,6 @@ jobs:
         arch: 'linux_gcc_64'
         cache: true
         install-deps: true
-        # Add Wayland module
-        modules: 'qtwayland'
     
     - name: Verify installation
       run: |
@@ -103,9 +73,6 @@ jobs:
         
         echo -e "\n=== CMake ==="
         cmake --version
-        
-        echo -e "\n=== Qt Wayland plugins ==="
-        find $Qt6_DIR -name "*wayland*" -type f | head -10
     
     - name: Configure CMake
       run: |
@@ -207,10 +174,6 @@ jobs:
         export QT_PLUGIN_PATH="${HERE}/usr/plugins"
         export QML_IMPORT_PATH="${HERE}/usr/qml"
         export QML2_IMPORT_PATH="${HERE}/usr/qml"
-        # Add Wayland platform plugin path
-        export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/plugins/platforms"
-        # Allow fallback to X11 if Wayland fails
-        export QT_QPA_PLATFORM="wayland;xcb"
         exec "${HERE}/usr/bin/NST" "$@"
         EOF
         chmod +x AppRun
@@ -249,413 +212,28 @@ jobs:
         echo -e "\n=== Deployment completed ==="
         echo "Libraries in usr/lib:"
         ls -lh usr/lib/ | head -20
+
+    - name: Add Qt Wayland plugins
+      run: |
+        echo "Adding Qt Wayland platform plugins..."
         
-        # Ensure Wayland plugins are included
-        echo -e "\n=== Checking for Wayland plugins ==="
-        if [ -d "${{ env.Qt6_DIR }}/plugins/platforms" ]; then
-          echo "Found Qt platform plugins directory"
-          ls -la "${{ env.Qt6_DIR }}/plugins/platforms" | grep wayland || echo "No Wayland plugins found in Qt installation"
+        QT_PLUGIN_DIR=$(qtpaths6 --plugin-dir 2>/dev/null || echo "${{ env.Qt6_DIR }}/plugins")
+        
+        mkdir -p AppDir/usr/plugins/platforms
+        
+        for f in \
+          libqwayland-egl.so \
+          libqwayland-generic.so \
+          libqwayland-xcomposite-egl.so \
+          libqwayland-xcomposite-glx.so; do
           
-          # Create platforms directory if it doesn't exist
-          mkdir -p usr/plugins/platforms
-          
-          # Copy Wayland plugins if they exist
-          for plugin in libqwayland-egl.so libqwayland-generic.so libqwayland-xcomposite-egl.so libqwayland-xcomposite-glx.so; do
-            if [ -f "${{ env.Qt6_DIR }}/plugins/platforms/$plugin" ]; then
-              echo "Copying $plugin"
-              cp "${{ env.Qt6_DIR }}/plugins/platforms/$plugin" usr/plugins/platforms/
-            else
-              echo "Warning: $plugin not found in Qt installation"
-            fi
-          done
-          
-          # Also copy libqwayland-shell-integration.so if it exists
-          if [ -f "${{ env.Qt6_DIR }}/plugins/wayland-shell-integration/libqwayland-shell-integration.so" ]; then
-            mkdir -p usr/plugins/wayland-shell-integration
-            cp "${{ env.Qt6_DIR }}/plugins/wayland-shell-integration/libqwayland-shell-integration.so" usr/plugins/wayland-shell-integration/
+          if [ -f "${QT_PLUGIN_DIR}/platforms/$f" ]; then
+            echo "Copying $f"
+            cp "${QT_PLUGIN_DIR}/platforms/$f" AppDir/usr/plugins/platforms/
+          else
+            echo "Warning: $f not found in ${QT_PLUGIN_DIR}/platforms/"
           fi
-          
-          # Copy wayland-decoration-client if it exists
-          if [ -f "${{ env.Qt6_DIR }}/plugins/wayland-decoration-client/libqt-wayland-decoration-client.so" ]; then
-            mkdir -p usr/plugins/wayland-decoration-client
-            cp "${{ env.Qt6_DIR }}/plugins/wayland-decoration-client/libqt-wayland-decoration-client.so" usr/plugins/wayland-decoration-client/
-          fi
-        else
-          echo "Qt platform plugins directory not found"
-        fi
+        done
         
-        echo -e "\n=== Final platform plugins ==="
-        ls -la usr/plugins/platforms/ | grep -E "(wayland|libqwayland)" || echo "No Wayland plugins found"
-    
-    - name: Create AppImage
-      run: |
-        cd AppDir
-        
-        wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-        chmod +x appimagetool-x86_64.AppImage
-        
-        ./appimagetool-x86_64.AppImage --appimage-extract
-        
-        ARCH=x86_64 ./squashfs-root/AppRun . ../NST-0.4.3-x86_64.AppImage
-        
-        cd ..
-        chmod +x NST-0.4.3-x86_64.AppImage
-        
-        echo -e "\n=== AppImage created ==="
-        ls -lh NST-0.4.3-x86_64.AppImage
-        
-        ./NST-0.4.3-x86_64.AppImage --version || echo "Version check skipped"
-    
-    - name: Create tar.gz archive
-      run: |
-        mkdir -p package-tar/NST-0.4.3
-        cd AppDir
-        
-        cp -r usr ../package-tar/NST-0.4.3/
-        cp AppRun ../package-tar/NST-0.4.3/
-        
-        cd ../package-tar
-        
-        cat > NST-0.4.3/README.txt << 'EOF'
-        NST v0.4.3 - A tool for translating video games
-        ================================================
-        
-        Installation:
-        -------------
-        Run: sudo ./install.sh
-        
-        This will copy files to:
-        - /usr/bin/NST (executable)
-        - /usr/share/applications/nst.desktop (desktop entry)
-        - /usr/share/icons/ (application icon)
-        - /usr/bin/ (required libraries)
-        - /usr/plugins/platforms/ (Qt platform plugins including Wayland support)
-        
-        Uninstallation:
-        ---------------
-        Run: sudo ./uninstall.sh
-        
-        Manual Run (without installation):
-        -----------------------------------
-        ./AppRun
-        
-        Requirements:
-        -------------
-        - Linux x86_64
-        - glibc 2.31+
-        - libGL, libxcb, libxkbcommon
-        - Wayland libraries (for Wayland support)
-        EOF
-        
-        cat > NST-0.4.3/install.sh << 'EOF'
-        #!/bin/bash
-        set -e
-        
-        echo "Installing NST v0.4.3..."
-        
-        if [ "$EUID" -ne 0 ]; then 
-            echo "Please run as root (use sudo)"
-            exit 1
-        fi
-        
-        echo "Copying files..."
-        cp -r usr/* /usr/
-        
-        chmod +x /usr/bin/NST
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            echo "Updating desktop database..."
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            echo "Updating icon cache..."
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        echo ""
-        echo "Installation complete!"
-        echo "You can now run 'NST' from terminal or find it in your applications menu."
-        echo "The application supports both X11 and Wayland display servers."
-        EOF
-        chmod +x NST-0.4.3/install.sh
-        
-        cat > NST-0.4.3/uninstall.sh << 'EOF'
-        #!/bin/bash
-        set -e
-        
-        echo "Uninstalling NST..."
-        
-        if [ "$EUID" -ne 0 ]; then 
-            echo "Please run as root (use sudo)"
-            exit 1
-        fi
-        
-        echo "Removing files..."
-        rm -f /usr/bin/NST
-        rm -f /usr/bin/libBGACore.so*
-        rm -f /usr/bin/libQtLingo.so*
-        rm -f /usr/share/applications/nst.desktop
-        rm -f /usr/share/icons/hicolor/*/apps/nst.png
-        rm -f /usr/share/icons/hicolor/scalable/apps/nst.svg
-        rm -rf /usr/plugins/platforms/libqwayland*
-        rm -rf /usr/plugins/wayland-*
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            echo "Updating desktop database..."
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            echo "Updating icon cache..."
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        echo "Uninstallation complete!"
-        EOF
-        chmod +x NST-0.4.3/uninstall.sh
-        
-        tar -czf ../NST-0.4.3-Linux-x86_64.tar.gz NST-0.4.3/
-        cd ..
-        
-        echo -e "\n=== tar.gz created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.tar.gz
-    
-    - name: Create DEB package
-      run: |
-        mkdir -p nst-deb/DEBIAN
-        mkdir -p nst-deb/usr
-        
-        cp -r AppDir/usr/* nst-deb/usr/
-        
-        cat > nst-deb/DEBIAN/control << 'EOF'
-        Package: nst
-        Version: 0.4.3
-        Section: utils
-        Priority: optional
-        Architecture: amd64
-        Depends: libc6 (>= 2.31), libstdc++6 (>= 10), libgcc1, libgl1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libfontconfig1, libfreetype6, libdbus-1-3, libwayland-client0, libwayland-cursor0, libwayland-egl1
-        Maintainer: NST Ghost <you@example.com>
-        Description: A tool for translating video games
-         NST is a powerful tool for translating video games.
-         It supports various game formats and provides an intuitive
-         interface for translation workflows.
-         .
-         Built with Qt 6.7.3
-         Supports both X11 and Wayland display servers.
-        EOF
-        
-        cat > nst-deb/DEBIAN/postinst << 'EOF'
-        #!/bin/bash
-        set -e
-        
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        exit 0
-        EOF
-        chmod +x nst-deb/DEBIAN/postinst
-        
-        cat > nst-deb/DEBIAN/postrm << 'EOF'
-        #!/bin/bash
-        set -e
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        exit 0
-        EOF
-        chmod +x nst-deb/DEBIAN/postrm
-        
-        dpkg-deb --build nst-deb NST-0.4.3-Linux-x86_64.deb
-        
-        echo -e "\n=== DEB package created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.deb
-        dpkg-deb --info NST-0.4.3-Linux-x86_64.deb
-        echo -e "\n=== DEB contents ==="
-        dpkg-deb --contents NST-0.4.3-Linux-x86_64.deb | head -20
-    
-    - name: Create RPM package
-      run: |
-        mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
-        
-        mkdir -p nst-rpm-source/nst-0.4.3/usr
-        cp -r AppDir/usr/* nst-rpm-source/nst-0.4.3/usr/
-        cd nst-rpm-source
-        tar -czf ~/rpmbuild/SOURCES/nst-0.4.3.tar.gz nst-0.4.3/
-        cd ..
-        
-        # Check what directories exist
-        echo "=== Checking AppDir structure for RPM ==="
-        ls -la AppDir/usr/
-        
-        # Build file list dynamically
-        FILES_LIST="/usr/bin/*
-        /usr/share/applications/nst.desktop
-        /usr/share/icons/hicolor/*/apps/nst.*"
-        
-        if [ -d "AppDir/usr/lib" ] && [ "$(ls -A AppDir/usr/lib 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/lib/*"
-        fi
-        
-        if [ -d "AppDir/usr/plugins" ] && [ "$(ls -A AppDir/usr/plugins 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/plugins/*"
-        fi
-        
-        if [ -d "AppDir/usr/qml" ] && [ "$(ls -A AppDir/usr/qml 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/qml/*"
-        fi
-        
-        if [ -d "AppDir/usr/translations" ] && [ "$(ls -A AppDir/usr/translations 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/translations/*"
-        fi
-        
-        if [ -d "AppDir/usr/share/doc" ] && [ "$(ls -A AppDir/usr/share/doc 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/share/doc/*"
-        fi
-        
-        cat > ~/rpmbuild/SPECS/nst.spec << EOF
-        Name:           nst
-        Version:        0.4.3
-        Release:        1%{?dist}
-        Summary:        A tool for translating video games
-        
-        License:        MIT
-        URL:            https://github.com/yourusername/nst
-        Source0:        %{name}-%{version}.tar.gz
-        
-        BuildArch:      x86_64
-        
-        Requires:       glibc >= 2.31, libstdc++ >= 10, libgcc, libGL, libxcb, libxkbcommon, fontconfig, freetype, dbus-libs, wayland, wayland-egl
-        
-        %description
-        NST is a powerful tool for translating video games.
-        It supports various game formats and provides an intuitive
-        interface for translation workflows.
-        
-        Built with Qt 6.7.3
-        Supports both X11 and Wayland display servers.
-        
-        %prep
-        %setup -q
-        
-        %install
-        rm -rf \$RPM_BUILD_ROOT
-        mkdir -p \$RPM_BUILD_ROOT
-        cp -r usr \$RPM_BUILD_ROOT/
-        
-        %post
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        %postun
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        %files
-        $FILES_LIST
-        
-        %changelog
-        * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
-        - Release version 0.4.3
-        - Built with Qt 6.7.3
-        - Added Wayland support
-        EOF
-        
-        echo "=== Generated RPM spec file ==="
-        cat ~/rpmbuild/SPECS/nst.spec
-        
-        rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
-        
-        find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-0.4.3-Linux-x86_64.rpm \;
-        
-        echo -e "\n=== RPM package created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.rpm
-        rpm -qpi NST-0.4.3-Linux-x86_64.rpm
-    
-    - name: Verify all packages
-      run: |
-        echo "=== All packages created ==="
-        ls -lh NST-* | grep -E '\.(AppImage|tar\.gz|deb|rpm)$'
-        
-        echo -e "\n=== Package sizes ==="
-        du -h NST-0.4.3-x86_64.AppImage \
-               NST-0.4.3-Linux-x86_64.tar.gz \
-               NST-0.4.3-Linux-x86_64.deb \
-               NST-0.4.3-Linux-x86_64.rpm
-        
-        echo -e "\n=== Package details ==="
-        echo "AppImage: Portable, run directly"
-        echo "tar.gz: Manual installation with install.sh"
-        echo "DEB: For Debian/Ubuntu (dpkg -i or apt install)"
-        echo "RPM: For Fedora/RHEL/CentOS (rpm -i or dnf install)"
-        
-        echo -e "\n=== Wayland plugin verification ==="
-        echo "Checking AppImage for Wayland plugins:"
-        if [ -f "NST-0.4.3-x86_64.AppImage" ]; then
-          ./NST-0.4.3-x86_64.AppImage --appimage-extract
-          find squashfs-root -name "*wayland*" -type f || echo "No Wayland plugins found in AppImage"
-        fi
-    
-    - name: Upload AppImage
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-x86_64-AppImage
-        path: NST-0.4.3-x86_64.AppImage
-        if-no-files-found: error
-    
-    - name: Upload tar.gz
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-tar
-        path: NST-0.4.3-Linux-x86_64.tar.gz
-        if-no-files-found: error
-    
-    - name: Upload DEB
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-deb
-        path: NST-0.4.3-Linux-x86_64.deb
-        if-no-files-found: error
-    
-    - name: Upload RPM
-      uses: actions/upload-artifact@v4
-      with:
-        name: NST-0.4.3-Linux-x86_64-rpm
-        path: NST-0.4.3-Linux-x86_64.rpm
-        if-no-files-found: error
+        echo -e "\n=== Verifying Wayland plugins ==="
+        ls -lh AppDir/usr/plugins/platforms/
