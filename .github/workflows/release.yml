@@ -340,10 +340,10 @@ jobs:
             # Upload with gh CLI (handles large files better)
             if gh release upload "${VERSION_TAG}" "${file}" --repo "${REPO}" --clobber; then
               echo "✓ Successfully uploaded ${filename}"
-              ((upload_success++))
+              upload_success=$((upload_success + 1))
             else
               echo "✗ Failed to upload ${filename}"
-              ((upload_fail++))
+              upload_fail=$((upload_fail + 1))
               
               # Try with curl as fallback
               echo "Attempting fallback upload with curl..."
@@ -369,8 +369,8 @@ jobs:
                 
                 if grep -q '"state".*"uploaded"' /tmp/upload_response.txt; then
                   echo "✓ Fallback upload succeeded for ${filename}"
-                  ((upload_success++))
-                  ((upload_fail--))
+                  upload_success=$((upload_success + 1))
+                  upload_fail=$((upload_fail - 1))
                 fi
               fi
             fi
