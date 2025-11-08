@@ -54,7 +54,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        version: '6.8.1'
+        version: '6.7.3'
         host: 'linux'
         target: 'desktop'
         arch: 'gcc_64'
@@ -348,7 +348,7 @@ jobs:
          It supports various game formats and provides an intuitive
          interface for translation workflows.
          .
-         Built with Qt 6.8.1
+         Built with Qt 6.7.3
         CONTROLEOF
         
         # Create postinst script
@@ -435,7 +435,7 @@ jobs:
         It supports various game formats and provides an intuitive
         interface for translation workflows.
         
-        Built with Qt 6.8.1
+        Built with Qt 6.7.3
         
         %prep
         %setup -q
