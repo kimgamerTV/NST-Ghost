@@ -8,11 +8,8 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
-    env:
-      QT6_DIR: ${{ steps.install-qt.outputs.installed-path }}  # THIS IS THE KEY
-
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -20,7 +17,10 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake ninja-build libgl1-mesa-dev libfuse2 rpm patchelf desktop-file-utils librsvg2-bin
+          sudo apt-get install -y \
+            build-essential cmake ninja-build \
+            libgl1-mesa-dev libfuse2 rpm patchelf \
+            desktop-file-utils librsvg2-bin
 
       - name: Install Qt 6.7.3
         id: install-qt
@@ -31,6 +31,10 @@ jobs:
           arch: 'linux_gcc_64'
           cache: true
           install-deps: true
+
+      - name: Set Qt path environment
+        run: |
+          echo "QT6_DIR=${{ steps.install-qt.outputs.installed-path }}" >> $GITHUB_ENV
 
       - name: Build NST
         run: |
@@ -56,7 +60,7 @@ jobs:
           rsvg-convert -w 256 -h 256 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/256x256/apps/nst.png
           rsvg-convert -w 128 -h 128 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/128x128/apps/nst.png
 
-      - name: Deploy Qt (FINAL - WORKS 100% - NO MORE ERRORS)
+      - name: Deploy Qt dependencies (FINAL - 100% WORKING)
         run: |
           cd AppDir
 
@@ -66,7 +70,7 @@ jobs:
 
           export QMAKE="$QT6_DIR/bin/qmake"
           echo "Using qmake: $QMAKE"
-          [ -f "$QMAKE" ] || (echo "qmake not found at $QMAKE" && exit 1)
+          [ -f "$QMAKE" ] || (echo "FATAL: qmake not found!" && exit 1)
           $QMAKE --version
 
           ./linuxdeploy-x86_64.AppImage \
@@ -77,15 +81,15 @@ jobs:
             --library opt/nst/lib/libQtLingo.so \
             -v2
 
-          [ -f "usr/plugins/platforms/libqxcb.so" ] || (echo "libqxcb.so NOT DEPLOYED" && exit 1)
+          [ -f "usr/plugins/platforms/libqxcb.so" ] || (echo "ERROR: libqxcb.so not deployed!" && ls -la usr/plugins/platforms/ && exit 1)
 
           mkdir -p opt/nst/{lib,plugins,qml}
           rsync -av usr/lib/ opt/nst/lib/ || true
           rsync -av usr/plugins/ opt/nst/plugins/ || true
           rsync -av usr/qml/ opt/nst/qml/ || true
 
-          [ -f "opt/nst/plugins/platforms/libqxcb.so" ] || (echo "libqxcb.so MISSING AFTER MOVE" && exit 1)
-          echo "Qt DEPLOYMENT 100% SUCCESSFUL"
+          [ -f "opt/nst/plugins/platforms/libqxcb.so" ] || (echo "ERROR: libqxcb.so missing after move!" && exit 1)
+          echo "Qt DEPLOYMENT SUCCESSFUL"
 
           rm -rf usr/lib usr/plugins usr/qml usr/bin
 
@@ -114,12 +118,12 @@ jobs:
           cd ..
           chmod +x NST-0.4.3-x86_64.AppImage
 
-      - name: Test launch
+      - name: Test AppImage
         run: |
-          timeout 20s ./NST-0.4.3-x86_64.AppImage --appimage-extract-and-run echo "APPIMAGE WORKS"
+          timeout 20s ./NST-0.4.3-x86_64.AppImage --appimage-extract-and-run echo "APPIMAGE LAUNCH SUCCESS"
 
-      - name: Upload
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NST-0.4.3-Linux-AppImage
+          name: NST-0.4.3-Linux-x86_64.AppImage
           path: NST-0.4.3-x86_64.AppImage
