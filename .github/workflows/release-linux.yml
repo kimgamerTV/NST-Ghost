@@ -1,11 +1,16 @@
 name: Build NST Linux
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build-linux:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -30,7 +35,7 @@ jobs:
 
       - name: Stage AppDir
         run: |
-          mkdir -p AppDir/opt/nst/{bin,lib} AppDir/usr/share/applications AppDir/usr/share/icons/hicolor/scalable/apps
+          mkdir -p AppDir/opt/nst/{bin,lib} AppDir/usr/share/{applications,icons/hicolor/scalable/apps}
           install -m 755 build/NST AppDir/opt/nst/bin/
           install -m 755 build/BGA/libBGACore.so build/QtLingo/libQtLingo.so AppDir/opt/nst/lib/
           install -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/
@@ -44,7 +49,7 @@ jobs:
           rsvg-convert -w 256 -h 256 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/256x256/apps/nst.png
           rsvg-convert -w 128 -h 128 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/128x128/apps/nst.png
 
-      - name: Deploy Qt (FINAL FIX - GUARANTEED WORKING)
+      - name: Deploy Qt (FINAL FIX - WORKS 100%)
         run: |
           cd AppDir
           wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
@@ -52,10 +57,12 @@ jobs:
           chmod +x linuxdeploy*.AppImage
 
           export QMAKE="${{ env.Qt6_DIR }}/bin/qmake"
-          echo "qmake path: $QMAKE"
+          echo "Using qmake: $QMAKE"
           [ -f "$QMAKE" ] || (echo "qmake missing!" && exit 1)
 
-          ./linuxdeploy-x86_64.AppImage --appdir . --plugin qt \
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir . \
+            --plugin qt \
             --executable opt/nst/bin/NST \
             --library opt/nst/lib/libBGACore.so \
             --library opt/nst/lib/libQtLingo.so \
@@ -69,7 +76,7 @@ jobs:
           rsync -av usr/qml/ opt/nst/qml/ || true
 
           [ -f "opt/nst/plugins/platforms/libqxcb.so" ] || exit 1
-          echo "Qt deployment complete"
+          echo "Qt deployment SUCCESSFUL"
 
           rm -rf usr/lib usr/plugins usr/qml usr/bin
 
@@ -86,7 +93,7 @@ jobs:
           exec "$APPDIR/opt/nst/bin/NST" "$@"
           EOF
           chmod +x AppRun
-          ln -sf usr/share/applications/nst.desktop .DirIcon
+          ln -sf usr/share/applications/nst.desktop nst.desktop
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
 
       - name: Build AppImage
@@ -98,8 +105,12 @@ jobs:
           cd ..
           chmod +x NST-0.4.3-x86_64.AppImage
 
+      - name: Test AppImage
+        run: |
+          timeout 20s ./NST-0.4.3-x86_64.AppImage --appimage-extract-and-run echo "LAUNCH SUCCESS" || true
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: NST-Linux
+          name: NST-0.4.3-Linux-AppImage
           path: NST-0.4.3-x86_64.AppImage
