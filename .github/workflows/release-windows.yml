@@ -22,10 +22,8 @@ jobs:
     - name: Install Qt with aqtinstall
       run: |
         pip install aqtinstall
-        # Qt 6.8.1 requires MinGW 11.2.0
+        # Qt 6.8.1 comes with MinGW 13.1.0 bundled
         aqt install-qt windows desktop 6.8.1 win64_mingw
-        # Install MATCHING MinGW 11.2.0 toolchain
-        aqt install-tool windows desktop tools_mingw1120 qt.tools.win64_mingw1120
       shell: pwsh
     
     - name: Install Ninja
@@ -36,8 +34,8 @@ jobs:
       run: |
         echo "Qt6_DIR=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
         echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
+        # MinGW 13.1.0 is bundled with Qt in the bin directory
         echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "${{ github.workspace }}/Tools/mingw1120_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: pwsh
     
     - name: Verify installation
@@ -54,8 +52,9 @@ jobs:
     
     - name: Configure CMake
       run: |
-        $env:CC = "${{ github.workspace }}/Tools/mingw1120_64/bin/gcc.exe"
-        $env:CXX = "${{ github.workspace }}/Tools/mingw1120_64/bin/g++.exe"
+        # MinGW is bundled in Qt's bin directory
+        $env:CC = "${{ github.workspace }}/6.8.1/mingw_64/bin/gcc.exe"
+        $env:CXX = "${{ github.workspace }}/6.8.1/mingw_64/bin/g++.exe"
         cmake -S . -B build `
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
