@@ -27,8 +27,8 @@ jobs:
     - name: Install Qt with aqtinstall
       run: |
         pip install aqtinstall
-        # Install Qt 6.8.1 with MSVC 2022 (win64_msvc2022_64)
-        aqt install-qt windows desktop 6.8.1 win64_msvc2022_64
+        # Install Qt 6.10.0 with MSVC 2022 (win64_msvc2022_64)
+        aqt install-qt windows desktop 6.10.0 win64_msvc2022_64
       shell: pwsh
     
     - name: Install Ninja
@@ -37,9 +37,9 @@ jobs:
     
     - name: Set environment variables
       run: |
-        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/msvc2022_64" >> $env:GITHUB_ENV
-        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/msvc2022_64" >> $env:GITHUB_ENV
-        echo "${{ github.workspace }}/6.8.1/msvc2022_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "Qt6_DIR=${{ github.workspace }}/6.10.0/msvc2022_64" >> $env:GITHUB_ENV
+        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.10.0/msvc2022_64" >> $env:GITHUB_ENV
+        echo "${{ github.workspace }}/6.10.0/msvc2022_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       shell: pwsh
     
     - name: Verify installation
@@ -62,7 +62,7 @@ jobs:
         cmake -S . -B build `
           -G Ninja `
           -DCMAKE_BUILD_TYPE=Release `
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.8.1\msvc2022_64"
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.10.0\msvc2022_64"
         
         Write-Host "`n=== CMake Configuration ==="
         Write-Host "Compiler ID: MSVC"
@@ -92,7 +92,7 @@ jobs:
           $exeDir = $exePath.DirectoryName
           
           # Run windeployqt
-          $windeployqt = "${{ github.workspace }}/6.8.1/msvc2022_64/bin/windeployqt.exe"
+          $windeployqt = "${{ github.workspace }}/6.10.0/msvc2022_64/bin/windeployqt.exe"
           Write-Host "Running windeployqt..."
           & $windeployqt --release --no-translations --compiler-runtime "$($exePath.FullName)"
           
