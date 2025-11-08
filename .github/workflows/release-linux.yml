@@ -59,15 +59,15 @@ jobs:
     - name: Install Qt with aqtinstall
       run: |
         pip install aqtinstall
-        # Install Qt 6.10.0 for Linux
-        aqt install-qt linux desktop 6.10.0 gcc_64
+        # Install Qt 6.8.1 for Linux (6.10.0 not available yet)
+        aqt install-qt linux desktop 6.8.1 gcc_64
     
     - name: Set environment variables
       run: |
-        echo "Qt6_DIR=${{ github.workspace }}/6.10.0/gcc_64" >> $GITHUB_ENV
-        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.10.0/gcc_64" >> $GITHUB_ENV
-        echo "${{ github.workspace }}/6.10.0/gcc_64/bin" >> $GITHUB_PATH
-        echo "LD_LIBRARY_PATH=${{ github.workspace }}/6.10.0/gcc_64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/gcc_64" >> $GITHUB_ENV
+        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/gcc_64" >> $GITHUB_ENV
+        echo "${{ github.workspace }}/6.8.1/gcc_64/bin" >> $GITHUB_PATH
+        echo "LD_LIBRARY_PATH=${{ github.workspace }}/6.8.1/gcc_64/lib:$LD_LIBRARY_PATH" >> $GITHUB_ENV
     
     - name: Verify installation
       run: |
@@ -88,7 +88,7 @@ jobs:
         cmake -S . -B build \
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.10.0/gcc_64" \
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/gcc_64" \
           -DCMAKE_INSTALL_PREFIX=/usr
         
         echo -e "\n=== CMake Configuration ==="
@@ -178,8 +178,8 @@ jobs:
         chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
         
         # Set Qt path for the plugin
-        export QMAKE=${{ github.workspace }}/6.10.0/gcc_64/bin/qmake
-        export LD_LIBRARY_PATH=${{ github.workspace }}/6.10.0/gcc_64/lib:$LD_LIBRARY_PATH
+        export QMAKE=${{ github.workspace }}/6.8.1/gcc_64/bin/qmake
+        export LD_LIBRARY_PATH=${{ github.workspace }}/6.8.1/gcc_64/lib:$LD_LIBRARY_PATH
         
         # Deploy Qt dependencies
         echo "Deploying Qt dependencies..."
@@ -361,7 +361,7 @@ jobs:
          It supports various game formats and provides an intuitive
          interface for translation workflows.
          .
-         Built with Qt 6.10.0
+         Built with Qt 6.8.1
         CONTROLEOF
         
         # Create postinst script
@@ -448,7 +448,7 @@ jobs:
         It supports various game formats and provides an intuitive
         interface for translation workflows.
         
-        Built with Qt 6.10.0
+        Built with Qt 6.8.1
         
         %prep
         %setup -q
@@ -493,7 +493,7 @@ jobs:
         %changelog
         * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
         - Release version 0.4.3
-        - Built with Qt 6.10.0
+        - Built with Qt 6.8.1
         SPECEOF
         
         # Build RPM
