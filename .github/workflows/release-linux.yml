@@ -49,7 +49,11 @@ jobs:
           libxcb-util0-dev \
           libxkbcommon-dev \
           libxkbcommon-x11-dev \
-          librsvg2-bin
+          librsvg2-bin \
+          # Add Wayland development packages
+          libwayland-dev \
+          wayland-protocols \
+          pkg-config
     
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -59,6 +63,8 @@ jobs:
         arch: 'linux_gcc_64'
         cache: true
         install-deps: true
+        # Add Wayland module
+        modules: 'qtwayland'
     
     - name: Verify installation
       run: |
@@ -73,6 +79,9 @@ jobs:
         
         echo -e "\n=== CMake ==="
         cmake --version
+        
+        echo -e "\n=== Qt Wayland plugins ==="
+        find $Qt6_DIR -name "*wayland*" -type f | head -10
     
     - name: Configure CMake
       run: |
@@ -174,6 +183,10 @@ jobs:
         export QT_PLUGIN_PATH="${HERE}/usr/plugins"
         export QML_IMPORT_PATH="${HERE}/usr/qml"
         export QML2_IMPORT_PATH="${HERE}/usr/qml"
+        # Add Wayland platform plugin path
+        export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/plugins/platforms"
+        # Allow fallback to X11 if Wayland fails
+        export QT_QPA_PLATFORM="wayland;xcb"
         exec "${HERE}/usr/bin/NST" "$@"
         EOF
         chmod +x AppRun
@@ -212,6 +225,43 @@ jobs:
         echo -e "\n=== Deployment completed ==="
         echo "Libraries in usr/lib:"
         ls -lh usr/lib/ | head -20
+        
+        # Ensure Wayland plugins are included
+        echo -e "\n=== Checking for Wayland plugins ==="
+        if [ -d "${{ env.Qt6_DIR }}/plugins/platforms" ]; then
+          echo "Found Qt platform plugins directory"
+          ls -la "${{ env.Qt6_DIR }}/plugins/platforms" | grep wayland || echo "No Wayland plugins found in Qt installation"
+          
+          # Create platforms directory if it doesn't exist
+          mkdir -p usr/plugins/platforms
+          
+          # Copy Wayland plugins if they exist
+          for plugin in libqwayland-egl.so libqwayland-generic.so libqwayland-xcomposite-egl.so libqwayland-xcomposite-glx.so; do
+            if [ -f "${{ env.Qt6_DIR }}/plugins/platforms/$plugin" ]; then
+              echo "Copying $plugin"
+              cp "${{ env.Qt6_DIR }}/plugins/platforms/$plugin" usr/plugins/platforms/
+            else
+              echo "Warning: $plugin not found in Qt installation"
+            fi
+          done
+          
+          # Also copy libqwayland-shell-integration.so if it exists
+          if [ -f "${{ env.Qt6_DIR }}/plugins/wayland-shell-integration/libqwayland-shell-integration.so" ]; then
+            mkdir -p usr/plugins/wayland-shell-integration
+            cp "${{ env.Qt6_DIR }}/plugins/wayland-shell-integration/libqwayland-shell-integration.so" usr/plugins/wayland-shell-integration/
+          fi
+          
+          # Copy wayland-decoration-client if it exists
+          if [ -f "${{ env.Qt6_DIR }}/plugins/wayland-decoration-client/libqt-wayland-decoration-client.so" ]; then
+            mkdir -p usr/plugins/wayland-decoration-client
+            cp "${{ env.Qt6_DIR }}/plugins/wayland-decoration-client/libqt-wayland-decoration-client.so" usr/plugins/wayland-decoration-client/
+          fi
+        else
+          echo "Qt platform plugins directory not found"
+        fi
+        
+        echo -e "\n=== Final platform plugins ==="
+        ls -la usr/plugins/platforms/ | grep -E "(wayland|libqwayland)" || echo "No Wayland plugins found"
     
     - name: Create AppImage
       run: |
@@ -255,6 +305,7 @@ jobs:
         - /usr/share/applications/nst.desktop (desktop entry)
         - /usr/share/icons/ (application icon)
         - /usr/bin/ (required libraries)
+        - /usr/plugins/platforms/ (Qt platform plugins including Wayland support)
         
         Uninstallation:
         ---------------
@@ -269,6 +320,7 @@ jobs:
         - Linux x86_64
         - glibc 2.31+
         - libGL, libxcb, libxkbcommon
+        - Wayland libraries (for Wayland support)
         EOF
         
         cat > NST-0.4.3/install.sh << 'EOF'
@@ -302,6 +354,7 @@ jobs:
         echo ""
         echo "Installation complete!"
         echo "You can now run 'NST' from terminal or find it in your applications menu."
+        echo "The application supports both X11 and Wayland display servers."
         EOF
         chmod +x NST-0.4.3/install.sh
         
@@ -323,6 +376,8 @@ jobs:
         rm -f /usr/share/applications/nst.desktop
         rm -f /usr/share/icons/hicolor/*/apps/nst.png
         rm -f /usr/share/icons/hicolor/scalable/apps/nst.svg
+        rm -rf /usr/plugins/platforms/libqwayland*
+        rm -rf /usr/plugins/wayland-*
         
         if command -v update-desktop-database >/dev/null 2>&1; then
             echo "Updating desktop database..."
@@ -357,7 +412,7 @@ jobs:
         Section: utils
         Priority: optional
         Architecture: amd64
-        Depends: libc6 (>= 2.31), libstdc++6 (>= 10), libgcc1, libgl1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libfontconfig1, libfreetype6, libdbus-1-3
+        Depends: libc6 (>= 2.31), libstdc++6 (>= 10), libgcc1, libgl1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libfontconfig1, libfreetype6, libdbus-1-3, libwayland-client0, libwayland-cursor0, libwayland-egl1
         Maintainer: NST Ghost <you@example.com>
         Description: A tool for translating video games
          NST is a powerful tool for translating video games.
@@ -365,6 +420,7 @@ jobs:
          interface for translation workflows.
          .
          Built with Qt 6.7.3
+         Supports both X11 and Wayland display servers.
         EOF
         
         cat > nst-deb/DEBIAN/postinst << 'EOF'
@@ -407,9 +463,9 @@ jobs:
         
         echo -e "\n=== DEB package created ==="
         ls -lh NST-0.4.3-Linux-x86_64.deb
-        dpkg-deb --info NST-0.4.3-Linux-x86_64.deb
+        dpkg-deb --info NST-0.4.3-Linux_x86_64.deb
         echo -e "\n=== DEB contents ==="
-        dpkg-deb --contents NST-0.4.3-Linux-x86_64.deb | head -20
+        dpkg-deb --contents NST-0.4.3-Linux_x86_64.deb | head -20
     
     - name: Create RPM package
       run: |
@@ -467,7 +523,7 @@ jobs:
         
         BuildArch:      x86_64
         
-        Requires:       glibc >= 2.31, libstdc++ >= 10, libgcc, libGL, libxcb, libxkbcommon, fontconfig, freetype, dbus-libs
+        Requires:       glibc >= 2.31, libstdc++ >= 10, libgcc, libGL, libxcb, libxkbcommon, fontconfig, freetype, dbus-libs, wayland, wayland-egl
         
         %description
         NST is a powerful tool for translating video games.
@@ -475,6 +531,7 @@ jobs:
         interface for translation workflows.
         
         Built with Qt 6.7.3
+        Supports both X11 and Wayland display servers.
         
         %prep
         %setup -q
@@ -513,6 +570,7 @@ jobs:
         * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
         - Release version 0.4.3
         - Built with Qt 6.7.3
+        - Added Wayland support
         EOF
         
         echo "=== Generated RPM spec file ==="
@@ -520,11 +578,11 @@ jobs:
         
         rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
         
-        find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-0.4.3-Linux-x86_64.rpm \;
+        find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-0.4.3-Linux_x86_64.rpm \;
         
         echo -e "\n=== RPM package created ==="
-        ls -lh NST-0.4.3-Linux-x86_64.rpm
-        rpm -qpi NST-0.4.3-Linux-x86_64.rpm
+        ls -lh NST-0.4.3-Linux_x86_64.rpm
+        rpm -qpi NST-0.4.3-Linux_x86_64.rpm
     
     - name: Verify all packages
       run: |
@@ -542,6 +600,13 @@ jobs:
         echo "tar.gz: Manual installation with install.sh"
         echo "DEB: For Debian/Ubuntu (dpkg -i or apt install)"
         echo "RPM: For Fedora/RHEL/CentOS (rpm -i or dnf install)"
+        
+        echo -e "\n=== Wayland plugin verification ==="
+        echo "Checking AppImage for Wayland plugins:"
+        if [ -f "NST-0.4.3-x86_64.AppImage" ]; then
+          ./NST-0.4.3-x86_64.AppImage --appimage-extract
+          find squashfs-root -name "*wayland*" -type f || echo "No Wayland plugins found in AppImage"
+        fi
     
     - name: Upload AppImage
       uses: actions/upload-artifact@v4
@@ -561,12 +626,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: NST-0.4.3-Linux-x86_64-deb
-        path: NST-0.4.3-Linux-x86_64.deb
+        path: NST-0.4.3-Linux_x86_64.deb
         if-no-files-found: error
     
     - name: Upload RPM
       uses: actions/upload-artifact@v4
       with:
         name: NST-0.4.3-Linux-x86_64-rpm
-        path: NST-0.4.3-Linux-x86_64.rpm
+        path: NST-0.4.3-Linux_x86_64.rpm
         if-no-files-found: error
