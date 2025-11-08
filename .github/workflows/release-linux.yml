@@ -80,13 +80,13 @@ jobs:
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
-          -DCMAKE_INSTALL_PREFIX=/usr \
+          -DCMAKE_INSTALL_PREFIX=/opt/nst \
           -DQT_DEPLOY_SUPPORT=OFF \
           -DSKIP_QT_DEPLOY=ON
         
         echo -e "\n=== CMake Configuration ==="
         echo "Build Type: Release"
-        echo "Install Prefix: /usr"
+        echo "Install Prefix: /opt/nst"
     
     - name: Build
       run: cmake --build build --config Release --parallel $(nproc)
@@ -102,24 +102,29 @@ jobs:
     
     - name: Install to staging directory
       run: |
-        mkdir -p AppDir/usr/bin
+        mkdir -p AppDir/opt/nst/bin
+        mkdir -p AppDir/opt/nst/lib
         mkdir -p AppDir/usr/share/applications
         mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
-        mkdir -p AppDir/usr/lib/x86_64-linux-gnu
         
         cd build
         
-        install -D -m 755 NST ../AppDir/usr/bin/NST
-        install -D -m 755 BGA/libBGACore.so ../AppDir/usr/bin/libBGACore.so
-        install -D -m 755 QtLingo/libQtLingo.so ../AppDir/usr/bin/libQtLingo.so
+        install -D -m 755 NST ../AppDir/opt/nst/bin/NST
+        install -D -m 755 BGA/libBGACore.so ../AppDir/opt/nst/lib/libBGACore.so
+        install -D -m 755 QtLingo/libQtLingo.so ../AppDir/opt/nst/lib/libQtLingo.so
         
         cd ..
         
         install -D -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/nst.desktop
         install -D -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg
         
+        # Update desktop file to use /opt/nst path
+        sed -i 's|Exec=NST|Exec=/opt/nst/bin/NST|g' AppDir/usr/share/applications/nst.desktop
+        
         echo "Installation completed, checking files..."
-        ls -la AppDir/usr/bin/
+        ls -la AppDir/opt/nst/bin/
+        echo ""
+        ls -la AppDir/opt/nst/lib/
         echo ""
         echo "Desktop file:"
         ls -la AppDir/usr/share/applications/
@@ -131,14 +136,14 @@ jobs:
       run: |
         cd AppDir
         
-        if [ ! -f "usr/bin/NST" ]; then
-          echo "Error: NST binary not found at usr/bin/NST"
+        if [ ! -f "opt/nst/bin/NST" ]; then
+          echo "Error: NST binary not found at opt/nst/bin/NST"
           echo "Contents of AppDir:"
           find . -type f
           exit 1
         fi
         
-        echo "Found NST binary at: usr/bin/NST"
+        echo "Found NST binary at: opt/nst/bin/NST"
         
         if [ -f "usr/share/icons/hicolor/scalable/apps/nst.svg" ]; then
           echo "Converting SVG icon to PNG sizes..."
@@ -169,12 +174,12 @@ jobs:
         #!/bin/bash
         SELF=$(readlink -f "$0")
         HERE=${SELF%/*}
-        export PATH="${HERE}/usr/bin:${PATH}"
-        export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
-        export QT_PLUGIN_PATH="${HERE}/usr/plugins"
-        export QML_IMPORT_PATH="${HERE}/usr/qml"
-        export QML2_IMPORT_PATH="${HERE}/usr/qml"
-        exec "${HERE}/usr/bin/NST" "$@"
+        export PATH="${HERE}/opt/nst/bin:${PATH}"
+        export LD_LIBRARY_PATH="${HERE}/opt/nst/lib:${LD_LIBRARY_PATH}"
+        export QT_PLUGIN_PATH="${HERE}/opt/nst/plugins"
+        export QML_IMPORT_PATH="${HERE}/opt/nst/qml"
+        export QML2_IMPORT_PATH="${HERE}/opt/nst/qml"
+        exec "${HERE}/opt/nst/bin/NST" "$@"
         EOF
         chmod +x AppRun
         
@@ -206,12 +211,37 @@ jobs:
         wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
         chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
         
-        echo "Deploying Qt dependencies..."
-        ./linuxdeploy-x86_64.AppImage --appdir . --plugin qt || true
+        # Set environment for linuxdeploy to use /opt/nst structure
+        export DEPLOY_PREFIX=/opt/nst
+        
+        echo "Deploying Qt dependencies to /opt/nst..."
+        ./linuxdeploy-x86_64.AppImage \
+          --appdir . \
+          --executable opt/nst/bin/NST \
+          --library opt/nst/lib/libBGACore.so \
+          --library opt/nst/lib/libQtLingo.so \
+          --plugin qt \
+          --output appimage || true
+        
+        # Move Qt files from usr to opt/nst if linuxdeploy put them in usr
+        if [ -d "usr/lib" ]; then
+          mkdir -p opt/nst/lib
+          cp -r usr/lib/* opt/nst/lib/ 2>/dev/null || true
+        fi
+        
+        if [ -d "usr/plugins" ]; then
+          mkdir -p opt/nst/plugins
+          cp -r usr/plugins/* opt/nst/plugins/ 2>/dev/null || true
+        fi
+        
+        if [ -d "usr/qml" ]; then
+          mkdir -p opt/nst/qml
+          cp -r usr/qml/* opt/nst/qml/ 2>/dev/null || true
+        fi
         
         echo -e "\n=== Deployment completed ==="
-        echo "Libraries in usr/lib:"
-        ls -lh usr/lib/ | head -20
+        echo "Libraries in opt/nst/lib:"
+        ls -lh opt/nst/lib/ | head -20
     
     - name: Create AppImage
       run: |
@@ -251,10 +281,10 @@ jobs:
         Run: sudo ./install.sh
         
         This will copy files to:
-        - /usr/bin/NST (executable)
+        - /opt/nst/ (application directory)
         - /usr/share/applications/nst.desktop (desktop entry)
         - /usr/share/icons/ (application icon)
-        - /usr/bin/ (required libraries)
+        - /usr/local/bin/nst (symbolic link for terminal access)
         
         Uninstallation:
         ---------------
@@ -283,11 +313,17 @@ jobs:
         fi
         
         echo "Copying files..."
-        cp -r usr/* /usr/
+        mkdir -p /opt/nst
+        cp -r opt/nst/* /opt/nst/
         
-        chmod +x /usr/bin/NST
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+        cp -r usr/share/* /usr/share/
+        
+        # Create symbolic link in /usr/local/bin for easy terminal access
+        mkdir -p /usr/local/bin
+        ln -sf /opt/nst/bin/NST /usr/local/bin/nst
+        
+        chmod +x /opt/nst/bin/NST
+        chmod +x /opt/nst/lib/*.so* 2>/dev/null || true
         
         if command -v update-desktop-database >/dev/null 2>&1; then
             echo "Updating desktop database..."
@@ -301,7 +337,11 @@ jobs:
         
         echo ""
         echo "Installation complete!"
-        echo "You can now run 'NST' from terminal or find it in your applications menu."
+        echo "You can now run:"
+        echo "  - 'nst' from terminal"
+        echo "  - Or find 'NST' in your applications menu"
+        echo ""
+        echo "All application files are in: /opt/nst"
         EOF
         chmod +x NST-0.4.3/install.sh
         
@@ -317,9 +357,8 @@ jobs:
         fi
         
         echo "Removing files..."
-        rm -f /usr/bin/NST
-        rm -f /usr/bin/libBGACore.so*
-        rm -f /usr/bin/libQtLingo.so*
+        rm -rf /opt/nst
+        rm -f /usr/local/bin/nst
         rm -f /usr/share/applications/nst.desktop
         rm -f /usr/share/icons/hicolor/*/apps/nst.png
         rm -f /usr/share/icons/hicolor/scalable/apps/nst.svg
@@ -347,9 +386,12 @@ jobs:
     - name: Create DEB package
       run: |
         mkdir -p nst-deb/DEBIAN
-        mkdir -p nst-deb/usr
+        mkdir -p nst-deb/opt
+        mkdir -p nst-deb/usr/share
+        mkdir -p nst-deb/usr/local/bin
         
-        cp -r AppDir/usr/* nst-deb/usr/
+        cp -r AppDir/opt/* nst-deb/opt/
+        cp -r AppDir/usr/share/* nst-deb/usr/share/
         
         cat > nst-deb/DEBIAN/control << 'EOF'
         Package: nst
@@ -365,15 +407,19 @@ jobs:
          interface for translation workflows.
          .
          Built with Qt 6.7.3
+         .
+         Installed to /opt/nst
         EOF
         
         cat > nst-deb/DEBIAN/postinst << 'EOF'
         #!/bin/bash
         set -e
         
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+        chmod +x /opt/nst/bin/NST || true
+        chmod +x /opt/nst/lib/*.so* 2>/dev/null || true
+        
+        # Create symbolic link
+        ln -sf /opt/nst/bin/NST /usr/local/bin/nst 2>/dev/null || true
         
         if command -v update-desktop-database >/dev/null 2>&1; then
             update-desktop-database /usr/share/applications 2>/dev/null || true
@@ -390,6 +436,8 @@ jobs:
         cat > nst-deb/DEBIAN/postrm << 'EOF'
         #!/bin/bash
         set -e
+        
+        rm -f /usr/local/bin/nst 2>/dev/null || true
         
         if command -v update-desktop-database >/dev/null 2>&1; then
             update-desktop-database /usr/share/applications 2>/dev/null || true
@@ -415,45 +463,22 @@ jobs:
       run: |
         mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
         
-        mkdir -p nst-rpm-source/nst-0.4.3/usr
-        cp -r AppDir/usr/* nst-rpm-source/nst-0.4.3/usr/
+        mkdir -p nst-rpm-source/nst-0.4.3/opt
+        mkdir -p nst-rpm-source/nst-0.4.3/usr/share
+        cp -r AppDir/opt/* nst-rpm-source/nst-0.4.3/opt/
+        cp -r AppDir/usr/share/* nst-rpm-source/nst-0.4.3/usr/share/
         cd nst-rpm-source
         tar -czf ~/rpmbuild/SOURCES/nst-0.4.3.tar.gz nst-0.4.3/
         cd ..
         
         # Check what directories exist
         echo "=== Checking AppDir structure for RPM ==="
-        ls -la AppDir/usr/
+        ls -la AppDir/opt/nst/
         
         # Build file list dynamically
-        FILES_LIST="/usr/bin/*
+        FILES_LIST="/opt/nst/*
         /usr/share/applications/nst.desktop
         /usr/share/icons/hicolor/*/apps/nst.*"
-        
-        if [ -d "AppDir/usr/lib" ] && [ "$(ls -A AppDir/usr/lib 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/lib/*"
-        fi
-        
-        if [ -d "AppDir/usr/plugins" ] && [ "$(ls -A AppDir/usr/plugins 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/plugins/*"
-        fi
-        
-        if [ -d "AppDir/usr/qml" ] && [ "$(ls -A AppDir/usr/qml 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/qml/*"
-        fi
-        
-        if [ -d "AppDir/usr/translations" ] && [ "$(ls -A AppDir/usr/translations 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/translations/*"
-        fi
-        
-        if [ -d "AppDir/usr/share/doc" ] && [ "$(ls -A AppDir/usr/share/doc 2>/dev/null)" ]; then
-          FILES_LIST="$FILES_LIST
-        /usr/share/doc/*"
-        fi
         
         cat > ~/rpmbuild/SPECS/nst.spec << EOF
         Name:           nst
@@ -482,12 +507,16 @@ jobs:
         %install
         rm -rf \$RPM_BUILD_ROOT
         mkdir -p \$RPM_BUILD_ROOT
+        cp -r opt \$RPM_BUILD_ROOT/
         cp -r usr \$RPM_BUILD_ROOT/
         
         %post
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+        chmod +x /opt/nst/bin/NST || true
+        chmod +x /opt/nst/lib/*.so* 2>/dev/null || true
+        
+        # Create symbolic link
+        mkdir -p /usr/local/bin
+        ln -sf /opt/nst/bin/NST /usr/local/bin/nst 2>/dev/null || true
         
         if command -v update-desktop-database >/dev/null 2>&1; then
             update-desktop-database /usr/share/applications 2>/dev/null || true
@@ -498,6 +527,8 @@ jobs:
         fi
         
         %postun
+        rm -f /usr/local/bin/nst 2>/dev/null || true
+        
         if command -v update-desktop-database >/dev/null 2>&1; then
             update-desktop-database /usr/share/applications 2>/dev/null || true
         fi
