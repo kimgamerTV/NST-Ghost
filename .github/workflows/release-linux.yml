@@ -80,7 +80,8 @@ jobs:
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
-          -DCMAKE_INSTALL_PREFIX=/usr
+          -DCMAKE_INSTALL_PREFIX=/usr \
+          -DQT_DEPLOY_SUPPORT=OFF
         
         echo -e "\n=== CMake Configuration ==="
         echo "Build Type: Release"
