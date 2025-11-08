@@ -91,6 +91,15 @@ jobs:
     - name: Build
       run: cmake --build build --config Release --parallel $(nproc)
     
+    - name: Verify build output
+      run: |
+        echo "=== Build directory structure ==="
+        find build -name "*.so" -o -name "NST" -type f
+        echo ""
+        echo "=== Checking library locations ==="
+        ls -la build/BGA/ || true
+        ls -la build/QtLingo/ || true
+    
     - name: Install to staging directory
       run: |
         # Create AppDir structure first
@@ -105,8 +114,8 @@ jobs:
         # Install NST executable
         install -D -m 755 NST ../AppDir/usr/bin/NST
         
-        # Install libraries
-        install -D -m 755 BGA/core/libBGACore.so ../AppDir/usr/bin/libBGACore.so
+        # Install libraries - FIXED PATHS
+        install -D -m 755 BGA/libBGACore.so ../AppDir/usr/bin/libBGACore.so
         install -D -m 755 QtLingo/libQtLingo.so ../AppDir/usr/bin/libQtLingo.so
         
         cd ..
@@ -170,16 +179,16 @@ jobs:
         
         # Create AppRun script
         cat > AppRun << 'APPRUNEOF'
-        #!/bin/bash
-        SELF=$(readlink -f "$0")
-        HERE=${SELF%/*}
-        export PATH="${HERE}/usr/bin:${PATH}"
-        export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
-        export QT_PLUGIN_PATH="${HERE}/usr/plugins"
-        export QML_IMPORT_PATH="${HERE}/usr/qml"
-        export QML2_IMPORT_PATH="${HERE}/usr/qml"
-        exec "${HERE}/usr/bin/NST" "$@"
-        APPRUNEOF
+#!/bin/bash
+SELF=$(readlink -f "$0")
+HERE=${SELF%/*}
+export PATH="${HERE}/usr/bin:${PATH}"
+export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+export QT_PLUGIN_PATH="${HERE}/usr/plugins"
+export QML_IMPORT_PATH="${HERE}/usr/qml"
+export QML2_IMPORT_PATH="${HERE}/usr/qml"
+exec "${HERE}/usr/bin/NST" "$@"
+APPRUNEOF
         chmod +x AppRun
         
         # Create symbolic links for AppImage (required in root of AppDir)
@@ -259,111 +268,111 @@ jobs:
         
         # Create README
         cat > NST-0.4.3/README.txt << 'READMEEOF'
-        NST v0.4.3 - A tool for translating video games
-        ================================================
-        
-        Installation:
-        -------------
-        Run: sudo ./install.sh
-        
-        This will copy files to:
-        - /usr/bin/NST (executable)
-        - /usr/share/applications/nst.desktop (desktop entry)
-        - /usr/share/icons/ (application icon)
-        - /usr/bin/ (required libraries)
-        
-        Uninstallation:
-        ---------------
-        Run: sudo ./uninstall.sh
-        
-        Manual Run (without installation):
-        -----------------------------------
-        ./AppRun
-        
-        Requirements:
-        -------------
-        - Linux x86_64
-        - glibc 2.31+
-        - libGL, libxcb, libxkbcommon
-        
-        READMEEOF
+NST v0.4.3 - A tool for translating video games
+================================================
+
+Installation:
+-------------
+Run: sudo ./install.sh
+
+This will copy files to:
+- /usr/bin/NST (executable)
+- /usr/share/applications/nst.desktop (desktop entry)
+- /usr/share/icons/ (application icon)
+- /usr/bin/ (required libraries)
+
+Uninstallation:
+---------------
+Run: sudo ./uninstall.sh
+
+Manual Run (without installation):
+-----------------------------------
+./AppRun
+
+Requirements:
+-------------
+- Linux x86_64
+- glibc 2.31+
+- libGL, libxcb, libxkbcommon
+
+READMEEOF
         
         # Create installation script
         cat > NST-0.4.3/install.sh << 'INSTALLEOF'
-        #!/bin/bash
-        set -e
-        
-        echo "Installing NST v0.4.3..."
-        
-        # Check if running as root
-        if [ "$EUID" -ne 0 ]; then 
-            echo "Please run as root (use sudo)"
-            exit 1
-        fi
-        
-        # Copy files
-        echo "Copying files..."
-        cp -r usr/* /usr/
-        
-        # Set permissions
-        chmod +x /usr/bin/NST
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        # Update desktop database
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            echo "Updating desktop database..."
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        # Update icon cache
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            echo "Updating icon cache..."
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        echo ""
-        echo "Installation complete!"
-        echo "You can now run 'NST' from terminal or find it in your applications menu."
-        INSTALLEOF
+#!/bin/bash
+set -e
+
+echo "Installing NST v0.4.3..."
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo "Please run as root (use sudo)"
+    exit 1
+fi
+
+# Copy files
+echo "Copying files..."
+cp -r usr/* /usr/
+
+# Set permissions
+chmod +x /usr/bin/NST
+chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
+chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+
+# Update desktop database
+if command -v update-desktop-database >/dev/null 2>&1; then
+    echo "Updating desktop database..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+# Update icon cache
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    echo "Updating icon cache..."
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+echo ""
+echo "Installation complete!"
+echo "You can now run 'NST' from terminal or find it in your applications menu."
+INSTALLEOF
         chmod +x NST-0.4.3/install.sh
         
         # Create uninstall script
         cat > NST-0.4.3/uninstall.sh << 'UNINSTALLEOF'
-        #!/bin/bash
-        set -e
-        
-        echo "Uninstalling NST..."
-        
-        # Check if running as root
-        if [ "$EUID" -ne 0 ]; then 
-            echo "Please run as root (use sudo)"
-            exit 1
-        fi
-        
-        # Remove files
-        echo "Removing files..."
-        rm -f /usr/bin/NST
-        rm -f /usr/bin/libBGACore.so*
-        rm -f /usr/bin/libQtLingo.so*
-        rm -f /usr/share/applications/nst.desktop
-        rm -f /usr/share/icons/hicolor/*/apps/nst.png
-        rm -f /usr/share/icons/hicolor/scalable/apps/nst.svg
-        
-        # Update desktop database
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            echo "Updating desktop database..."
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        # Update icon cache
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            echo "Updating icon cache..."
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        echo "Uninstallation complete!"
-        UNINSTALLEOF
+#!/bin/bash
+set -e
+
+echo "Uninstalling NST..."
+
+# Check if running as root
+if [ "$EUID" -ne 0 ]; then 
+    echo "Please run as root (use sudo)"
+    exit 1
+fi
+
+# Remove files
+echo "Removing files..."
+rm -f /usr/bin/NST
+rm -f /usr/bin/libBGACore.so*
+rm -f /usr/bin/libQtLingo.so*
+rm -f /usr/share/applications/nst.desktop
+rm -f /usr/share/icons/hicolor/*/apps/nst.png
+rm -f /usr/share/icons/hicolor/scalable/apps/nst.svg
+
+# Update desktop database
+if command -v update-desktop-database >/dev/null 2>&1; then
+    echo "Updating desktop database..."
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+# Update icon cache
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    echo "Updating icon cache..."
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+echo "Uninstallation complete!"
+UNINSTALLEOF
         chmod +x NST-0.4.3/uninstall.sh
         
         # Create archive
@@ -383,62 +392,62 @@ jobs:
         
         # Create control file
         cat > nst-deb/DEBIAN/control << 'CONTROLEOF'
-        Package: nst
-        Version: 0.4.3
-        Section: utils
-        Priority: optional
-        Architecture: amd64
-        Depends: libc6 (>= 2.31), libstdc++6 (>= 10), libgcc1, libgl1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libfontconfig1, libfreetype6, libdbus-1-3
-        Maintainer: NST Ghost <you@example.com>
-        Description: A tool for translating video games
-         NST is a powerful tool for translating video games.
-         It supports various game formats and provides an intuitive
-         interface for translation workflows.
-         .
-         Built with Qt 6.7.3
-        CONTROLEOF
+Package: nst
+Version: 0.4.3
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: libc6 (>= 2.31), libstdc++6 (>= 10), libgcc1, libgl1, libxcb1, libxkbcommon0, libxkbcommon-x11-0, libfontconfig1, libfreetype6, libdbus-1-3
+Maintainer: NST Ghost <you@example.com>
+Description: A tool for translating video games
+ NST is a powerful tool for translating video games.
+ It supports various game formats and provides an intuitive
+ interface for translation workflows.
+ .
+ Built with Qt 6.7.3
+CONTROLEOF
         
         # Create postinst script
         cat > nst-deb/DEBIAN/postinst << 'POSTINSTEOF'
-        #!/bin/bash
-        set -e
-        
-        # Set permissions
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        # Update desktop database
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        # Update icon cache
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        exit 0
-        POSTINSTEOF
+#!/bin/bash
+set -e
+
+# Set permissions
+chmod +x /usr/bin/NST || true
+chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
+chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+
+# Update desktop database
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+# Update icon cache
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+exit 0
+POSTINSTEOF
         chmod +x nst-deb/DEBIAN/postinst
         
         # Create postrm script
         cat > nst-deb/DEBIAN/postrm << 'POSTRMEOF'
-        #!/bin/bash
-        set -e
-        
-        # Update desktop database
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        # Update icon cache
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        exit 0
-        POSTRMEOF
+#!/bin/bash
+set -e
+
+# Update desktop database
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+# Update icon cache
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+exit 0
+POSTRMEOF
         chmod +x nst-deb/DEBIAN/postrm
         
         # Build DEB package
@@ -464,71 +473,71 @@ jobs:
         
         # Create RPM spec file
         cat > ~/rpmbuild/SPECS/nst.spec << 'SPECEOF'
-        Name:           nst
-        Version:        0.4.3
-        Release:        1%{?dist}
-        Summary:        A tool for translating video games
-        
-        License:        MIT
-        URL:            https://github.com/yourusername/nst
-        Source0:        %{name}-%{version}.tar.gz
-        
-        BuildArch:      x86_64
-        
-        Requires:       glibc >= 2.31, libstdc++ >= 10, libgcc, libGL, libxcb, libxkbcommon, fontconfig, freetype, dbus-libs
-        
-        %description
-        NST is a powerful tool for translating video games.
-        It supports various game formats and provides an intuitive
-        interface for translation workflows.
-        
-        Built with Qt 6.7.3
-        
-        %prep
-        %setup -q
-        
-        %install
-        rm -rf $RPM_BUILD_ROOT
-        mkdir -p $RPM_BUILD_ROOT
-        cp -r usr $RPM_BUILD_ROOT/
-        
-        %post
-        chmod +x /usr/bin/NST || true
-        chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
-        chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
-        
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        %postun
-        if command -v update-desktop-database >/dev/null 2>&1; then
-            update-desktop-database /usr/share/applications 2>/dev/null || true
-        fi
-        
-        if command -v gtk-update-icon-cache >/dev/null 2>&1; then
-            gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
-        fi
-        
-        %files
-        /usr/bin/NST
-        /usr/bin/libBGACore.so*
-        /usr/bin/libQtLingo.so*
-        /usr/share/applications/nst.desktop
-        /usr/share/icons/hicolor/*/apps/nst.*
-        /usr/lib/*
-        /usr/plugins/*
-        /usr/qml/*
-        
-        %changelog
-        * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
-        - Release version 0.4.3
-        - Built with Qt 6.7.3
-        SPECEOF
+Name:           nst
+Version:        0.4.3
+Release:        1%{?dist}
+Summary:        A tool for translating video games
+
+License:        MIT
+URL:            https://github.com/yourusername/nst
+Source0:        %{name}-%{version}.tar.gz
+
+BuildArch:      x86_64
+
+Requires:       glibc >= 2.31, libstdc++ >= 10, libgcc, libGL, libxcb, libxkbcommon, fontconfig, freetype, dbus-libs
+
+%description
+NST is a powerful tool for translating video games.
+It supports various game formats and provides an intuitive
+interface for translation workflows.
+
+Built with Qt 6.7.3
+
+%prep
+%setup -q
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
+cp -r usr $RPM_BUILD_ROOT/
+
+%post
+chmod +x /usr/bin/NST || true
+chmod +x /usr/bin/libBGACore.so* 2>/dev/null || true
+chmod +x /usr/bin/libQtLingo.so* 2>/dev/null || true
+
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+%postun
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database /usr/share/applications 2>/dev/null || true
+fi
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor 2>/dev/null || true
+fi
+
+%files
+/usr/bin/NST
+/usr/bin/libBGACore.so*
+/usr/bin/libQtLingo.so*
+/usr/share/applications/nst.desktop
+/usr/share/icons/hicolor/*/apps/nst.*
+/usr/lib/*
+/usr/plugins/*
+/usr/qml/*
+
+%changelog
+* Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
+- Release version 0.4.3
+- Built with Qt 6.7.3
+SPECEOF
         
         # Build RPM
         rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
