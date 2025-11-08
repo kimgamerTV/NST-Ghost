@@ -426,9 +426,7 @@ jobs:
         ls -la AppDir/usr/
         
         # Build file list dynamically
-        FILES_LIST="/usr/bin/NST
-        /usr/bin/libBGACore.so*
-        /usr/bin/libQtLingo.so*
+        FILES_LIST="/usr/bin/*
         /usr/share/applications/nst.desktop
         /usr/share/icons/hicolor/*/apps/nst.*"
         
@@ -445,6 +443,16 @@ jobs:
         if [ -d "AppDir/usr/qml" ] && [ "$(ls -A AppDir/usr/qml 2>/dev/null)" ]; then
           FILES_LIST="$FILES_LIST
         /usr/qml/*"
+        fi
+        
+        if [ -d "AppDir/usr/translations" ] && [ "$(ls -A AppDir/usr/translations 2>/dev/null)" ]; then
+          FILES_LIST="$FILES_LIST
+        /usr/translations/*"
+        fi
+        
+        if [ -d "AppDir/usr/share/doc" ] && [ "$(ls -A AppDir/usr/share/doc 2>/dev/null)" ]; then
+          FILES_LIST="$FILES_LIST
+        /usr/share/doc/*"
         fi
         
         cat > ~/rpmbuild/SPECS/nst.spec << EOF
