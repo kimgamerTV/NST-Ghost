@@ -37,6 +37,7 @@ public slots:
 
 private slots:
     void onLoadingFinished();
+    void onProjectProcessingFinished();
     void openSearchDialog();
     void onSearchResultSelected(const QString &fileName, int row);
     void onOpenMockData();

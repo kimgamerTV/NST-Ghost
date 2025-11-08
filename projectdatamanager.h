@@ -8,6 +8,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QFutureWatcher>
+#include <QPair>
+#include <QSet>
+#include <QStringList>
 
 class ProjectDataManager : public QObject
 {
@@ -22,11 +25,18 @@ public slots:
     void onLoadingFinished(const QJsonArray &extractedTextsArray);
     void onFileSelected(const QModelIndex &index);
 
+private slots:
+    void onProcessingFinished();
+
+signals:
+    void processingFinished();
+
 private:
     QStringListModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
     QMap<QString, QJsonArray> m_loadedGameProjectData;
     QString m_currentLoadedFilePath;
+    QFutureWatcher<QPair<QMap<QString, QJsonArray>, QStringList>> m_processingFutureWatcher;
 };
 
 #endif // PROJECTDATAMANAGER_H

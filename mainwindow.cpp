@@ -20,6 +20,7 @@
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
+#include <QtConcurrent>
 
 #include "customprogressdialog.h"
 #include "loadprojectdialog.h"
@@ -79,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Setup Project Data Manager
     m_projectDataManager = new ProjectDataManager(m_fileListModel, m_translationModel, this);
+    connect(m_projectDataManager, &ProjectDataManager::processingFinished, this, &MainWindow::onProjectProcessingFinished);
 
     // Setup search controller
     m_searchController = new SearchController(m_translationModel, ui->translationTableView, this);
@@ -152,7 +154,10 @@ void MainWindow::onLoadingFinished()
 
     QJsonArray extractedTextsArray = m_loadFutureWatcher.result();
     m_projectDataManager->onLoadingFinished(extractedTextsArray);
+}
 
+void MainWindow::onProjectProcessingFinished()
+{
     if (!m_fileListModel->stringList().isEmpty()) {
         // Auto-select first file
         QModelIndex firstIndex = m_fileListModel->index(0, 0);

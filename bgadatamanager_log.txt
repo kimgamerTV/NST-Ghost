@@ -1,0 +1,16 @@
+BGADataManager: Creating analyzer for engine: RPGM
+BGADataManager: Calling analyzer->analyze for project: /home/jop/Downloads/A Struggle With Sin 0.6.1.0c/www
+BGADataManager: Analyzer output payload size:71704583bytes
+BGADataManager: Before QJsonDocument::fromJson
+BGADataManager: After QJsonDocument::fromJson
+BGADataManager: Extracted 318665 entries.
+BGADataManager: After extracting entries
+BGADataManager: loadStringsFromGameProject returning.
+BGADataManager: Creating analyzer for engine: RPGM
+BGADataManager: Calling analyzer->analyze for project: /home/jop/Downloads/A Struggle With Sin 0.6.1.0c/www
+BGADataManager: Analyzer output payload size:71704583bytes
+BGADataManager: Before QJsonDocument::fromJson
+BGADataManager: After QJsonDocument::fromJson
+BGADataManager: Extracted 318665 entries.
+BGADataManager: After extracting entries
+BGADataManager: loadStringsFromGameProject returning.

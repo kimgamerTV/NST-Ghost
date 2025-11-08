@@ -491,7 +491,7 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
 
     // ตรวจสอบว่ามีแต่ special characters หรือ symbols
     static QRegularExpression symbolOnlyPattern(
-        QStringLiteral("^[^a-zA-Z0-9\\u0E00-\\u0E7F\\u4E00-\\u9FFF\\u3040-\\u309F\\u30A0-\\u30FF]+$")
+        QStringLiteral("^[^a-zA-Z0-9\\p{Thai}\\p{Han}\\p{Hiragana}\\p{Katakana}]+$")
         );
     if (symbolOnlyPattern.match(text).hasMatch()) {
         return true;
