@@ -135,8 +135,11 @@ endif()
 install(FILES packaging/debian/nst.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 install(FILES packaging/icons/nst.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)
 
+# Option to skip Qt deployment (useful for AppImage/custom packaging)
+option(SKIP_QT_DEPLOY "Skip Qt deployment during install" OFF)
+
 # Use Qt's official deployment API (Qt 6.3+)
-if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
+if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3 AND NOT SKIP_QT_DEPLOY)
     qt_generate_deploy_app_script(
         TARGET NST
         OUTPUT_SCRIPT deploy_script
@@ -144,8 +147,8 @@ if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
     )
     install(SCRIPT ${deploy_script})
 else()
-    # Fallback for older Qt versions
-    if(WIN32)
+    # Fallback for older Qt versions or when SKIP_QT_DEPLOY is ON
+    if(WIN32 AND NOT SKIP_QT_DEPLOY)
         # Find windeployqt
         get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
         get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
@@ -223,7 +226,7 @@ else()
     endif()
     
     # macOS: Bundle Qt frameworks
-    if(APPLE)
+    if(APPLE AND NOT SKIP_QT_DEPLOY)
         get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
         get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
