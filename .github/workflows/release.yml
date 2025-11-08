@@ -219,8 +219,7 @@ jobs:
           else
             echo "Creating new release..."
             
-            RELEASE_BODY=$(cat <<'EOFBODY'
-# Release ${VERSION}
+            RELEASE_BODY="# Release ${VERSION}
 
 ## Downloads
 
@@ -241,34 +240,32 @@ jobs:
 
 ### Linux
 **AppImage (recommended):**
-```bash
+\`\`\`bash
 chmod +x NST-${VERSION}-x86_64.AppImage
 ./NST-${VERSION}-x86_64.AppImage
-```
+\`\`\`
 
 **tar.gz:**
-```bash
+\`\`\`bash
 tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
 cd NST-${VERSION}
 sudo ./install.sh
-```
+\`\`\`
 
 **DEB:**
-```bash
+\`\`\`bash
 sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
 sudo apt-get install -f
-```
+\`\`\`
 
 **RPM:**
-```bash
+\`\`\`bash
 sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
-```
+\`\`\`
 
 ## What's New
 
-See CHANGELOG.md for details.
-EOFBODY
-)
+See CHANGELOG.md for details."
             
             create_resp=$(curl -s -X POST \
               -H "Authorization: token ${GITHUB_TOKEN}" \
