@@ -421,7 +421,33 @@ jobs:
         tar -czf ~/rpmbuild/SOURCES/nst-0.4.3.tar.gz nst-0.4.3/
         cd ..
         
-        cat > ~/rpmbuild/SPECS/nst.spec << 'EOF'
+        # Check what directories exist
+        echo "=== Checking AppDir structure for RPM ==="
+        ls -la AppDir/usr/
+        
+        # Build file list dynamically
+        FILES_LIST="/usr/bin/NST
+        /usr/bin/libBGACore.so*
+        /usr/bin/libQtLingo.so*
+        /usr/share/applications/nst.desktop
+        /usr/share/icons/hicolor/*/apps/nst.*"
+        
+        if [ -d "AppDir/usr/lib" ] && [ "$(ls -A AppDir/usr/lib 2>/dev/null)" ]; then
+          FILES_LIST="$FILES_LIST
+        /usr/lib/*"
+        fi
+        
+        if [ -d "AppDir/usr/plugins" ] && [ "$(ls -A AppDir/usr/plugins 2>/dev/null)" ]; then
+          FILES_LIST="$FILES_LIST
+        /usr/plugins/*"
+        fi
+        
+        if [ -d "AppDir/usr/qml" ] && [ "$(ls -A AppDir/usr/qml 2>/dev/null)" ]; then
+          FILES_LIST="$FILES_LIST
+        /usr/qml/*"
+        fi
+        
+        cat > ~/rpmbuild/SPECS/nst.spec << EOF
         Name:           nst
         Version:        0.4.3
         Release:        1%{?dist}
@@ -446,9 +472,9 @@ jobs:
         %setup -q
         
         %install
-        rm -rf $RPM_BUILD_ROOT
-        mkdir -p $RPM_BUILD_ROOT
-        cp -r usr $RPM_BUILD_ROOT/
+        rm -rf \$RPM_BUILD_ROOT
+        mkdir -p \$RPM_BUILD_ROOT
+        cp -r usr \$RPM_BUILD_ROOT/
         
         %post
         chmod +x /usr/bin/NST || true
@@ -473,20 +499,16 @@ jobs:
         fi
         
         %files
-        /usr/bin/NST
-        /usr/bin/libBGACore.so*
-        /usr/bin/libQtLingo.so*
-        /usr/share/applications/nst.desktop
-        /usr/share/icons/hicolor/*/apps/nst.*
-        /usr/lib/*
-        /usr/plugins/*
-        /usr/qml/*
+        $FILES_LIST
         
         %changelog
         * Sat Nov 08 2025 NST Ghost <you@example.com> - 0.4.3-1
         - Release version 0.4.3
         - Built with Qt 6.7.3
         EOF
+        
+        echo "=== Generated RPM spec file ==="
+        cat ~/rpmbuild/SPECS/nst.spec
         
         rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
         
