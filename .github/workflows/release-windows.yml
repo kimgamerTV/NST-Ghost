@@ -25,8 +25,6 @@ jobs:
           perl pkg-config python3 python3-pip python3-mako ruby scons sed \
           unzip wget xz-utils
 
-
-
     - name: Set cache key date
       id: cache-date
       run: echo "month=$(date +'%Y-%m')" >> $GITHUB_OUTPUT
@@ -36,9 +34,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/mxe
-        key: mxe-qt6-static-v3-${{ runner.os }}-${{ steps.cache-date.outputs.month }}
+        key: mxe-qt6-host-static-v1-${{ runner.os }}-${{ steps.cache-date.outputs.month }}
         restore-keys: |
-          mxe-qt6-static-v3-${{ runner.os }}-
+          mxe-qt6-host-static-v1-${{ runner.os }}-
     
     - name: Clone MXE
       if: steps.cache-mxe.outputs.cache-hit != 'true'
@@ -53,39 +51,50 @@ jobs:
         echo "MXE_PLUGIN_DIRS := plugins/gcc13" >> settings.mk
         cat settings.mk
     
-    - name: Build MXE GCC toolchain
+    - name: Build MXE toolchain
       if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        make JOBS=$(nproc) gcc
+        # Build GCC first
+        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) gcc
       timeout-minutes: 90
     
-    - name: Build Qt6 for Windows
+    - name: Build Qt6 (includes host build automatically)
       if: steps.cache-mxe.outputs.cache-hit != 'true'
       run: |
         cd ~/mxe
-        make JOBS=$(nproc) qt6-qtbase qt6-qttools
-      timeout-minutes: 300
+        # MXE will automatically build Qt6 for host first, then cross-compile
+        # This is required for Qt6 cross-compilation
+        make MXE_TARGETS='x86_64-w64-mingw32.static' JOBS=$(nproc) qt6-qtbase qt6-qttools
+      timeout-minutes: 360
     
     - name: Verify MXE installation
       run: |
-        echo "=== Checking MXE binaries ==="
+        echo "=== Checking MXE target binaries ==="
         ls -la ~/mxe/usr/bin/ | grep x86_64-w64-mingw32 || true
         echo ""
-        echo "=== Checking Qt6 installation ==="
-        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ 2>/dev/null || echo "Qt6 directory not found"
+        echo "=== Checking Qt6 target installation ==="
+        ls -la ~/mxe/usr/x86_64-w64-mingw32.static/qt6/ 2>/dev/null || echo "Qt6 target directory not found"
         echo ""
-        echo "=== Looking for cmake wrapper ==="
-        find ~/mxe/usr/bin -name "*cmake*" -type f 2>/dev/null || true
+        echo "=== Checking Qt6 host installation (required for cross-compile) ==="
+        ls -la ~/mxe/usr/x86_64-pc-linux-gnu/qt6/ 2>/dev/null || echo "Qt6 host directory not found"
+        echo ""
+        echo "=== Checking cmake wrapper ==="
+        which x86_64-w64-mingw32.static-cmake || echo "CMake wrapper not found"
         echo ""
         echo "=== Checking installed packages ==="
+        echo "Target packages:"
         ls ~/mxe/usr/x86_64-w64-mingw32.static/installed/ 2>/dev/null || true
+        echo ""
+        echo "Host packages:"
+        ls ~/mxe/usr/x86_64-pc-linux-gnu/installed/ 2>/dev/null || true
     
     - name: Configure CMake
       run: |
         mkdir -p build
         cd build
         export PATH="$HOME/mxe/usr/bin:$PATH"
+        # MXE's cmake wrapper handles QT_HOST_PATH automatically
         x86_64-w64-mingw32.static-cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_INSTALL_PREFIX=/
