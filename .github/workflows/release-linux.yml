@@ -81,7 +81,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
           -DCMAKE_INSTALL_PREFIX=/usr \
-          -DQT_DEPLOY_SUPPORT=OFF
+          -DQT_DEPLOY_SUPPORT=OFF \
+          -DSKIP_QT_DEPLOY=ON
         
         echo -e "\n=== CMake Configuration ==="
         echo "Build Type: Release"
@@ -92,7 +93,33 @@ jobs:
     
     - name: Install to staging directory
       run: |
-        DESTDIR="${{ github.workspace }}/AppDir" cmake --install build
+        # Create AppDir structure first
+        mkdir -p AppDir/usr/bin
+        mkdir -p AppDir/usr/share/applications
+        mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
+        mkdir -p AppDir/usr/lib/x86_64-linux-gnu
+        
+        # Try normal install, but continue even if it fails
+        DESTDIR="${{ github.workspace }}/AppDir" cmake --install build --component Runtime || true
+        
+        # Fallback: manually copy if cmake install failed
+        if [ ! -f "AppDir/usr/bin/NST" ]; then
+          echo "CMake install failed, copying manually..."
+          cp build/NST AppDir/usr/bin/
+          cp build/libBGACore.so AppDir/usr/bin/ || true
+          cp build/libQtLingo.so AppDir/usr/bin/ || true
+          
+          # Copy desktop file and icon
+          if [ -f "resources/nst.desktop" ]; then
+            cp resources/nst.desktop AppDir/usr/share/applications/
+          fi
+          if [ -f "resources/nst.svg" ]; then
+            cp resources/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/
+          fi
+        fi
+        
+        echo "Installation completed, checking files..."
+        ls -la AppDir/usr/bin/
     
     - name: Prepare AppDir structure
       run: |
