@@ -99,27 +99,30 @@ jobs:
         mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
         mkdir -p AppDir/usr/lib/x86_64-linux-gnu
         
-        # Try normal install, but continue even if it fails
-        DESTDIR="${{ github.workspace }}/AppDir" cmake --install build --component Runtime || true
+        # Install only the targets (skip deployment scripts)
+        cd build
         
-        # Fallback: manually copy if cmake install failed
-        if [ ! -f "AppDir/usr/bin/NST" ]; then
-          echo "CMake install failed, copying manually..."
-          cp build/NST AppDir/usr/bin/
-          cp build/libBGACore.so AppDir/usr/bin/ || true
-          cp build/libQtLingo.so AppDir/usr/bin/ || true
-          
-          # Copy desktop file and icon
-          if [ -f "resources/nst.desktop" ]; then
-            cp resources/nst.desktop AppDir/usr/share/applications/
-          fi
-          if [ -f "resources/nst.svg" ]; then
-            cp resources/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/
-          fi
-        fi
+        # Install NST executable
+        install -D -m 755 NST ../AppDir/usr/bin/NST
+        
+        # Install libraries
+        install -D -m 755 BGA/core/libBGACore.so ../AppDir/usr/bin/libBGACore.so
+        install -D -m 755 QtLingo/libQtLingo.so ../AppDir/usr/bin/libQtLingo.so
+        
+        cd ..
+        
+        # Install desktop file and icon
+        install -D -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/nst.desktop
+        install -D -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg
         
         echo "Installation completed, checking files..."
         ls -la AppDir/usr/bin/
+        echo ""
+        echo "Desktop file:"
+        ls -la AppDir/usr/share/applications/
+        echo ""
+        echo "Icon:"
+        ls -la AppDir/usr/share/icons/hicolor/scalable/apps/
     
     - name: Prepare AppDir structure
       run: |
@@ -137,28 +140,33 @@ jobs:
         
         # Convert SVG icon to PNG if needed
         if [ -f "usr/share/icons/hicolor/scalable/apps/nst.svg" ]; then
-          echo "Converting SVG icon to PNG..."
+          echo "Converting SVG icon to PNG sizes..."
           mkdir -p usr/share/icons/hicolor/256x256/apps
+          mkdir -p usr/share/icons/hicolor/128x128/apps
+          
+          # Create 256x256 PNG
           rsvg-convert -w 256 -h 256 \
             usr/share/icons/hicolor/scalable/apps/nst.svg \
             -o usr/share/icons/hicolor/256x256/apps/nst.png
+          
+          # Create 128x128 PNG
+          rsvg-convert -w 128 -h 128 \
+            usr/share/icons/hicolor/scalable/apps/nst.svg \
+            -o usr/share/icons/hicolor/128x128/apps/nst.png
+            
+          echo "Icon conversion completed"
         fi
         
         # Verify desktop file exists
         if [ ! -f "usr/share/applications/nst.desktop" ]; then
-          echo "Warning: Desktop file not found, creating one..."
-          mkdir -p usr/share/applications
-          cat > usr/share/applications/nst.desktop << 'DESKTOPEOF'
-        [Desktop Entry]
-        Type=Application
-        Name=NST
-        Comment=A tool for translating video games
-        Exec=NST
-        Icon=nst
-        Categories=Utility;Development;
-        Terminal=false
-        DESKTOPEOF
+          echo "Error: Desktop file not found"
+          exit 1
         fi
+        
+        # Fix desktop file - use only one main category
+        sed -i 's/Categories=.*/Categories=Development;/' usr/share/applications/nst.desktop
+        
+        echo "Desktop file fixed"
         
         # Create AppRun script
         cat > AppRun << 'APPRUNEOF'
@@ -166,7 +174,7 @@ jobs:
         SELF=$(readlink -f "$0")
         HERE=${SELF%/*}
         export PATH="${HERE}/usr/bin:${PATH}"
-        export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+        export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
         export QT_PLUGIN_PATH="${HERE}/usr/plugins"
         export QML_IMPORT_PATH="${HERE}/usr/qml"
         export QML2_IMPORT_PATH="${HERE}/usr/qml"
@@ -174,15 +182,26 @@ jobs:
         APPRUNEOF
         chmod +x AppRun
         
-        # Create symbolic links for AppImage
+        # Create symbolic links for AppImage (required in root of AppDir)
         ln -sf usr/share/applications/nst.desktop nst.desktop
+        
+        # Symlink the 256x256 PNG icon to root (appimagetool looks here)
         if [ -f usr/share/icons/hicolor/256x256/apps/nst.png ]; then
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
+          echo "Created icon symlinks (256x256 PNG)"
+        elif [ -f usr/share/icons/hicolor/scalable/apps/nst.svg ]; then
+          # Fallback to SVG if PNG creation failed
+          ln -sf usr/share/icons/hicolor/scalable/apps/nst.svg nst.svg
+          echo "Created icon symlinks (SVG fallback)"
+        else
+          echo "Warning: No icon found!"
         fi
         
         echo -e "\n=== AppDir structure created ==="
         ls -la
+        echo -e "\n=== Icon files ==="
+        find usr/share/icons -name "nst.*"
     
     - name: Deploy Qt dependencies
       run: |
