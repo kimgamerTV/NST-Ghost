@@ -23,69 +23,92 @@ jobs:
       run: |
         pip install aqtinstall
         aqt install-qt windows desktop 6.8.1 win64_mingw
-        echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo "${{ github.workspace }}/Tools/mingw1310_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-    
-    - name: Install MinGW
-      run: |
         aqt install-tool windows desktop tools_mingw90 qt.tools.win64_mingw900
+      shell: pwsh
     
-    - name: Verify Qt installation
+    - name: Install Ninja
+      run: choco install ninja
+      shell: pwsh
+    
+    - name: Set environment variables
       run: |
+        echo "Qt6_DIR=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
+        echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/6.8.1/mingw_64" >> $env:GITHUB_ENV
+        echo "${{ github.workspace }}/6.8.1/mingw_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo "${{ github.workspace }}/Tools/mingw1120_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      shell: pwsh
+    
+    - name: Verify installation
+      run: |
+        Write-Host "=== Qt Version ==="
         qmake --version
-        where qmake
+        Write-Host "`n=== Compiler ==="
         gcc --version
+        Write-Host "`n=== Ninja ==="
+        ninja --version
+        Write-Host "`n=== CMake ==="
+        cmake --version
+      shell: pwsh
     
     - name: Configure CMake
       run: |
-        mkdir build
-        cd build
-        cmake .. -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64"
+        $env:CC = "${{ github.workspace }}/Tools/mingw1120_64/bin/gcc.exe"
+        $env:CXX = "${{ github.workspace }}/Tools/mingw1120_64/bin/g++.exe"
+        cmake -S . -B build `
+          -G Ninja `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_PREFIX_PATH="${{ github.workspace }}/6.8.1/mingw_64"
+      shell: pwsh
     
     - name: Build
-      run: |
-        cd build
-        cmake --build . --config Release -j4
+      run: cmake --build build --config Release --parallel 4
+      shell: pwsh
     
     - name: Install to staging directory
       run: |
-        cd build
-        $env:DESTDIR = "$PWD/install"
-        cmake --install .
+        cmake --install build --prefix build/install
+      shell: pwsh
     
     - name: Deploy Qt dependencies
       run: |
-        cd build/install
+        $installDir = "build/install"
+        
         # Find NST.exe
-        $exePath = Get-ChildItem -Recurse -Filter "NST.exe" | Select-Object -First 1
+        $exePath = Get-ChildItem -Path $installDir -Recurse -Filter "NST.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+        
         if ($exePath) {
           Write-Host "Found NST.exe at: $($exePath.FullName)"
           $exeDir = $exePath.DirectoryName
           
           # Run windeployqt
-          windeployqt --release --no-translations "$($exePath.FullName)"
+          $windeployqt = "${{ github.workspace }}/6.8.1/mingw_64/bin/windeployqt.exe"
+          & $windeployqt --release --no-translations --compiler-runtime "$($exePath.FullName)"
           
           # Create package directory
-          New-Item -ItemType Directory -Force -Path "${{ github.workspace }}/package"
+          New-Item -ItemType Directory -Force -Path "package" | Out-Null
           
-          # Copy everything from exe directory
-          Copy-Item -Path "$exeDir/*" -Destination "${{ github.workspace }}/package/" -Recurse -Force
+          # Copy everything
+          Copy-Item -Path "$exeDir/*" -Destination "package/" -Recurse -Force
           
-          Write-Host "Package contents:"
-          Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Select-Object FullName
+          Write-Host "`nPackage contents:"
+          Get-ChildItem "package/" | Format-Table Name, Length
         } else {
-          Write-Error "NST.exe not found!"
+          Write-Error "NST.exe not found in $installDir"
+          Write-Host "Directory contents:"
+          Get-ChildItem $installDir -Recurse | Select-Object FullName
           exit 1
         }
+      shell: pwsh
     
     - name: List package contents
       run: |
         Write-Host "=== Package contents ==="
-        Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Format-Table Name, Length
+        Get-ChildItem "package/" -Recurse | Format-Table Name, Length
         
         Write-Host "`n=== Total package size ==="
-        $size = (Get-ChildItem "${{ github.workspace }}/package/" -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+        $size = (Get-ChildItem "package/" -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
         Write-Host ("{0:N2} MB" -f $size)
+      shell: pwsh
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
