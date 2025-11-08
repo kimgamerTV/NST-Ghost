@@ -50,7 +50,7 @@ jobs:
           libxkbcommon-dev \
           libxkbcommon-x11-dev \
           librsvg2-bin \
-          # Add Wayland development packages
+          # Correct Wayland development packages for Ubuntu 22.04
           libwayland-dev \
           wayland-protocols \
           pkg-config
@@ -463,9 +463,9 @@ jobs:
         
         echo -e "\n=== DEB package created ==="
         ls -lh NST-0.4.3-Linux-x86_64.deb
-        dpkg-deb --info NST-0.4.3-Linux_x86_64.deb
+        dpkg-deb --info NST-0.4.3-Linux-x86_64.deb
         echo -e "\n=== DEB contents ==="
-        dpkg-deb --contents NST-0.4.3-Linux_x86_64.deb | head -20
+        dpkg-deb --contents NST-0.4.3-Linux-x86_64.deb | head -20
     
     - name: Create RPM package
       run: |
@@ -578,11 +578,11 @@ jobs:
         
         rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
         
-        find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-0.4.3-Linux_x86_64.rpm \;
+        find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-0.4.3-Linux-x86_64.rpm \;
         
         echo -e "\n=== RPM package created ==="
-        ls -lh NST-0.4.3-Linux_x86_64.rpm
-        rpm -qpi NST-0.4.3-Linux_x86_64.rpm
+        ls -lh NST-0.4.3-Linux-x86_64.rpm
+        rpm -qpi NST-0.4.3-Linux-x86_64.rpm
     
     - name: Verify all packages
       run: |
@@ -626,12 +626,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: NST-0.4.3-Linux-x86_64-deb
-        path: NST-0.4.3-Linux_x86_64.deb
+        path: NST-0.4.3-Linux-x86_64.deb
         if-no-files-found: error
     
     - name: Upload RPM
       uses: actions/upload-artifact@v4
       with:
         name: NST-0.4.3-Linux-x86_64-rpm
-        path: NST-0.4.3-Linux_x86_64.rpm
+        path: NST-0.4.3-Linux-x86_64.rpm
         if-no-files-found: error
