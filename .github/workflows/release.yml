@@ -92,13 +92,16 @@ jobs:
       - name: Create tag if needed
         if: steps.check_tag.outputs.exists == 'false' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           VERSION_TAG="${{ steps.get_version.outputs.version_tag }}"
           VERSION="${{ steps.get_version.outputs.version }}"
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # ใช้ PAT แทน password
+          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
           
           git tag -a "${VERSION_TAG}" -m "Release ${VERSION}"
           git push origin "${VERSION_TAG}"
