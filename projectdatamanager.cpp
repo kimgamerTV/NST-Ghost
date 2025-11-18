@@ -5,7 +5,7 @@
 #include <QSet>
 #include <QtConcurrent>
 
-ProjectDataManager::ProjectDataManager(QStringListModel *fileListModel, QStandardItemModel *translationModel, QObject *parent)
+ProjectDataManager::ProjectDataManager(QStandardItemModel *fileListModel, QStandardItemModel *translationModel, QObject *parent)
     : QObject(parent)
     , m_fileListModel(fileListModel)
     , m_translationModel(translationModel)
@@ -30,7 +30,7 @@ void ProjectDataManager::onLoadingFinished(const QJsonArray &extractedTextsArray
     QFuture<QPair<QMap<QString, QJsonArray>, QStringList>> future = QtConcurrent::run([extractedTextsArray]() {
         qDebug() << "ProjectDataManager (background): Starting processing of" << extractedTextsArray.size() << "entries.";
         QMap<QString, QJsonArray> fileMap;
-        QSet<QString> fileNames;
+        QSet<QString> filePaths;
 
         // Log first 5 entries for inspection
         for (int i = 0; i < 5 && i < extractedTextsArray.size(); ++i) {
@@ -42,20 +42,24 @@ void ProjectDataManager::onLoadingFinished(const QJsonArray &extractedTextsArray
             QString filePath = obj["path"].toString();
             if (filePath.isEmpty()) {
                 // Let's log if we find an empty file path
-                if (fileNames.isEmpty()) { // Log only a few times to avoid spam
+                if (filePaths.isEmpty()) { // Log only a few times to avoid spam
                      qDebug() << "ProjectDataManager (background): Found entry with empty 'path' key. Object:" << obj;
                 }
                 continue;
             }
 
             fileMap[filePath].append(obj);
-
-            QString fileName = QFileInfo(filePath).fileName();
-            fileNames.insert(fileName);
+            filePaths.insert(filePath);
         }
 
-        qDebug() << "ProjectDataManager (background): Finished processing. Found" << fileNames.size() << "unique files.";
-        return qMakePair(fileMap, fileNames.values());
+        // Sort by filename
+        QStringList sortedPaths = filePaths.values();
+        std::sort(sortedPaths.begin(), sortedPaths.end(), [](const QString &a, const QString &b) {
+            return QFileInfo(a).fileName() < QFileInfo(b).fileName();
+        });
+
+        qDebug() << "ProjectDataManager (background): Finished processing. Found" << sortedPaths.size() << "unique files.";
+        return qMakePair(fileMap, sortedPaths);
     });
 
     m_processingFutureWatcher.setFuture(future);
@@ -66,7 +70,13 @@ void ProjectDataManager::onProcessingFinished()
     qDebug() << "ProjectDataManager: Background processing finished.";
     QPair<QMap<QString, QJsonArray>, QStringList> result = m_processingFutureWatcher.result();
     m_loadedGameProjectData = result.first;
-    m_fileListModel->setStringList(result.second);
+    
+    m_fileListModel->clear();
+    for (const QString &path : result.second) {
+        QStandardItem *item = new QStandardItem(QFileInfo(path).fileName());
+        item->setData(path, Qt::UserRole);
+        m_fileListModel->appendRow(item);
+    }
 
     qDebug() << "ProjectDataManager: Models updated. Emitting processingFinished signal.";
     emit processingFinished();
@@ -75,19 +85,13 @@ void ProjectDataManager::onProcessingFinished()
 
 void ProjectDataManager::onFileSelected(const QModelIndex &index)
 {
-    QString fileName = m_fileListModel->data(index, Qt::DisplayRole).toString();
+    QStandardItem *item = m_fileListModel->itemFromIndex(index);
+    if (!item) return;
+    
+    QString fullFilePath = item->data(Qt::UserRole).toString();
 
     m_translationModel->clear();
     m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation");
-
-    // Find the full file path from the display name
-    QString fullFilePath = fileName;
-    for (const QString &key : m_loadedGameProjectData.keys()) {
-        if (QFileInfo(key).fileName() == fileName) {
-            fullFilePath = key;
-            break;
-        }
-    }
 
     m_currentLoadedFilePath = fullFilePath;
 

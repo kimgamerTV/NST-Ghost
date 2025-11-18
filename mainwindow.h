@@ -64,7 +64,7 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    QStringListModel *m_fileListModel;
+    QStandardItemModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
     SearchController *m_searchController;
     SearchDialog *m_searchDialog;
@@ -84,7 +84,11 @@ private:
     QString m_llmModel;
     QString m_llmBaseUrl;
 
-    QMultiMap<QString, QModelIndex> m_pendingTranslations;
+    struct PendingTranslation {
+        QModelIndex index;
+        QString filePath;
+    };
+    QMultiMap<QString, PendingTranslation> m_pendingTranslations;
 
     QJsonArray m_gameFonts;
 
@@ -93,5 +97,23 @@ private:
 
     QFutureWatcher<QJsonArray> m_loadFutureWatcher;
     CustomProgressDialog *m_progressDialog;
+    
+    QTimer *m_spinnerTimer;
+    int m_spinnerFrame = 0;
+    QModelIndex m_currentTranslatingFileIndex;
+    
+    QVector<QModelIndex> m_pendingUIUpdates;
+    QTimer *m_uiUpdateTimer;
+    
+    struct TranslationJob {
+        QString serviceName;
+        QStringList sourceTexts;
+        QVariantMap settings;
+        QModelIndex fileIndex;
+    };
+    QQueue<TranslationJob> m_translationQueue;
+    bool m_isTranslating = false;
+    
+    void processNextTranslationJob();
 };
 

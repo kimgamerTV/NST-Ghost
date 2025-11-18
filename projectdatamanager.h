@@ -16,7 +16,7 @@ class ProjectDataManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit ProjectDataManager(QStringListModel *fileListModel, QStandardItemModel *translationModel, QObject *parent = nullptr);
+    explicit ProjectDataManager(QStandardItemModel *fileListModel, QStandardItemModel *translationModel, QObject *parent = nullptr);
 
     QMap<QString, QJsonArray> &getLoadedGameProjectData();
     QString &getCurrentLoadedFilePath();
@@ -32,7 +32,7 @@ signals:
     void processingFinished();
 
 private:
-    QStringListModel *m_fileListModel;
+    QStandardItemModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
     QMap<QString, QJsonArray> m_loadedGameProjectData;
     QString m_currentLoadedFilePath;

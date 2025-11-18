@@ -18,7 +18,7 @@ public:
 
     void setTranslationModel(QStandardItemModel *model);
     void setLoadedGameProjectData(const QMap<QString, QJsonArray> *data);
-    void setFileListModel(QStringListModel *model);
+    void setFileListModel(QStandardItemModel *model);
 
     QList<QPair<QString, QPair<int, QString>>> searchAllFiles(const QString &query) const;
 
@@ -29,7 +29,7 @@ private:
     QStandardItemModel *m_translationModel;
     QTableView *m_view;
     const QMap<QString, QJsonArray> *m_loadedGameProjectData;
-    QStringListModel *m_fileListModel;
+    QStandardItemModel *m_fileListModel;
 };
 
 #endif // SEARCHCONTROLLER_H

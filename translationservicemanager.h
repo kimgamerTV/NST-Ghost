@@ -4,10 +4,11 @@
 #include <QObject>
 #include <QStringList>
 #include <QList>
-#include <QPointer> // Add this include
+#include <QPointer>
+#include <QTimer>
+#include <QQueue>
 #include <qtlingo/translationservice.h>
 #include <qtlingo/translationservicefactory.h>
-
 #include <QVariantMap>
 
 class TranslationServiceManager : public QObject
@@ -23,9 +24,18 @@ public:
 signals:
     void translationFinished(const qtlingo::TranslationResult &result);
     void errorOccurred(const QString &message);
+    void progressUpdated(int current, int total);
+
+private slots:
+    void processNextTranslation();
 
 private:
     QList<qtlingo::ITranslationService*> m_services;
+    QQueue<QString> m_translationQueue;
+    QTimer m_timer;
+    qtlingo::ITranslationService* m_currentService = nullptr;
+    int m_totalItems = 0;
+    int m_processedItems = 0;
 };
 
 #endif // TRANSLATIONSERVICEMANAGER_H

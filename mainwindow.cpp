@@ -35,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_progressDialog(nullptr)
+    , m_spinnerTimer(new QTimer(this))
+    , m_uiUpdateTimer(new QTimer(this))
 {
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/mainwindow_log.txt";
     QFile logFile(logFilePath);
@@ -42,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowIcon(QIcon(":/icons/icon-app.png"));
     resize(1024, 768); // Set a reasonable default size
 
-    m_fileListModel = new QStringListModel(this);
+    m_fileListModel = new QStandardItemModel(this);
     ui->fileListView->setModel(m_fileListModel);
 
     // Set icon provider
@@ -121,6 +123,99 @@ MainWindow::MainWindow(QWidget *parent)
     m_translationServiceManager = new TranslationServiceManager(this);
     connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, this, &MainWindow::onTranslationFinished);
     connect(m_translationServiceManager, &TranslationServiceManager::errorOccurred, this, &MainWindow::onTranslationServiceError);
+    connect(m_translationServiceManager, &TranslationServiceManager::progressUpdated, this, [this](int current, int total) {
+        static int lastUpdate = 0;
+        if (current - lastUpdate < 10 && current < total) return; // Update every 10 items
+        lastUpdate = current;
+        
+        int queueSize = m_translationQueue.size();
+        QString queueInfo = queueSize > 0 ? QString(" (+%1 queued)").arg(queueSize) : "";
+        statusBar()->showMessage(QString("Translating: %1/%2%3").arg(current).arg(total).arg(queueInfo));
+        
+        if (current == 1 && m_currentTranslatingFileIndex.isValid()) {
+            m_spinnerTimer->start(300);
+        }
+        
+        if (current >= total) {
+            lastUpdate = 0;
+            m_spinnerTimer->stop();
+            m_uiUpdateTimer->stop();
+            
+            // Final UI update
+            if (!m_pendingUIUpdates.isEmpty()) {
+                int minRow = INT_MAX;
+                int maxRow = 0;
+                for (const QModelIndex &idx : m_pendingUIUpdates) {
+                    if (idx.row() < minRow) minRow = idx.row();
+                    if (idx.row() > maxRow) maxRow = idx.row();
+                }
+                if (minRow <= maxRow) {
+                    QModelIndex topLeft = m_translationModel->index(minRow, 1);
+                    QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
+                    emit m_translationModel->dataChanged(topLeft, bottomRight);
+                }
+                m_pendingUIUpdates.clear();
+            }
+            
+            if (m_currentTranslatingFileIndex.isValid()) {
+                QStandardItem *item = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
+                if (item) {
+                    QString originalText = item->data(Qt::UserRole + 1).toString();
+                    if (!originalText.isEmpty()) {
+                        item->setText("✓ " + originalText);
+                        item->setData(QVariant(), Qt::UserRole + 1);
+                    }
+                }
+            }
+            m_isTranslating = false;
+            processNextTranslationJob();
+        }
+    });
+    
+    // Setup spinner animation
+    connect(m_spinnerTimer, &QTimer::timeout, this, [this]() {
+        if (!m_currentTranslatingFileIndex.isValid()) return;
+        
+        QStandardItem *item = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
+        if (!item) return;
+        
+        static const QStringList spinners = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
+        m_spinnerFrame = (m_spinnerFrame + 1) % spinners.size();
+        
+        QString originalText = item->data(Qt::UserRole + 1).toString();
+        if (originalText.isEmpty()) {
+            originalText = item->text();
+            item->setData(originalText, Qt::UserRole + 1);
+        }
+        
+        item->setText(spinners[m_spinnerFrame] + " " + originalText);
+    });
+    
+    // Setup UI batch update timer
+    m_uiUpdateTimer->setInterval(500);
+    m_uiUpdateTimer->setSingleShot(false);
+    connect(m_uiUpdateTimer, &QTimer::timeout, this, [this]() {
+        if (m_pendingUIUpdates.isEmpty()) return;
+        
+        int minRow = INT_MAX;
+        int maxRow = 0;
+        for (const QModelIndex &idx : m_pendingUIUpdates) {
+            if (idx.isValid() && idx.row() >= 0) {
+                if (idx.row() < minRow) minRow = idx.row();
+                if (idx.row() > maxRow) maxRow = idx.row();
+            }
+        }
+        
+        if (minRow <= maxRow && minRow != INT_MAX) {
+            QModelIndex topLeft = m_translationModel->index(minRow, 1);
+            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
+            if (topLeft.isValid() && bottomRight.isValid()) {
+                emit m_translationModel->dataChanged(topLeft, bottomRight);
+            }
+        }
+        
+        m_pendingUIUpdates.clear();
+    });
 
     m_menuBar = new MenuBar(this);
     setMenuBar(m_menuBar);
@@ -193,7 +288,7 @@ void MainWindow::onLoadingFinished()
 
 void MainWindow::onProjectProcessingFinished()
 {
-    if (!m_fileListModel->stringList().isEmpty()) {
+    if (m_fileListModel->rowCount() > 0) {
         // Auto-select first file
         QModelIndex firstIndex = m_fileListModel->index(0, 0);
         ui->fileListView->setCurrentIndex(firstIndex);
@@ -232,7 +327,7 @@ void MainWindow::onLoadFromGameProject()
     m_currentProjectPath = projectPath;
 
     m_projectDataManager->getLoadedGameProjectData().clear();
-    m_fileListModel->setStringList(QStringList());
+    m_fileListModel->clear();
 
     m_progressDialog = new CustomProgressDialog(this);
     m_progressDialog->setWindowModality(Qt::WindowModal);
@@ -279,13 +374,16 @@ void MainWindow::onSearchResultSelected(const QString &fileName, int row)
     if (fullPath.isEmpty()) return;
 
     // Select file in list
-    int idx = m_fileListModel->stringList().indexOf(fileName);
-    if (idx >= 0) {
-        QModelIndex modelIdx = m_fileListModel->index(idx, 0);
-        ui->fileListView->setCurrentIndex(modelIdx);
-        ui->translationTableView->setUpdatesEnabled(false);
-        m_projectDataManager->onFileSelected(modelIdx);
-        ui->translationTableView->setUpdatesEnabled(true);
+    for (int i = 0; i < m_fileListModel->rowCount(); ++i) {
+        QStandardItem *item = m_fileListModel->item(i);
+        if (item && item->data(Qt::UserRole).toString() == fullPath) {
+            QModelIndex modelIdx = m_fileListModel->index(i, 0);
+            ui->fileListView->setCurrentIndex(modelIdx);
+            ui->translationTableView->setUpdatesEnabled(false);
+            m_projectDataManager->onFileSelected(modelIdx);
+            ui->translationTableView->setUpdatesEnabled(true);
+            break;
+        }
     }
 
     // Select row in table
@@ -316,12 +414,15 @@ void MainWindow::onOpenMockData()
 
     // Simulate loading
     m_projectDataManager->getLoadedGameProjectData().clear();
-    m_fileListModel->setStringList(QStringList());
+    m_fileListModel->clear();
 
     QMap<QString, QJsonArray> fileMap;
     fileMap["script1.json"] = mockArray;
     m_projectDataManager->getLoadedGameProjectData() = fileMap;
-    m_fileListModel->setStringList(QStringList() << "script1.json");
+    
+    QStandardItem *item = new QStandardItem("script1.json");
+    item->setData("script1.json", Qt::UserRole);
+    m_fileListModel->appendRow(item);
 
     QModelIndex idx = m_fileListModel->index(0, 0);
     ui->fileListView->setCurrentIndex(idx);
@@ -334,7 +435,7 @@ void MainWindow::onMockDataLoaded(const QJsonArray &data)
 {
     // Load mock data from Lua plugin
     m_projectDataManager->getLoadedGameProjectData().clear();
-    m_fileListModel->setStringList(QStringList());
+    m_fileListModel->clear();
 
     QMap<QString, QJsonArray> fileMap;
     QJsonArray mockArray;
@@ -351,7 +452,10 @@ void MainWindow::onMockDataLoaded(const QJsonArray &data)
     
     fileMap["mock_data.json"] = mockArray;
     m_projectDataManager->getLoadedGameProjectData() = fileMap;
-    m_fileListModel->setStringList(QStringList() << "mock_data.json");
+    
+    QStandardItem *item = new QStandardItem("mock_data.json");
+    item->setData("mock_data.json", Qt::UserRole);
+    m_fileListModel->appendRow(item);
 
     QModelIndex idx = m_fileListModel->index(0, 0);
     ui->fileListView->setCurrentIndex(idx);
@@ -367,15 +471,56 @@ void MainWindow::onSearchRequested(const QString &query)
 
 void MainWindow::onTranslationFinished(const qtlingo::TranslationResult &result)
 {
+    if (!m_translationModel) return;
+    
     const QString &sourceText = result.sourceText;
     const QString &translatedText = result.translatedText;
+    QString currentFilePath = m_projectDataManager->getCurrentLoadedFilePath();
 
-    auto indexes = m_pendingTranslations.values(sourceText);
-    for (const QModelIndex &idx : indexes) {
-        if (idx.isValid()) {
-            m_translationModel->setData(idx, translatedText);
+    auto pendingList = m_pendingTranslations.values(sourceText);
+    
+    for (const PendingTranslation &pending : pendingList) {
+        if (pending.filePath != currentFilePath) continue;
+        if (!pending.index.isValid()) continue;
+        if (pending.index.model() != m_translationModel) continue;
+        
+        int row = pending.index.row();
+        int col = pending.index.column();
+        
+        if (row < 0 || row >= m_translationModel->rowCount()) continue;
+        if (col < 0 || col >= m_translationModel->columnCount()) continue;
+        
+        QStandardItem *item = m_translationModel->item(row, col);
+        if (item) {
+            item->setText(translatedText);
+            m_pendingUIUpdates.append(pending.index);
         }
     }
+    
+    // Limit pending updates to prevent memory issues
+    if (m_pendingUIUpdates.size() > 1000) {
+        int minRow = INT_MAX;
+        int maxRow = 0;
+        for (const QModelIndex &idx : m_pendingUIUpdates) {
+            if (idx.isValid() && idx.row() >= 0) {
+                if (idx.row() < minRow) minRow = idx.row();
+                if (idx.row() > maxRow) maxRow = idx.row();
+            }
+        }
+        if (minRow <= maxRow && minRow != INT_MAX) {
+            QModelIndex topLeft = m_translationModel->index(minRow, 1);
+            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
+            if (topLeft.isValid() && bottomRight.isValid()) {
+                emit m_translationModel->dataChanged(topLeft, bottomRight);
+            }
+        }
+        m_pendingUIUpdates.clear();
+    }
+    
+    if (!m_uiUpdateTimer->isActive()) {
+        m_uiUpdateTimer->start();
+    }
+    
     m_pendingTranslations.remove(sourceText);
 }
 
@@ -430,7 +575,10 @@ void MainWindow::onTranslateSelectedTextWithService()
         QString sourceText = m_translationModel->data(selectedIndex, Qt::DisplayRole).toString();
         if (!sourceText.isEmpty()) {
             sourceTexts.append(sourceText);
-            m_pendingTranslations.insert(sourceText, m_translationModel->index(selectedIndex.row(), 1));
+            PendingTranslation pending;
+            pending.index = m_translationModel->index(selectedIndex.row(), 1);
+            pending.filePath = m_projectDataManager->getCurrentLoadedFilePath();
+            m_pendingTranslations.insert(sourceText, pending);
         }
     }
 
@@ -444,9 +592,27 @@ void MainWindow::onTranslateSelectedTextWithService()
         settings["llmModel"] = m_llmModel;
         settings["llmBaseUrl"] = m_llmBaseUrl;
 
-        m_translationServiceManager->translate(serviceName, sourceTexts, settings);
+        TranslationJob job;
+        job.serviceName = serviceName;
+        job.sourceTexts = sourceTexts;
+        job.settings = settings;
+        job.fileIndex = ui->fileListView->currentIndex();
+        
+        // Mark as queued
+        QStandardItem *item = m_fileListModel->itemFromIndex(job.fileIndex);
+        if (item) {
+            QString originalText = item->data(Qt::UserRole + 1).toString();
+            if (originalText.isEmpty()) {
+                item->setData(item->text(), Qt::UserRole + 1);
+            }
+            item->setText("⏳ " + item->data(Qt::UserRole + 1).toString());
+        }
+        
+        m_translationQueue.enqueue(job);
+        processNextTranslationJob();
     }
 }
+
 
 void MainWindow::onTranslateAllSelectedText()
 {
@@ -559,6 +725,31 @@ void MainWindow::onSaveGameProject()
     } else {
         QMessageBox::critical(this, "Save Project", "Failed to save project.");
     }
+}
+
+void MainWindow::processNextTranslationJob()
+{
+    if (m_isTranslating || m_translationQueue.isEmpty()) {
+        if (m_translationQueue.isEmpty()) {
+            statusBar()->showMessage("All translations completed", 3000);
+        }
+        return;
+    }
+    
+    m_isTranslating = true;
+    TranslationJob job = m_translationQueue.dequeue();
+    m_currentTranslatingFileIndex = job.fileIndex;
+    
+    // Change queued icon to processing
+    QStandardItem *item = m_fileListModel->itemFromIndex(job.fileIndex);
+    if (item) {
+        QString originalText = item->data(Qt::UserRole + 1).toString();
+        if (!originalText.isEmpty()) {
+            item->setText("▶ " + originalText);
+        }
+    }
+    
+    m_translationServiceManager->translate(job.serviceName, job.sourceTexts, job.settings);
 }
 
 void MainWindow::onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)

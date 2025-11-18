@@ -31,3 +31,13 @@ void CustomProgressDialog::setLabelText(const QString &text)
 {
     m_labelText->setText(text);
 }
+
+void CustomProgressDialog::setRange(int min, int max)
+{
+    m_progressBar->setRange(min, max);
+}
+
+void CustomProgressDialog::setMaximum(int max)
+{
+    m_progressBar->setMaximum(max);
+}

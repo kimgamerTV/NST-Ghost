@@ -18,6 +18,8 @@ public:
 public slots:
     void setValue(int value);
     void setLabelText(const QString &text);
+    void setRange(int min, int max);
+    void setMaximum(int max);
 
 private:
     QProgressBar *m_progressBar;

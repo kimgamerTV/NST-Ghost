@@ -19,7 +19,7 @@ void SearchController::setLoadedGameProjectData(const QMap<QString, QJsonArray> 
     m_loadedGameProjectData = data;
 }
 
-void SearchController::setFileListModel(QStringListModel *model)
+void SearchController::setFileListModel(QStandardItemModel *model)
 {
     m_fileListModel = model;
 }
