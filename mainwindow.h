@@ -52,6 +52,8 @@ private slots:
     void onSettingsActionTriggered();
     void onFontsLoaded(const QJsonArray &fonts);
     void onFontManagerActionTriggered();
+    void onPluginManagerActionTriggered();
+    void onMockDataLoaded(const QJsonArray &data);
     void onUndoTranslation();
     void onSaveGameProject();
     void onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);

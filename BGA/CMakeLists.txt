@@ -16,6 +16,7 @@ set(CORE_SOURCES
     core/src/analyzerfactory.cpp
     core/src/engines/rpgm/rpganalyzer.cpp
     core/src/engines/unity/unityanalyzer.cpp
+    core/src/engines/renpy/renpyanalyzer.cpp
 )
 
 set(CORE_HEADERS
@@ -23,6 +24,7 @@ set(CORE_HEADERS
     core/include/core/gameanalyzer.h
     core/include/core/engines/rpgm/rpganalyzer.h
     core/include/core/engines/unity/unityanalyzer.h
+    core/include/core/engines/renpy/renpyanalyzer.h
 )
 
 # Create library

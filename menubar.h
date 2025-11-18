@@ -16,6 +16,7 @@ signals:
     void saveProject(); // New signal for saving project
     void exit();
     void fontManager();
+    void pluginManager();
 
 private:
     void createMenus();
@@ -29,6 +30,7 @@ private:
     QAction *saveProjectAction; // New action declaration
     QAction *exitAction;
     QAction *fontManagerAction;
+    QAction *pluginManagerAction;
 };
 
 #endif // MENUBAR_H

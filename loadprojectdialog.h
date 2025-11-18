@@ -43,7 +43,7 @@ public:
 
 protected:
     /// Handles mouse click events for selecting an engine frame.
-    //bool eventFilter(QObject *obj, QEvent *event) override;
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
     /// Opens a file dialog for browsing the game project directory.

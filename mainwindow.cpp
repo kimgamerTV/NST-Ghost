@@ -1,5 +1,10 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "pluginmanagerdialog.h"
+
+#ifdef HAS_LUA
+#include "src/plugins/LuaScriptManager.h"
+#endif
 
 #include <QStandardItemModel>
 #include <QFileIconProvider>
@@ -126,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveGameProject);
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
     connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
+    connect(m_menuBar, &MenuBar::pluginManager, this, &MainWindow::onPluginManagerActionTriggered);
 
     // Enable custom context menu for translation table view
     ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -141,6 +147,35 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ใช้ QFutureWatcher เพื่อจัดการการโหลดแบบ async
     connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::finished, this, &MainWindow::onLoadingFinished);
+
+#ifdef HAS_LUA
+    // Load enabled Lua plugins only
+    QString scriptPath = QCoreApplication::applicationDirPath() + "/scripts";
+    QDir scriptDir(scriptPath);
+    QSettings settings;
+    
+    int loadedCount = 0;
+    for (const QString& file : scriptDir.entryList({"*.lua"}, QDir::Files)) {
+        bool enabled = settings.value("plugins/" + file + "/enabled", false).toBool();
+        if (enabled) {
+            // Load only this plugin
+            LuaScriptManager::instance().loadScriptsFromDir(scriptPath);
+            LuaScriptManager::instance().registerAPI();
+            qDebug() << "Loaded enabled plugin:" << file;
+            loadedCount++;
+        }
+    }
+    
+    // Connect Lua signals
+    connect(&LuaScriptManager::instance(), &LuaScriptManager::mockDataLoaded,
+            this, &MainWindow::onMockDataLoaded);
+    
+    if (loadedCount > 0) {
+        qDebug() << "Total enabled plugins loaded:" << loadedCount;
+    } else {
+        qDebug() << "No plugins enabled. Use Tools > Plugin Manager to enable plugins.";
+    }
+#endif
     connect(ui->fileListView, &QListView::clicked, m_projectDataManager, &ProjectDataManager::onFileSelected);
 }
 
@@ -287,6 +322,36 @@ void MainWindow::onOpenMockData()
     fileMap["script1.json"] = mockArray;
     m_projectDataManager->getLoadedGameProjectData() = fileMap;
     m_fileListModel->setStringList(QStringList() << "script1.json");
+
+    QModelIndex idx = m_fileListModel->index(0, 0);
+    ui->fileListView->setCurrentIndex(idx);
+    ui->translationTableView->setUpdatesEnabled(false);
+    m_projectDataManager->onFileSelected(idx);
+    ui->translationTableView->setUpdatesEnabled(true);
+}
+
+void MainWindow::onMockDataLoaded(const QJsonArray &data)
+{
+    // Load mock data from Lua plugin
+    m_projectDataManager->getLoadedGameProjectData().clear();
+    m_fileListModel->setStringList(QStringList());
+
+    QMap<QString, QJsonArray> fileMap;
+    QJsonArray mockArray;
+    
+    for (const auto& item : data) {
+        QJsonObject obj = item.toObject();
+        QJsonObject entry;
+        entry["file"] = "mock_data.json";
+        entry["source"] = obj["source"];
+        entry["text"] = obj["translation"];
+        entry["key"] = "mock_" + QString::number(mockArray.size());
+        mockArray.append(entry);
+    }
+    
+    fileMap["mock_data.json"] = mockArray;
+    m_projectDataManager->getLoadedGameProjectData() = fileMap;
+    m_fileListModel->setStringList(QStringList() << "mock_data.json");
 
     QModelIndex idx = m_fileListModel->index(0, 0);
     ui->fileListView->setCurrentIndex(idx);
@@ -464,6 +529,12 @@ void MainWindow::onFontManagerActionTriggered()
     if (dialog.exec() == QDialog::Accepted) {
         // Handle accepted dialog
     }
+}
+
+void MainWindow::onPluginManagerActionTriggered()
+{
+    PluginManagerDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::onUndoTranslation()

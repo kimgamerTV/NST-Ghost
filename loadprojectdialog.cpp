@@ -153,7 +153,7 @@ QFrame *LoadProjectDialog::createEngineFrame(const QString &engine, int index)
     frame->setMinimumHeight(120);
     frame->setStyleSheet(defaultEngineFrameStyle());
     frame->setCursor(Qt::PointingHandCursor);
-    //frame->installEventFilter(this);
+    frame->installEventFilter(this);
 
     QHBoxLayout *layout = new QHBoxLayout(frame);
     layout->setSpacing(0);
@@ -212,7 +212,7 @@ QPixmap LoadProjectDialog::loadEngineIcon(const QString &engine) const
 {
     if (engine == "RPGM") return QPixmap(":/icons/rpgm_icon.png");
     if (engine == "UNITY") return QPixmap(":/icons/unity_icon.png");
-    if (engine == "REN'PY") return QPixmap(":/icons/renpy_icon.png");
+    if (engine == "RENPY") return QPixmap(":/icons/renpy_icon.png");
     return QPixmap(); // Return an empty pixmap as a safe fallback
 }
 
@@ -221,7 +221,7 @@ QString LoadProjectDialog::engineFileTypes(const QString &engine) const
     static QMap<QString, QString> types{
         {"RPGM", ".json, .png, .ogg, ..."},
         {"UNITY", "unity.exe, .assets, .dll, ..."},
-        {"REN'PY", ".rpy, .rpyc, ..."}
+        {"RENPY", ".rpy, .rpyc, ..."}
     };
     return types.value(engine, "...");
 }
@@ -250,7 +250,7 @@ void LoadProjectDialog::updateFrameSelection(QAbstractButton *button)
     }
 }
 
-/*bool LoadProjectDialog::eventFilter(QObject *obj, QEvent *event)
+bool LoadProjectDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::MouseButtonPress) {
         if (auto *frame = qobject_cast<QFrame *>(obj)) {
@@ -261,7 +261,7 @@ void LoadProjectDialog::updateFrameSelection(QAbstractButton *button)
         }
     }
     return QDialog::eventFilter(obj, event);
-}*/
+}
 
 /* =========================================================================
  *  PUBLIC ACCESSORS

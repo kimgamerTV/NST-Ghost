@@ -18,6 +18,7 @@ endif()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
+find_package(Lua)
 
 # Use qt_standard_project_setup for Qt 6.3+
 if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
@@ -40,6 +41,7 @@ set(PROJECT_SOURCES
     translationcontextmenu.cpp
     updatecontroller.cpp
     fontmanagerdialog.cpp
+    pluginmanagerdialog.cpp
     projectdatamanager.cpp # New file
     mainwindow.h
     menubar.h
@@ -47,6 +49,7 @@ set(PROJECT_SOURCES
     searchdialog.h
     settingsdialog.h
     fontmanagerdialog.h
+    pluginmanagerdialog.h
     searchcontroller.h
     shortcutcontroller.h
     bgadatamanager.h
@@ -59,17 +62,31 @@ set(PROJECT_SOURCES
     resources.qrc
 )
 
+# Lua plugin sources (optional)
+if(Lua_FOUND)
+    list(APPEND PROJECT_SOURCES
+        src/plugins/LuaPlugin.cpp
+        src/plugins/LuaPlugin.h
+        src/plugins/LuaScriptManager.cpp
+        src/plugins/LuaScriptManager.h
+        src/plugins/PluginManager.cpp
+        src/plugins/PluginManager.h
+    )
+endif()
+
 # Add BGA as a subdirectory
 add_subdirectory(BGA)
 # Add QtLingo as a subdirectory
 add_subdirectory(QtLingo)
+# Add plugins subdirectory
+add_subdirectory(plugins)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(NST
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+    qt_create_translation(QM_FILES ${PROJECT_SOURCES} ${TS_FILES})
 else()
     if(ANDROID)
         add_library(NST SHARED
@@ -80,7 +97,7 @@ else()
             ${PROJECT_SOURCES}
         )
     endif()
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+    qt5_create_translation(QM_FILES ${PROJECT_SOURCES} ${TS_FILES})
 endif()
 
 target_link_libraries(NST PRIVATE
@@ -90,6 +107,12 @@ target_link_libraries(NST PRIVATE
     BGACore
     QtLingo
 )
+
+if(Lua_FOUND)
+    target_link_libraries(NST PRIVATE ${LUA_LIBRARIES})
+    target_include_directories(NST PRIVATE ${LUA_INCLUDE_DIR})
+    target_compile_definitions(NST PRIVATE HAS_LUA=1)
+endif()
 
 target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
 

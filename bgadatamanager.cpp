@@ -30,7 +30,9 @@ QJsonArray BGADataManager::loadStringsFromGameProject(const QString &engineName,
 
     QString logFilePath = "bgadatamanager_log.txt";
     QFile logFile(logFilePath);
-    logFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    if (!logFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        return QJsonArray();
+    }
     QTextStream logStream(&logFile);
 
     QJsonArray extractedTextsArray;

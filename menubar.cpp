@@ -21,6 +21,7 @@ void MenuBar::createMenus()
 
     toolsMenu = addMenu(tr("&Tools"));
     toolsMenu->addAction(fontManagerAction);
+    toolsMenu->addAction(pluginManagerAction);
 }
 
 void MenuBar::createActions()
@@ -42,4 +43,7 @@ void MenuBar::createActions()
 
     fontManagerAction = new QAction(tr("Font Manager..."), this);
     connect(fontManagerAction, &QAction::triggered, this, &MenuBar::fontManager);
+
+    pluginManagerAction = new QAction(tr("Plugin Manager..."), this);
+    connect(pluginManagerAction, &QAction::triggered, this, &MenuBar::pluginManager);
 }

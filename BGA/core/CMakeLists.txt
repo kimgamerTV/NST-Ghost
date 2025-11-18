@@ -3,9 +3,11 @@ add_library(BGACore SHARED
     include/core/analyzerfactory.h
     include/core/engines/rpgm/rpganalyzer.h
     include/core/engines/unity/unityanalyzer.h
+    include/core/engines/renpy/renpyanalyzer.h
     src/analyzerfactory.cpp
     src/engines/rpgm/rpganalyzer.cpp
     src/engines/unity/unityanalyzer.cpp
+    src/engines/renpy/renpyanalyzer.cpp
 )
 
 target_include_directories(BGACore
