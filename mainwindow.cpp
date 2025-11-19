@@ -29,6 +29,7 @@
 
 #include "customprogressdialog.h"
 #include "loadprojectdialog.h"
+#include <QRegularExpression>
 #include "projectdatamanager.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -36,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_progressDialog(nullptr)
     , m_spinnerTimer(new QTimer(this))
-    , m_uiUpdateTimer(new QTimer(this))
 {
     QString logFilePath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/mainwindow_log.txt";
     QFile logFile(logFilePath);
@@ -124,39 +124,46 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, this, &MainWindow::onTranslationFinished);
     connect(m_translationServiceManager, &TranslationServiceManager::errorOccurred, this, &MainWindow::onTranslationServiceError);
     connect(m_translationServiceManager, &TranslationServiceManager::progressUpdated, this, [this](int current, int total) {
-        static int lastUpdate = 0;
-        if (current - lastUpdate < 10 && current < total) return; // Update every 10 items
-        lastUpdate = current;
-        
-        int queueSize = m_translationQueue.size();
-        QString queueInfo = queueSize > 0 ? QString(" (+%1 queued)").arg(queueSize) : "";
-        statusBar()->showMessage(QString("Translating: %1/%2%3").arg(current).arg(total).arg(queueInfo));
+        if (total == 0) return;
+
+        statusBar()->showMessage(QString("Translating: %1/%2").arg(current).arg(total));
         
         if (current == 1 && m_currentTranslatingFileIndex.isValid()) {
             m_spinnerTimer->start(300);
         }
         
         if (current >= total) {
-            lastUpdate = 0;
             m_spinnerTimer->stop();
-            m_uiUpdateTimer->stop();
             
-            // Final UI update
-            if (!m_pendingUIUpdates.isEmpty()) {
-                int minRow = INT_MAX;
-                int maxRow = 0;
-                for (const QModelIndex &idx : m_pendingUIUpdates) {
-                    if (idx.row() < minRow) minRow = idx.row();
-                    if (idx.row() > maxRow) maxRow = idx.row();
+            // Final UI update.
+            ui->translationTableView->setUpdatesEnabled(false);
+            QList<QModelIndex> changedIndexes;
+            for (int row = 0; row < m_translationModel->rowCount(); ++row) {
+                QModelIndex sourceIndex = m_translationModel->index(row, 0);
+                QString sourceText = m_translationModel->data(sourceIndex, Qt::DisplayRole).toString();
+                
+                if (m_completedTranslations.contains(sourceText)) {
+                    QString translatedText = m_completedTranslations.value(sourceText);
+                    QModelIndex targetIndex = m_translationModel->index(row, 1);
+                    m_translationModel->setData(targetIndex, translatedText);
+                    changedIndexes.append(targetIndex);
                 }
-                if (minRow <= maxRow) {
-                    QModelIndex topLeft = m_translationModel->index(minRow, 1);
-                    QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
-                    emit m_translationModel->dataChanged(topLeft, bottomRight);
-                }
-                m_pendingUIUpdates.clear();
+            }
+            ui->translationTableView->setUpdatesEnabled(true);
+            
+            // Emit dataChanged for all modified items if needed, though setData should do it.
+            // A full repaint might be smoother.
+            if (!changedIndexes.isEmpty()) {
+                // To be safe, let's emit that the whole data might have changed.
+                // This is less efficient than ranges but simpler than calculating them.
+                emit m_translationModel->dataChanged(
+                    m_translationModel->index(0,1),
+                    m_translationModel->index(m_translationModel->rowCount() - 1, 1)
+                );
             }
             
+            m_completedTranslations.clear();
+
             if (m_currentTranslatingFileIndex.isValid()) {
                 QStandardItem *item = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
                 if (item) {
@@ -169,6 +176,7 @@ MainWindow::MainWindow(QWidget *parent)
             }
             m_isTranslating = false;
             processNextTranslationJob();
+            statusBar()->showMessage("Translation finished.", 4000);
         }
     });
     
@@ -189,32 +197,6 @@ MainWindow::MainWindow(QWidget *parent)
         }
         
         item->setText(spinners[m_spinnerFrame] + " " + originalText);
-    });
-    
-    // Setup UI batch update timer
-    m_uiUpdateTimer->setInterval(500);
-    m_uiUpdateTimer->setSingleShot(false);
-    connect(m_uiUpdateTimer, &QTimer::timeout, this, [this]() {
-        if (m_pendingUIUpdates.isEmpty()) return;
-        
-        int minRow = INT_MAX;
-        int maxRow = 0;
-        for (const QModelIndex &idx : m_pendingUIUpdates) {
-            if (idx.isValid() && idx.row() >= 0) {
-                if (idx.row() < minRow) minRow = idx.row();
-                if (idx.row() > maxRow) maxRow = idx.row();
-            }
-        }
-        
-        if (minRow <= maxRow && minRow != INT_MAX) {
-            QModelIndex topLeft = m_translationModel->index(minRow, 1);
-            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
-            if (topLeft.isValid() && bottomRight.isValid()) {
-                emit m_translationModel->dataChanged(topLeft, bottomRight);
-            }
-        }
-        
-        m_pendingUIUpdates.clear();
     });
 
     m_menuBar = new MenuBar(this);
@@ -471,63 +453,15 @@ void MainWindow::onSearchRequested(const QString &query)
 
 void MainWindow::onTranslationFinished(const qtlingo::TranslationResult &result)
 {
-    if (!m_translationModel) return;
-    
-    const QString &sourceText = result.sourceText;
-    const QString &translatedText = result.translatedText;
-    QString currentFilePath = m_projectDataManager->getCurrentLoadedFilePath();
-
-    auto pendingList = m_pendingTranslations.values(sourceText);
-    
-    for (const PendingTranslation &pending : pendingList) {
-        if (pending.filePath != currentFilePath) continue;
-        if (!pending.index.isValid()) continue;
-        if (pending.index.model() != m_translationModel) continue;
-        
-        int row = pending.index.row();
-        int col = pending.index.column();
-        
-        if (row < 0 || row >= m_translationModel->rowCount()) continue;
-        if (col < 0 || col >= m_translationModel->columnCount()) continue;
-        
-        QStandardItem *item = m_translationModel->item(row, col);
-        if (item) {
-            item->setText(translatedText);
-            m_pendingUIUpdates.append(pending.index);
-        }
+    if (!result.sourceText.isEmpty()) {
+        m_completedTranslations.insert(result.sourceText, result.translatedText);
     }
-    
-    // Limit pending updates to prevent memory issues
-    if (m_pendingUIUpdates.size() > 1000) {
-        int minRow = INT_MAX;
-        int maxRow = 0;
-        for (const QModelIndex &idx : m_pendingUIUpdates) {
-            if (idx.isValid() && idx.row() >= 0) {
-                if (idx.row() < minRow) minRow = idx.row();
-                if (idx.row() > maxRow) maxRow = idx.row();
-            }
-        }
-        if (minRow <= maxRow && minRow != INT_MAX) {
-            QModelIndex topLeft = m_translationModel->index(minRow, 1);
-            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
-            if (topLeft.isValid() && bottomRight.isValid()) {
-                emit m_translationModel->dataChanged(topLeft, bottomRight);
-            }
-        }
-        m_pendingUIUpdates.clear();
-    }
-    
-    if (!m_uiUpdateTimer->isActive()) {
-        m_uiUpdateTimer->start();
-    }
-    
-    m_pendingTranslations.remove(sourceText);
 }
 
 void MainWindow::onTranslationServiceError(const QString &message)
 {
-    QMessageBox::warning(this, "Translation Error", message);
-    m_pendingTranslations.clear();
+    statusBar()->showMessage(QString("Translation Error: %1").arg(message), 5000); // Show for 5 seconds
+    qWarning() << "Translation Service Error:" << message;
 }
 
 void MainWindow::onTranslationTableViewCustomContextMenuRequested(const QPoint &pos)
@@ -570,16 +504,21 @@ void MainWindow::onTranslateSelectedTextWithService()
     }
 
     QStringList sourceTexts;
+    int skippedCount = 0;
     for (const QModelIndex &selectedIndex : selectedIndexes) {
         if (selectedIndex.column() != 0) continue;
         QString sourceText = m_translationModel->data(selectedIndex, Qt::DisplayRole).toString();
         if (!sourceText.isEmpty()) {
+            if (isLikelyCode(sourceText)) {
+                skippedCount++;
+                continue;
+            }
             sourceTexts.append(sourceText);
-            PendingTranslation pending;
-            pending.index = m_translationModel->index(selectedIndex.row(), 1);
-            pending.filePath = m_projectDataManager->getCurrentLoadedFilePath();
-            m_pendingTranslations.insert(sourceText, pending);
         }
+    }
+
+    if (skippedCount > 0) {
+        statusBar()->showMessage(QString("Skipped %1 lines (suspected to be code).").arg(skippedCount), 4000);
     }
 
     if (!sourceTexts.isEmpty()) {
@@ -774,4 +713,30 @@ void MainWindow::onTranslationDataChanged(const QModelIndex &topLeft, const QMod
             m_projectDataManager->getLoadedGameProjectData().insert(m_projectDataManager->getCurrentLoadedFilePath(), textsArray);
         }
     }
+}
+
+bool MainWindow::isLikelyCode(const QString &text) const
+{
+    // Heuristic 1: Check for common code operators and symbols.
+    // Matches: ==, !=, >=, <=, +=, -=, *=, /=, ->, $, [, ], {, }
+    static const QRegularExpression codeRegex(R"([<>=!+\-*\/%]=|\$|->|\[|\]|\{|\})");
+    if (text.contains(codeRegex)) {
+        return true;
+    }
+
+    // Heuristic 2: Contains no Unicode letters at all (is just numbers/punctuation)
+    static const QRegularExpression hasLettersRegex(R"(\p{L})");
+    if (!text.contains(hasLettersRegex)) {
+        return true; // It's likely code/data if it has no letters of any language
+    }
+    
+    // Heuristic 3: Very few spaces, but multiple words and mixed case (like a variableName)
+    if (text.count(' ') < 2) {
+        static const QRegularExpression mixedCase(R"([a-z]+[A-Z]+)");
+        if (text.contains(mixedCase)) {
+            return true;
+        }
+    }
+
+    return false;
 }

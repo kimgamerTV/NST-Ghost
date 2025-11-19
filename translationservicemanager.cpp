@@ -1,10 +1,12 @@
 #include "translationservicemanager.h"
 #include <QDebug>
+#include <QSettings>
 
 TranslationServiceManager::TranslationServiceManager(QObject *parent)
     : QObject(parent)
 {
-    connect(&m_timer, &QTimer::timeout, this, &TranslationServiceManager::processNextTranslation);
+    m_processTimer.setSingleShot(true);
+    connect(&m_processTimer, &QTimer::timeout, this, &TranslationServiceManager::processNextTranslation);
 }
 
 TranslationServiceManager::~TranslationServiceManager()
@@ -21,22 +23,38 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
 {
     if (sourceTexts.isEmpty()) return;
 
-    m_currentService = qtlingo::createTranslationService(serviceName, nullptr).release();
+    // Stop any ongoing processing before starting a new one.
+    if (m_isProcessing) {
+        m_processTimer.stop();
+        m_isProcessing = false;
+    }
+
+    m_currentServiceName = serviceName;
+    m_currentService = qtlingo::createTranslationService(m_currentServiceName, nullptr).release();
     if (!m_currentService) {
-        emit errorOccurred(QString("Failed to create translation service: %1").arg(serviceName));
+        emit errorOccurred(QString("Failed to create translation service: %1").arg(m_currentServiceName));
         return;
     }
 
-    connect(m_currentService, &qtlingo::ITranslationService::translationFinished, this, &TranslationServiceManager::translationFinished);
-    connect(m_currentService, &qtlingo::ITranslationService::errorOccurred, this, &TranslationServiceManager::errorOccurred);
+    // Disconnect previous connections if any
+    if (m_services.size() > 0) {
+        for(auto service : m_services) {
+            disconnect(service, nullptr, this, nullptr);
+        }
+        qDeleteAll(m_services);
+        m_services.clear();
+    }
 
-    if (serviceName == "Google Translate") {
+    connect(m_currentService, &qtlingo::ITranslationService::translationFinished, this, &TranslationServiceManager::onTranslationDone);
+    connect(m_currentService, &qtlingo::ITranslationService::errorOccurred, this, &TranslationServiceManager::onTranslationError);
+
+    if (m_currentServiceName == "Google Translate") {
         m_currentService->setTargetLanguage(settings.value("targetLanguage").toString());
         m_currentService->setGoogleTranslateMode(settings.value("googleApi").toBool());
         if (settings.value("googleApi").toBool()) {
             m_currentService->setApiKey(settings.value("googleApiKey").toString());
         }
-    } else if (serviceName == "LLM Translation") {
+    } else if (m_currentServiceName == "LLM Translation") {
         m_currentService->setLlmProvider(settings.value("llmProvider").toString());
         m_currentService->setApiKey(settings.value("llmApiKey").toString());
         m_currentService->setLlmModel(settings.value("llmModel").toString());
@@ -50,6 +68,11 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
     
     m_totalItems = sourceTexts.size();
     m_processedItems = 0;
+    
+    // Load persisted delay for this service
+    QSettings qsettings("MySoft", "NST");
+    m_currentDelay = qsettings.value("ServiceDelays/" + m_currentServiceName, 0).toInt();
+
     m_services.append(m_currentService);
     
     processNextTranslation();
@@ -57,19 +80,57 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
 
 void TranslationServiceManager::processNextTranslation()
 {
-    if (m_translationQueue.isEmpty()) {
-        m_timer.stop();
-        emit progressUpdated(m_totalItems, m_totalItems);
+    if (m_translationQueue.isEmpty() || m_isProcessing) {
+        if(m_translationQueue.isEmpty()) {
+            emit progressUpdated(m_totalItems, m_totalItems);
+        }
         return;
     }
 
-    QString text = m_translationQueue.dequeue();
+    m_isProcessing = true;
+    QString text = m_translationQueue.head(); // Peek at the next item
     m_currentService->translate(text);
-    m_processedItems++;
+}
+
+void TranslationServiceManager::onTranslationDone(const qtlingo::TranslationResult &result)
+{
+    if (!m_translationQueue.isEmpty()) {
+        m_translationQueue.dequeue(); // Remove the successfully processed item
+    }
+
+    // Gradually decrease delay on success
+    m_currentDelay = qMax(0, m_currentDelay - m_delayStep / 5);
     
+    // Persist the new delay
+    QSettings settings("MySoft", "NST");
+    settings.setValue("ServiceDelays/" + m_currentServiceName, m_currentDelay);
+
+    emit translationFinished(result);
+    m_processedItems++;
     emit progressUpdated(m_processedItems, m_totalItems);
     
-    if (!m_translationQueue.isEmpty() && !m_timer.isActive()) {
-        m_timer.start(500);
+    m_isProcessing = false;
+    // Schedule the next translation
+    if (!m_translationQueue.isEmpty()) {
+        m_processTimer.start(m_currentDelay);
+    }
+}
+
+void TranslationServiceManager::onTranslationError(const QString &message)
+{
+    // Increase delay on error
+    m_currentDelay = qMin(m_maxDelay, m_currentDelay + m_delayStep);
+
+    // Persist the new delay
+    QSettings settings("MySoft", "NST");
+    settings.setValue("ServiceDelays/" + m_currentServiceName, m_currentDelay);
+    
+    // We don't dequeue, so the failed item remains at the head
+    emit errorOccurred(message);
+    
+    m_isProcessing = false;
+    // Schedule a retry after the new delay
+    if (!m_translationQueue.isEmpty()) {
+        m_processTimer.start(m_currentDelay);
     }
 }

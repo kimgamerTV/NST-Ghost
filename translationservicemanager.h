@@ -28,14 +28,22 @@ signals:
 
 private slots:
     void processNextTranslation();
+    void onTranslationDone(const qtlingo::TranslationResult &result);
+    void onTranslationError(const QString &message);
 
 private:
     QList<qtlingo::ITranslationService*> m_services;
     QQueue<QString> m_translationQueue;
-    QTimer m_timer;
     qtlingo::ITranslationService* m_currentService = nullptr;
+    QString m_currentServiceName;
     int m_totalItems = 0;
     int m_processedItems = 0;
+
+    QTimer m_processTimer;
+    int m_currentDelay = 0;
+    const int m_maxDelay = 5000; // 5 seconds
+    const int m_delayStep = 500;  // 500 ms
+    bool m_isProcessing = false;
 };
 
 #endif // TRANSLATIONSERVICEMANAGER_H

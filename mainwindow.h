@@ -63,6 +63,7 @@ private:
     void saveSettings();
 
 private:
+    bool isLikelyCode(const QString &text) const;
     Ui::MainWindow *ui;
     QStandardItemModel *m_fileListModel;
     QStandardItemModel *m_translationModel;
@@ -84,11 +85,8 @@ private:
     QString m_llmModel;
     QString m_llmBaseUrl;
 
-    struct PendingTranslation {
-        QModelIndex index;
-        QString filePath;
-    };
-    QMultiMap<QString, PendingTranslation> m_pendingTranslations;
+    QMap<QString, QString> m_completedTranslations;
+
 
     QJsonArray m_gameFonts;
 
@@ -102,8 +100,6 @@ private:
     int m_spinnerFrame = 0;
     QModelIndex m_currentTranslatingFileIndex;
     
-    QVector<QModelIndex> m_pendingUIUpdates;
-    QTimer *m_uiUpdateTimer;
     
     struct TranslationJob {
         QString serviceName;

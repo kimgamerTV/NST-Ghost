@@ -51,11 +51,7 @@ void GoogleTranslateService::translate(const QString &sourceText)
 void GoogleTranslateService::translateWithApi(const QString &sourceText)
 {
     if (m_apiKey.isEmpty()) {
-        TranslationResult result;
-        result.sourceText = sourceText;
-        result.translatedText = "[Error: API key is not set]";
         emit errorOccurred("API key is not set for Google Translate.");
-        emit translationFinished(result);
         return;
     }
 
@@ -155,9 +151,7 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
         emit translationFinished(result);
     } else {
         qDebug() << "Network Error:" << reply->errorString();
-        result.translatedText = QString("[Error: %1]").arg(reply->errorString());
         emit errorOccurred(reply->errorString());
-        emit translationFinished(result);
     }
 
     reply->deleteLater();
