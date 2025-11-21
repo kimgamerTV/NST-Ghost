@@ -57,6 +57,9 @@ private slots:
     void onUndoTranslation();
     void onSaveGameProject();
     void onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    void onTranslateSelectedFiles();
+    void onTranslateAllFiles();
+    void onFileListCustomContextMenuRequested(const QPoint &pos);
 
 private:
     void loadSettings();
@@ -85,7 +88,14 @@ private:
     QString m_llmModel;
     QString m_llmBaseUrl;
 
-    QMap<QString, QString> m_completedTranslations;
+    struct PendingTranslation {
+        QModelIndex index;
+        QString filePath;
+    };
+    QMultiMap<QString, PendingTranslation> m_pendingTranslations;
+    
+    QVector<QModelIndex> m_pendingUIUpdates;
+    QTimer *m_uiUpdateTimer;
 
 
     QJsonArray m_gameFonts;
@@ -111,5 +121,15 @@ private:
     bool m_isTranslating = false;
     
     void processNextTranslationJob();
+    
+    struct QueuedTranslationResult {
+        qtlingo::TranslationResult result;
+        QString filePath;
+    };
+    QQueue<QueuedTranslationResult> m_incomingResults;
+    QTimer *m_resultProcessingTimer;
+    
+private slots:
+    void processIncomingResults();
 };
 

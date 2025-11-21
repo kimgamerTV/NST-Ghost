@@ -50,6 +50,9 @@ MainWindow::MainWindow(QWidget *parent)
     // Set icon provider
     QFileIconProvider *iconProvider = new QFileIconProvider();
     ui->fileListView->setIconSize(QSize(24, 24));
+    ui->fileListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    ui->fileListView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->fileListView, &QListView::customContextMenuRequested, this, &MainWindow::onFileListCustomContextMenuRequested);
 
     m_translationModel = new QStandardItemModel(this);
     ui->translationTableView->setModel(m_translationModel);
@@ -60,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->translationTableView->setAlternatingRowColors(true);
 
     // ปรับ Vertical Header
-    ui->translationTableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->translationTableView->verticalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->translationTableView->verticalHeader()->setDefaultSectionSize(60); // ความสูงขั้นต่ำ
 
     // ปรับ Horizontal Header
@@ -135,35 +138,6 @@ MainWindow::MainWindow(QWidget *parent)
         if (current >= total) {
             m_spinnerTimer->stop();
             
-            // Final UI update.
-            ui->translationTableView->setUpdatesEnabled(false);
-            QList<QModelIndex> changedIndexes;
-            for (int row = 0; row < m_translationModel->rowCount(); ++row) {
-                QModelIndex sourceIndex = m_translationModel->index(row, 0);
-                QString sourceText = m_translationModel->data(sourceIndex, Qt::DisplayRole).toString();
-                
-                if (m_completedTranslations.contains(sourceText)) {
-                    QString translatedText = m_completedTranslations.value(sourceText);
-                    QModelIndex targetIndex = m_translationModel->index(row, 1);
-                    m_translationModel->setData(targetIndex, translatedText);
-                    changedIndexes.append(targetIndex);
-                }
-            }
-            ui->translationTableView->setUpdatesEnabled(true);
-            
-            // Emit dataChanged for all modified items if needed, though setData should do it.
-            // A full repaint might be smoother.
-            if (!changedIndexes.isEmpty()) {
-                // To be safe, let's emit that the whole data might have changed.
-                // This is less efficient than ranges but simpler than calculating them.
-                emit m_translationModel->dataChanged(
-                    m_translationModel->index(0,1),
-                    m_translationModel->index(m_translationModel->rowCount() - 1, 1)
-                );
-            }
-            
-            m_completedTranslations.clear();
-
             if (m_currentTranslatingFileIndex.isValid()) {
                 QStandardItem *item = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
                 if (item) {
@@ -177,6 +151,8 @@ MainWindow::MainWindow(QWidget *parent)
             m_isTranslating = false;
             processNextTranslationJob();
             statusBar()->showMessage("Translation finished.", 4000);
+            ui->fileListView->setEnabled(true);
+            ui->translationTableView->setEnabled(true);
         }
     });
     
@@ -198,6 +174,41 @@ MainWindow::MainWindow(QWidget *parent)
         
         item->setText(spinners[m_spinnerFrame] + " " + originalText);
     });
+
+    // Setup UI batch update timer
+    m_uiUpdateTimer = new QTimer(this);
+    m_uiUpdateTimer->setInterval(100); // Update every 100ms
+    m_uiUpdateTimer->setSingleShot(true);
+    connect(m_uiUpdateTimer, &QTimer::timeout, this, [this]() {
+        if (m_pendingUIUpdates.isEmpty()) return;
+        
+        ui->translationTableView->setUpdatesEnabled(false);
+        int minRow = INT_MAX;
+        int maxRow = 0;
+        for (const QModelIndex &idx : m_pendingUIUpdates) {
+            if (idx.isValid() && idx.row() >= 0) {
+                if (idx.row() < minRow) minRow = idx.row();
+                if (idx.row() > maxRow) maxRow = idx.row();
+            }
+        }
+        
+        if (minRow <= maxRow && minRow != INT_MAX) {
+            QModelIndex topLeft = m_translationModel->index(minRow, 1);
+            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
+            if (topLeft.isValid() && bottomRight.isValid()) {
+                emit m_translationModel->dataChanged(topLeft, bottomRight);
+            }
+        }
+        ui->translationTableView->setUpdatesEnabled(true);
+        
+        m_pendingUIUpdates.clear();
+    });
+
+    // Setup result processing timer (for batching incoming translations)
+    m_resultProcessingTimer = new QTimer(this);
+    m_resultProcessingTimer->setInterval(100); // Process every 100ms
+    connect(m_resultProcessingTimer, &QTimer::timeout, this, &MainWindow::processIncomingResults);
+
 
     m_menuBar = new MenuBar(this);
     setMenuBar(m_menuBar);
@@ -281,6 +292,7 @@ void MainWindow::onProjectProcessingFinished()
 
 MainWindow::~MainWindow()
 {
+    m_uiUpdateTimer->stop();
     delete ui;
 }
 
@@ -453,8 +465,116 @@ void MainWindow::onSearchRequested(const QString &query)
 
 void MainWindow::onTranslationFinished(const qtlingo::TranslationResult &result)
 {
-    if (!result.sourceText.isEmpty()) {
-        m_completedTranslations.insert(result.sourceText, result.translatedText);
+    if (!m_translationModel) return;
+    
+    if (!m_translationModel) return;
+    
+    QueuedTranslationResult queuedResult;
+    queuedResult.result = result;
+    
+    // Capture the file path associated with this translation
+    // If we are in batch mode, use the current translating file
+    if (m_currentTranslatingFileIndex.isValid()) {
+        QStandardItem *fileItem = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
+        if (fileItem) {
+            queuedResult.filePath = fileItem->data(Qt::UserRole).toString();
+        }
+    } else {
+        // Fallback to currently loaded file if not batch translating (single file mode)
+        queuedResult.filePath = m_projectDataManager->getCurrentLoadedFilePath();
+    }
+    
+    m_incomingResults.enqueue(queuedResult);
+    
+    if (!m_resultProcessingTimer->isActive()) {
+        m_resultProcessingTimer->start();
+    }
+}
+
+void MainWindow::processIncomingResults()
+{
+    if (m_incomingResults.isEmpty()) {
+        m_resultProcessingTimer->stop();
+        return;
+    }
+
+    // Process a batch of results (e.g., up to 50 at a time to keep UI responsive)
+    int processedCount = 0;
+    const int BATCH_SIZE = 50;
+    
+    // Block signals to prevent excessive redraws
+    if (m_translationModel) m_translationModel->blockSignals(true);
+
+    while (!m_incomingResults.isEmpty() && processedCount < BATCH_SIZE) {
+        QueuedTranslationResult queuedResult = m_incomingResults.dequeue();
+        processedCount++;
+
+        const QString &sourceText = queuedResult.result.sourceText;
+        const QString &translatedText = queuedResult.result.translatedText;
+        const QString &targetFilePath = queuedResult.filePath;
+        
+        // 1. Update the UI if the file is currently open
+        QString currentLoadedPath = m_projectDataManager->getCurrentLoadedFilePath();
+        
+        if (targetFilePath == currentLoadedPath) {
+            auto pendingList = m_pendingTranslations.values(sourceText);
+            for (const PendingTranslation &pending : pendingList) {
+                if (pending.filePath != targetFilePath) continue;
+                if (!pending.index.isValid()) continue;
+                if (pending.index.model() != m_translationModel) continue;
+                
+                int row = pending.index.row();
+                int col = pending.index.column();
+                
+                if (row < 0 || row >= m_translationModel->rowCount()) continue;
+                if (col < 0 || col >= m_translationModel->columnCount()) continue;
+                
+                QStandardItem *item = m_translationModel->item(row, col);
+                if (item) {
+                    item->setText(translatedText); 
+                    m_pendingUIUpdates.append(pending.index);
+                }
+            }
+        }
+        
+        // 2. Update the underlying data (Batch Mode support)
+        // We use the captured targetFilePath, so even if m_currentTranslatingFileIndex has moved on,
+        // we update the correct file's data.
+        if (!targetFilePath.isEmpty() && m_projectDataManager->getLoadedGameProjectData().contains(targetFilePath)) {
+            QJsonArray textsArray = m_projectDataManager->getLoadedGameProjectData().value(targetFilePath);
+            bool modified = false;
+            for (int i = 0; i < textsArray.size(); ++i) {
+                QJsonObject textObject = textsArray.at(i).toObject();
+                if (textObject["source"].toString() == sourceText) {
+                    textObject["text"] = translatedText;
+                    textsArray.replace(i, textObject);
+                    modified = true;
+                }
+            }
+            if (modified) {
+                m_projectDataManager->getLoadedGameProjectData().insert(targetFilePath, textsArray);
+                
+                // If this file is currently open, we might need to refresh the view if it wasn't caught by m_pendingTranslations
+                if (targetFilePath == currentLoadedPath) {
+                     for(int r=0; r<m_translationModel->rowCount(); ++r) {
+                         if (m_translationModel->data(m_translationModel->index(r, 0)).toString() == sourceText) {
+                             m_translationModel->setData(m_translationModel->index(r, 1), translatedText);
+                         }
+                     }
+                }
+            }
+        }
+        
+        m_pendingTranslations.remove(sourceText);
+    }
+
+    if (m_translationModel) m_translationModel->blockSignals(false);
+
+    // Trigger UI update for the changed range
+    if (!m_pendingUIUpdates.isEmpty()) {
+        if (!m_uiUpdateTimer->isActive()) {
+            m_uiUpdateTimer->start();
+        }
     }
 }
 
@@ -514,6 +634,10 @@ void MainWindow::onTranslateSelectedTextWithService()
                 continue;
             }
             sourceTexts.append(sourceText);
+            PendingTranslation pending;
+            pending.index = m_translationModel->index(selectedIndex.row(), 1);
+            pending.filePath = m_projectDataManager->getCurrentLoadedFilePath();
+            m_pendingTranslations.insert(sourceText, pending);
         }
     }
 
@@ -522,6 +646,9 @@ void MainWindow::onTranslateSelectedTextWithService()
     }
 
     if (!sourceTexts.isEmpty()) {
+        ui->fileListView->setEnabled(false);
+        ui->translationTableView->setEnabled(false);
+        
         QVariantMap settings;
         settings["googleApiKey"] = m_apiKey;
         settings["targetLanguage"] = m_targetLanguage;
@@ -739,4 +866,103 @@ bool MainWindow::isLikelyCode(const QString &text) const
     }
 
     return false;
+}
+
+void MainWindow::onFileListCustomContextMenuRequested(const QPoint &pos)
+{
+    QMenu contextMenu(this);
+    QAction *translateSelectedAction = contextMenu.addAction("Translate Selected Files");
+    QAction *translateAllAction = contextMenu.addAction("Translate All Files");
+
+    connect(translateSelectedAction, &QAction::triggered, this, &MainWindow::onTranslateSelectedFiles);
+    connect(translateAllAction, &QAction::triggered, this, &MainWindow::onTranslateAllFiles);
+
+    contextMenu.exec(ui->fileListView->mapToGlobal(pos));
+}
+
+void MainWindow::onTranslateSelectedFiles()
+{
+    QModelIndexList selectedIndexes = ui->fileListView->selectionModel()->selectedIndexes();
+    if (selectedIndexes.isEmpty()) {
+        QMessageBox::information(this, "Translate", "Please select files to translate.");
+        return;
+    }
+
+    QStringList availableServices = m_translationServiceManager->getAvailableServices();
+    if (availableServices.isEmpty()) {
+        QMessageBox::warning(this, "Error", "No translation services available.");
+        return;
+    }
+
+    bool ok;
+    QString serviceName = QInputDialog::getItem(this, "Translate Selected Files",
+                                                "Select Translation Service:", availableServices, 0, false, &ok);
+    if (!ok || serviceName.isEmpty()) {
+        return;
+    }
+
+    // Prepare settings once
+    QVariantMap settings;
+    settings["googleApiKey"] = m_apiKey;
+    settings["targetLanguage"] = m_targetLanguage;
+    settings["googleApi"] = m_googleApi;
+    settings["llmProvider"] = m_llmProvider;
+    settings["llmApiKey"] = m_llmApiKey;
+    settings["llmModel"] = m_llmModel;
+    settings["llmBaseUrl"] = m_llmBaseUrl;
+
+    int queuedFiles = 0;
+
+    for (const QModelIndex &idx : selectedIndexes) {
+        QStandardItem *item = m_fileListModel->itemFromIndex(idx);
+        if (!item) continue;
+
+        QString filePath = item->data(Qt::UserRole).toString();
+        if (!m_projectDataManager->getLoadedGameProjectData().contains(filePath)) continue;
+
+        const QJsonArray &textsArray = m_projectDataManager->getLoadedGameProjectData().value(filePath);
+        QStringList sourceTexts;
+
+        for (const QJsonValue &val : textsArray) {
+            QJsonObject obj = val.toObject();
+            QString source = obj["source"].toString();
+            QString translation = obj["text"].toString();
+
+            // Only translate if translation is empty and not code
+            if (translation.isEmpty() && !source.isEmpty() && !isLikelyCode(source)) {
+                sourceTexts.append(source);
+            }
+        }
+
+        if (!sourceTexts.isEmpty()) {
+            TranslationJob job;
+            job.serviceName = serviceName;
+            job.sourceTexts = sourceTexts;
+            job.settings = settings;
+            job.fileIndex = idx;
+
+            // Mark as queued
+            QString originalText = item->data(Qt::UserRole + 1).toString();
+            if (originalText.isEmpty()) {
+                item->setData(item->text(), Qt::UserRole + 1);
+            }
+            item->setText("⏳ " + item->data(Qt::UserRole + 1).toString());
+
+            m_translationQueue.enqueue(job);
+            queuedFiles++;
+        }
+    }
+
+    if (queuedFiles > 0) {
+        processNextTranslationJob();
+        statusBar()->showMessage(QString("Queued %1 files for translation.").arg(queuedFiles), 4000);
+    } else {
+        QMessageBox::information(this, "Translate", "No translatable text found in selected files (or all already translated).");
+    }
+}
+
+void MainWindow::onTranslateAllFiles()
+{
+    ui->fileListView->selectAll();
+    onTranslateSelectedFiles();
 }

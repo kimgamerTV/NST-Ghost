@@ -40,8 +40,8 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
     if (m_services.size() > 0) {
         for(auto service : m_services) {
             disconnect(service, nullptr, this, nullptr);
+            service->deleteLater();
         }
-        qDeleteAll(m_services);
         m_services.clear();
     }
 
