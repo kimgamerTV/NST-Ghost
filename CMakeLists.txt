@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(NST VERSION 0.4.7 LANGUAGES CXX)
+project(NST VERSION 0.4.8 LANGUAGES CXX)
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
 set(CMAKE_AUTOUIC ON)
