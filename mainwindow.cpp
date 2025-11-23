@@ -72,10 +72,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->translationTableView->horizontalHeader()->setStretchLastSection(true);
 
     // ตั้งชื่อ Header
-    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation");
+    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Context" << "Source Text" << "Translation");
 
-    // กำหนดความกว้างเริ่มต้นของคอลัมน์ Source Text
-    ui->translationTableView->setColumnWidth(0, 400);
+    // กำหนดความกว้างเริ่มต้นของคอลัมน์ Context และ Source Text
+    ui->translationTableView->setColumnWidth(0, 150); // Context
+    ui->translationTableView->setColumnWidth(1, 400); // Source
 
     // ปรับ Selection behavior
     ui->translationTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -193,8 +194,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         
         if (minRow <= maxRow && minRow != INT_MAX) {
-            QModelIndex topLeft = m_translationModel->index(minRow, 1);
-            QModelIndex bottomRight = m_translationModel->index(maxRow, 1);
+            QModelIndex topLeft = m_translationModel->index(minRow, 2); // Translation column is now 2
+            QModelIndex bottomRight = m_translationModel->index(maxRow, 2);
             if (topLeft.isValid() && bottomRight.isValid()) {
                 emit m_translationModel->dataChanged(topLeft, bottomRight);
             }
@@ -220,6 +221,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
     connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
     connect(m_menuBar, &MenuBar::pluginManager, this, &MainWindow::onPluginManagerActionTriggered);
+    connect(m_menuBar, &MenuBar::toggleContext, this, &MainWindow::onToggleContext);
+    connect(m_menuBar, &MenuBar::hideCompleted, this, &MainWindow::onHideCompleted);
+    connect(m_menuBar, &MenuBar::exportSmartFilterRules, this, &MainWindow::onExportSmartFilterRules);
+    connect(m_menuBar, &MenuBar::importSmartFilterRules, this, &MainWindow::onImportSmartFilterRules);
 
     // Enable custom context menu for translation table view
     ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -232,6 +237,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_updateController = new UpdateController(this);
     m_updateController->checkForUpdates();
+
+    m_smartFilterManager = new SmartFilterManager(this); // Initialize SmartFilterManager
 
     // ใช้ QFutureWatcher เพื่อจัดการการโหลดแบบ async
     connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::finished, this, &MainWindow::onLoadingFinished);
@@ -319,6 +326,9 @@ void MainWindow::onLoadFromGameProject()
 
     m_currentEngineName = engineName;
     m_currentProjectPath = projectPath;
+
+    // Set engine context for Smart Filter
+    m_smartFilterManager->setEngine(m_currentEngineName);
 
     m_projectDataManager->getLoadedGameProjectData().clear();
     m_fileListModel->clear();
@@ -557,8 +567,8 @@ void MainWindow::processIncomingResults()
                 // If this file is currently open, we might need to refresh the view if it wasn't caught by m_pendingTranslations
                 if (targetFilePath == currentLoadedPath) {
                      for(int r=0; r<m_translationModel->rowCount(); ++r) {
-                         if (m_translationModel->data(m_translationModel->index(r, 0)).toString() == sourceText) {
-                             m_translationModel->setData(m_translationModel->index(r, 1), translatedText);
+                         if (m_translationModel->data(m_translationModel->index(r, 1)).toString() == sourceText) { // Source is col 1
+                             m_translationModel->setData(m_translationModel->index(r, 2), translatedText); // Translation is col 2
                          }
                      }
                 }
@@ -590,12 +600,16 @@ void MainWindow::onTranslationTableViewCustomContextMenuRequested(const QPoint &
 
     QAction *translateAction = contextMenu.addAction("Translate Selected with...");
     QAction *translateAllAction = contextMenu.addAction("Translate All Selected");
+    QAction *markAsIgnoredAction = contextMenu.addAction("Mark as Ignored / Skip");
+    QAction *unmarkAsIgnoredAction = contextMenu.addAction("Unmark as Ignored"); // New action
     QAction *undoAction = contextMenu.addAction("Undo Translation");
     contextMenu.addSeparator();
     QAction *selectAllAction = contextMenu.addAction("Select All");
 
     connect(translateAction, &QAction::triggered, this, &MainWindow::onTranslateSelectedTextWithService);
     connect(translateAllAction, &QAction::triggered, this, &MainWindow::onTranslateAllSelectedText);
+    connect(markAsIgnoredAction, &QAction::triggered, this, &MainWindow::onMarkAsIgnored);
+    connect(unmarkAsIgnoredAction, &QAction::triggered, this, &MainWindow::onUnmarkAsIgnored); // Connect new action
     connect(undoAction, &QAction::triggered, this, &MainWindow::onUndoTranslation);
     connect(selectAllAction, &QAction::triggered, this, &MainWindow::onSelectAllRequested);
 
@@ -626,16 +640,22 @@ void MainWindow::onTranslateSelectedTextWithService()
     QStringList sourceTexts;
     int skippedCount = 0;
     for (const QModelIndex &selectedIndex : selectedIndexes) {
-        if (selectedIndex.column() != 0) continue;
+        if (selectedIndex.column() != 1) continue; // Source is now column 1
         QString sourceText = m_translationModel->data(selectedIndex, Qt::DisplayRole).toString();
         if (!sourceText.isEmpty()) {
+            // Check Smart Filter
+            if (m_smartFilterManager->shouldSkip(sourceText)) {
+                skippedCount++;
+                continue;
+            }
+
             if (isLikelyCode(sourceText)) {
                 skippedCount++;
                 continue;
             }
             sourceTexts.append(sourceText);
             PendingTranslation pending;
-            pending.index = m_translationModel->index(selectedIndex.row(), 1);
+            pending.index = m_translationModel->index(selectedIndex.row(), 2); // Translation is column 2
             pending.filePath = m_projectDataManager->getCurrentLoadedFilePath();
             m_pendingTranslations.insert(sourceText, pending);
         }
@@ -769,12 +789,80 @@ void MainWindow::onPluginManagerActionTriggered()
     dialog.exec();
 }
 
+void MainWindow::onToggleContext(bool checked)
+{
+    ui->translationTableView->setColumnHidden(0, !checked);
+}
+
+void MainWindow::onHideCompleted(bool checked)
+{
+    m_searchController->setHideCompleted(checked);
+}
+
+void MainWindow::onMarkAsIgnored()
+{
+    QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedIndexes();
+    int learnedCount = 0;
+    for (const QModelIndex &selectedIndex : selectedIndexes) {
+        if (selectedIndex.column() != 1) continue; // Source Text column
+        QString sourceText = m_translationModel->data(selectedIndex, Qt::DisplayRole).toString();
+        if (!sourceText.isEmpty()) {
+            m_smartFilterManager->learn(sourceText);
+            learnedCount++;
+        }
+    }
+    if (learnedCount > 0) {
+        statusBar()->showMessage(QString("Learned %1 new patterns to ignore.").arg(learnedCount), 3000);
+    }
+}
+
+void MainWindow::onUnmarkAsIgnored()
+{
+    QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedIndexes();
+    int unlearnedCount = 0;
+    for (const QModelIndex &selectedIndex : selectedIndexes) {
+        if (selectedIndex.column() != 1) continue; // Source Text column
+        QString sourceText = m_translationModel->data(selectedIndex, Qt::DisplayRole).toString();
+        if (!sourceText.isEmpty()) {
+            m_smartFilterManager->unlearn(sourceText);
+            unlearnedCount++;
+        }
+    }
+    if (unlearnedCount > 0) {
+        statusBar()->showMessage(QString("Unlearned %1 patterns.").arg(unlearnedCount), 3000);
+    }
+}
+
+void MainWindow::onExportSmartFilterRules()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Export Smart Filter Rules"), QString(), tr("JSON Files (*.json)"));
+    if (filePath.isEmpty()) return;
+
+    if (m_smartFilterManager->exportRules(filePath)) {
+        QMessageBox::information(this, tr("Export Successful"), tr("Rules exported successfully."));
+    } else {
+        QMessageBox::warning(this, tr("Export Failed"), tr("Failed to export rules."));
+    }
+}
+
+void MainWindow::onImportSmartFilterRules()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Import Smart Filter Rules"), QString(), tr("JSON Files (*.json)"));
+    if (filePath.isEmpty()) return;
+
+    if (m_smartFilterManager->importRules(filePath)) {
+        QMessageBox::information(this, tr("Import Successful"), tr("Rules imported successfully."));
+    } else {
+        QMessageBox::warning(this, tr("Import Failed"), tr("Failed to import rules."));
+    }
+}
+
 void MainWindow::onUndoTranslation()
 {
     QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedRows();
 
     for (const QModelIndex &selectedIndex : selectedIndexes) {
-        QModelIndex translationIndex = m_translationModel->index(selectedIndex.row(), 1);
+        QModelIndex translationIndex = m_translationModel->index(selectedIndex.row(), 2); // Translation is col 2
         m_translationModel->setData(translationIndex, "");
     }
 }

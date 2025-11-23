@@ -17,6 +17,7 @@
 #include "settingsdialog.h"
 #include "fontmanagerdialog.h"
 #include "updatecontroller.h"
+#include "smartfiltermanager.h" // New include
 #include "translationcontextmenu.h"
 #include "projectdatamanager.h"
 
@@ -53,6 +54,17 @@ private slots:
     void onFontsLoaded(const QJsonArray &fonts);
     void onFontManagerActionTriggered();
     void onPluginManagerActionTriggered();
+    
+    // View slots
+    void onToggleContext(bool checked);
+    void onHideCompleted(bool checked);
+    
+    // Smart Filter slots
+    void onMarkAsIgnored();
+    void onUnmarkAsIgnored(); // New slot
+    void onExportSmartFilterRules();
+    void onImportSmartFilterRules();
+
     void onMockDataLoaded(const QJsonArray &data);
     void onUndoTranslation();
     void onSaveGameProject();
@@ -75,6 +87,7 @@ private:
     ShortcutController *m_shortcutController;
     BGADataManager *m_bgaDataManager;
     TranslationServiceManager *m_translationServiceManager;
+    SmartFilterManager *m_smartFilterManager; // New member
     MenuBar *m_menuBar;
     UpdateController *m_updateController;
     ProjectDataManager *m_projectDataManager;

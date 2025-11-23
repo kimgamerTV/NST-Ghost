@@ -18,12 +18,22 @@ signals:
     void fontManager();
     void pluginManager();
 
+    // View signals
+    void toggleContext(bool checked);
+    void hideCompleted(bool checked);
+
+    // Smart Filter signals
+    void exportSmartFilterRules();
+    void importSmartFilterRules();
+
 private:
     void createMenus();
     void createActions();
 
     QMenu *fileMenu;
+    QMenu *viewMenu; // New View menu
     QMenu *toolsMenu;
+    QMenu *smartFilterMenu; // New menu
     QAction *openMockDataAction;
     QAction *loadFromGameProjectAction;
     QAction *settingsAction;
@@ -31,6 +41,14 @@ private:
     QAction *exitAction;
     QAction *fontManagerAction;
     QAction *pluginManagerAction;
+
+    // View actions
+    QAction *toggleContextAction;
+    QAction *hideCompletedAction;
+
+    // Smart Filter actions
+    QAction *exportSmartFilterRulesAction;
+    QAction *importSmartFilterRulesAction;
 };
 
 #endif // MENUBAR_H

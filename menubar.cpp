@@ -19,9 +19,17 @@ void MenuBar::createMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
+    viewMenu = addMenu(tr("&View"));
+    viewMenu->addAction(toggleContextAction);
+    viewMenu->addAction(hideCompletedAction);
+
     toolsMenu = addMenu(tr("&Tools"));
     toolsMenu->addAction(fontManagerAction);
     toolsMenu->addAction(pluginManagerAction);
+
+    smartFilterMenu = addMenu(tr("&Smart Filter"));
+    smartFilterMenu->addAction(importSmartFilterRulesAction);
+    smartFilterMenu->addAction(exportSmartFilterRulesAction);
 }
 
 void MenuBar::createActions()
@@ -46,4 +54,22 @@ void MenuBar::createActions()
 
     pluginManagerAction = new QAction(tr("Plugin Manager..."), this);
     connect(pluginManagerAction, &QAction::triggered, this, &MenuBar::pluginManager);
+
+    // View Actions
+    toggleContextAction = new QAction(tr("Show Context Column"), this);
+    toggleContextAction->setCheckable(true);
+    toggleContextAction->setChecked(true);
+    connect(toggleContextAction, &QAction::toggled, this, &MenuBar::toggleContext);
+
+    hideCompletedAction = new QAction(tr("Hide Completed Rows"), this);
+    hideCompletedAction->setCheckable(true);
+    hideCompletedAction->setChecked(false);
+    connect(hideCompletedAction, &QAction::toggled, this, &MenuBar::hideCompleted);
+
+    // Smart Filter Actions
+    exportSmartFilterRulesAction = new QAction(tr("Export Rules..."), this);
+    connect(exportSmartFilterRulesAction, &QAction::triggered, this, &MenuBar::exportSmartFilterRules);
+
+    importSmartFilterRulesAction = new QAction(tr("Import Rules..."), this);
+    connect(importSmartFilterRulesAction, &QAction::triggered, this, &MenuBar::importSmartFilterRules);
 }

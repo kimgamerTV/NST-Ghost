@@ -91,7 +91,7 @@ void ProjectDataManager::onFileSelected(const QModelIndex &index)
     QString fullFilePath = item->data(Qt::UserRole).toString();
 
     m_translationModel->clear();
-    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Source Text" << "Translation");
+    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Context" << "Source Text" << "Translation");
 
     m_currentLoadedFilePath = fullFilePath;
 
@@ -109,13 +109,18 @@ void ProjectDataManager::onFileSelected(const QModelIndex &index)
             QString translation = obj["text"].toString();
             QString key = obj["key"].toString();
 
+            QStandardItem *contextItem = new QStandardItem(key);
+            contextItem->setEditable(false); // Context should be read-only
+            contextItem->setForeground(QBrush(QColor(150, 150, 150))); // Grey out context text
+
             QStandardItem *sourceItem = new QStandardItem(source);
             QStandardItem *transItem = new QStandardItem(translation);
 
-            // เก็บ key เพื่อใช้ตอน save
+            // Store key in source item as well for backward compatibility if needed, 
+            // but now it's visible in the first column.
             sourceItem->setData(key, Qt::UserRole + 1);
 
-            m_translationModel->appendRow(QList<QStandardItem*>() << sourceItem << transItem);
+            m_translationModel->appendRow(QList<QStandardItem*>() << contextItem << sourceItem << transItem);
         }
     }
 }

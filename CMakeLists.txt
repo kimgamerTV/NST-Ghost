@@ -38,6 +38,7 @@ set(PROJECT_SOURCES
     shortcutcontroller.cpp
     bgadatamanager.cpp
     translationservicemanager.cpp
+    smartfiltermanager.cpp
     translationcontextmenu.cpp
     updatecontroller.cpp
     fontmanagerdialog.cpp

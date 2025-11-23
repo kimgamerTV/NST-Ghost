@@ -56,14 +56,33 @@ QList<QPair<QString, QPair<int, QString>>> SearchController::searchAllFiles(cons
     return QtConcurrent::blockingMappedReduced(m_loadedGameProjectData->keys(), searchFile, reduceLists);
 }
 
+
+
+void SearchController::setHideCompleted(bool hide)
+{
+    m_hideCompleted = hide;
+    onSearchQueryChanged(m_currentQuery); // Re-apply filter
+}
+
 void SearchController::onSearchQueryChanged(const QString &query)
 {
+    m_currentQuery = query; // Update current query
     if (!m_translationModel || !m_view) {
         return;
     }
 
     for (int i = 0; i < m_translationModel->rowCount(); ++i) {
         bool match = false;
+        
+        // Check hide completed filter first
+        if (m_hideCompleted) {
+             QStandardItem *translationItem = m_translationModel->item(i, 2); // Translation is col 2
+             if (translationItem && !translationItem->text().isEmpty()) {
+                 m_view->setRowHidden(i, true);
+                 continue;
+             }
+        }
+
         if (query.isEmpty()) {
             match = true;
         } else {

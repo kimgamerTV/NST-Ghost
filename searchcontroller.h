@@ -21,6 +21,7 @@ public:
     void setFileListModel(QStandardItemModel *model);
 
     QList<QPair<QString, QPair<int, QString>>> searchAllFiles(const QString &query) const;
+    void setHideCompleted(bool hide); // New method
 
 public slots:
     void onSearchQueryChanged(const QString &query);
@@ -30,6 +31,8 @@ private:
     QTableView *m_view;
     const QMap<QString, QJsonArray> *m_loadedGameProjectData;
     QStandardItemModel *m_fileListModel;
+    bool m_hideCompleted = false; // New member
+    QString m_currentQuery; // Store current query to re-apply filter
 };
 
 #endif // SEARCHCONTROLLER_H
