@@ -39,7 +39,7 @@ jobs:
         shell: pwsh
       
       - name: Install Lua
-        run: choco install lua
+        run: vcpkg install lua:x64-windows
         shell: pwsh
 
       
@@ -55,7 +55,8 @@ jobs:
           cmake -S . -B build `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.10.0\msvc2022_64"
+            -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.10.0\msvc2022_64" `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
         shell: pwsh
       
       - name: Build
