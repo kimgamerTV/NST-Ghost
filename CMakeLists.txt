@@ -18,7 +18,9 @@ endif()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
-find_package(Lua)
+find_package(Lua REQUIRED)
+message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
+message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
 
 # Use qt_standard_project_setup for Qt 6.3+
 if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
