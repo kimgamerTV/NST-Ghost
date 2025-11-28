@@ -1,0 +1,35 @@
+[  0%] Built target QtLingo_autogen_timestamp_deps
+[  1%] Built target QtLingo_autogen
+[ 11%] Built target QtLingo
+[ 11%] Built target BGACore_autogen_timestamp_deps
+[ 12%] Built target BGACore_autogen
+[ 22%] Built target BGACore
+[ 22%] Built target NST_autogen_timestamp_deps
+[ 24%] Automatic MOC and UIC for target NST
+[ 24%] Built target NST_autogen
+[ 25%] Building CXX object CMakeFiles/NST.dir/plugins/LuaTranslationPlugin/luatranslationservice.cpp.o
+[ 27%] Building CXX object CMakeFiles/NST.dir/settingsdialog.cpp.o
+[ 28%] Linking CXX executable NST
+[ 62%] Built target NST
+[ 62%] Built target VerificationTest_autogen_timestamp_deps
+[ 64%] Automatic MOC and UIC for target VerificationTest
+[ 64%] Built target VerificationTest_autogen
+[ 65%] Building CXX object CMakeFiles/VerificationTest.dir/verification_test.cpp.o
+[ 67%] Linking CXX executable VerificationTest
+[ 70%] Built target VerificationTest
+[ 70%] Built target MockDataPlugin_autogen_timestamp_deps
+[ 71%] Built target MockDataPlugin_autogen
+[ 77%] Built target MockDataPlugin
+[ 77%] Built target UnrpycPlugin_autogen_timestamp_deps
+[ 78%] Built target UnrpycPlugin_autogen
+[ 84%] Built target UnrpycPlugin
+[ 84%] Built target MockTranslationPlugin_autogen_timestamp_deps
+[ 85%] Built target MockTranslationPlugin_autogen
+[ 91%] Built target MockTranslationPlugin
+[ 91%] Built target LuaTranslationPlugin_autogen_timestamp_deps
+[ 92%] Automatic MOC and UIC for target LuaTranslationPlugin
+[ 92%] Built target LuaTranslationPlugin_autogen
+[ 94%] Building CXX object plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin.dir/luaplugin.cpp.o
+[ 95%] Building CXX object plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin.dir/luatranslationservice.cpp.o
+[ 97%] Linking CXX shared library ../libLuaTranslationPlugin.so
+[100%] Built target LuaTranslationPlugin

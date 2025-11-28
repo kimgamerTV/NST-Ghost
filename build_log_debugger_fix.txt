@@ -1,0 +1,71 @@
+-- GLOB mismatch!
+-- Configuring done (0.7s)
+-- Generating done (0.1s)
+-- Build files have been written to: /home/jop/work/NST/NST/build
+[  0%] Built target QtLingo_autogen_timestamp_deps
+[  1%] Built target QtLingo_autogen
+[ 11%] Built target QtLingo
+[ 11%] Built target BGACore_autogen_timestamp_deps
+[ 12%] Built target BGACore_autogen
+[ 22%] Built target BGACore
+[ 22%] Built target NST_autogen_timestamp_deps
+[ 24%] Automatic MOC and UIC for target NST
+[ 24%] Built target NST_autogen
+[ 25%] Building CXX object CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o
+[ 27%] Building CXX object CMakeFiles/NST.dir/plugins/LuaTranslationPlugin/luatranslationservice.cpp.o
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp: In static member function ‘static int LuaWorker::lua_http_request(lua_State*)’:
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:98:1: warning: no return statement in function returning non-void [-Wreturn-type]
+   98 | }
+      | ^
+In file included from /usr/include/lua.hpp:8,
+                 from /home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.h:9,
+                 from /home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:1:
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp: At global scope:
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:120:43: error: ‘L’ was not declared in this scope
+  120 |     const char* urlStr = luaL_checkstring(L, 1);
+      |                                           ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:121:41: error: ‘L’ was not declared in this scope
+  121 |     const char* method = luaL_optstring(L, 2, "GET");
+      |                                         ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:126:5: error: expected unqualified-id before ‘if’
+  126 |     if (lua_istable(L, 3)) {
+      |     ^~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:137:5: error: expected unqualified-id before ‘if’
+  137 |     if (lua_isstring(L, 4)) {
+      |     ^~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:145:5: error: expected unqualified-id before ‘if’
+  145 |     if (QString::compare(method, "POST", Qt::CaseInsensitive) == 0) {
+      |     ^~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:147:7: error: expected unqualified-id before ‘else’
+  147 |     } else {
+      |       ^~~~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:152:21: error: expected constructor, destructor, or type conversion before ‘(’ token
+  152 |     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+      |                     ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:153:5: error: ‘loop’ does not name a type
+  153 |     loop.exec();
+      |     ^~~~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:159:20: error: expected constructor, destructor, or type conversion before ‘(’ token
+  159 |     lua_pushlstring(L, responseBody.constData(), responseBody.size());
+      |                    ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:160:20: error: expected constructor, destructor, or type conversion before ‘(’ token
+  160 |     lua_pushinteger(L, statusCode);
+      |                    ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:162:5: error: ‘reply’ does not name a type
+  162 |     reply->deleteLater();
+      |     ^~~~~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:163:5: error: expected unqualified-id before ‘return’
+  163 |     return 2;
+      |     ^~~~~~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:164:1: error: expected declaration before ‘}’ token
+  164 | }
+      | ^
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:372:1: error: redefinition of ‘LuaTranslationService::LuaTranslationService(const QString&, QObject*)’
+  372 | LuaTranslationService::LuaTranslationService(const QString &scriptPath, QObject *parent)
+      | ^~~~~~~~~~~~~~~~~~~~~
+/home/jop/work/NST/NST/plugins/LuaTranslationPlugin/luatranslationservice.cpp:102:1: note: ‘LuaTranslationService::LuaTranslationService(const QString&, QObject*)’ previously defined here
+  102 | LuaTranslationService::LuaTranslationService(const QString &scriptPath, QObject *parent)
+      | ^~~~~~~~~~~~~~~~~~~~~
+gmake[2]: *** [CMakeFiles/NST.dir/build.make:336: CMakeFiles/NST.dir/plugins/LuaTranslationPlugin/luatranslationservice.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:265: CMakeFiles/NST.dir/all] Error 2
+gmake: *** [Makefile:156: all] Error 2

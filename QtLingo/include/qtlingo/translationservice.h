@@ -33,8 +33,13 @@ public:
     virtual void setLlmModel(const QString &model) { Q_UNUSED(model); }
     virtual void setLlmEndpoint(const QString &endpoint) { Q_UNUSED(endpoint); }
 
+    // Batch Translation
+    virtual bool supportsBatchTranslation() const { return false; }
+    virtual void batchTranslate(const QStringList &sourceTexts) { Q_UNUSED(sourceTexts); }
+
 signals:
     void translationFinished(const TranslationResult &result);
+    void batchTranslationFinished(const QList<TranslationResult> &results);
     void errorOccurred(const QString &message);
 };
 

@@ -1,2 +1,4 @@
 add_subdirectory(MockDataPlugin)
 add_subdirectory(UnrpycPlugin)
+add_subdirectory(MockTranslationPlugin)
+add_subdirectory(LuaTranslationPlugin)

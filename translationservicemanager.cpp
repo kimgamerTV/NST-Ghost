@@ -46,6 +46,7 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
     }
 
     connect(m_currentService, &qtlingo::ITranslationService::translationFinished, this, &TranslationServiceManager::onTranslationDone);
+    connect(m_currentService, &qtlingo::ITranslationService::batchTranslationFinished, this, &TranslationServiceManager::onBatchTranslationDone);
     connect(m_currentService, &qtlingo::ITranslationService::errorOccurred, this, &TranslationServiceManager::onTranslationError);
 
     if (m_currentServiceName == "Google Translate") {
@@ -61,11 +62,6 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
         m_currentService->setTargetLanguage(settings.value("targetLanguage").toString());
     }
 
-    m_translationQueue.clear();
-    for (const QString &text : sourceTexts) {
-        m_translationQueue.enqueue(text);
-    }
-    
     m_totalItems = sourceTexts.size();
     m_processedItems = 0;
     
@@ -75,7 +71,46 @@ void TranslationServiceManager::translate(const QString &serviceName, const QStr
 
     m_services.append(m_currentService);
     
+    // Populate queue
+    m_translationQueue.clear();
+    for (const QString &text : sourceTexts) {
+        m_translationQueue.enqueue(text);
+    }
+    
+    // Always start with processNextTranslation, which will handle batching if supported
     processNextTranslation();
+}
+
+void TranslationServiceManager::onBatchTranslationDone(const QList<qtlingo::TranslationResult> &results)
+{
+    // Remove processed items from queue
+    // We assume the results correspond to the requested batch (or at least the attempt finished)
+    // Even if results are fewer (partial failure?), we should probably dequeue the batch size
+    // to avoid infinite loops, or rely on m_currentBatch size.
+    
+    int count = m_currentBatch.size();
+    for(int i=0; i<count; ++i) {
+        if (!m_translationQueue.isEmpty()) m_translationQueue.dequeue();
+    }
+    m_currentBatch.clear();
+
+    for (const auto &result : results) {
+        emit translationFinished(result);
+        m_processedItems++;
+    }
+    emit progressUpdated(m_processedItems, m_totalItems);
+    
+    // Gradually decrease delay on success
+    m_currentDelay = qMax(0, m_currentDelay - m_delayStep / 5);
+    QSettings settings("MySoft", "NST");
+    settings.setValue("ServiceDelays/" + m_currentServiceName, m_currentDelay);
+
+    m_isProcessing = false;
+    
+    // Schedule the next batch
+    if (!m_translationQueue.isEmpty()) {
+        m_processTimer.start(m_currentDelay);
+    }
 }
 
 void TranslationServiceManager::processNextTranslation()
@@ -88,8 +123,22 @@ void TranslationServiceManager::processNextTranslation()
     }
 
     m_isProcessing = true;
-    QString text = m_translationQueue.head(); // Peek at the next item
-    m_currentService->translate(text);
+
+    if (m_currentService->supportsBatchTranslation()) {
+        // Batch mode: Take up to 30 items
+        int batchSize = 30; 
+        m_currentBatch.clear();
+        
+        for (int i = 0; i < batchSize && i < m_translationQueue.size(); ++i) {
+            m_currentBatch.append(m_translationQueue.at(i));
+        }
+        
+        m_currentService->batchTranslate(m_currentBatch);
+    } else {
+        // Single mode
+        QString text = m_translationQueue.head(); 
+        m_currentService->translate(text);
+    }
 }
 
 void TranslationServiceManager::onTranslationDone(const qtlingo::TranslationResult &result)

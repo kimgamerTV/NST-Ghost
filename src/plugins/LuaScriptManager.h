@@ -13,6 +13,7 @@ public:
     void registerAPI();
     QVariant executeHook(const QString& hookName, const QVariantList& args = {});
     QVariant executeHookForPlugin(const QString& pluginName, const QString& hookName, const QVariantList& args = {});
+    bool hasHook(const QString& pluginName, const QString& hookName);
     void installAll();
     void addMenuItems(QMenu* menu);
 

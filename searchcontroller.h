@@ -22,6 +22,7 @@ public:
 
     QList<QPair<QString, QPair<int, QString>>> searchAllFiles(const QString &query) const;
     void setHideCompleted(bool hide); // New method
+    QString currentQuery() const { return m_currentQuery; }
 
 public slots:
     void onSearchQueryChanged(const QString &query);

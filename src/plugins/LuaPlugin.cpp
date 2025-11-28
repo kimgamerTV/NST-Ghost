@@ -54,6 +54,13 @@ QVariant LuaPlugin::callFunction(const QString& funcName, const QVariantList& ar
     return result;
 }
 
+bool LuaPlugin::hasFunction(const QString& funcName) {
+    lua_getglobal(m_lua.get(), funcName.toUtf8().constData());
+    bool exists = lua_isfunction(m_lua.get(), -1);
+    lua_pop(m_lua.get(), 1);
+    return exists;
+}
+
 void LuaPlugin::registerFunction(const QString& name, lua_CFunction func) {
     lua_register(m_lua.get(), name.toUtf8().constData(), func);
 }

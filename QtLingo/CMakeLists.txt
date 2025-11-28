@@ -17,6 +17,7 @@ add_library(QtLingo SHARED
   QtLingo_global.h
   qtlingo.cpp
   qtlingo.h
+  include/qtlingo/translationplugininterface.h
   include/qtlingo/translationservice.h
   include/qtlingo/translationservicefactory.h
   src/translationservicefactory.cpp

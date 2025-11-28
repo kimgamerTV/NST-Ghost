@@ -13,7 +13,7 @@ void MenuBar::createMenus()
     fileMenu = addMenu(tr("&File"));
     fileMenu->addAction(openMockDataAction);
     fileMenu->addAction(loadFromGameProjectAction);
-    fileMenu->addAction(saveProjectAction); // Add save action
+    fileMenu->addAction(saveProjectAction);
     fileMenu->addSeparator();
     fileMenu->addAction(settingsAction);
     fileMenu->addSeparator();

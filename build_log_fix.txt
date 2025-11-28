@@ -1,0 +1,44 @@
+[  0%] Built target QtLingo_autogen_timestamp_deps
+[  1%] Built target QtLingo_autogen
+[ 11%] Built target QtLingo
+[ 11%] Built target BGACore_autogen_timestamp_deps
+[ 13%] Built target BGACore_autogen
+[ 23%] Built target BGACore
+[ 23%] Built target NST_autogen_timestamp_deps
+[ 25%] Automatic MOC and UIC for target NST
+[ 25%] Built target NST_autogen
+[ 26%] Building CXX object CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o
+[ 27%] Building CXX object CMakeFiles/NST.dir/mainwindow.cpp.o
+[ 29%] Building CXX object CMakeFiles/NST.dir/pluginmanagerdialog.cpp.o
+/home/jop/work/NST/NST/pluginmanagerdialog.cpp: In constructor ‘PluginManagerDialog::PluginManagerDialog(QWidget*)’:
+/home/jop/work/NST/NST/pluginmanagerdialog.cpp:75:43: warning: ‘void QCheckBox::stateChanged(int)’ is deprecated: Use checkStateChanged() instead [-Wdeprecated-declarations]
+   75 |     connect(m_enableCheckBox, &QCheckBox::stateChanged, this, &PluginManagerDialog::onEnableToggled);
+      |                                           ^~~~~~~~~~~~
+In file included from /usr/include/qt6/QtWidgets/QCheckBox:1,
+                 from /home/jop/work/NST/NST/pluginmanagerdialog.h:6,
+                 from /home/jop/work/NST/NST/pluginmanagerdialog.cpp:1:
+/usr/include/qt6/QtWidgets/qcheckbox.h:42:10: note: declared here
+   42 |     void stateChanged(int);
+      |          ^~~~~~~~~~~~
+[ 30%] Building CXX object CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o
+[ 32%] Building CXX object CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o
+[ 33%] Linking CXX executable NST
+[ 61%] Built target NST
+[ 61%] Built target VerificationTest_autogen_timestamp_deps
+[ 63%] Built target VerificationTest_autogen
+[ 69%] Built target VerificationTest
+[ 69%] Built target MockDataPlugin_autogen_timestamp_deps
+[ 70%] Built target MockDataPlugin_autogen
+[ 76%] Built target MockDataPlugin
+[ 76%] Built target UnrpycPlugin_autogen_timestamp_deps
+[ 77%] Built target UnrpycPlugin_autogen
+[ 83%] Built target UnrpycPlugin
+[ 83%] Built target MockTranslationPlugin_autogen_timestamp_deps
+[ 85%] Built target MockTranslationPlugin_autogen
+[ 91%] Built target MockTranslationPlugin
+[ 91%] Built target LuaTranslationPlugin_autogen_timestamp_deps
+[ 92%] Automatic MOC and UIC for target LuaTranslationPlugin
+[ 92%] Built target LuaTranslationPlugin_autogen
+[ 94%] Building CXX object plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin.dir/luaplugin.cpp.o
+[ 95%] Linking CXX shared library ../libLuaTranslationPlugin.so
+[100%] Built target LuaTranslationPlugin

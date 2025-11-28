@@ -71,29 +71,41 @@ void SearchController::onSearchQueryChanged(const QString &query)
         return;
     }
 
+    // Optimization: Disable updates while filtering
+    m_view->setUpdatesEnabled(false);
+
     for (int i = 0; i < m_translationModel->rowCount(); ++i) {
-        bool match = false;
+        bool shouldHide = false;
         
         // Check hide completed filter first
         if (m_hideCompleted) {
              QStandardItem *translationItem = m_translationModel->item(i, 2); // Translation is col 2
              if (translationItem && !translationItem->text().isEmpty()) {
-                 m_view->setRowHidden(i, true);
-                 continue;
+                 shouldHide = true;
              }
         }
 
-        if (query.isEmpty()) {
-            match = true;
-        } else {
-            for (int j = 0; j < m_translationModel->columnCount(); ++j) {
-                QStandardItem *item = m_translationModel->item(i, j);
-                if (item && item->text().contains(query, Qt::CaseInsensitive)) {
-                    match = true;
-                    break;
+        if (!shouldHide) {
+            if (query.isEmpty()) {
+                shouldHide = false;
+            } else {
+                bool match = false;
+                for (int j = 0; j < m_translationModel->columnCount(); ++j) {
+                    QStandardItem *item = m_translationModel->item(i, j);
+                    if (item && item->text().contains(query, Qt::CaseInsensitive)) {
+                        match = true;
+                        break;
+                    }
                 }
+                shouldHide = !match;
             }
         }
-        m_view->setRowHidden(i, !match);
+        
+        // Only call setRowHidden if state changes to avoid unnecessary overhead
+        if (m_view->isRowHidden(i) != shouldHide) {
+            m_view->setRowHidden(i, shouldHide);
+        }
     }
+    
+    m_view->setUpdatesEnabled(true);
 }

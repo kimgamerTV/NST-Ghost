@@ -115,9 +115,9 @@ void PluginManagerDialog::appendLog(const QString& msg) {
 }
 
 QString PluginManagerDialog::getPluginStatus(const QString& pluginName) {
-    QSettings settings;
-    bool installed = settings.value("plugins/" + pluginName + "/installed", false).toBool();
-    bool enabled = settings.value("plugins/" + pluginName + "/enabled", false).toBool();
+    QSettings settings("NST", "PluginSettings");
+    bool installed = settings.value("Plugins/" + pluginName + "/Installed", false).toBool();
+    bool enabled = settings.value("Plugins/" + pluginName + "/Enabled", false).toBool();
     
     QString status;
     if (installed) status += "✓ Installed";
@@ -142,8 +142,8 @@ void PluginManagerDialog::onPluginSelected() {
         "Status: " + getPluginStatus(pluginName)
     );
     
-    QSettings settings;
-    bool enabled = settings.value("plugins/" + pluginName + "/enabled", false).toBool();
+    QSettings settings("NST", "PluginSettings");
+    bool enabled = settings.value("Plugins/" + pluginName + "/Enabled", false).toBool();
     m_enableCheckBox->setChecked(enabled);
     
     appendLog("Selected plugin: " + pluginName);
@@ -154,8 +154,8 @@ void PluginManagerDialog::onEnableToggled(int state) {
     if (!item) return;
     
     QString pluginName = item->text();
-    QSettings settings;
-    settings.setValue("plugins/" + pluginName + "/enabled", state == Qt::Checked);
+    QSettings settings("NST", "PluginSettings");
+    settings.setValue("Plugins/" + pluginName + "/Enabled", state == Qt::Checked);
     
     if (state == Qt::Checked) {
         appendLog("✓ Enabled: " + pluginName + " (will load on next startup)");
@@ -174,13 +174,26 @@ void PluginManagerDialog::onInstallClicked() {
     QString pluginName = item->text();
     appendLog("=== Installing: " + pluginName + " ===");
     
+    // Check if on_install hook exists
+    if (!LuaScriptManager::instance().hasHook(pluginName, "on_install")) {
+        // No installation hook needed, treat as success
+        QSettings settings("NST", "PluginSettings");
+        settings.setValue("Plugins/" + pluginName + "/Installed", true);
+        appendLog("✓ Installation completed (No dependencies)");
+        onPluginSelected();
+        return;
+    }
+
     auto result = LuaScriptManager::instance().executeHookForPlugin(pluginName, "on_install");
     
     if (result.toBool()) {
-        QSettings settings;
-        settings.setValue("plugins/" + pluginName + "/installed", true);
+        QSettings settings("NST", "PluginSettings");
+        settings.setValue("Plugins/" + pluginName + "/Installed", true);
         appendLog("✓ Installation completed successfully");
     } else {
+        QSettings settings("NST", "PluginSettings");
+        settings.setValue("Plugins/" + pluginName + "/Installed", false);
+        settings.setValue("Plugins/" + pluginName + "/Enabled", false); // Disable if install failed
         appendLog("✗ Installation failed");
     }
     

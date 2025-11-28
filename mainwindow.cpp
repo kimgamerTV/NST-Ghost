@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "plugindebuggerdialog.h"
 #include "pluginmanagerdialog.h"
+#include "settingsdialog.h"
+#include "searchcontroller.h"
 
 #ifdef HAS_LUA
 #include "src/plugins/LuaScriptManager.h"
@@ -67,16 +70,15 @@ MainWindow::MainWindow(QWidget *parent)
     ui->translationTableView->verticalHeader()->setDefaultSectionSize(60); // ความสูงขั้นต่ำ
 
     // ปรับ Horizontal Header
-    ui->translationTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
-    ui->translationTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->translationTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->translationTableView->horizontalHeader()->setStretchLastSection(true);
 
     // ตั้งชื่อ Header
     m_translationModel->setHorizontalHeaderLabels(QStringList() << "Context" << "Source Text" << "Translation");
 
-    // กำหนดความกว้างเริ่มต้นของคอลัมน์ Context และ Source Text
-    ui->translationTableView->setColumnWidth(0, 150); // Context
-    ui->translationTableView->setColumnWidth(1, 400); // Source
+    // กำหนดความกว้างเริ่มต้น
+    ui->translationTableView->setColumnWidth(0, 250);
+    ui->translationTableView->setColumnWidth(1, 250);
 
     // ปรับ Selection behavior
     ui->translationTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -145,7 +147,8 @@ MainWindow::MainWindow(QWidget *parent)
                     QString originalText = item->data(Qt::UserRole + 1).toString();
                     if (!originalText.isEmpty()) {
                         item->setText("✓ " + originalText);
-                        item->setData(QVariant(), Qt::UserRole + 1);
+                        // Do NOT clear the original text, so we can reuse it for subsequent translations
+                        // item->setData(QVariant(), Qt::UserRole + 1); 
                     }
                 }
             }
@@ -586,12 +589,27 @@ void MainWindow::processIncomingResults()
             m_uiUpdateTimer->start();
         }
     }
+    
+    // Refresh filter (e.g. Hide Completed)
+    if (m_searchController) {
+        m_searchController->onSearchQueryChanged(m_searchController->currentQuery());
+    }
 }
 
 void MainWindow::onTranslationServiceError(const QString &message)
 {
     statusBar()->showMessage(QString("Translation Error: %1").arg(message), 5000); // Show for 5 seconds
     qWarning() << "Translation Service Error:" << message;
+    
+    // Re-enable UI
+    ui->fileListView->setEnabled(true);
+    ui->translationTableView->setEnabled(true);
+    m_isTranslating = false;
+    m_spinnerTimer->stop();
+    
+    // If we were batch translating, we might want to stop or continue?
+    // For now, let's stop to prevent a cascade of errors.
+    m_translationQueue.clear();
 }
 
 void MainWindow::onTranslationTableViewCustomContextMenuRequested(const QPoint &pos)
@@ -933,8 +951,9 @@ void MainWindow::onTranslationDataChanged(const QModelIndex &topLeft, const QMod
 bool MainWindow::isLikelyCode(const QString &text) const
 {
     // Heuristic 1: Check for common code operators and symbols.
-    // Matches: ==, !=, >=, <=, +=, -=, *=, /=, ->, $, [, ], {, }
-    static const QRegularExpression codeRegex(R"([<>=!+\-*\/%]=|\$|->|\[|\]|\{|\})");
+    // Matches: ==, !=, >=, <=, +=, -=, *=, /=, ->, $
+    // Removed: [, ], {, } as they are common in game text (e.g. [b]bold[/b])
+    static const QRegularExpression codeRegex(R"([<>=!+\-*\/%]=|\$|->)");
     if (text.contains(codeRegex)) {
         return true;
     }
@@ -946,8 +965,10 @@ bool MainWindow::isLikelyCode(const QString &text) const
     }
     
     // Heuristic 3: Very few spaces, but multiple words and mixed case (like a variableName)
-    if (text.count(' ') < 2) {
-        static const QRegularExpression mixedCase(R"([a-z]+[A-Z]+)");
+    // Relaxed: Only check if it looks like a variable name (no spaces, starts lower, has upper)
+    // and is relatively short.
+    if (!text.contains(' ') && text.length() < 30) {
+        static const QRegularExpression mixedCase(R"(^[a-z]+[A-Z]+[a-zA-Z0-9]*$)");
         if (text.contains(mixedCase)) {
             return true;
         }

@@ -14,3 +14,19 @@ BGADataManager: After QJsonDocument::fromJson
 BGADataManager: Extracted 318665 entries.
 BGADataManager: After extracting entries
 BGADataManager: loadStringsFromGameProject returning.
+BGADataManager: Creating analyzer for engine: RPGM
+BGADataManager: Calling analyzer->analyze for project: /home/jop/Downloads/[Chanomhub] NTRダンジョン/www
+BGADataManager: Analyzer output payload size:16220482bytes
+BGADataManager: Before QJsonDocument::fromJson
+BGADataManager: After QJsonDocument::fromJson
+BGADataManager: Extracted 70591 entries.
+BGADataManager: After extracting entries
+BGADataManager: loadStringsFromGameProject returning.
+BGADataManager: Creating analyzer for engine: RPGM
+BGADataManager: Calling analyzer->analyze for project: /home/jop/Downloads/[Chanomhub] NTRダンジョン/www
+BGADataManager: Analyzer output payload size:16220482bytes
+BGADataManager: Before QJsonDocument::fromJson
+BGADataManager: After QJsonDocument::fromJson
+BGADataManager: Extracted 70591 entries.
+BGADataManager: After extracting entries
+BGADataManager: loadStringsFromGameProject returning.

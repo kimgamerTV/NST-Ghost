@@ -29,11 +29,13 @@ signals:
 private slots:
     void processNextTranslation();
     void onTranslationDone(const qtlingo::TranslationResult &result);
+    void onBatchTranslationDone(const QList<qtlingo::TranslationResult> &results);
     void onTranslationError(const QString &message);
 
 private:
     QList<qtlingo::ITranslationService*> m_services;
     QQueue<QString> m_translationQueue;
+    QStringList m_currentBatch; // Track current batch for error handling
     qtlingo::ITranslationService* m_currentService = nullptr;
     QString m_currentServiceName;
     int m_totalItems = 0;

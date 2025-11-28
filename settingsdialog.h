@@ -2,6 +2,15 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QJsonArray>
+
+class QListWidgetItem;
+class QListWidget;
+class QCheckBox;
+class QFormLayout;
+class QRadioButton;
+class QLabel;
+class QLineEdit;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -40,6 +49,23 @@ private slots:
 
 private:
     Ui::SettingsDialog *ui;
+    
+    // Plugin UI members
+    QRadioButton *pluginsRadioButton;
+    QWidget *pluginsPage;
+    QListWidget *pluginListWidget;
+    QCheckBox *pluginEnabledCheckBox;
+    QWidget *pluginSettingsContainer;
+    QFormLayout *pluginSettingsLayout;
+    
+    void setupPluginsUI();
+    void loadPluginList();
+    void onPluginSelected(QListWidgetItem *item);
+    void saveCurrentPluginSettings();
+    void clearPluginSettingsUI();
+    
+    // Helper to get settings schema from Lua
+    QJsonArray getPluginSettingsSchema(const QString &scriptPath);
 };
 
 #endif // SETTINGSDIALOG_H

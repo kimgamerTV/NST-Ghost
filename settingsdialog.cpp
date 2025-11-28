@@ -31,6 +31,8 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     updateConfigPanel();
     updateLlmModelComboBox();
+    
+    setupPluginsUI();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -140,6 +142,8 @@ void SettingsDialog::updateConfigPanel()
         ui->configStackedWidget->setCurrentIndex(1); // Page for Professional (Google API)
     } else if (ui->aiPoweredTranslateRadioButton->isChecked()) {
         ui->configStackedWidget->setCurrentIndex(2); // Page for AI-Powered (LLM)
+    } else if (pluginsRadioButton->isChecked()) {
+        ui->configStackedWidget->setCurrentWidget(pluginsPage);
     }
 }
 
@@ -155,4 +159,236 @@ void SettingsDialog::updateLlmModelComboBox()
     } else if (provider == "Google AI") {
         ui->llmModelComboBox->addItems({"gemini-1.5-pro-latest", "gemini-pro"});
     }
+}
+
+// --- Plugin Manager Implementation ---
+
+#include <QListWidget>
+#include <QCheckBox>
+#include <QFormLayout>
+#include <QRadioButton>
+#include <QDir>
+#include <QSettings>
+#include <QScrollArea>
+#include <QLabel>
+#include <QLineEdit>
+#include <QGroupBox>
+#include <lua.hpp>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+void SettingsDialog::setupPluginsUI()
+{
+    // 1. Add "Plugins" Radio Button to the GroupBox
+    // We need to find the layout of translationModeGroupBox
+    // Accessing ui->translationModeGroupBox directly
+    
+    pluginsRadioButton = new QRadioButton("🧩 Plugins (Lua)", this);
+    ui->translationModeGroupBox->layout()->addWidget(pluginsRadioButton);
+    
+    connect(pluginsRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
+    
+    // 2. Create Plugins Page
+    pluginsPage = new QWidget();
+    QHBoxLayout *pageLayout = new QHBoxLayout(pluginsPage);
+    
+    // Left: Plugin List
+    pluginListWidget = new QListWidget();
+    pluginListWidget->setFixedWidth(150);
+    connect(pluginListWidget, &QListWidget::itemClicked, this, &SettingsDialog::onPluginSelected);
+    
+    // Right: Settings Area
+    QVBoxLayout *rightLayout = new QVBoxLayout();
+    
+    pluginEnabledCheckBox = new QCheckBox("Enable Plugin");
+    pluginEnabledCheckBox->setEnabled(false); // Disabled until plugin selected
+    connect(pluginEnabledCheckBox, &QCheckBox::toggled, [this](bool checked){
+        // Save enabled state immediately or when saving settings?
+        // Let's save on accept, but we need to track it.
+        // Actually, simpler to write to QSettings immediately for now, or keep in memory.
+        // Let's write to QSettings immediately for simplicity in this iteration.
+        if (pluginListWidget->currentItem()) {
+             QString scriptName = pluginListWidget->currentItem()->text();
+             QSettings settings(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
+             settings.setValue("Plugins/" + scriptName + "/Enabled", checked);
+        }
+    });
+    
+    QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setWidgetResizable(true);
+    pluginSettingsContainer = new QWidget();
+    pluginSettingsLayout = new QFormLayout(pluginSettingsContainer);
+    scrollArea->setWidget(pluginSettingsContainer);
+    
+    rightLayout->addWidget(pluginEnabledCheckBox);
+    rightLayout->addWidget(scrollArea);
+    
+    pageLayout->addWidget(pluginListWidget);
+    pageLayout->addLayout(rightLayout);
+    
+    // Add to Stacked Widget
+    ui->configStackedWidget->addWidget(pluginsPage);
+    
+    loadPluginList();
+}
+
+void SettingsDialog::loadPluginList()
+{
+    QDir scriptDir(QCoreApplication::applicationDirPath());
+    if (!scriptDir.cd("scripts")) {
+        // Try one level up (for dev environment)
+        scriptDir.cdUp();
+        scriptDir.cd("scripts");
+    }
+    
+    pluginListWidget->clear();
+    for (const QString &fileName : scriptDir.entryList({"*.lua"}, QDir::Files)) {
+        // Filter logic (same as plugin)
+        // For now, list all, or check for on_text_extract?
+        // Let's check for on_text_extract to be consistent.
+        QString filePath = scriptDir.absoluteFilePath(fileName);
+        lua_State *L = luaL_newstate();
+        if (luaL_dofile(L, filePath.toStdString().c_str()) == LUA_OK) {
+            lua_getglobal(L, "on_text_extract");
+            if (lua_isfunction(L, -1)) {
+                 pluginListWidget->addItem(fileName);
+            }
+        }
+        lua_close(L);
+    }
+}
+
+void SettingsDialog::onPluginSelected(QListWidgetItem *item)
+{
+    if (!item) return;
+    QString scriptName = item->text();
+    
+    // Load Enabled State
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
+    bool enabled = settings.value("Plugins/" + scriptName + "/Enabled", false).toBool();
+    
+    pluginEnabledCheckBox->setEnabled(true);
+    pluginEnabledCheckBox->blockSignals(true);
+    pluginEnabledCheckBox->setChecked(enabled);
+    pluginEnabledCheckBox->blockSignals(false);
+    
+    // Load Settings Schema
+    clearPluginSettingsUI();
+    
+    // Find script path
+    QDir scriptDir(QCoreApplication::applicationDirPath());
+    if (!scriptDir.cd("scripts")) { scriptDir.cdUp(); scriptDir.cd("scripts"); }
+    QString filePath = scriptDir.absoluteFilePath(scriptName);
+    
+    QJsonArray schema = getPluginSettingsSchema(filePath);
+    
+    for (const QJsonValue &val : schema) {
+        QJsonObject field = val.toObject();
+        QString key = field["key"].toString();
+        QString label = field["label"].toString();
+        QString type = field["type"].toString();
+        QString defaultValue = field["default"].toString(); // or toVariant
+        
+        QString currentVal = settings.value("Plugins/" + scriptName + "/Settings/" + key, defaultValue).toString();
+        
+        if (type == "text" || type == "password") {
+            QLineEdit *edit = new QLineEdit();
+            edit->setText(currentVal);
+            if (type == "password") edit->setEchoMode(QLineEdit::Password);
+            
+            // Save on change
+            connect(edit, &QLineEdit::textChanged, [scriptName, key](const QString &text){
+                QSettings s(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
+                s.setValue("Plugins/" + scriptName + "/Settings/" + key, text);
+            });
+            
+            pluginSettingsLayout->addRow(label + ":", edit);
+        } else if (type == "dropdown") {
+            QComboBox *combo = new QComboBox();
+            QJsonArray options = field["options"].toArray();
+            for (const QJsonValue &opt : options) {
+                combo->addItem(opt.toString());
+            }
+            
+            // Set current value
+            int idx = combo->findText(currentVal);
+            if (idx != -1) combo->setCurrentIndex(idx);
+            else if (combo->count() > 0) combo->setCurrentIndex(0); // Default to first if not found
+            
+            // Save on change
+            connect(combo, &QComboBox::currentTextChanged, [scriptName, key](const QString &text){
+                QSettings s(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
+                s.setValue("Plugins/" + scriptName + "/Settings/" + key, text);
+            });
+            
+            pluginSettingsLayout->addRow(label + ":", combo);
+        }
+    }
+}
+
+void SettingsDialog::clearPluginSettingsUI()
+{
+    QLayoutItem *item;
+    while ((item = pluginSettingsLayout->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
+}
+
+QJsonArray SettingsDialog::getPluginSettingsSchema(const QString &scriptPath)
+{
+    QJsonArray schema;
+    lua_State *L = luaL_newstate();
+    luaL_openlibs(L); // Needed for table manipulation if script uses it
+    
+    if (luaL_dofile(L, scriptPath.toStdString().c_str()) == LUA_OK) {
+        lua_getglobal(L, "on_define_settings");
+        if (lua_isfunction(L, -1)) {
+            if (lua_pcall(L, 0, 1, 0) == LUA_OK) {
+                // Result should be a table (array of objects)
+                // Convert Lua table to QJsonArray
+                // Use a simplified converter here since we don't have the full helper from LuaWorker
+                // Or just copy the helper?
+                // Let's implement a quick one-off for this specific structure.
+                
+                if (lua_istable(L, -1)) {
+                    int len = lua_rawlen(L, -1);
+                    for (int i = 1; i <= len; ++i) {
+                        lua_rawgeti(L, -1, i); // Push item
+                        if (lua_istable(L, -1)) {
+                            QJsonObject obj;
+                            lua_pushnil(L);
+                            while (lua_next(L, -2) != 0) {
+                                QString k = QString::fromUtf8(lua_tostring(L, -2));
+                                
+                                // Check value type
+                                if (lua_isstring(L, -1)) {
+                                    QString v = QString::fromUtf8(lua_tostring(L, -1));
+                                    obj.insert(k, v);
+                                } else if (lua_istable(L, -1) && k == "options") {
+                                    // Handle options array
+                                    QJsonArray optionsArr;
+                                    int optLen = lua_rawlen(L, -1);
+                                    for (int j = 1; j <= optLen; ++j) {
+                                        lua_rawgeti(L, -1, j);
+                                        if (lua_isstring(L, -1)) {
+                                            optionsArr.append(QString::fromUtf8(lua_tostring(L, -1)));
+                                        }
+                                        lua_pop(L, 1);
+                                    }
+                                    obj.insert("options", optionsArr);
+                                }
+                                
+                                lua_pop(L, 1);
+                            }
+                            schema.append(obj);
+                        }
+                        lua_pop(L, 1); // Pop item
+                    }
+                }
+            }
+        }
+    }
+    lua_close(L);
+    return schema;
 }

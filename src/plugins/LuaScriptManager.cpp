@@ -66,6 +66,13 @@ QVariant LuaScriptManager::executeHookForPlugin(const QString& pluginName, const
     return QVariant();
 }
 
+bool LuaScriptManager::hasHook(const QString& pluginName, const QString& hookName) {
+    if (m_scripts.contains(pluginName)) {
+        return m_scripts[pluginName]->hasFunction(hookName);
+    }
+    return false;
+}
+
 int LuaScriptManager::api_log(lua_State* L) {
     const char* msg = lua_tostring(L, 1);
     qDebug() << "[Lua]" << msg;

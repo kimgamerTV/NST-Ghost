@@ -12,6 +12,7 @@ public:
 
     bool loadScript(const QString& scriptPath);
     QVariant callFunction(const QString& funcName, const QVariantList& args = {});
+    bool hasFunction(const QString& funcName);
     void registerFunction(const QString& name, lua_CFunction func);
 
 signals:

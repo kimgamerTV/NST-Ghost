@@ -1,0 +1,10 @@
+Scanning scripts in: /home/jop/work/NST/NST/build/scripts
+Found translation script (Disabled/Not Installed): api_example.lua
+Skipping script (no on_text_extract): custom_engine.lua
+Found translation script (Disabled/Not Installed): groq_translate.lua
+Skipping script (no on_text_extract): install_unrpyc.lua
+Skipping script (no on_text_extract): mock_data.lua
+Found translation script (Disabled/Not Installed): official_example.lua
+Found translation script (Disabled/Not Installed): text_processor.lua
+Skipping script (no on_text_extract): unrpyc_installer.lua
+Lua Service 'Lua: groq_translate.lua' not found! (Did enable work?)

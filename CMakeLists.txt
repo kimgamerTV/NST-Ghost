@@ -43,6 +43,8 @@ set(PROJECT_SOURCES
     updatecontroller.cpp
     fontmanagerdialog.cpp
     pluginmanagerdialog.cpp
+    plugindebuggerdialog.cpp
+    plugins/LuaTranslationPlugin/luatranslationservice.cpp
     projectdatamanager.cpp # New file
     mainwindow.h
     menubar.h
@@ -51,6 +53,8 @@ set(PROJECT_SOURCES
     settingsdialog.h
     fontmanagerdialog.h
     pluginmanagerdialog.h
+    plugindebuggerdialog.h
+    plugins/LuaTranslationPlugin/luatranslationservice.h
     searchcontroller.h
     shortcutcontroller.h
     bgadatamanager.h
@@ -109,6 +113,10 @@ target_link_libraries(NST PRIVATE
     QtLingo
 )
 
+add_executable(VerificationTest verification_test.cpp)
+target_link_libraries(VerificationTest PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network QtLingo)
+target_include_directories(VerificationTest PRIVATE ${CMAKE_SOURCE_DIR}/QtLingo/include)
+
 if(Lua_FOUND)
     target_link_libraries(NST PRIVATE ${LUA_LIBRARIES})
     target_include_directories(NST PRIVATE ${LUA_INCLUDE_DIR})
@@ -116,6 +124,9 @@ if(Lua_FOUND)
 endif()
 
 target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
+
+# Copy scripts to build directory
+file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
