@@ -70,7 +70,7 @@ set(PROJECT_SOURCES
 )
 
 # Lua plugin sources (optional)
-if(Lua_FOUND)
+if(LUA_FOUND)
     list(APPEND PROJECT_SOURCES
         src/plugins/LuaPlugin.cpp
         src/plugins/LuaPlugin.h
@@ -119,10 +119,13 @@ add_executable(VerificationTest verification_test.cpp)
 target_link_libraries(VerificationTest PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network QtLingo)
 target_include_directories(VerificationTest PRIVATE ${CMAKE_SOURCE_DIR}/QtLingo/include)
 
-if(Lua_FOUND)
+if(LUA_FOUND)
+    message(STATUS "Lua found, adding include directories: ${LUA_INCLUDE_DIR}")
     target_link_libraries(NST PRIVATE ${LUA_LIBRARIES})
     target_include_directories(NST PRIVATE ${LUA_INCLUDE_DIR})
     target_compile_definitions(NST PRIVATE HAS_LUA=1)
+else()
+    message(WARNING "Lua not found (LUA_FOUND is false)")
 endif()
 
 target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
