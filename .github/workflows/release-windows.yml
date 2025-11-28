@@ -38,6 +38,11 @@ jobs:
         run: choco install ninja
         shell: pwsh
       
+      - name: Install Lua
+        run: choco install lua
+        shell: pwsh
+
+      
       - name: Set environment variables
         run: |
           echo "Qt6_DIR=${{ github.workspace }}/6.10.0/msvc2022_64" >> $env:GITHUB_ENV

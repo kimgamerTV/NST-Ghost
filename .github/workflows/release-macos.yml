@@ -19,6 +19,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Install Dependencies
+        run: brew install lua
+
+      
       - name: Install Qt
         run: |
           brew install qt@6
