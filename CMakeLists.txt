@@ -115,9 +115,7 @@ target_link_libraries(NST PRIVATE
     QtLingo
 )
 
-add_executable(VerificationTest verification_test.cpp)
-target_link_libraries(VerificationTest PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network QtLingo)
-target_include_directories(VerificationTest PRIVATE ${CMAKE_SOURCE_DIR}/QtLingo/include)
+
 
 message(STATUS "DEBUG: Reached line 120 (before if check)")
 message(STATUS "DEBUG: Lua_FOUND: ${Lua_FOUND}")

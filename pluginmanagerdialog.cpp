@@ -72,7 +72,7 @@ PluginManagerDialog::PluginManagerDialog(QWidget* parent) : QDialog(parent) {
     connect(m_runActionBtn, &QPushButton::clicked, this, &PluginManagerDialog::onRunActionClicked);
     connect(reloadBtn, &QPushButton::clicked, this, &PluginManagerDialog::onReloadClicked);
     connect(closeBtn, &QPushButton::clicked, this, &QDialog::accept);
-    connect(m_enableCheckBox, &QCheckBox::stateChanged, this, &PluginManagerDialog::onEnableToggled);
+    connect(m_enableCheckBox, &QCheckBox::checkStateChanged, this, &PluginManagerDialog::onEnableToggled);
     
 #ifdef HAS_LUA
     // Connect Lua log output
