@@ -72,6 +72,8 @@ set(PROJECT_SOURCES
     realtimetranslationwidget.h
     translationserver.cpp
     translationserver.h
+    processselectordialog.cpp
+    processselectordialog.h
     resources.qrc
 )
 
@@ -326,3 +328,4 @@ if(WIN32)
 endif()
 
 include(CPack)
+add_subdirectory(Injection)

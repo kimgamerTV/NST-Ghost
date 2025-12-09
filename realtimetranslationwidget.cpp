@@ -1,8 +1,9 @@
 #include "realtimetranslationwidget.h"
+#include "processselectordialog.h"
 #include <QDateTime>
 
 RealTimeTranslationWidget::RealTimeTranslationWidget(QWidget *parent)
-    : QWidget(parent), m_server(new TranslationServer(this)), m_isServerRunning(false)
+    : QWidget(parent), m_server(new TranslationServer(this)), m_isServerRunning(false), m_targetPid(-1)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     
@@ -26,6 +27,12 @@ RealTimeTranslationWidget::RealTimeTranslationWidget(QWidget *parent)
     controlsLayout->addWidget(m_portSpinBox);
     controlsLayout->addSpacing(10);
     controlsLayout->addWidget(m_toggleServerButton);
+    
+    m_selectProcessButton = new QPushButton("Select Game Process", this);
+    m_selectProcessButton->setFixedHeight(40);
+    controlsLayout->addSpacing(10);
+    controlsLayout->addWidget(m_selectProcessButton);
+    
     controlsLayout->addWidget(m_statusLabel);
     controlsLayout->addStretch();
     
@@ -42,6 +49,7 @@ RealTimeTranslationWidget::RealTimeTranslationWidget(QWidget *parent)
 
     // Connections
     connect(m_toggleServerButton, &QPushButton::clicked, this, &RealTimeTranslationWidget::onToggleServer);
+    connect(m_selectProcessButton, &QPushButton::clicked, this, &RealTimeTranslationWidget::onSelectProcess);
     connect(m_server, &TranslationServer::logMessage, this, &RealTimeTranslationWidget::onLogMessage);
     connect(m_server, &TranslationServer::newTranslationRequest, this, &RealTimeTranslationWidget::onNewTranslationRequest);
 }
@@ -73,6 +81,19 @@ void RealTimeTranslationWidget::onToggleServer()
         } else {
             m_toggleServerButton->setChecked(false); // Reset button if failed
         }
+    }
+}
+
+void RealTimeTranslationWidget::onSelectProcess()
+{
+    ProcessSelectorDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        m_targetPid = dialog.selectedPid();
+        QString name = dialog.selectedName();
+        onLogMessage(QString("Target Process Selected: %1 (PID: %2)").arg(name).arg(m_targetPid));
+        
+        // TODO: Trigger actual injection strategy here
+        onLogMessage("Ready to inject... (Logic pending)");
     }
 }
 
