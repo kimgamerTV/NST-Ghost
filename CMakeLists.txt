@@ -70,6 +70,8 @@ set(PROJECT_SOURCES
     customtitlebar.h
     realtimetranslationwidget.cpp
     realtimetranslationwidget.h
+    translationserver.cpp
+    translationserver.h
     resources.qrc
 )
 
