@@ -2,6 +2,7 @@
 #include <QStyle>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QButtonGroup>
 
 CustomTitleBar::CustomTitleBar(QWidget *parent)
     : QWidget(parent), m_isDrag(false)
@@ -16,6 +17,26 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
 
     m_titleLabel = new QLabel(this);
     m_titleLabel->setObjectName("titleBarTitle");
+    
+    // Navigation Buttons
+    m_fileTransButton = new QPushButton(this);
+    m_fileTransButton->setObjectName("navButton");
+    m_fileTransButton->setText("File Translate");
+    m_fileTransButton->setCheckable(true);
+    m_fileTransButton->setChecked(true);
+    m_fileTransButton->setCursor(Qt::PointingHandCursor);
+
+    m_realTimeButton = new QPushButton(this);
+    m_realTimeButton->setObjectName("navButton");
+    m_realTimeButton->setText("Real-time");
+    m_realTimeButton->setCheckable(true);
+    m_realTimeButton->setCursor(Qt::PointingHandCursor);
+    
+    // Exclusive checking
+    QButtonGroup *navGroup = new QButtonGroup(this);
+    navGroup->addButton(m_fileTransButton);
+    navGroup->addButton(m_realTimeButton);
+    navGroup->setExclusive(true);
     
     // Window controls
     m_minimizeButton = new QPushButton(this);
@@ -39,6 +60,9 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     // Add widgets to layout
     m_layout->addWidget(m_iconLabel);
     m_layout->addWidget(m_titleLabel);
+    m_layout->addSpacing(20);
+    m_layout->addWidget(m_fileTransButton);
+    m_layout->addWidget(m_realTimeButton);
     m_layout->addStretch();
     m_layout->addWidget(m_minimizeButton);
     m_layout->addWidget(m_maximizeButton);
@@ -51,6 +75,9 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     connect(m_minimizeButton, &QPushButton::clicked, this, &CustomTitleBar::minimizeClicked);
     connect(m_maximizeButton, &QPushButton::clicked, this, &CustomTitleBar::maximizeRestoreClicked);
     connect(m_closeButton, &QPushButton::clicked, this, &CustomTitleBar::closeClicked);
+    
+    connect(m_fileTransButton, &QPushButton::clicked, this, &CustomTitleBar::translateModeClicked);
+    connect(m_realTimeButton, &QPushButton::clicked, this, &CustomTitleBar::realTimeModeClicked);
 }
 
 void CustomTitleBar::setTitle(const QString &title)

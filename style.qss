@@ -1520,3 +1520,24 @@ CustomTitleBar {
 #titleBarClose:pressed {
     background-color: #b32419;
 }
+
+/* Navigation Buttons in Title Bar */
+#navButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    color: #999999;
+    font-weight: bold;
+    padding: 4px 12px;
+    font-size: 10pt;
+}
+
+#navButton:hover {
+    color: #cccccc;
+    background-color: #3a3a3a;
+}
+
+#navButton:checked {
+    color: #ffffff;
+    background-color: #3399ff;
+}

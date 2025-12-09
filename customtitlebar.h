@@ -20,6 +20,8 @@ signals:
     void minimizeClicked();
     void maximizeRestoreClicked();
     void closeClicked();
+    void translateModeClicked(); // Switch to File Translation
+    void realTimeModeClicked();  // Switch to Real-time Translation
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -30,6 +32,12 @@ protected:
 private:
     QLabel *m_iconLabel;
     QLabel *m_titleLabel;
+    
+    // Navigation Buttons
+    QPushButton *m_fileTransButton;
+    QPushButton *m_realTimeButton;
+    
+    // Window Controls
     QPushButton *m_minimizeButton;
     QPushButton *m_maximizeButton;
     QPushButton *m_closeButton;

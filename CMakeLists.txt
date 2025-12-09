@@ -68,6 +68,8 @@ set(PROJECT_SOURCES
     projectdatamanager.h # New file
     customtitlebar.cpp
     customtitlebar.h
+    realtimetranslationwidget.cpp
+    realtimetranslationwidget.h
     resources.qrc
 )
 

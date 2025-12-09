@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+    #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "plugindebuggerdialog.h"
 #include "pluginmanagerdialog.h"
@@ -246,29 +246,44 @@ MainWindow::MainWindow(QWidget *parent)
     // 1. Get the existing central widget created by ui->setupUi()
     QWidget *oldCentralWidget = ui->centralwidget;
     
-    // 2. Create a new container widget to be the new central widget
+    // 2. Create Stacked Widget and Pages
+    m_stackedWidget = new QStackedWidget(this);
+    m_stackedWidget->addWidget(oldCentralWidget); // Index 0: File Translate
+    
+    m_realTimeWidget = new RealTimeTranslationWidget(this);
+    m_stackedWidget->addWidget(m_realTimeWidget); // Index 1: Real-time Translate
+    
+    // 3. Create a new container widget to be the new central widget
     QWidget *mainContainer = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(mainContainer);
     // Use a small margin to allow mouse events to reach MainWindow for resizing
     mainLayout->setContentsMargins(5, 5, 5, 5); 
     mainLayout->setSpacing(0);
     
-    // 3. Add widgets to the new layout
+    // 4. Add widgets to the new layout
     m_titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_menuBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    oldCentralWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_stackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     mainLayout->addWidget(m_titleBar);
     mainLayout->addWidget(m_menuBar);
-    mainLayout->addWidget(oldCentralWidget);
+    mainLayout->addWidget(m_stackedWidget);
     
     // Set stretch factors to ensure content takes all available space
     mainLayout->setStretch(0, 0); // Title Bar
     mainLayout->setStretch(1, 0); // Menu Bar
     mainLayout->setStretch(2, 1); // Content
     
-    // 4. Set the new container as the central widget
+    // 5. Set the new container as the central widget
     setCentralWidget(mainContainer);
+    
+    // Connect Navigation
+    connect(m_titleBar, &CustomTitleBar::translateModeClicked, this, [this]() {
+        onNavigationChanged(0);
+    });
+    connect(m_titleBar, &CustomTitleBar::realTimeModeClicked, this, [this]() {
+        onNavigationChanged(1);
+    });
     
     // Enable mouse tracking for resizing
     setMouseTracking(true);
@@ -1131,6 +1146,20 @@ void MainWindow::onTranslateAllFiles()
 {
     ui->fileListView->selectAll();
     onTranslateSelectedFiles();
+}
+
+
+// ==========================================
+// Navigation
+// ==========================================
+void MainWindow::onNavigationChanged(int index)
+{
+    m_stackedWidget->setCurrentIndex(index);
+    if (index == 0) {
+        m_menuBar->show(); // Show menu bar for File Translate
+    } else {
+        m_menuBar->hide(); // Hide menu bar for Real-time Translate (or keep if desired)
+    }
 }
 
 

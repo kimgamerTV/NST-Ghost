@@ -21,6 +21,8 @@
 #include "translationcontextmenu.h"
 #include "projectdatamanager.h"
 #include "customtitlebar.h"
+#include "realtimetranslationwidget.h"
+#include <QStackedWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -56,9 +58,14 @@ private slots:
     void onFontManagerActionTriggered();
     void onPluginManagerActionTriggered();
     
+    
+    
     // View slots
     void onToggleContext(bool checked);
     void onHideCompleted(bool checked);
+
+    // Navigation slots
+    void onNavigationChanged(int index);
     
     // Smart Filter slots
     void onMarkAsIgnored();
@@ -91,6 +98,8 @@ private:
     SmartFilterManager *m_smartFilterManager; // New member
     MenuBar *m_menuBar;
     CustomTitleBar *m_titleBar;
+    QStackedWidget *m_stackedWidget;
+    RealTimeTranslationWidget *m_realTimeWidget;
     UpdateController *m_updateController;
     ProjectDataManager *m_projectDataManager;
 
