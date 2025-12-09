@@ -30,6 +30,7 @@ add_library(Injection SHARED
   ${TS_FILES}
 )
 
+
 if (WIN32)
     target_link_libraries(Injection PRIVATE Qt${QT_VERSION_MAJOR}::Core ws2_32)
 else()
@@ -37,6 +38,16 @@ else()
 endif()
 
 target_compile_definitions(Injection PRIVATE INJECTION_LIBRARY)
+
+# Standalone Injector Agent (helper for Wine)
+if(WIN32)
+    # Standalone Injector Agent (helper for Wine)
+    add_executable(InjectorAgent
+        runner/injector_main.cpp
+    )
+    # Make sure it builds as a console app
+    set_target_properties(InjectorAgent PROPERTIES WIN32_EXECUTABLE FALSE)
+endif()
 
 # if(COMMAND qt_create_translation)
 #     qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${TS_FILES})
