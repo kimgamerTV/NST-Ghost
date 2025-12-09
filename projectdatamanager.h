@@ -21,6 +21,10 @@ public:
     QMap<QString, QJsonArray> &getLoadedGameProjectData();
     QString &getCurrentLoadedFilePath();
 
+    void updateTranslation(const QString &source, const QString &translation);
+    void saveGameProject();
+    void setHideCompleted(bool hide);
+
 public slots:
     void onLoadingFinished(const QJsonArray &extractedTextsArray);
     void onFileSelected(const QModelIndex &index);
@@ -37,6 +41,7 @@ private:
     QMap<QString, QJsonArray> m_loadedGameProjectData;
     QString m_currentLoadedFilePath;
     QFutureWatcher<QPair<QMap<QString, QJsonArray>, QStringList>> m_processingFutureWatcher;
+    bool m_hideCompleted = false;
 };
 
 #endif // PROJECTDATAMANAGER_H

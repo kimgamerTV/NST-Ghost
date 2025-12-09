@@ -47,7 +47,7 @@ set(PROJECT_SOURCES
     pluginmanagerdialog.cpp
     plugindebuggerdialog.cpp
     plugins/LuaTranslationPlugin/luatranslationservice.cpp
-    projectdatamanager.cpp # New file
+    projectdatamanager.cpp
     mainwindow.h
     menubar.h
     loadprojectdialog.h
@@ -65,11 +65,14 @@ set(PROJECT_SOURCES
     updatecontroller.h
     customprogressdialog.cpp
     customprogressdialog.h
-    projectdatamanager.h # New file
+    projectdatamanager.h
     customtitlebar.cpp
     customtitlebar.h
     realtimetranslationwidget.cpp
     realtimetranslationwidget.h
+    filetranslationwidget.cpp
+    filetranslationwidget.h
+    filetranslationwidget.ui
     translationserver.cpp
     translationserver.h
     processselectordialog.cpp

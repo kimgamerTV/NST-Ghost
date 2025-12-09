@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QSet>
 #include <QtConcurrent>
+#include <QJsonDocument>
+#include <QFile>
 
 ProjectDataManager::ProjectDataManager(QStandardItemModel *fileListModel, QStandardItemModel *translationModel, QObject *parent)
     : QObject(parent)
@@ -120,7 +122,53 @@ void ProjectDataManager::onFileSelected(const QModelIndex &index)
             // but now it's visible in the first column.
             sourceItem->setData(key, Qt::UserRole + 1);
 
+            if (m_hideCompleted && !translation.isEmpty()) {
+                 continue;
+            }
+
             m_translationModel->appendRow(QList<QStandardItem*>() << contextItem << sourceItem << transItem);
         }
     }
+}
+
+void ProjectDataManager::updateTranslation(const QString &source, const QString &translation)
+{
+    if (m_currentLoadedFilePath.isEmpty() || !m_loadedGameProjectData.contains(m_currentLoadedFilePath))
+        return;
+
+    QJsonArray &textsArray = m_loadedGameProjectData[m_currentLoadedFilePath];
+    for (int i = 0; i < textsArray.size(); ++i) {
+        QJsonObject obj = textsArray.at(i).toObject();
+        if (obj["source"].toString() == source) {
+            obj["text"] = translation;
+            textsArray.replace(i, obj);
+        }
+    }
+    // Also update map
+    m_loadedGameProjectData[m_currentLoadedFilePath] = textsArray;
+}
+
+void ProjectDataManager::saveGameProject()
+{
+    // Iterate over all loaded files and save them back to disk
+    QMapIterator<QString, QJsonArray> i(m_loadedGameProjectData);
+    while (i.hasNext()) {
+        i.next();
+        QString filePath = i.key();
+        QJsonArray data = i.value();
+
+        QFile file(filePath);
+        if (file.open(QIODevice::WriteOnly)) {
+            QJsonDocument doc(data);
+            file.write(doc.toJson());
+            file.close();
+        } else {
+            qWarning() << "Failed to save file:" << filePath;
+        }
+    }
+}
+
+void ProjectDataManager::setHideCompleted(bool hide)
+{
+    m_hideCompleted = hide;
 }

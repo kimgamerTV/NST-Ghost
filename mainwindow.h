@@ -1,28 +1,18 @@
-#include "customprogressdialog.h"
-#include <QMainWindow>
-#include <QStandardItemModel>
-#include <QStringListModel>
-#include <QMap>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QFutureWatcher>
-#include <QProgressDialog>
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include "searchcontroller.h"
-#include "searchdialog.h"
-#include "shortcutcontroller.h"
-#include "bgadatamanager.h"
-#include "translationservicemanager.h"
+#include <QMainWindow>
+#include <QStackedWidget>
+#include <QSharedPointer>
+
 #include "menubar.h"
-#include "settingsdialog.h"
-#include "fontmanagerdialog.h"
-#include "updatecontroller.h"
-#include "smartfiltermanager.h" // New include
-#include "translationcontextmenu.h"
-#include "projectdatamanager.h"
 #include "customtitlebar.h"
 #include "realtimetranslationwidget.h"
-#include <QStackedWidget>
+#include "filetranslationwidget.h"
+#include "settingsdialog.h"
+#include "updatecontroller.h"
+#include "translationservicemanager.h"
+#include "fontmanagerdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,69 +30,47 @@ public slots:
     void onLoadFromGameProject();
 
 private slots:
-    void onLoadingFinished();
-    void onProjectProcessingFinished();
-    void openSearchDialog();
-    void onSearchResultSelected(const QString &fileName, int row);
     void onOpenMockData();
-    void onBGADataError(const QString &message);
-    void onSearchRequested(const QString &query);
-    void onTranslationFinished(const qtlingo::TranslationResult &result);
-    void onTranslationServiceError(const QString &message);
-    void onTranslationTableViewCustomContextMenuRequested(const QPoint &pos);
-    void onTranslateSelectedTextWithService();
-    void onTranslateAllSelectedText();
-    void onSelectAllRequested();
     void onSettingsActionTriggered();
     void onFontsLoaded(const QJsonArray &fonts);
     void onFontManagerActionTriggered();
     void onPluginManagerActionTriggered();
     
-    
-    
-    // View slots
+    // View slots (delegated)
     void onToggleContext(bool checked);
     void onHideCompleted(bool checked);
 
     // Navigation slots
     void onNavigationChanged(int index);
     
-    // Smart Filter slots
-    void onMarkAsIgnored();
-    void onUnmarkAsIgnored(); // New slot
+    // Smart Filter slots (delegated)
     void onExportSmartFilterRules();
     void onImportSmartFilterRules();
 
-    void onMockDataLoaded(const QJsonArray &data);
-    void onUndoTranslation();
-    void onSaveGameProject();
-    void onTranslationDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
-    void onTranslateSelectedFiles();
-    void onTranslateAllFiles();
-    void onFileListCustomContextMenuRequested(const QPoint &pos);
+    void onSaveGameProject(); // delegated
 
 private:
     void loadSettings();
     void saveSettings();
+    void updateChildSettings();
 
 private:
-    bool isLikelyCode(const QString &text) const;
     Ui::MainWindow *ui;
-    QStandardItemModel *m_fileListModel;
-    QStandardItemModel *m_translationModel;
-    SearchController *m_searchController;
-    SearchDialog *m_searchDialog;
-    ShortcutController *m_shortcutController;
-    BGADataManager *m_bgaDataManager;
-    TranslationServiceManager *m_translationServiceManager;
-    SmartFilterManager *m_smartFilterManager; // New member
+    
+    // UI Components
     MenuBar *m_menuBar;
     CustomTitleBar *m_titleBar;
     QStackedWidget *m_stackedWidget;
+    
+    // Widgets
+    FileTranslationWidget *m_fileTranslationWidget;
     RealTimeTranslationWidget *m_realTimeWidget;
+    
+    // Managers / Controllers owned by MainWindow but shared/used by children
+    TranslationServiceManager *m_translationServiceManager;
     UpdateController *m_updateController;
-    ProjectDataManager *m_projectDataManager;
-
+    
+    // Settings state
     QString m_apiKey;
     QString m_targetLanguage;
     QString m_targetLanguageName;
@@ -112,57 +80,14 @@ private:
     QString m_llmModel;
     QString m_llmBaseUrl;
 
-    struct PendingTranslation {
-        QModelIndex index;
-        QString filePath;
-    };
-    QMultiMap<QString, PendingTranslation> m_pendingTranslations;
-    
-    QVector<QModelIndex> m_pendingUIUpdates;
-    QTimer *m_uiUpdateTimer;
-
-
-    QJsonArray m_gameFonts;
-
-    QString m_currentEngineName;
-    QString m_currentProjectPath;
-
-    QFutureWatcher<QJsonArray> m_loadFutureWatcher;
-    CustomProgressDialog *m_progressDialog;
-    
-    QTimer *m_spinnerTimer;
-    int m_spinnerFrame = 0;
-    QModelIndex m_currentTranslatingFileIndex;
-    
-    
-    struct TranslationJob {
-        QString serviceName;
-        QStringList sourceTexts;
-        QVariantMap settings;
-        QModelIndex fileIndex;
-    };
-    QQueue<TranslationJob> m_translationQueue;
-    bool m_isTranslating = false;
-    
-    void processNextTranslationJob();
-    
-    struct QueuedTranslationResult {
-        qtlingo::TranslationResult result;
-        QString filePath;
-    };
-    QQueue<QueuedTranslationResult> m_incomingResults;
-    QTimer *m_resultProcessingTimer;
-    
-private slots:
-    void processIncomingResults();
-
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
-    // Resize handling
+    // Resize and Move handling
     enum ResizeDirection {
         ResizeNone = 0,
         ResizeTop = 1,
@@ -176,8 +101,11 @@ private:
     };
     int m_resizeDirection = ResizeNone;
     QPoint m_dragPosition;
+    QRect m_originalGeometry;
+    bool m_isDragging = false;
+    
     void updateCursorShape(const QPoint &pos);
     int getResizeDirection(const QPoint &pos);
-    
 };
 
+#endif // MAINWINDOW_H
