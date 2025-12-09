@@ -1,7 +1,7 @@
 
 
 /*
-    COLOR PALETTE (Inspired by DaVinci Resolve)
+    COLOR PALETTE
     ---------------------------------------------------
     BACKGROUND:         #1a1a1a  (Very dark grey)
     BACKGROUND-LIGHT:   #2b2b2b  (Slightly lighter grey for panels/menus)
@@ -1479,3 +1479,44 @@ QOpenGLWidget {
     selection-background-color: #3399ff;
 }
 
+/* Custom Title Bar */
+CustomTitleBar {
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #252525;
+}
+
+#titleBarTitle {
+    color: #cccccc;
+    font-size: 11pt;
+    font-weight: bold;
+    padding-left: 5px;
+}
+
+#titleBarMinimize,
+#titleBarMaximize,
+#titleBarClose {
+    background-color: transparent;
+    border: none;
+    border-radius: 0px;
+    color: #cccccc;
+    font-size: 10pt;
+}
+
+#titleBarMinimize:hover,
+#titleBarMaximize:hover {
+    background-color: #3a3a3a;
+}
+
+#titleBarClose:hover {
+    background-color: #c42b1c; /* Windows red style */
+    color: white;
+}
+
+#titleBarMinimize:pressed,
+#titleBarMaximize:pressed {
+    background-color: #2b2b2b;
+}
+
+#titleBarClose:pressed {
+    background-color: #b32419;
+}

@@ -20,6 +20,7 @@
 #include "smartfiltermanager.h" // New include
 #include "translationcontextmenu.h"
 #include "projectdatamanager.h"
+#include "customtitlebar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -89,6 +90,7 @@ private:
     TranslationServiceManager *m_translationServiceManager;
     SmartFilterManager *m_smartFilterManager; // New member
     MenuBar *m_menuBar;
+    CustomTitleBar *m_titleBar;
     UpdateController *m_updateController;
     ProjectDataManager *m_projectDataManager;
 
@@ -144,5 +146,29 @@ private:
     
 private slots:
     void processIncomingResults();
+
+protected:
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+
+private:
+    // Resize handling
+    enum ResizeDirection {
+        ResizeNone = 0,
+        ResizeTop = 1,
+        ResizeBottom = 2,
+        ResizeLeft = 4,
+        ResizeRight = 8,
+        ResizeTopLeft = 5,
+        ResizeTopRight = 9,
+        ResizeBottomLeft = 6,
+        ResizeBottomRight = 10
+    };
+    int m_resizeDirection = ResizeNone;
+    QPoint m_dragPosition;
+    void updateCursorShape(const QPoint &pos);
+    int getResizeDirection(const QPoint &pos);
+    
 };
 

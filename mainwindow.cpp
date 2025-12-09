@@ -46,6 +46,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowIcon(QIcon(":/icons/icon-app.png"));
     resize(1024, 768); // Set a reasonable default size
+    
+    // Remote the default menu bar created by ui-setupUi
+    if (ui->menubar) {
+        delete ui->menubar;
+        ui->menubar = nullptr;
+    }
 
     m_fileListModel = new QStandardItemModel(this);
     ui->fileListView->setModel(m_fileListModel);
@@ -214,8 +220,59 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_resultProcessingTimer, &QTimer::timeout, this, &MainWindow::processIncomingResults);
 
 
+    // Customize Window Flags
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    
+    // Create Custom Title Bar
+    m_titleBar = new CustomTitleBar(this);
+    m_titleBar->setTitle("NST Translation Tool");
+    m_titleBar->setIcon(QIcon(":/icons/icon-app.png"));
+    
+    connect(m_titleBar, &CustomTitleBar::minimizeClicked, this, &QMainWindow::showMinimized);
+    connect(m_titleBar, &CustomTitleBar::maximizeRestoreClicked, this, [this]() {
+        if (isMaximized()) {
+            showNormal();
+        } else {
+            showMaximized();
+        }
+    });
+    connect(m_titleBar, &CustomTitleBar::closeClicked, this, &QMainWindow::close);
+
+    // Setup MenuBar
     m_menuBar = new MenuBar(this);
-    setMenuBar(m_menuBar);
+    // Note: We do NOT call setMenuBar(m_menuBar) because we want to place it manually below the title bar.
+
+    // Re-layout the main window
+    // 1. Get the existing central widget created by ui->setupUi()
+    QWidget *oldCentralWidget = ui->centralwidget;
+    
+    // 2. Create a new container widget to be the new central widget
+    QWidget *mainContainer = new QWidget(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(mainContainer);
+    // Use a small margin to allow mouse events to reach MainWindow for resizing
+    mainLayout->setContentsMargins(5, 5, 5, 5); 
+    mainLayout->setSpacing(0);
+    
+    // 3. Add widgets to the new layout
+    m_titleBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_menuBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    oldCentralWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    mainLayout->addWidget(m_titleBar);
+    mainLayout->addWidget(m_menuBar);
+    mainLayout->addWidget(oldCentralWidget);
+    
+    // Set stretch factors to ensure content takes all available space
+    mainLayout->setStretch(0, 0); // Title Bar
+    mainLayout->setStretch(1, 0); // Menu Bar
+    mainLayout->setStretch(2, 1); // Content
+    
+    // 4. Set the new container as the central widget
+    setCentralWidget(mainContainer);
+    
+    // Enable mouse tracking for resizing
+    setMouseTracking(true);
+    centralWidget()->setMouseTracking(true); // Propagate text
 
     connect(m_menuBar, &MenuBar::openMockData, this, &MainWindow::onOpenMockData);
     connect(m_menuBar, &MenuBar::loadFromGameProject, this, &MainWindow::onLoadFromGameProject);
@@ -1074,4 +1131,100 @@ void MainWindow::onTranslateAllFiles()
 {
     ui->fileListView->selectAll();
     onTranslateSelectedFiles();
+}
+
+
+// ==========================================
+// Resize Handling
+// ==========================================
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_resizeDirection = getResizeDirection(event->pos());
+        if (m_resizeDirection != ResizeNone) {
+            m_dragPosition = event->globalPos();
+        }
+    }
+    QMainWindow::mousePressEvent(event);
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_resizeDirection != ResizeNone) {
+        // Handle resizing
+        QPoint globalPos = event->globalPos();
+        QPoint delta = globalPos - m_dragPosition;
+        QRect geom = geometry();
+
+        if (m_resizeDirection & ResizeLeft) {
+            geom.setLeft(geom.left() + delta.x());
+        }
+        if (m_resizeDirection & ResizeRight) {
+            geom.setRight(geom.right() + delta.x());
+        }
+        if (m_resizeDirection & ResizeTop) {
+            geom.setTop(geom.top() + delta.y());
+        }
+        if (m_resizeDirection & ResizeBottom) {
+            geom.setBottom(geom.bottom() + delta.y());
+        }
+
+        // Apply constraints (min size)
+        if (geom.width() >= minimumWidth() && geom.height() >= minimumHeight()) {
+             setGeometry(geom);
+             m_dragPosition = globalPos;
+        }
+    } else {
+        // Update cursor shape
+        updateCursorShape(event->pos());
+    }
+    QMainWindow::mouseMoveEvent(event);
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_resizeDirection = ResizeNone;
+    }
+    QMainWindow::mouseReleaseEvent(event);
+}
+
+void MainWindow::updateCursorShape(const QPoint &pos)
+{
+    int dir = getResizeDirection(pos);
+    switch (dir) {
+        case ResizeTopLeft:
+        case ResizeBottomRight:
+            setCursor(Qt::SizeFDiagCursor);
+            break;
+        case ResizeTopRight:
+        case ResizeBottomLeft:
+            setCursor(Qt::SizeBDiagCursor);
+            break;
+        case ResizeTop:
+        case ResizeBottom:
+            setCursor(Qt::SizeVerCursor);
+            break;
+        case ResizeLeft:
+        case ResizeRight:
+            setCursor(Qt::SizeHorCursor);
+            break;
+        default:
+            setCursor(Qt::ArrowCursor);
+            break;
+    }
+}
+
+int MainWindow::getResizeDirection(const QPoint &pos)
+{
+    int dir = ResizeNone;
+    const int margin = 8; // Margin width for resizing
+
+    if (pos.x() < margin) dir |= ResizeLeft;
+    if (pos.x() > width() - margin) dir |= ResizeRight;
+    if (pos.y() < margin) dir |= ResizeTop;
+    if (pos.y() > height() - margin) dir |= ResizeBottom;
+
+    return dir;
 }

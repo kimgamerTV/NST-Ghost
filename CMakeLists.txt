@@ -66,6 +66,8 @@ set(PROJECT_SOURCES
     customprogressdialog.cpp
     customprogressdialog.h
     projectdatamanager.h # New file
+    customtitlebar.cpp
+    customtitlebar.h
     resources.qrc
 )
 
