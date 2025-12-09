@@ -7,7 +7,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QJsonArray>
 #include <QSettings>
+#include <QThread>
 
 // --- LuaWorker Implementation ---
 
@@ -35,6 +37,13 @@ bool LuaWorker::initLua()
 
     // Register HTTP function
     lua_register(L, "nst_http_request", lua_http_request);
+
+    // Register Sleep function
+    lua_register(L, "nst_sleep", [](lua_State* L) -> int {
+        int ms = luaL_checkinteger(L, 1);
+        QThread::msleep(ms);
+        return 0;
+    });
     
     // Register JSON functions
     lua_register(L, "nst_json_encode", [](lua_State* L) -> int {
@@ -130,15 +139,24 @@ int LuaWorker::lua_http_request(lua_State *L)
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
 
-    // Return result: body, status_code
+    // Return result: body, status_code, headers
     QByteArray responseBody = reply->readAll();
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     
     lua_pushlstring(L, responseBody.constData(), responseBody.size());
     lua_pushinteger(L, statusCode);
+
+    // Return headers table as 3rd result
+    lua_newtable(L);
+    QList<QByteArray> headerList = reply->rawHeaderList();
+    for (const QByteArray &head : headerList) {
+        lua_pushstring(L, head.constData()); // key
+        lua_pushstring(L, reply->rawHeader(head).constData()); // value
+        lua_settable(L, -3);
+    }
     
     reply->deleteLater();
-    return 2;
+    return 3;
 }
 
 // --- JSON Helpers ---

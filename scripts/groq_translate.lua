@@ -36,6 +36,68 @@ function on_define_settings()
     }
 end
 
+
+-- Helper function for API requests with retry logic
+function request_with_retry(url, method, headers, body)
+    local max_retries = 5
+    local attempt = 0
+    local backoff_delay = 2000 -- Start with 2 seconds
+
+    while attempt <= max_retries do
+        attempt = attempt + 1
+        nst_log("[DEBUG] Request attempt " .. attempt .. " of " .. (max_retries + 1))
+        
+        local response_body, status, response_headers = nst_http_request(url, method, headers, body)
+        
+        if status == 200 then
+            return response_body, status, response_headers
+        elseif status == 429 then
+            nst_log("[WARNING] Rate limit reached (429).")
+            
+            local wait_time = backoff_delay
+            
+            -- Try to parse Retry-After header
+            if response_headers and type(response_headers) == "table" then
+                -- Header keys might be case-insensitive or normalized, usually lower case in my C++ impl? 
+                -- Actually QNetworkReply::rawHeaderList returns original case usually, but I didn't normalize.
+                -- Let's check a few variations or iterate.
+                local retry_after = nil
+                for k, v in pairs(response_headers) do
+                    if string.lower(k) == "retry-after" then
+                        retry_after = tonumber(v)
+                        break
+                    end
+                end
+                
+                if retry_after then
+                    nst_log("[DEBUG] Found Retry-After header: " .. retry_after .. " seconds")
+                    wait_time = retry_after * 1000 -- Convert to ms
+                end
+            end
+            
+            if attempt > max_retries then
+                return response_body, status, "Rate limit exceeded after max retries."
+            end
+            
+            nst_log("[INFO] Waiting " .. (wait_time/1000) .. "s before retrying...")
+            
+            if nst_sleep then
+                nst_sleep(wait_time)
+            else
+                nst_log("[WARNING] nst_sleep not available, cannot wait properly. Aborting retry.")
+                return response_body, status, "Rate limit reached (nst_sleep missing)"
+            end
+            
+            -- Increase backoff for next time (exponential)
+            backoff_delay = backoff_delay * 2
+        else
+            -- Other errors
+            return response_body, status, nil
+        end
+    end
+    return nil, 0, "Unknown error" 
+end
+
 function on_text_extract(text)
     nst_log("[DEBUG] on_text_extract called with text: " .. text)
     local api_key = nst_get_setting("api_key")
@@ -82,9 +144,8 @@ function on_text_extract(text)
     local body = nst_json_encode(payload)
     
     nst_log("[DEBUG] Sending request to Groq API...")
-    local response_body, status = nst_http_request(url, "POST", headers, body)
+    local response_body, status = request_with_retry(url, "POST", headers, body)
     nst_log("[DEBUG] Received response - Status: " .. status)
-    nst_log("[DEBUG] Response body: " .. response_body)
     
     if status == 200 then
         local response = nst_json_decode(response_body)
@@ -100,7 +161,7 @@ function on_text_extract(text)
         end
     end
     
-    local error_msg = "Groq API Error: " .. status .. " - " .. response_body
+    local error_msg = "Groq API Error: " .. status .. " - " .. (response_body or "nil")
     nst_log(error_msg)
     return nil, error_msg
 end
@@ -145,7 +206,7 @@ function on_batch_text_extract(text_array)
     
     local body = nst_json_encode(payload)
     
-    local response_body, status = nst_http_request(url, "POST", headers, body)
+    local response_body, status = request_with_retry(url, "POST", headers, body)
     
     if status == 200 then
         nst_log("Groq Response: " .. response_body)
@@ -172,7 +233,7 @@ function on_batch_text_extract(text_array)
         end
     end
     
-    local error_msg = "Groq API Batch Error: " .. status .. " - " .. response_body
+    local error_msg = "Groq API Batch Error: " .. status .. " - " .. (response_body or "nil")
     nst_log(error_msg)
     return nil, error_msg
 end

@@ -232,9 +232,17 @@ QString LoadProjectDialog::engineFileTypes(const QString &engine) const
 
 void LoadProjectDialog::browseProjectPath()
 {
-    QString dir = QFileDialog::getExistingDirectory(this, "Select Game Project Directory", QDir::homePath());
-    if (!dir.isEmpty())
-        ui->projectPathLineEdit->setText(dir);
+    QFileDialog dialog(this, "Select Game Project Directory", QDir::homePath());
+    dialog.setFileMode(QFileDialog::Directory);
+    dialog.setOption(QFileDialog::ShowDirsOnly);
+    dialog.setOption(QFileDialog::DontUseNativeDialog);
+    
+    if (dialog.exec()) {
+        QStringList distinct = dialog.selectedFiles();
+        if (!distinct.isEmpty()) {
+            ui->projectPathLineEdit->setText(distinct.first());
+        }
+    }
 }
 
 void LoadProjectDialog::updateFrameSelection(QAbstractButton *button)
