@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Injection LANGUAGES CXX)
+project(Injection LANGUAGES CXX C)
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -38,8 +38,8 @@ endif()
 
 target_compile_definitions(Injection PRIVATE INJECTION_LIBRARY)
 
-if(COMMAND qt_create_translation)
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-else()
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
-endif()
+# if(COMMAND qt_create_translation)
+#     qt_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${TS_FILES})
+# else()
+#     qt5_create_translation(QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${TS_FILES})
+# endif()
