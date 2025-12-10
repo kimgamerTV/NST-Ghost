@@ -325,9 +325,22 @@ bool RpgmAnalyzer::updateJsonObject(QJsonObject &obj, const QStringList &keys, i
                 return true;
             }
         } else {
-            if (updateJsonArray(arr, keys, index + 1, newValue)) {
-                obj[baseKey] = arr;
-                return true;
+            // Navigate INTO the element at arrayIndex, not the whole array
+            QJsonValue elementVal = arr[arrayIndex];
+            if (elementVal.isObject()) {
+                QJsonObject elementObj = elementVal.toObject();
+                if (updateJsonObject(elementObj, keys, index + 1, newValue)) {
+                    arr.replace(arrayIndex, elementObj);
+                    obj[baseKey] = arr;
+                    return true;
+                }
+            } else if (elementVal.isArray()) {
+                QJsonArray elementArr = elementVal.toArray();
+                if (updateJsonArray(elementArr, keys, index + 1, newValue)) {
+                    arr.replace(arrayIndex, elementArr);
+                    obj[baseKey] = arr;
+                    return true;
+                }
             }
         }
     } else {
@@ -434,42 +447,235 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
     } else if (jsonValue.isObject()) {
         QJsonObject obj = jsonValue.toObject();
 
-        // Rule 1: Event Command Handling - เฉพาะ Code 401 และ 405 เท่านั้น
+        // ===== Rule 1: Event Command Handling (Complete) =====
         if (obj.contains("code") && obj.contains("parameters") && obj["parameters"].isArray()) {
             int code = obj["code"].toInt();
             QJsonArray params = obj["parameters"].toArray();
-
-            // 401: Show Text, 405: Show Scrolling Text
-            if (code == 401 || code == 405) {
-                if (params.size() > 0 && params[0].isString()) {
-                    QString text = params[0].toString();
-                    QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[0]" : currentKeyPath + ".parameters[0]";
-                    
-                    if (!text.isEmpty() && !isSystemString(text)) {
-                        QJsonObject entry;
-                        entry.insert(QStringLiteral("source"), text);
-                        entry.insert(QStringLiteral("path"), filePath);
-                        entry.insert(QStringLiteral("key"), newKeyPath);
-                        extractedStrings.append(entry);
-                    }
-                }
-            }
-            // Code อื่นๆ ทั้งหมด - เพิกเฉย (ไม่ต้อง recurse เข้าไป)
             
-            // ยังคง recurse เข้าไปใน object เพื่อหา nested event commands
-            // แต่ไม่ดึง parameters ของ code อื่นๆ ออกมา
+            bool extractedFromCommand = false;
+
+            switch (code) {
+                // === Text Display Commands ===
+                case 101: // Show Text: Character Name/Face Setup
+                    // parameters[0] = character name (often empty or actor name)
+                    // Usually skip this as it's often system/actor names
+                    break;
+                    
+                case 401: // Show Text: Dialogue Line
+                    if (params.size() > 0 && params[0].isString()) {
+                        QString text = params[0].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[0]" : currentKeyPath + ".parameters[0]";
+                        
+                        if (!text.isEmpty() && !isSystemString(text)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), text);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
+                    break;
+                
+                case 102: // Show Choices
+                    // parameters[0] = array of choice texts
+                    if (params.size() > 0 && params[0].isArray()) {
+                        QJsonArray choices = params[0].toArray();
+                        for (int i = 0; i < choices.size(); ++i) {
+                            if (choices[i].isString()) {
+                                QString choiceText = choices[i].toString();
+                                QString newKeyPath = currentKeyPath.isEmpty() 
+                                    ? QString("parameters[0][%1]").arg(i)
+                                    : QString("%1.parameters[0][%2]").arg(currentKeyPath).arg(i);
+                                
+                                if (!choiceText.isEmpty() && !isSystemString(choiceText)) {
+                                    QJsonObject entry;
+                                    entry.insert(QStringLiteral("source"), choiceText);
+                                    entry.insert(QStringLiteral("path"), filePath);
+                                    entry.insert(QStringLiteral("key"), newKeyPath);
+                                    extractedStrings.append(entry);
+                                }
+                            }
+                        }
+                        extractedFromCommand = true;
+                    }
+                    break;
+                
+                case 103: // Input Number
+                    // No translatable text
+                    break;
+                
+                case 104: // Select Item
+                    // parameters[1] = item type (system value)
+                    break;
+                
+                case 105: // Show Scrolling Text
+                    // Similar to 401 but for scrolling
+                    if (params.size() > 0 && params[0].isString()) {
+                        QString text = params[0].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[0]" : currentKeyPath + ".parameters[0]";
+                        
+                        if (!text.isEmpty() && !isSystemString(text)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), text);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
+                    break;
+                
+                case 405: // Show Scrolling Text continuation
+                    if (params.size() > 0 && params[0].isString()) {
+                        QString text = params[0].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[0]" : currentKeyPath + ".parameters[0]";
+                        
+                        if (!text.isEmpty() && !isSystemString(text)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), text);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
+                    break;
+                
+                // === System Commands (Usually No Translation) ===
+                case 108: // Comment
+                case 408: // Comment continuation
+                    // Developer comments - usually skip, but could add option to extract
+                    break;
+                
+                case 111: // Conditional Branch
+                case 112: // Loop
+                case 113: // Break Loop
+                case 115: // Exit Event Processing
+                case 117: // Common Event
+                case 118: // Label
+                case 119: // Jump to Label
+                case 121: // Control Switches
+                case 122: // Control Variables
+                case 123: // Control Self Switch
+                case 124: // Control Timer
+                    // Pure logic - no translatable content
+                    break;
+                
+                // === Game Progression Commands ===
+                case 125: // Change Gold
+                case 126: // Change Items
+                case 127: // Change Weapons
+                case 128: // Change Armors
+                case 129: // Change Party Member
+                    // System commands - no text
+                    break;
+                
+                // === Screen Commands ===
+                case 201: // Transfer Player
+                case 202: // Set Vehicle Location
+                case 203: // Set Event Location
+                case 204: // Scroll Map
+                case 205: // Set Movement Route
+                    // Map/movement commands - no text
+                    break;
+                
+                case 231: // Show Picture
+                    // parameters[1] = picture name (filename - skip)
+                    break;
+                
+                case 241: // Play BGM
+                case 242: // Fadeout BGM
+                case 245: // Play BGS
+                case 246: // Fadeout BGS
+                case 249: // Play ME
+                case 250: // Play SE
+                    // Audio commands - filenames only
+                    break;
+                
+                // === Battle Commands ===
+                case 301: // Battle Processing
+                case 311: // Change HP
+                case 312: // Change MP
+                case 313: // Change State
+                case 314: // Recover All
+                case 339: // Force Action
+                    // Battle system commands - no text
+                    break;
+                
+                // === Actor Commands ===
+                case 320: // Change Name
+                    // parameters[1] = new actor name (TRANSLATABLE!)
+                    if (params.size() > 1 && params[1].isString()) {
+                        QString actorName = params[1].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[1]" : currentKeyPath + ".parameters[1]";
+                        
+                        if (!actorName.isEmpty() && !isSystemString(actorName)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), actorName);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
+                    break;
+                
+                case 324: // Change Nickname
+                    // parameters[1] = new nickname (TRANSLATABLE!)
+                    if (params.size() > 1 && params[1].isString()) {
+                        QString nickname = params[1].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[1]" : currentKeyPath + ".parameters[1]";
+                        
+                        if (!nickname.isEmpty() && !isSystemString(nickname)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), nickname);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
+                    break;
+                
+                // === Plugin Commands ===
+                case 356: // Plugin Command (MV)
+                case 357: // Plugin Command (MZ)
+                    // parameters[0] = plugin command string
+                    // Usually technical (like "EnemyBook open"), but some plugins use translatable text
+                    // Best to skip unless specifically needed
+                    // Add to blacklist or use heuristic
+                    break;
+                
+                // === Script Commands ===
+                case 355: // Script
+                case 655: // Script continuation
+                    // JavaScript code - never translate
+                    break;
+                
+                default:
+                    // Unknown command - log but don't extract
+                    qDebug() << "RpgmAnalyzer: Unknown event code:" << code 
+                             << "in file:" << filePath;
+                    break;
+            }
+            
+            // Recurse into nested structures (like lists within events)
+            // But skip parameters array if we already extracted from it
             for (const QString &key : obj.keys()) {
+                if (key == "parameters" && extractedFromCommand) {
+                    continue; // Already handled above
+                }
+                
+                // Skip technical keys
+                static const QSet<QString> technicalKeys = {
+                    "code", "indent"
+                };
+                if (technicalKeys.contains(key)) {
+                    continue;
+                }
+                
                 QJsonValue val = obj[key];
-                // Skip parameters for 401/405 (Show Text) as they are extracted manually above
-                if (key == "parameters" && (code == 401 || code == 405)) {
-                    continue;
-                }
-                
-                // Also skip parameters for other codes as we generally don't want to extract raw params
-                if (key == "parameters") {
-                    continue;
-                }
-                
                 QString newKeyPath = currentKeyPath.isEmpty() ? key : currentKeyPath + "." + key;
                 
                 if (val.isArray() || val.isObject()) {
@@ -477,33 +683,48 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 }
             }
             
-            return; // เสร็จแล้วสำหรับ event command object
+            return; // Done with event command
         }
 
-        // Rule 2: Database Objects - Whitelist เข้มงวด
-        // เฉพาะ Keys ที่ระบุเท่านั้น
+        // ===== Rule 2: Database Objects - Strict Whitelist =====
         static const QSet<QString> whitelistedKeys = {
             "name",
             "description", 
             "message1",
             "message2",
+            "message3",
+            "message4",
             "note",
             "nickname",
             "profile"
         };
         
+        // Keys to always ignore (contain filenames/technical data)
+        static const QSet<QString> blacklistedKeys = {
+            "se", "bgm", "bgs", "me", 
+            "animation1Name", "animation2Name",
+            "battlerName", "characterName", "faceName",
+            "motion", "overlay1Name", "overlay2Name",
+            "tileset", "parallaxName", "battleback1Name", "battleback2Name",
+            "script", "url"
+        };
+        
         for (const QString &key : obj.keys()) {
+            // Skip blacklisted keys entirely
+            if (blacklistedKeys.contains(key)) {
+                continue;
+            }
+            
             QJsonValue val = obj[key];
             QString newKeyPath = currentKeyPath.isEmpty() ? key : currentKeyPath + "." + key;
             
             if (val.isString()) {
-                // Leaf Node: ตรวจสอบ Whitelist เท่านั้น
+                // Only extract if key is whitelisted
                 if (whitelistedKeys.contains(key)) {
                     extractStringsFromJsonValue(val, extractedStrings, filePath, newKeyPath);
                 }
-                // Keys อื่นๆ ทั้งหมด - เพิกเฉย
             } else if (val.isArray() || val.isObject()) {
-                // Recurse เข้าไปหา whitelisted keys ที่อยู่ลึกลงไป
+                // Recurse to find nested whitelisted keys
                 extractStringsFromJsonValue(val, extractedStrings, filePath, newKeyPath);
             }
         }
@@ -520,33 +741,42 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
 
 bool RpgmAnalyzer::isSystemString(const QString &text)
 {
-    // ตรวจสอบว่ามีแต่ whitespace
+    // Empty or whitespace only
     if (text.trimmed().isEmpty()) {
         return true;
     }
 
-    // ตรวจสอบว่าเป็นตัวเลขล้วน
+    // Pure numbers
     bool isNumber;
     text.toDouble(&isNumber);
     if (isNumber) {
         return true;
     }
 
-    // ตรวจสอบว่าเป็น path (มี / หรือ \)
+    // Paths (contains / or \)
     if (text.contains('/') || text.contains('\\')) {
         return true;
     }
 
-    // ตรวจสอบ URL patterns
+    // URLs
     static QRegularExpression urlPattern(
         QStringLiteral("^(https?|ftp|file)://"),
         QRegularExpression::CaseInsensitiveOption
-        );
+    );
     if (urlPattern.match(text).hasMatch()) {
         return true;
     }
 
-    // กรองสตริงที่เป็น system string ไม่ต้องแปล
+    // File extensions
+    static QRegularExpression fileExtPattern(
+        QStringLiteral("\\.(png|jpg|jpeg|gif|bmp|wav|ogg|m4a|mp3|json|js)$"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    if (fileExtPattern.match(text).hasMatch()) {
+        return true;
+    }
+
+    // RPG Maker system prefixes
     static QStringList systemPrefixes = {
         "img/", "audio/", "data/", "js/", "fonts/",
         "Actor", "Class", "Skill", "Item", "Weapon", "Armor",
@@ -555,36 +785,64 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
     };
 
     for (const QString &prefix : systemPrefixes) {
-        if (text.startsWith(prefix)) {
+        if (text.startsWith(prefix, Qt::CaseInsensitive)) {
             return true;
         }
     }
 
-    // ตรวจสอบ RPG Maker control codes (เช่น \c[1], \n[1], \v[1])
+    // RPG Maker control codes (\c[1], \n[1], \v[1], \i[1])
     static QRegularExpression controlCodePattern(
         QStringLiteral("^\\\\[a-z]\\[\\d+\\]$"),
         QRegularExpression::CaseInsensitiveOption
-        );
+    );
     if (controlCodePattern.match(text.trimmed()).hasMatch()) {
         return true;
     }
 
-    // ตรวจสอบว่ามีแต่ special characters หรือ symbols
+    // Generic event names (EV001, EV030, etc.)
+    static QRegularExpression eventNamePattern(
+        QStringLiteral("^EV\\d{3,}$"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    if (eventNamePattern.match(text).hasMatch()) {
+        return true;
+    }
+
+    // Plugin command patterns (technical strings)
+    static QRegularExpression pluginCommandPattern(
+        QStringLiteral("^[A-Z][a-zA-Z]+ (open|close|add|remove|set|get|show|hide|enable|disable)"),
+        QRegularExpression::CaseInsensitiveOption
+    );
+    if (pluginCommandPattern.match(text).hasMatch()) {
+        return true;
+    }
+
+    // Variable references ($gameVariables, $gameSwitches, etc.)
+    if (text.contains(QStringLiteral("$game"), Qt::CaseInsensitive)) {
+        return true;
+    }
+
+    // Only symbols/punctuation (no actual text)
     static QRegularExpression symbolOnlyPattern(
-        QStringLiteral("^[^a-zA-Z0-9\\p{Thai}\\p{Han}\\p{Hiragana}\\p{Katakana}]+$")
-        );
+        QStringLiteral("^[^a-zA-Z0-9\\p{Thai}\\p{Han}\\p{Hiragana}\\p{Katakana}\\p{Hangul}\\p{Cyrillic}\\p{Arabic}]+$")
+    );
     if (symbolOnlyPattern.match(text).hasMatch()) {
         return true;
     }
 
-    // ตรวจสอบสตริงที่สั้นเกินไป (น้อยกว่า 2 ตัวอักษร) และไม่ใช่ภาษาที่ต้องการแปล
+    // Very short strings (< 2 chars) that are non-translatable
     if (text.length() < 2) {
         static QRegularExpression nonTranslatableShort(
             QStringLiteral("^[a-zA-Z0-9!@#$%^&*()_+=\\-\\[\\]{}|;:'\",.<>?/\\\\]+$")
-            );
+        );
         if (nonTranslatableShort.match(text).hasMatch()) {
             return true;
         }
+    }
+
+    // Single letters or abbreviations (often system values)
+    if (text.length() <= 2 && text.toUpper() == text) {
+        return true; // HP, MP, ATK, DEF, etc.
     }
 
     return false;

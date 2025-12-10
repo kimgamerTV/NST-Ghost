@@ -1,0 +1,22 @@
+{
+    "events": [
+        null,
+        {
+            "id": 1,
+            "name": "EV030",
+            "note": "",
+            "pages": [
+                {
+                    "list": [
+                        {
+                            "code": 0,
+                            "indent": 0,
+                            "parameters": []
+                        }
+                    ],
+                    "trigger": 0
+                }
+            ]
+        }
+    ]
+}

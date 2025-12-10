@@ -1,0 +1,111 @@
+[
+    null,
+    {
+        "atypeId": 5,
+        "description": "",
+        "etypeId": 2,
+        "iconIndex": 128,
+        "id": 1,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 300,
+        "traits": [
+            {
+                "code": 22,
+                "dataId": 1,
+                "value": 0
+            }
+        ]
+    },
+    {
+        "atypeId": 1,
+        "description": "",
+        "etypeId": 3,
+        "iconIndex": 130,
+        "id": 2,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 300,
+        "traits": [
+            {
+                "code": 22,
+                "dataId": 1,
+                "value": 0
+            }
+        ]
+    },
+    {
+        "atypeId": 1,
+        "description": "",
+        "etypeId": 4,
+        "iconIndex": 135,
+        "id": 3,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 300,
+        "traits": [
+            {
+                "code": 22,
+                "dataId": 1,
+                "value": 0
+            }
+        ]
+    },
+    {
+        "atypeId": 1,
+        "description": "",
+        "etypeId": 5,
+        "iconIndex": 145,
+        "id": 4,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            0,
+            0,
+            10,
+            0,
+            0,
+            0
+        ],
+        "price": 300,
+        "traits": [
+            {
+                "code": 22,
+                "dataId": 1,
+                "value": 0
+            }
+        ]
+    }
+]

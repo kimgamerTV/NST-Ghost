@@ -94,6 +94,81 @@ private slots:
         
         QVERIFY(strings.size() > 0);
     }
+
+    void testSave()
+    {
+        // 1. Setup a simple mock file
+        QString mockFileName = "save_test.json";
+        QString mockFilePath = dataPath + "/" + mockFileName;
+        
+        QJsonArray parameters;
+        parameters.append("Original Text");
+        
+        QJsonObject command;
+        command.insert("code", 401);
+        command.insert("indent", 0);
+        command.insert("parameters", parameters);
+        
+        QJsonArray list;
+        list.append(command);
+        
+        QJsonObject event;
+        event.insert("id", 1);
+        event.insert("list", list);
+        
+        QJsonArray root;
+        root.append(QJsonValue::Null); // Index 0 is null
+        root.append(event);            // Index 1 is the event
+        
+        QJsonDocument doc(root);
+        QFile file(mockFilePath);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write(doc.toJson());
+        file.close();
+        
+        // 2. Prepare translation payload
+        // We know the key path will be "1.list[0].parameters[0]" based on analysis
+        QJsonObject entry;
+        entry.insert("path", mockFilePath);
+        entry.insert("key", "1.list[0].parameters[0]");
+        entry.insert("text", "Translated Text");
+        
+        QJsonArray texts;
+        texts.append(entry);
+        
+        // 3. Call Save
+        core::engines::rpgm::RpgmAnalyzer analyzer;
+        bool success = analyzer.save(tempDir->path(), texts);
+        QVERIFY(success);
+        
+        // 4. Verify content
+        QFile checkFile(mockFilePath);
+        QVERIFY(checkFile.open(QIODevice::ReadOnly));
+        QJsonDocument checkDoc = QJsonDocument::fromJson(checkFile.readAll());
+        checkFile.close();
+        
+        QJsonArray checkRoot = checkDoc.array();
+        QJsonObject checkEvent = checkRoot[1].toObject();
+        QJsonArray checkList = checkEvent["list"].toArray();
+        QJsonValue checkCommandVal = checkList[0];
+        
+        // FAIL CONDITION: If the bug exists, checkCommandVal will be a String.
+        // SUCCESS CONDITION: checkCommandVal must be an Object.
+        
+        if (checkCommandVal.isString()) {
+             qCritical() << "BUG DETECTED: list[0] became a string: " << checkCommandVal.toString();
+        } else if (checkCommandVal.isObject()) {
+             qDebug() << "SUCCESS: list[0] is still an object.";
+             QJsonObject checkCommand = checkCommandVal.toObject();
+             QJsonArray checkParams = checkCommand["parameters"].toArray();
+             qDebug() << "Param[0]: " << checkParams[0].toString();
+             QCOMPARE(checkParams[0].toString(), QString("Translated Text"));
+        } else {
+             qCritical() << "Unknown type at list[0]";
+        }
+        
+        QVERIFY2(checkCommandVal.isObject(), "Structure corrupted: Command object replaced by string!");
+    }
 };
 
 QTEST_MAIN(TestRpgAnalyzer)

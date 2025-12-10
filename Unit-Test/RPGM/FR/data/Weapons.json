@@ -1,0 +1,135 @@
+[
+    null,
+    {
+        "animationId": 6,
+        "description": "",
+        "etypeId": 1,
+        "iconIndex": 97,
+        "id": 1,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 500,
+        "traits": [
+            {
+                "code": 31,
+                "dataId": 1,
+                "value": 0
+            },
+            {
+                "code": 22,
+                "dataId": 0,
+                "value": 0
+            }
+        ],
+        "wtypeId": 2
+    },
+    {
+        "animationId": 6,
+        "description": "",
+        "etypeId": 1,
+        "iconIndex": 99,
+        "id": 2,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 500,
+        "traits": [
+            {
+                "code": 31,
+                "dataId": 1,
+                "value": 0
+            },
+            {
+                "code": 22,
+                "dataId": 0,
+                "value": 0
+            }
+        ],
+        "wtypeId": 4
+    },
+    {
+        "animationId": 1,
+        "description": "",
+        "etypeId": 1,
+        "iconIndex": 101,
+        "id": 3,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 500,
+        "traits": [
+            {
+                "code": 31,
+                "dataId": 1,
+                "value": 0
+            },
+            {
+                "code": 22,
+                "dataId": 0,
+                "value": 0
+            }
+        ],
+        "wtypeId": 6
+    },
+    {
+        "animationId": 11,
+        "description": "",
+        "etypeId": 1,
+        "iconIndex": 102,
+        "id": 4,
+        "name": "",
+        "note": "",
+        "params": [
+            0,
+            0,
+            10,
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "price": 500,
+        "traits": [
+            {
+                "code": 31,
+                "dataId": 1,
+                "value": 0
+            },
+            {
+                "code": 22,
+                "dataId": 0,
+                "value": 0
+            }
+        ],
+        "wtypeId": 7
+    }
+]

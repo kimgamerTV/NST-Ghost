@@ -1,0 +1,99 @@
+[
+    null,
+    {
+        "battlerName": "",
+        "characterIndex": 0,
+        "characterName": "mia",
+        "classId": 5,
+        "equips": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "faceIndex": 0,
+        "faceName": "",
+        "id": 1,
+        "initialLevel": 1,
+        "maxLevel": 99,
+        "name": "",
+        "nickname": "",
+        "note": "",
+        "profile": "",
+        "traits": [
+        ]
+    },
+    {
+        "battlerName": "",
+        "characterIndex": 1,
+        "characterName": "mia",
+        "classId": 6,
+        "equips": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "faceIndex": 0,
+        "faceName": "",
+        "id": 2,
+        "initialLevel": 1,
+        "maxLevel": 99,
+        "name": "",
+        "nickname": "",
+        "note": "",
+        "profile": "",
+        "traits": [
+        ]
+    },
+    {
+        "battlerName": "",
+        "characterIndex": 0,
+        "characterName": "mia",
+        "classId": 7,
+        "equips": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "faceIndex": 0,
+        "faceName": "",
+        "id": 3,
+        "initialLevel": 1,
+        "maxLevel": 99,
+        "name": "",
+        "nickname": "",
+        "note": "",
+        "profile": "",
+        "traits": [
+        ]
+    },
+    {
+        "battlerName": "",
+        "characterIndex": 0,
+        "characterName": "",
+        "classId": 1,
+        "equips": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "faceIndex": 0,
+        "faceName": "",
+        "id": 4,
+        "initialLevel": 1,
+        "maxLevel": 99,
+        "name": "",
+        "nickname": "",
+        "note": "",
+        "profile": "",
+        "traits": [
+        ]
+    }
+]
