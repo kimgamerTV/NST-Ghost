@@ -124,6 +124,13 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
     int failedCount = 0;
 
     for (const QFileInfo &info : jsonFiles) {
+        qDebug() << "RpgmAnalyzer: Processing file:" << info.absoluteFilePath();
+        // Skip package.json as it's usually not for translation
+        if (info.fileName().toLower() == "package.json") {
+            qDebug() << "RpgmAnalyzer: Skipping package.json";
+            continue;
+        }
+
         QFile file(info.absoluteFilePath());
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QByteArray content = file.readAll();
@@ -133,17 +140,20 @@ core::AnalyzerOutput RpgmAnalyzer::analyze(const QString &inputPath)
             QJsonDocument doc = QJsonDocument::fromJson(content, &parseError);
 
             if (!doc.isNull()) {
+                int prevCount = extractedStrings.size();
                 extractStringsFromJsonValue(
                     QJsonValue::fromVariant(doc.toVariant()),
                     extractedStrings,
                     info.absoluteFilePath(),
                     ""
                     );
+                qDebug() << "RpgmAnalyzer: Processed" << info.fileName() << "Extracted" << (extractedStrings.size() - prevCount) << "strings.";
                 processedCount++;
             } else {
                 logStream << "RPGM Analyzer: Failed to parse JSON from file: "
                           << info.absoluteFilePath()
                           << " Error: " << parseError.errorString() << "\n";
+                qWarning() << "RpgmAnalyzer: Failed to parse JSON from file:" << info.absoluteFilePath() << "Error:" << parseError.errorString();
                 failedCount++;
             }
         } else {
@@ -413,7 +423,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
 {
     if (jsonValue.isString()) {
         QString text = jsonValue.toString();
-        // กรองข้อความที่ไม่ต้องการแปล
+        
         if (!text.isEmpty() && !isSystemString(text)) {
             QJsonObject entry;
             entry.insert(QStringLiteral("source"), text);
@@ -423,16 +433,81 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
         }
     } else if (jsonValue.isObject()) {
         QJsonObject obj = jsonValue.toObject();
+
+        // Rule 1: Event Command Handling - เฉพาะ Code 401 และ 405 เท่านั้น
+        if (obj.contains("code") && obj.contains("parameters") && obj["parameters"].isArray()) {
+            int code = obj["code"].toInt();
+            QJsonArray params = obj["parameters"].toArray();
+
+            // 401: Show Text, 405: Show Scrolling Text
+            if (code == 401 || code == 405) {
+                if (params.size() > 0 && params[0].isString()) {
+                    QString text = params[0].toString();
+                    QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[0]" : currentKeyPath + ".parameters[0]";
+                    
+                    if (!text.isEmpty() && !isSystemString(text)) {
+                        QJsonObject entry;
+                        entry.insert(QStringLiteral("source"), text);
+                        entry.insert(QStringLiteral("path"), filePath);
+                        entry.insert(QStringLiteral("key"), newKeyPath);
+                        extractedStrings.append(entry);
+                    }
+                }
+            }
+            // Code อื่นๆ ทั้งหมด - เพิกเฉย (ไม่ต้อง recurse เข้าไป)
+            
+            // ยังคง recurse เข้าไปใน object เพื่อหา nested event commands
+            // แต่ไม่ดึง parameters ของ code อื่นๆ ออกมา
+            for (const QString &key : obj.keys()) {
+                QJsonValue val = obj[key];
+                // ข้าม parameters ถ้าไม่ใช่ code 401/405
+                if (key == "parameters" && code != 401 && code != 405) {
+                    continue;
+                }
+                
+                QString newKeyPath = currentKeyPath.isEmpty() ? key : currentKeyPath + "." + key;
+                
+                if (val.isArray() || val.isObject()) {
+                    extractStringsFromJsonValue(val, extractedStrings, filePath, newKeyPath);
+                }
+            }
+            
+            return; // เสร็จแล้วสำหรับ event command object
+        }
+
+        // Rule 2: Database Objects - Whitelist เข้มงวด
+        // เฉพาะ Keys ที่ระบุเท่านั้น
+        static const QSet<QString> whitelistedKeys = {
+            "name",
+            "description", 
+            "message1",
+            "message2",
+            "note",
+            "nickname",
+            "profile"
+        };
+        
         for (const QString &key : obj.keys()) {
+            QJsonValue val = obj[key];
             QString newKeyPath = currentKeyPath.isEmpty() ? key : currentKeyPath + "." + key;
-            extractStringsFromJsonValue(obj[key], extractedStrings, filePath, newKeyPath);
+            
+            if (val.isString()) {
+                // Leaf Node: ตรวจสอบ Whitelist เท่านั้น
+                if (whitelistedKeys.contains(key)) {
+                    extractStringsFromJsonValue(val, extractedStrings, filePath, newKeyPath);
+                }
+                // Keys อื่นๆ ทั้งหมด - เพิกเฉย
+            } else if (val.isArray() || val.isObject()) {
+                // Recurse เข้าไปหา whitelisted keys ที่อยู่ลึกลงไป
+                extractStringsFromJsonValue(val, extractedStrings, filePath, newKeyPath);
+            }
         }
     } else if (jsonValue.isArray()) {
         QJsonArray arr = jsonValue.toArray();
         for (int i = 0; i < arr.size(); ++i) {
             QString newKeyPath = currentKeyPath.isEmpty()
-            ? QString::number(i)
-            : currentKeyPath + "[" + QString::number(i) + "]";
+                ? QString::number(i)
+                : currentKeyPath + "[" + QString::number(i) + "]";
             extractStringsFromJsonValue(arr[i], extractedStrings, filePath, newKeyPath);
         }
     }

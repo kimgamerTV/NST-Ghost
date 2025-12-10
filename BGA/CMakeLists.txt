@@ -40,3 +40,5 @@ target_link_libraries(BGACore PRIVATE Qt${QT_VERSION_MAJOR}::Core)
 target_include_directories(BGACore PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/core/include
 )
+
+add_subdirectory(tests)

@@ -123,6 +123,7 @@ private:
     QVector<QModelIndex> m_pendingUIUpdates;
     QTimer *m_uiUpdateTimer;
     
+    bool m_isImporting = false; // Flag to track import state
     QJsonArray m_gameFonts; // Added
     
     QTimer *m_spinnerTimer;

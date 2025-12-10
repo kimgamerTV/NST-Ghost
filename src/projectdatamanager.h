@@ -21,6 +21,8 @@ public:
     QMap<QString, QJsonArray> &getLoadedGameProjectData();
     QString &getCurrentLoadedFilePath();
 
+    void clearAllData();
+
     void updateTranslation(const QString &source, const QString &translation);
     void saveGameProject();
     void exportGameProject(const QString &targetDir);

@@ -26,6 +26,24 @@ QString &ProjectDataManager::getCurrentLoadedFilePath()
     return m_currentLoadedFilePath;
 }
 
+void ProjectDataManager::clearAllData()
+{
+    // Disconnect to signal to prevent handling "finished" from the cancelled future
+    disconnect(&m_processingFutureWatcher, nullptr, this, nullptr);
+    m_processingFutureWatcher.cancel();
+    
+    // Do NOT set empty future as it might cause Qt internal crash with complex types
+    // m_processingFutureWatcher.setFuture(...); 
+
+    m_loadedGameProjectData.clear();
+    m_currentLoadedFilePath.clear();
+    m_fileListModel->clear();
+    m_translationModel->clear();
+
+    // Reconnect the signal for the future usage
+    connect(&m_processingFutureWatcher, &QFutureWatcher<QPair<QMap<QString, QJsonArray>, QStringList>>::finished, this, &ProjectDataManager::onProcessingFinished);
+}
+
 void ProjectDataManager::onLoadingFinished(const QJsonArray &extractedTextsArray)
 {
     qDebug() << "ProjectDataManager: onLoadingFinished called with " << extractedTextsArray.size() << " entries. Starting background processing.";
@@ -111,10 +129,17 @@ void ProjectDataManager::onFileSelected(const QModelIndex &index)
             QString source = obj["source"].toString();
             QString translation = obj["text"].toString();
             QString key = obj["key"].toString();
+            QString warning = obj["warning"].toString();
 
             QStandardItem *contextItem = new QStandardItem(key);
             contextItem->setEditable(false); // Context should be read-only
             contextItem->setForeground(QBrush(QColor(150, 150, 150))); // Grey out context text
+            
+            if (!warning.isEmpty()) {
+                contextItem->setIcon(QIcon::fromTheme("dialog-warning")); // Or built-in standard icon
+                contextItem->setToolTip("Warning: " + warning);
+                contextItem->setData(warning, Qt::UserRole + 2); // Store warning data
+            }
 
             QStandardItem *sourceItem = new QStandardItem(source);
             QStandardItem *transItem = new QStandardItem(translation);

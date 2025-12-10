@@ -1,0 +1,10 @@
+[  0%] Built target BGACore_autogen_timestamp_deps
+[  7%] Built target BGACore_autogen
+[ 61%] Built target BGACore
+[ 61%] Built target TestRpgAnalyzer_autogen_timestamp_deps
+[ 69%] Automatic MOC and UIC for target TestRpgAnalyzer
+[ 69%] Built target TestRpgAnalyzer_autogen
+[ 76%] Building CXX object BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/TestRpgAnalyzer_autogen/mocs_compilation.cpp.o
+[ 84%] Building CXX object BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o
+[ 92%] Linking CXX executable TestRpgAnalyzer
+[100%] Built target TestRpgAnalyzer
