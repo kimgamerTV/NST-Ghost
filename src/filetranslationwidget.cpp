@@ -709,6 +709,26 @@ void FileTranslationWidget::onDeployProject()
         return;
     }
 
+    // Show export mode dialog
+    QStringList options;
+    options << tr("Only Translated Files (Recommended)") 
+            << tr("All Files");
+    
+    bool ok;
+    QString choice = QInputDialog::getItem(
+        this, 
+        tr("Deploy Options"),
+        tr("What do you want to export?"),
+        options, 
+        0,  // default: Only Translated
+        false, 
+        &ok
+    );
+    
+    if (!ok) return;
+    
+    bool onlyTranslated = (choice == options[0]);
+
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Deployment Folder (Where to create game)"),
                                                 "",
                                                 QFileDialog::ShowDirsOnly
@@ -721,37 +741,15 @@ void FileTranslationWidget::onDeployProject()
     m_progressDialog->setRange(0, 0);
     m_progressDialog->show();
     
-    // Run in background to avoid freezing UI during copy
-    QFuture<bool> future = QtConcurrent::run([this, dir, gamePath]() {
-         return m_bgaDataManager->exportStringsToGameProject(
-            m_engineName,
-            gamePath,
-            dir,
-            m_projectDataManager->getLoadedGameProjectData()
-        );
-    });
-    
-    // We need a watcher for this one too, or just wait?
-    // Quick hack: Use a local event loop or new watcher member.
-    // For safety/simplicity let's block or add a new watcher member if strictly needed.
-    // Given the previous issue, let's just wait for now or add a new watcher.
-    // Actually, `exportStringsToGameProject` might take time.
-    // Let's use the valid QtConcurrent approach but we need to handle the result.
-    
-    // For now, let's run it synchronously ON THE MAIN THREAD if simple, OR handle it properly.
-    // Copying files is blocking.
-    // Let's stick to the previous synchronous call but with progress dialog active (it won't spin well if main thread blocked).
-    // Reverting to direct call for safety unless we add complexity.
-    
-    m_progressDialog->close(); // Close the indeterminate one
-    // Re-show?
-    // Let's just do synchronous for now to ensure safety.
+    // Run synchronously for safety
+    m_progressDialog->close();
     
     bool success = m_bgaDataManager->exportStringsToGameProject(
         m_engineName,
         gamePath,
         dir,
-        m_projectDataManager->getLoadedGameProjectData()
+        m_projectDataManager->getLoadedGameProjectData(),
+        onlyTranslated
     );
 
     if (success) {

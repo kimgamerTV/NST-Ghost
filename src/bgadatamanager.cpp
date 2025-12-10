@@ -138,14 +138,46 @@ bool BGADataManager::saveStringsToGameProject(const QString &engineName, const Q
     return true;
 }
 
-bool BGADataManager::exportStringsToGameProject(const QString &engineName, const QString &projectPath, const QString &targetDir, const QMap<QString, QJsonArray> &data)
+bool BGADataManager::exportStringsToGameProject(const QString &engineName, const QString &projectPath, const QString &targetDir, const QMap<QString, QJsonArray> &data, bool onlyTranslated)
 {
+    // Step 0: Filter data if onlyTranslated is true
+    QMap<QString, QJsonArray> filteredData;
+    
+    for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
+        const QString &filePath = it.key();
+        const QJsonArray &entries = it.value();
+        
+        if (onlyTranslated) {
+            // Check if this file has any translated entries
+            bool hasTranslation = false;
+            for (const QJsonValue &val : entries) {
+                QJsonObject obj = val.toObject();
+                QString translation = obj["text"].toString();
+                if (!translation.isEmpty()) {
+                    hasTranslation = true;
+                    break;
+                }
+            }
+            if (hasTranslation) {
+                filteredData.insert(filePath, entries);
+            }
+        } else {
+            // Include all files
+            filteredData.insert(filePath, entries);
+        }
+    }
+    
+    if (filteredData.isEmpty()) {
+        emit errorOccurred(tr("No files to export. Please translate some entries first."));
+        return false;
+    }
+
     // Step 1: Copy original files to target directory
     QDir projectDir(projectPath);
     QDir targetDirectory(targetDir);
 
     QSet<QString> filesToProcess;
-    for (const QJsonArray &fileTexts : data.values()) {
+    for (const QJsonArray &fileTexts : filteredData.values()) {
         for (const QJsonValue &value : fileTexts) {
              filesToProcess.insert(value.toObject()["path"].toString());
         }
@@ -172,15 +204,9 @@ bool BGADataManager::exportStringsToGameProject(const QString &engineName, const
     }
 
     // Step 2: Create modified data with new paths
-    QMap<QString, QJsonArray> modifiedData = data;
-    // We actually don't need to patch the "path" inside QJsonObjects if the analyzer executes against the targetDir 
-    // BUT the analyzer's save method likely uses the paths inside the objects.
-    // So we MUST update the paths in the data objects to point to the new location.
-
-    // Better approach:
     // Create a NEW QJsonArray of all texts, but with paths adjusted to targetDir.
     QJsonArray allTexts;
-    for (const QJsonArray &fileTexts : data.values()) {
+    for (const QJsonArray &fileTexts : filteredData.values()) {
         for (const QJsonValue &val : fileTexts) {
             QJsonObject obj = val.toObject();
             QString originalPath = obj["path"].toString();

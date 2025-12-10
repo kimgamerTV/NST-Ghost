@@ -309,36 +309,80 @@ bool RpgmAnalyzer::updateJsonObject(QJsonObject &obj, const QStringList &keys, i
 
     QString currentKey = keys[index];
 
-    // Check if key contains array notation [n]
+    // Check if key contains array notation [n] (possibly multiple like [0][0])
     if (currentKey.contains('[')) {
         int bracketPos = currentKey.indexOf('[');
         QString baseKey = currentKey.left(bracketPos);
-        int arrayIndex = currentKey.mid(bracketPos + 1, currentKey.indexOf(']') - bracketPos - 1).toInt();
-
-        if (!obj.contains(baseKey) || !obj[baseKey].isArray()) return false;
-
-        QJsonArray arr = obj[baseKey].toArray();
+        
+        // Extract all array indices from the key (e.g., "parameters[0][0]" -> [0, 0])
+        QList<int> arrayIndices;
+        QString remaining = currentKey.mid(bracketPos);
+        QRegularExpression re("\\[(\\d+)\\]");
+        QRegularExpressionMatchIterator it = re.globalMatch(remaining);
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            arrayIndices.append(match.captured(1).toInt());
+        }
+        
+        if (arrayIndices.isEmpty()) return false;
+        if (!obj.contains(baseKey)) return false;
+        
+        // Navigate through the nested arrays
+        QJsonValue currentVal = obj[baseKey];
+        QList<QPair<QJsonArray, int>> pathStack; // Stack to track path for reconstruction
+        
+        for (int i = 0; i < arrayIndices.size(); ++i) {
+            int idx = arrayIndices[i];
+            
+            if (!currentVal.isArray()) return false;
+            QJsonArray arr = currentVal.toArray();
+            if (idx < 0 || idx >= arr.size()) return false;
+            
+            pathStack.append(qMakePair(arr, idx));
+            currentVal = arr[idx];
+        }
+        
+        // Now currentVal is the value we need to update or navigate into
         if (index == keys.size() - 1) {
-            if (arrayIndex >= 0 && arrayIndex < arr.size()) {
-                arr.replace(arrayIndex, newValue);
-                obj[baseKey] = arr;
-                return true;
+            // This is the last key, replace the value
+            // Reconstruct the path backwards
+            QJsonValue newVal = QJsonValue(newValue);
+            for (int i = pathStack.size() - 1; i >= 0; --i) {
+                QJsonArray arr = pathStack[i].first;
+                int idx = pathStack[i].second;
+                arr.replace(idx, newVal);
+                newVal = arr;
             }
+            obj[baseKey] = newVal.toArray();
+            return true;
         } else {
-            // Navigate INTO the element at arrayIndex, not the whole array
-            QJsonValue elementVal = arr[arrayIndex];
-            if (elementVal.isObject()) {
-                QJsonObject elementObj = elementVal.toObject();
+            // Navigate into the element
+            if (currentVal.isObject()) {
+                QJsonObject elementObj = currentVal.toObject();
                 if (updateJsonObject(elementObj, keys, index + 1, newValue)) {
-                    arr.replace(arrayIndex, elementObj);
-                    obj[baseKey] = arr;
+                    // Reconstruct the path backwards
+                    QJsonValue newVal = elementObj;
+                    for (int i = pathStack.size() - 1; i >= 0; --i) {
+                        QJsonArray arr = pathStack[i].first;
+                        int idx = pathStack[i].second;
+                        arr.replace(idx, newVal);
+                        newVal = arr;
+                    }
+                    obj[baseKey] = newVal.toArray();
                     return true;
                 }
-            } else if (elementVal.isArray()) {
-                QJsonArray elementArr = elementVal.toArray();
+            } else if (currentVal.isArray()) {
+                QJsonArray elementArr = currentVal.toArray();
                 if (updateJsonArray(elementArr, keys, index + 1, newValue)) {
-                    arr.replace(arrayIndex, elementArr);
-                    obj[baseKey] = arr;
+                    // Reconstruct the path backwards
+                    QJsonValue newVal = elementArr;
+                    for (int i = pathStack.size() - 1; i >= 0; --i) {
+                        QJsonArray arr = pathStack[i].first;
+                        int idx = pathStack[i].second;
+                        arr.replace(idx, newVal);
+                        newVal = arr;
+                    }
+                    obj[baseKey] = newVal.toArray();
                     return true;
                 }
             }
@@ -376,28 +420,84 @@ bool RpgmAnalyzer::updateJsonArray(QJsonArray &arr, const QStringList &keys, int
 
     QString currentKey = keys[index];
 
-    // Check if it's an array index
+    // Check if it's an array index (possibly multiple like [0][0])
     if (currentKey.contains('[')) {
-        int bracketPos = currentKey.indexOf('[');
-        int arrayIndex = currentKey.mid(bracketPos + 1, currentKey.indexOf(']') - bracketPos - 1).toInt();
-
-        if (arrayIndex < 0 || arrayIndex >= arr.size()) return false;
-
+        // Extract all array indices from the key
+        QList<int> arrayIndices;
+        QRegularExpression re("\\[(\\d+)\\]");
+        QRegularExpressionMatchIterator it = re.globalMatch(currentKey);
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            arrayIndices.append(match.captured(1).toInt());
+        }
+        
+        if (arrayIndices.isEmpty()) return false;
+        
+        // Navigate through the nested arrays
+        QJsonValue currentVal = arr[arrayIndices[0]];
+        if (arrayIndices[0] < 0 || arrayIndices[0] >= arr.size()) return false;
+        
+        QList<QPair<QJsonArray, int>> pathStack;
+        pathStack.append(qMakePair(arr, arrayIndices[0]));
+        
+        for (int i = 1; i < arrayIndices.size(); ++i) {
+            int idx = arrayIndices[i];
+            
+            if (!currentVal.isArray()) return false;
+            QJsonArray nestedArr = currentVal.toArray();
+            if (idx < 0 || idx >= nestedArr.size()) return false;
+            
+            pathStack.append(qMakePair(nestedArr, idx));
+            currentVal = nestedArr[idx];
+        }
+        
         if (index == keys.size() - 1) {
-            arr.replace(arrayIndex, newValue);
+            // This is the last key, replace the value
+            QJsonValue newVal = QJsonValue(newValue);
+            for (int i = pathStack.size() - 1; i >= 0; --i) {
+                QJsonArray stackArr = pathStack[i].first;
+                int idx = pathStack[i].second;
+                stackArr.replace(idx, newVal);
+                newVal = stackArr;
+            }
+            // Copy back to arr (first level)
+            QJsonArray resultArr = newVal.toArray();
+            for (int i = 0; i < resultArr.size(); ++i) {
+                arr.replace(i, resultArr[i]);
+            }
             return true;
         } else {
-            QJsonValue value = arr[arrayIndex];
+            QJsonValue value = currentVal;
             if (value.isObject()) {
                 QJsonObject obj = value.toObject();
                 if (updateJsonObject(obj, keys, index + 1, newValue)) {
-                    arr.replace(arrayIndex, obj);
+                    QJsonValue newVal = obj;
+                    for (int i = pathStack.size() - 1; i >= 0; --i) {
+                        QJsonArray stackArr = pathStack[i].first;
+                        int idx = pathStack[i].second;
+                        stackArr.replace(idx, newVal);
+                        newVal = stackArr;
+                    }
+                    QJsonArray resultArr = newVal.toArray();
+                    for (int i = 0; i < resultArr.size(); ++i) {
+                        arr.replace(i, resultArr[i]);
+                    }
                     return true;
                 }
             } else if (value.isArray()) {
                 QJsonArray nestedArr = value.toArray();
                 if (updateJsonArray(nestedArr, keys, index + 1, newValue)) {
-                    arr.replace(arrayIndex, nestedArr);
+                    QJsonValue newVal = nestedArr;
+                    for (int i = pathStack.size() - 1; i >= 0; --i) {
+                        QJsonArray stackArr = pathStack[i].first;
+                        int idx = pathStack[i].second;
+                        stackArr.replace(idx, newVal);
+                        newVal = stackArr;
+                    }
+                    QJsonArray resultArr = newVal.toArray();
+                    for (int i = 0; i < resultArr.size(); ++i) {
+                        arr.replace(i, resultArr[i]);
+                    }
                     return true;
                 }
             }
@@ -546,6 +646,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 108: // Comment
                 case 408: // Comment continuation
                     // Developer comments - usually skip, but could add option to extract
+                    extractedFromCommand = true; // Fix: Prevent recursion
                     break;
                 
                 case 111: // Conditional Branch
@@ -582,6 +683,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 
                 case 231: // Show Picture
                     // parameters[1] = picture name (filename - skip)
+                    extractedFromCommand = true; // Fix: Prevent recursion so "PictureZIndex" isn't extracted
                     break;
                 
                 case 241: // Play BGM
@@ -590,7 +692,9 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 246: // Fadeout BGS
                 case 249: // Play ME
                 case 250: // Play SE
-                    // Audio commands - filenames only
+                    // Audio commands - filenames only (parameters contain {name, volume, pitch, pan})
+                    // Mark as handled to prevent recursing into parameters which would incorrectly extract 'name'
+                    extractedFromCommand = true;
                     break;
                 
                 // === Battle Commands ===
@@ -645,12 +749,14 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                     // Usually technical (like "EnemyBook open"), but some plugins use translatable text
                     // Best to skip unless specifically needed
                     // Add to blacklist or use heuristic
+                    extractedFromCommand = true; // Fix: Prevent recursion
                     break;
                 
                 // === Script Commands ===
                 case 355: // Script
                 case 655: // Script continuation
                     // JavaScript code - never translate
+                    extractedFromCommand = true; // Fix: Prevent recursion
                     break;
                 
                 default:

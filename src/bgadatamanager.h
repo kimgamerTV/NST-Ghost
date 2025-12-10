@@ -21,7 +21,7 @@ public:
     QStringList getAvailableAnalyzers() const;
     QJsonArray loadStringsFromGameProject(const QString &engineName, const QString &projectPath);
     bool saveStringsToGameProject(const QString &engineName, const QString &projectPath, const QMap<QString, QJsonArray> &data);
-    bool exportStringsToGameProject(const QString &engineName, const QString &projectPath, const QString &targetDir, const QMap<QString, QJsonArray> &data);
+    bool exportStringsToGameProject(const QString &engineName, const QString &projectPath, const QString &targetDir, const QMap<QString, QJsonArray> &data, bool onlyTranslated = true);
 
     QJsonArray loadedFonts() const;
 
