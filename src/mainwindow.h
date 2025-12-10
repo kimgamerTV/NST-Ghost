@@ -27,9 +27,10 @@ public:
     ~MainWindow();
 
 public slots:
-    void onLoadFromGameProject();
+    void onNewProject(); // Renamed
 
 private slots:
+// Restore missing slots
     void onOpenMockData();
     void onSettingsActionTriggered();
     void onFontsLoaded(const QJsonArray &fonts);
@@ -47,7 +48,8 @@ private slots:
     void onExportSmartFilterRules();
     void onImportSmartFilterRules();
 
-    void onSaveGameProject(); // delegated
+    void onSaveProject();    // Renamed
+    void onDeployProject();  // Renamed
 
 private:
     void loadSettings();

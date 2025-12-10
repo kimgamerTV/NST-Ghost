@@ -182,22 +182,48 @@ FileTranslationWidget::~FileTranslationWidget()
     delete ui;
 }
 
-void FileTranslationWidget::loadFromGameProject(const QString &engineName, const QString &projectPath)
+void FileTranslationWidget::onNewProject(const QString &engineName, const QString &projectPath)
 {
+    m_engineName = engineName; 
     m_smartFilterManager->setEngine(engineName);
+    
+    // Reset project file path for new project
+    m_currentProjectFile.clear();
+
+    // Sync with ProjectDataManager
+    m_projectDataManager->setProjectPath(projectPath);
+    m_projectDataManager->setEngineName(engineName);
+    
     m_projectDataManager->getLoadedGameProjectData().clear();
     m_fileListModel->clear();
+    
+    // Prompt to save .nst immediately (Enforce "Project File is King")
+    QString defaultName = QFileInfo(projectPath).fileName() + "_Translation.nst";
+    QString filePath = QFileDialog::getSaveFileName(this, tr("Create Translation Project"), 
+                                                     defaultName, 
+                                                     tr("NST Workspace Files (*.nst)"));
+                                                     
+    if (!filePath.isEmpty()) {
+        if (!filePath.endsWith(".nst")) filePath += ".nst";
+        m_currentProjectFile = filePath;
+        // We will save empty state initially or after load? 
+        // Better to load first, then save.
+    } else {
+        // If user cancels, we still load but unsaved state? Or cancel?
+        // Let's allow loading but warn or just leave m_currentProjectFile empty (unsaved).
+    }
 
     m_progressDialog = new CustomProgressDialog(this);
     m_progressDialog->setWindowModality(Qt::WindowModal);
     m_progressDialog->setValue(0);
+    m_progressDialog->setLabelText(tr("Analyzing game project..."));
     m_progressDialog->show();
 
+    // Use lambda to call BGADataManager
     QFuture<QJsonArray> future = QtConcurrent::run([this, engineName, projectPath]() {
-        // Warning: This assumes m_bgaDataManager is thread-safe or this method is independent
         return m_bgaDataManager->loadStringsFromGameProject(engineName, projectPath);
     });
-
+    
     m_loadFutureWatcher.setFuture(future);
 }
 
@@ -210,6 +236,12 @@ void FileTranslationWidget::onLoadingFinished()
     }
     QJsonArray extractedTextsArray = m_loadFutureWatcher.result();
     m_projectDataManager->onLoadingFinished(extractedTextsArray);
+
+    // Auto-save if we have a project file (from New Project flow)
+    if (!m_currentProjectFile.isEmpty()) {
+        m_projectDataManager->saveTranslationWorkspace(m_currentProjectFile);
+        QMessageBox::information(this, tr("Project Created"), tr("Project successfully created and saved to:\n%1").arg(m_currentProjectFile));
+    }
 }
 
 void FileTranslationWidget::onProjectProcessingFinished()
@@ -510,6 +542,8 @@ void FileTranslationWidget::onToggleContext(bool checked)
     ui->translationTableView->setColumnHidden(0, !checked);
 }
 
+
+
 void FileTranslationWidget::onHideCompleted(bool checked)
 {
     m_projectDataManager->setHideCompleted(checked);
@@ -534,9 +568,135 @@ void FileTranslationWidget::onImportSmartFilterRules()
     }
 }
 
-void FileTranslationWidget::onSaveGameProject()
+
+
+void FileTranslationWidget::onSaveProject()
 {
-     m_projectDataManager->saveGameProject();
+     if (m_projectDataManager->getLoadedGameProjectData().isEmpty()) return;
+     
+     QString filePath = m_currentProjectFile;
+     
+     // specific "Save As" behavior if no file yet
+     if (filePath.isEmpty()) {
+         filePath = QFileDialog::getSaveFileName(this, tr("Save Project"), 
+                                                 "", 
+                                                 tr("NST Workspace Files (*.nst)"));
+         if (filePath.isEmpty()) return;
+         if (!filePath.endsWith(".nst")) filePath += ".nst";
+         m_currentProjectFile = filePath;
+     }
+
+     bool success = m_projectDataManager->saveTranslationWorkspace(filePath);
+     
+     if (success) {
+         // Optional: flash status bar instead of annoying popup
+         // QMessageBox::information(this, tr("Success"), tr("Project saved.")); 
+         // For now, let's keep popup or just debug log? User requested less confusion.
+         // A subtle confirmation is better.
+         QMessageBox::information(this, tr("Saved"), tr("Project saved successfully."));
+     } else {
+         QMessageBox::critical(this, tr("Error"), tr("Failed to save project."));
+     }
+}
+
+void FileTranslationWidget::onOpenProject()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, tr("Open Project"), 
+                                                    "", 
+                                                    tr("NST Workspace Files (*.nst)"));
+    if (filePath.isEmpty()) return;
+    
+    if (!m_progressDialog) {
+         m_progressDialog = new CustomProgressDialog(this);
+    }
+    m_progressDialog->setLabelText(tr("Loading project..."));
+    m_progressDialog->setRange(0, 0); 
+    m_progressDialog->show();
+    
+    // Clear current state first?
+    m_currentProjectFile = filePath;
+
+    bool success = m_projectDataManager->loadTranslationWorkspace(filePath);
+    m_progressDialog->close();
+
+    if (success) {
+        m_engineName = m_projectDataManager->getEngineName();
+        // Check if project path is valid?
+        QString projectPath = m_projectDataManager->getProjectPath();
+        if (!QFileInfo::exists(projectPath)) {
+             QMessageBox::warning(this, tr("Warning"), tr("The original game folder for this project was not found:\n%1\nYou can continue translating, but you won't be able to Deploy/Export until you fix the path.").arg(projectPath));
+             // TODO: Allow fixing path
+        }
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load project file."));
+        m_currentProjectFile.clear(); 
+    }
+}
+
+void FileTranslationWidget::onDeployProject()
+{
+    if (m_projectDataManager->getLoadedGameProjectData().isEmpty()) {
+        QMessageBox::warning(this, tr("Warning"), tr("No project loaded to deploy."));
+        return;
+    }
+
+    // Verify game path exists
+    QString gamePath = m_projectDataManager->getProjectPath();
+    if (!QFileInfo::exists(gamePath)) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot find original game files at:\n%1\nPlease ensure the game drive is connected.").arg(gamePath));
+        return;
+    }
+
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Deployment Folder (Where to create game)"),
+                                                "",
+                                                QFileDialog::ShowDirsOnly
+                                                | QFileDialog::DontResolveSymlinks);
+
+    if (dir.isEmpty()) return;
+    
+    if (!m_progressDialog) m_progressDialog = new CustomProgressDialog(this);
+    m_progressDialog->setLabelText(tr("Deploying game (Copying & Patching)..."));
+    m_progressDialog->setRange(0, 0);
+    m_progressDialog->show();
+    
+    // Run in background to avoid freezing UI during copy
+    QFuture<bool> future = QtConcurrent::run([this, dir, gamePath]() {
+         return m_bgaDataManager->exportStringsToGameProject(
+            m_engineName,
+            gamePath,
+            dir,
+            m_projectDataManager->getLoadedGameProjectData()
+        );
+    });
+    
+    // We need a watcher for this one too, or just wait?
+    // Quick hack: Use a local event loop or new watcher member.
+    // For safety/simplicity let's block or add a new watcher member if strictly needed.
+    // Given the previous issue, let's just wait for now or add a new watcher.
+    // Actually, `exportStringsToGameProject` might take time.
+    // Let's use the valid QtConcurrent approach but we need to handle the result.
+    
+    // For now, let's run it synchronously ON THE MAIN THREAD if simple, OR handle it properly.
+    // Copying files is blocking.
+    // Let's stick to the previous synchronous call but with progress dialog active (it won't spin well if main thread blocked).
+    // Reverting to direct call for safety unless we add complexity.
+    
+    m_progressDialog->close(); // Close the indeterminate one
+    // Re-show?
+    // Let's just do synchronous for now to ensure safety.
+    
+    bool success = m_bgaDataManager->exportStringsToGameProject(
+        m_engineName,
+        gamePath,
+        dir,
+        m_projectDataManager->getLoadedGameProjectData()
+    );
+
+    if (success) {
+        QMessageBox::information(this, tr("Success"), tr("Game Deployed successfully to:\n%1").arg(dir));
+    } else {
+        QMessageBox::critical(this, tr("Error"), tr("Failed to deploy game. Check logs."));
+    }
 }
 
 void FileTranslationWidget::onUndoTranslation()

@@ -23,7 +23,15 @@ public:
 
     void updateTranslation(const QString &source, const QString &translation);
     void saveGameProject();
+    void exportGameProject(const QString &targetDir);
+    void setProjectPath(const QString &path);
     void setHideCompleted(bool hide);
+    QString getProjectPath() const { return m_projectPath; }
+    void setEngineName(const QString &name) { m_engineName = name; }
+    QString getEngineName() const { return m_engineName; }
+
+    bool saveTranslationWorkspace(const QString &filePath);
+    bool loadTranslationWorkspace(const QString &filePath);
 
 public slots:
     void onLoadingFinished(const QJsonArray &extractedTextsArray);
@@ -31,6 +39,7 @@ public slots:
 
 private slots:
     void onProcessingFinished();
+    
 
 signals:
     void processingFinished();
@@ -42,6 +51,8 @@ private:
     QString m_currentLoadedFilePath;
     QFutureWatcher<QPair<QMap<QString, QJsonArray>, QStringList>> m_processingFutureWatcher;
     bool m_hideCompleted = false;
+    QString m_projectPath;
+    QString m_engineName;
 };
 
 #endif // PROJECTDATAMANAGER_H

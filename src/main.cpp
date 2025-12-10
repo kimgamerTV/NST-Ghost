@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    QTimer::singleShot(0, &w, &MainWindow::onLoadFromGameProject);
+     // QTimer::singleShot(0, &w, &MainWindow::onNewProject); // Optional: Auto-start new project flow // Optional: Auto-start new project flow
 
 
     return a.exec();

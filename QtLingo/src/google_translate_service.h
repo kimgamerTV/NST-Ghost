@@ -14,6 +14,10 @@ public:
     QString serviceName() const override { return "Google Translate"; }
     void translate(const QString &sourceText) override;
 
+    // Batch Translation
+    bool supportsBatchTranslation() const override { return true; }
+    void batchTranslate(const QStringList &sourceTexts) override;
+
     void setApiKey(const QString &apiKey) override;
     void setTargetLanguage(const QString &language) override;
     void setSourceLanguage(const QString &language);
@@ -33,6 +37,7 @@ private:
     QString m_sourceLanguage = "auto"; // Default to auto-detect
     bool m_isApi = false;
     QString m_currentSourceText;
+    QStringList m_currentBatchSource;
 };
 
 } // namespace qtlingo

@@ -6,6 +6,7 @@
 #include <QtConcurrent>
 #include <QJsonDocument>
 #include <QFile>
+#include <QDir>
 
 ProjectDataManager::ProjectDataManager(QStandardItemModel *fileListModel, QStandardItemModel *translationModel, QObject *parent)
     : QObject(parent)
@@ -171,4 +172,90 @@ void ProjectDataManager::saveGameProject()
 void ProjectDataManager::setHideCompleted(bool hide)
 {
     m_hideCompleted = hide;
+}
+
+void ProjectDataManager::setProjectPath(const QString &path)
+{
+    m_projectPath = path;
+}
+
+void ProjectDataManager::exportGameProject(const QString &targetDir)
+{
+    // Deprecated or delegated to BGA via FileTranslationWidget
+    // Keeping empty or removing implementation if not used.
+    // For now, let's leave it but it shouldn't be called directly without BGA logic.
+}
+
+bool ProjectDataManager::saveTranslationWorkspace(const QString &filePath)
+{
+    QJsonObject rootObj;
+    rootObj.insert("projectPath", m_projectPath);
+    rootObj.insert("engineName", m_engineName);
+    
+    QJsonObject dataObj;
+    QMapIterator<QString, QJsonArray> i(m_loadedGameProjectData);
+    while (i.hasNext()) {
+        i.next();
+        dataObj.insert(i.key(), i.value());
+    }
+    rootObj.insert("data", dataObj);
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "Failed to open workspace file for writing:" << filePath;
+        return false;
+    }
+
+    QJsonDocument doc(rootObj);
+    file.write(doc.toJson());
+    file.close();
+    return true;
+}
+
+bool ProjectDataManager::loadTranslationWorkspace(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Failed to open workspace file for reading:" << filePath;
+        return false;
+    }
+
+    QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
+    file.close();
+
+    if (doc.isNull() || !doc.isObject()) {
+        qWarning() << "Invalid workspace file format.";
+        return false;
+    }
+
+    QJsonObject rootObj = doc.object();
+    m_projectPath = rootObj["projectPath"].toString();
+    m_engineName = rootObj["engineName"].toString();
+    
+    QJsonObject dataObj = rootObj["data"].toObject();
+    m_loadedGameProjectData.clear();
+    
+    for (auto it = dataObj.begin(); it != dataObj.end(); ++it) {
+        if (it.value().isArray()) {
+            m_loadedGameProjectData.insert(it.key(), it.value().toArray());
+        }
+    }
+
+    // Refresh models
+    m_fileListModel->clear();
+    m_translationModel->clear();
+    
+    // Populate file list sorted by name
+    QStringList files = m_loadedGameProjectData.keys();
+    std::sort(files.begin(), files.end(), [](const QString &a, const QString &b) {
+         return QFileInfo(a).fileName() < QFileInfo(b).fileName();
+    });
+
+    for (const QString &path : files) {
+        QStandardItem *item = new QStandardItem(QFileInfo(path).fileName());
+        item->setData(path, Qt::UserRole);
+        m_fileListModel->appendRow(item);
+    }
+    
+    return true;
 }

@@ -11,9 +11,12 @@ MenuBar::MenuBar(QWidget *parent)
 void MenuBar::createMenus()
 {
     fileMenu = addMenu(tr("&File"));
-    fileMenu->addAction(openMockDataAction);
-    fileMenu->addAction(loadFromGameProjectAction);
+    fileMenu->addAction(newProjectAction);
+    fileMenu->addAction(openProjectAction);
+    fileMenu->addSeparator();
     fileMenu->addAction(saveProjectAction);
+    fileMenu->addSeparator();
+    fileMenu->addAction(deployProjectAction);
     fileMenu->addSeparator();
     fileMenu->addAction(settingsAction);
     fileMenu->addSeparator();
@@ -37,13 +40,20 @@ void MenuBar::createActions()
     openMockDataAction = new QAction(tr("Open Mock Data"), this);
     connect(openMockDataAction, &QAction::triggered, this, &MenuBar::openMockData);
 
-    loadFromGameProjectAction = new QAction(tr("Load from Game Project..."), this);
-    connect(loadFromGameProjectAction, &QAction::triggered, this, &MenuBar::loadFromGameProject);
+    newProjectAction = new QAction(tr("New Project..."), this);
+    connect(newProjectAction, &QAction::triggered, this, &MenuBar::newProject);
 
-    saveProjectAction = new QAction(tr("Save Project"), this); // New save action
+    openProjectAction = new QAction(tr("Open Project..."), this);
+    connect(openProjectAction, &QAction::triggered, this, &MenuBar::openProject);
+
+    saveProjectAction = new QAction(tr("Save"), this);
+    saveProjectAction->setShortcut(QKeySequence::Save);
     connect(saveProjectAction, &QAction::triggered, this, &MenuBar::saveProject);
 
-    settingsAction = new QAction(tr("Settings..."), this);
+    deployProjectAction = new QAction(tr("Deploy Game..."), this);
+    connect(deployProjectAction, &QAction::triggered, this, &MenuBar::deployProject);
+
+    settingsAction = new QAction(tr("Settings"), this);
     connect(settingsAction, &QAction::triggered, this, &MenuBar::settings);
 
     exitAction = new QAction(tr("&Exit"), this);

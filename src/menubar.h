@@ -11,9 +11,11 @@ public:
 
 signals:
     void openMockData();
-    void loadFromGameProject();
+    void newProject();      // Renamed from loadFromGameProject
+    void openProject();     // Renamed from openWorkspace
     void settings();
-    void saveProject(); // New signal for saving project
+    void saveProject();     // Kept same name, logic changes
+    void deployProject();   // Renamed from exportProject
     void exit();
     void fontManager();
     void pluginManager();
@@ -31,13 +33,15 @@ private:
     void createActions();
 
     QMenu *fileMenu;
-    QMenu *viewMenu; // New View menu
+    QMenu *viewMenu;
     QMenu *toolsMenu;
-    QMenu *smartFilterMenu; // New menu
+    QMenu *smartFilterMenu;
     QAction *openMockDataAction;
-    QAction *loadFromGameProjectAction;
+    QAction *newProjectAction;      // Renamed
+    QAction *openProjectAction;     // Renamed
     QAction *settingsAction;
-    QAction *saveProjectAction; // New action declaration
+    QAction *saveProjectAction;
+    QAction *deployProjectAction;   // Renamed
     QAction *exitAction;
     QAction *fontManagerAction;
     QAction *pluginManagerAction;

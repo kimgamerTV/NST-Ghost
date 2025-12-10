@@ -114,9 +114,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Connect MenuBar signals to FileTranslationWidget slots
     connect(m_menuBar, &MenuBar::openMockData, m_fileTranslationWidget, &FileTranslationWidget::openMockData);
-    connect(m_menuBar, &MenuBar::loadFromGameProject, this, &MainWindow::onLoadFromGameProject);
+    connect(m_menuBar, &MenuBar::newProject, this, &MainWindow::onNewProject);
+    connect(m_menuBar, &MenuBar::openProject, m_fileTranslationWidget, &FileTranslationWidget::onOpenProject);
     connect(m_menuBar, &MenuBar::settings, this, &MainWindow::onSettingsActionTriggered);
-    connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveGameProject);
+    connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveProject);
+    connect(m_menuBar, &MenuBar::deployProject, this, &MainWindow::onDeployProject);
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
     connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
     connect(m_menuBar, &MenuBar::pluginManager, this, &MainWindow::onPluginManagerActionTriggered);
@@ -151,7 +153,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::onLoadFromGameProject()
+void MainWindow::onNewProject()
 {
     BGADataManager tempManager(this); 
     QStringList availableEngines = tempManager.getAvailableAnalyzers();
@@ -174,7 +176,9 @@ void MainWindow::onLoadFromGameProject()
         return;
     }
     
-    m_fileTranslationWidget->loadFromGameProject(engineName, projectPath);
+    m_fileTranslationWidget->onNewProject(engineName, projectPath);
+    // Show file translation widget
+    m_stackedWidget->setCurrentWidget(m_fileTranslationWidget);
 }
 
 void MainWindow::onOpenMockData()
@@ -265,7 +269,8 @@ void MainWindow::onToggleContext(bool checked) { m_fileTranslationWidget->onTogg
 void MainWindow::onHideCompleted(bool checked) { m_fileTranslationWidget->onHideCompleted(checked); }
 void MainWindow::onExportSmartFilterRules() { m_fileTranslationWidget->onExportSmartFilterRules(); }
 void MainWindow::onImportSmartFilterRules() { m_fileTranslationWidget->onImportSmartFilterRules(); }
-void MainWindow::onSaveGameProject() { m_fileTranslationWidget->onSaveGameProject(); }
+void MainWindow::onSaveProject() { m_fileTranslationWidget->onSaveProject(); }
+void MainWindow::onDeployProject() { m_fileTranslationWidget->onDeployProject(); }
 
 void MainWindow::onNavigationChanged(int index)
 {
@@ -278,12 +283,12 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
         m_resizeDirection = getResizeDirection(event->pos());
         if (m_resizeDirection != ResizeNone) {
             m_isDragging = true;
-            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+            m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
             m_originalGeometry = geometry();
         } else {
              // If we prefer CustomTitleBar to handle moving, we rely on its signals or this logic if it bubbles up.
              m_isDragging = true;
-             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+             m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
              m_resizeDirection = ResizeNone; 
         }
     }
@@ -306,7 +311,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 
     if (m_isDragging) {
         if (m_resizeDirection != ResizeNone) {
-            QPoint globalPos = event->globalPos();
+            QPoint globalPos = event->globalPosition().toPoint();
             QRect geom = m_originalGeometry;
             
             int left = geom.left();
@@ -334,7 +339,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event)
 
             setGeometry(newGeom);
         } else {
-             move(event->globalPos() - m_dragPosition);
+             move(event->globalPosition().toPoint() - m_dragPosition);
         }
     }
     QMainWindow::mouseMoveEvent(event);

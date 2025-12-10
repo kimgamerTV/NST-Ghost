@@ -33,7 +33,6 @@ public:
     explicit FileTranslationWidget(TranslationServiceManager *serviceManager, QWidget *parent = nullptr);
     ~FileTranslationWidget();
 
-    void loadFromGameProject(const QString &engineName, const QString &projectPath);
     void openMockData();
     void setSettings(const QString &apiKey, const QString &targetLang, bool googleApi, 
                      const QString &llmProvider, const QString &llmApiKey, 
@@ -44,7 +43,12 @@ public:
     void onHideCompleted(bool checked);
     void onExportSmartFilterRules();
     void onImportSmartFilterRules();
-    void onSaveGameProject();
+    // New Project Flow
+    void onNewProject(const QString &engineName, const QString &projectPath); 
+    void onOpenProject();  // Renamed from onLoadTranslationWorkspace
+    void onSaveProject();  // Renamed from onSaveGameProject
+    void onDeployProject(); // Renamed from onExportGameProject
+
     void onUndoTranslation();
     
     void openFontManager(); // Added
@@ -101,6 +105,8 @@ private:
     // Settings (cached locally for use in translation jobs)
     QString m_apiKey;
     QString m_targetLanguage;
+    QString m_engineName;
+    QString m_currentProjectFile; // Track the current .nst file path
     bool m_googleApi;
     QString m_llmProvider;
     QString m_llmApiKey;
