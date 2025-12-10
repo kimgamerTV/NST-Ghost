@@ -1,4 +1,4 @@
-a<RCC>
+<RCC>
     <qresource prefix="/">
         <file>style.qss</file>
         <file>icons/rpgm_icon.png</file>
