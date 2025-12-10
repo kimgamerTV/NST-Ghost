@@ -10,7 +10,7 @@
 #include <QTime>
 
 #ifdef HAS_LUA
-#include "src/plugins/LuaScriptManager.h"
+#include "plugins/LuaScriptManager.h"
 #endif
 
 PluginManagerDialog::PluginManagerDialog(QWidget* parent) : QDialog(parent) {

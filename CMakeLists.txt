@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+acmake_minimum_required(VERSION 3.16)
 project(NST VERSION 0.5.0 LANGUAGES CXX)
 add_definitions(-DAPP_VERSION=\"${PROJECT_VERSION}\")
 
@@ -27,57 +27,57 @@ if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
     qt_standard_project_setup()
 endif()
 
-set(TS_FILES NST_en_US.ts)
+set(TS_FILES src/NST_en_US.ts)
 
 set(PROJECT_SOURCES
-    main.cpp
-    mainwindow.cpp
-    menubar.cpp
-    loadprojectdialog.cpp
-    searchdialog.cpp
-    settingsdialog.cpp
-    searchcontroller.cpp
-    shortcutcontroller.cpp
-    bgadatamanager.cpp
-    translationservicemanager.cpp
-    smartfiltermanager.cpp
-    translationcontextmenu.cpp
-    updatecontroller.cpp
-    fontmanagerdialog.cpp
-    pluginmanagerdialog.cpp
-    plugindebuggerdialog.cpp
-    plugins/LuaTranslationPlugin/luatranslationservice.cpp
-    projectdatamanager.cpp
-    mainwindow.h
-    menubar.h
-    loadprojectdialog.h
-    searchdialog.h
-    settingsdialog.h
-    fontmanagerdialog.h
-    pluginmanagerdialog.h
-    plugindebuggerdialog.h
-    plugins/LuaTranslationPlugin/luatranslationservice.h
-    searchcontroller.h
-    shortcutcontroller.h
-    bgadatamanager.h
-    translationservicemanager.h
-    translationcontextmenu.h
-    updatecontroller.h
-    customprogressdialog.cpp
-    customprogressdialog.h
-    projectdatamanager.h
-    customtitlebar.cpp
-    customtitlebar.h
-    realtimetranslationwidget.cpp
-    realtimetranslationwidget.h
-    filetranslationwidget.cpp
-    filetranslationwidget.h
-    filetranslationwidget.ui
-    translationserver.cpp
-    translationserver.h
-    processselectordialog.cpp
-    processselectordialog.h
-    resources.qrc
+    src/main.cpp
+    src/mainwindow.cpp
+    src/menubar.cpp
+    src/loadprojectdialog.cpp
+    src/searchdialog.cpp
+    src/settingsdialog.cpp
+    src/searchcontroller.cpp
+    src/shortcutcontroller.cpp
+    src/bgadatamanager.cpp
+    src/translationservicemanager.cpp
+    src/smartfiltermanager.cpp
+    src/translationcontextmenu.cpp
+    src/updatecontroller.cpp
+    src/fontmanagerdialog.cpp
+    src/pluginmanagerdialog.cpp
+    src/plugindebuggerdialog.cpp
+    src/plugins/LuaTranslationPlugin/luatranslationservice.cpp
+    src/projectdatamanager.cpp
+    src/mainwindow.h
+    src/menubar.h
+    src/loadprojectdialog.h
+    src/searchdialog.h
+    src/settingsdialog.h
+    src/fontmanagerdialog.h
+    src/pluginmanagerdialog.h
+    src/plugindebuggerdialog.h
+    src/plugins/LuaTranslationPlugin/luatranslationservice.h
+    src/searchcontroller.h
+    src/shortcutcontroller.h
+    src/bgadatamanager.h
+    src/translationservicemanager.h
+    src/translationcontextmenu.h
+    src/updatecontroller.h
+    src/customprogressdialog.cpp
+    src/customprogressdialog.h
+    src/projectdatamanager.h
+    src/customtitlebar.cpp
+    src/customtitlebar.h
+    src/realtimetranslationwidget.cpp
+    src/realtimetranslationwidget.h
+    src/filetranslationwidget.cpp
+    src/filetranslationwidget.h
+    src/filetranslationwidget.ui
+    src/translationserver.cpp
+    src/translationserver.h
+    src/processselectordialog.cpp
+    src/processselectordialog.h
+    src/resources.qrc
 )
 
 # Lua plugin sources (optional)
@@ -97,7 +97,7 @@ add_subdirectory(BGA)
 # Add QtLingo as a subdirectory
 add_subdirectory(QtLingo)
 # Add plugins subdirectory
-add_subdirectory(plugins)
+add_subdirectory(src/plugins)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(NST
@@ -142,7 +142,7 @@ else()
     message(WARNING "Lua not found (LUA_FOUND and Lua_FOUND are false)")
 endif()
 
-target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include)
+target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include ${CMAKE_SOURCE_DIR}/src)
 
 # Copy scripts to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})

@@ -5,7 +5,7 @@
 #include "loadprojectdialog.h"
 
 #ifdef HAS_LUA
-#include "src/plugins/LuaScriptManager.h"
+#include "plugins/LuaScriptManager.h"
 #endif
 
 #include <QStandardPaths>

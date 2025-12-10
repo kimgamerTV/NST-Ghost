@@ -1,6 +1,6 @@
 #pragma once
 #include <QObject>
-#include "../../src/plugins/IPlugin.h"
+#include "plugins/IPlugin.h"
 
 class MockDataPlugin : public QObject, public IPlugin {
     Q_OBJECT

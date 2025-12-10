@@ -1,7 +1,7 @@
 #pragma once
 #include <QObject>
 #include <QProcess>
-#include "../../src/plugins/IPlugin.h"
+#include "plugins/IPlugin.h"
 
 class UnrpycPlugin : public QObject, public IPlugin {
     Q_OBJECT
