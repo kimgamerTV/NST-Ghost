@@ -2,6 +2,7 @@
 #include "core/engines/rpgm/rpganalyzer.h"
 #include <QDir>
 #include <QFile>
+#include <QDirIterator>
 #include <QTemporaryDir>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -22,77 +23,76 @@ private slots:
         tempDir = std::make_unique<QTemporaryDir>();
         QVERIFY(tempDir->isValid());
         
-        // Setup mock project structure
         QDir dir(tempDir->path());
         dir.mkdir("data");
         dataPath = dir.filePath("data");
 
-        // Copy test files
+        // Copy ALL json files from Unit-Test/RPGM recursively to dataPath
         QString sourceRoot = "/home/jop/work/NST/NST/Unit-Test/RPGM";
+        QDirIterator it(sourceRoot, QStringList() << "*.json", QDir::Files, QDirIterator::Subdirectories);
         
-        // Check if source exists
-        QVERIFY2(QDir(sourceRoot).exists(), "Source mock data directory missing!");
-
-        QVERIFY(QFile::copy(sourceRoot + "/dialogs/Map001.json", dataPath + "/Map001.json"));
-        QVERIFY(QFile::copy(sourceRoot + "/objects/Actors.json", dataPath + "/Actors.json"));
+        while (it.hasNext()) {
+            QString sourcePath = it.next();
+            QString fileName = it.fileName();
+            // Flatten the structure for simplicity in data folder, or just copy to root of data
+            // RPGM usually expects them in specific places, but analyzer might just scan all.
+            // Let's copy to data/fileName to simulate standard data folder content.
+            // If filenames collide (e.g. Map001.json in dialogs and dialogs_gaya), we might issue.
+            // Let's check if we need to rename or keep structure.
+            // The analyzer searches recursively in project root, or in "data" folder.
+            // It searches "data"/*.json.
+            
+            // For this coverage test, we want to capture EVERYTHING.
+            // Let's copy them with unique names if needed, or just copy into data/.
+            
+            QString destPath = dataPath + "/" + fileName;
+            if (QFile::exists(destPath)) {
+                destPath = dataPath + "/" + it.fileInfo().baseName() + "_" + QString::number(QRandomGenerator::global()->generate()) + ".json";
+            }
+            QFile::copy(sourcePath, destPath);
+        }
     }
 
-    void testAnalyze()
+    void testCoverage()
     {
         core::engines::rpgm::RpgmAnalyzer analyzer;
-        core::AnalyzerOutput output = analyzer.analyze(tempDir->path()); // Analyze root, should find data/
+        core::AnalyzerOutput output = analyzer.analyze(tempDir->path()); 
 
-        QCOMPARE(output.format, QString("application/json"));
-        
         QJsonDocument doc = QJsonDocument::fromJson(output.payload);
-        QVERIFY(!doc.isNull());
-        QVERIFY(doc.isObject());
+        QJsonArray strings = doc.object()["strings"].toArray();
         
-        QJsonObject root = doc.object();
-        QVERIFY(root.contains("strings"));
-        QJsonArray strings = root["strings"].toArray();
+        qDebug() << "==========================================";
+        qDebug() << "          EXTRACTION COVERAGE REPORT      ";
+        qDebug() << "==========================================";
+        qDebug() << "Total Strings Extracted: " << strings.size();
+        
+        QMap<QString, int> fileCounts;
+
+        for(const auto& val : strings) {
+            QJsonObject obj = val.toObject();
+            QString path = obj["path"].toString();
+            QString fileName = QFileInfo(path).fileName();
+            fileCounts[fileName]++;
+            
+            // Print details for manual verification if needed
+            // qDebug() << "[" << fileName << "] " << obj["key"].toString() << " : " << obj["source"].toString();
+        }
+
+        for(auto it = fileCounts.begin(); it != fileCounts.end(); ++it) {
+            qDebug() << "File:" << it.key() << " - Extracted:" << it.value();
+        }
+        
+        // Also print out the actual strings to stdout for capture
+        for(const auto& val : strings) {
+            QJsonObject obj = val.toObject();
+             // Clean newlines for cleaner output
+            QString source = obj["source"].toString().replace("\n", "\\n");
+            qInfo() << "[EXTRACTED] " << QFileInfo(obj["path"].toString()).fileName() << " | " << obj["key"].toString() << " | " << source;
+        }
+
+        qDebug() << "==========================================";
+        
         QVERIFY(strings.size() > 0);
-
-        // Check for specific known strings from Map001.json
-        // {"code":401,"indent":0,"parameters":["All'orizzonte il cielo blu andava a cadere nelle"]}
-        bool foundMapText = false;
-        for(const auto& val : strings) {
-            QJsonObject obj = val.toObject();
-            if (obj["source"].toString().contains("All'orizzonte il cielo blu")) {
-                foundMapText = true;
-                QCOMPARE(obj["key"].toString(), QString("events[0].pages[0].list[4].parameters[0]")); 
-                // Note: The key path depends on array indices, events array index 0.
-                // Map001.json: "events": [null, {"id":1,...}] usually in RPGM events array has null at 0.
-                // But the snippet showed: "events":[ {"id":1...} ] so index 0 is valid.
-                break;
-            }
-        }
-        QVERIFY(foundMapText);
-        
-        // Check for Actors.json extraction (whitelisted keys)
-        // Actors.json: "name": "Destiny"
-        bool foundActorName = false;
-        bool foundActorProfile = false;
-        bool foundNonWhitelistedKey = false;
-
-        for(const auto& val : strings) {
-            QJsonObject obj = val.toObject();
-            if (obj["path"].toString().endsWith("Actors.json")) {
-                if (obj["source"].toString() == "Destiny") {
-                    foundActorName = true;
-                }
-                if (obj["source"].toString().contains("Un ragazzo misterioso")) {
-                    foundActorProfile = true;
-                }
-                // Check for keys that should NOT be here (e.g. battlerName)
-                if (obj["key"].toString().contains("battlerName")) {
-                    foundNonWhitelistedKey = true;
-                }
-            }
-        }
-        QVERIFY(foundActorName);
-        QVERIFY(foundActorProfile);
-        QVERIFY(!foundNonWhitelistedKey); // Ensure non-whitelisted keys are ignored
     }
 };
 

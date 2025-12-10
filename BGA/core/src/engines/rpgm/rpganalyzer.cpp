@@ -460,8 +460,13 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
             // แต่ไม่ดึง parameters ของ code อื่นๆ ออกมา
             for (const QString &key : obj.keys()) {
                 QJsonValue val = obj[key];
-                // ข้าม parameters ถ้าไม่ใช่ code 401/405
-                if (key == "parameters" && code != 401 && code != 405) {
+                // Skip parameters for 401/405 (Show Text) as they are extracted manually above
+                if (key == "parameters" && (code == 401 || code == 405)) {
+                    continue;
+                }
+                
+                // Also skip parameters for other codes as we generally don't want to extract raw params
+                if (key == "parameters") {
                     continue;
                 }
                 
