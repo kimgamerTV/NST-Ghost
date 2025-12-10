@@ -191,6 +191,9 @@ install(FILES packaging/icons/nst.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons
 
 # Option to skip Qt deployment (useful for AppImage/custom packaging)
 option(SKIP_QT_DEPLOY "Skip Qt deployment during install" OFF)
+if(DEFINED ENV{SKIP_QT_DEPLOY})
+    set(SKIP_QT_DEPLOY ON)
+endif()
 
 # Use Qt's official deployment API (Qt 6.3+)
 if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3 AND NOT SKIP_QT_DEPLOY)
