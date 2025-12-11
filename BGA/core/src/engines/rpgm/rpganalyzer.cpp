@@ -547,6 +547,13 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
     } else if (jsonValue.isObject()) {
         QJsonObject obj = jsonValue.toObject();
 
+        // Check for Audio Object structure (name, volume, pitch, pan) and skip
+        if (obj.contains("name") && obj.contains("volume") && obj.contains("pitch") && obj.contains("pan")) {
+           // This is an audio configuration object. 'name' is a filename and should not be translated.
+           // We explicitly skip recursing into it to avoid extracting 'name'.
+           return;
+        }
+
         // ===== Rule 1: Event Command Handling (Complete) =====
         if (obj.contains("code") && obj.contains("parameters") && obj["parameters"].isArray()) {
             int code = obj["code"].toInt();
@@ -972,20 +979,7 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
         return true;
     }
 
-    // Very short strings (< 2 chars) that are non-translatable
-    if (text.length() < 2) {
-        static QRegularExpression nonTranslatableShort(
-            QStringLiteral("^[a-zA-Z0-9!@#$%^&*()_+=\\-\\[\\]{}|;:'\",.<>?/\\\\]+$")
-        );
-        if (nonTranslatableShort.match(text).hasMatch()) {
-            return true;
-        }
-    }
-
-    // Single letters or abbreviations (often system values)
-    if (text.length() <= 2 && text.toUpper() == text) {
-        return true; // HP, MP, ATK, DEF, etc.
-    }
+    // (Removed short string checks per user request to support short choices like "Yes"/"No")
 
     return false;
 }

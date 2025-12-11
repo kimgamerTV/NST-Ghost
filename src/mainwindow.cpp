@@ -182,10 +182,6 @@ void MainWindow::onNewProject()
         return;
     }
 
-    if (dialog.exec() != QDialog::Accepted) {
-        return;
-    }
-
     QString engineName = dialog.selectedEngine();
     // Update member
     m_engineName = engineName;
@@ -199,10 +195,31 @@ void MainWindow::onNewProject()
     m_fileTranslationWidget->onNewProject(engineName, projectPath);
     
     // Check Engine Capability for Relations
-ฟ       QString styleSheet = stream.readAll();
-        dialog.setStyleSheet(styleSheet);
-        file.close();
+    bool isRpgMaker = (m_engineName.startsWith("RPG Maker"));
+    bool showRelations = m_enableRelations && isRpgMaker;
+    if (m_titleBar) {
+        m_titleBar->setRelationsVisible(showRelations);
     }
+}
+
+void MainWindow::onOpenMockData()
+{
+    if (m_fileTranslationWidget) {
+        m_fileTranslationWidget->openMockData();
+    }
+}
+
+void MainWindow::onSettingsActionTriggered()
+{
+    SettingsDialog dialog(this);
+    dialog.setGoogleApiKey(m_apiKey);
+    dialog.setTargetLanguage(m_targetLanguage);
+    dialog.setGoogleApi(m_googleApi);
+    dialog.setLlmProvider(m_llmProvider);
+    dialog.setLlmApiKey(m_llmApiKey);
+    dialog.setLlmModel(m_llmModel);
+    dialog.setLlmBaseUrl(m_llmBaseUrl);
+    dialog.setRelationsEnabled(m_enableRelations);
 
     if (dialog.exec() == QDialog::Accepted) {
         m_apiKey = dialog.googleApiKey();
@@ -212,18 +229,17 @@ void MainWindow::onNewProject()
         m_llmProvider = dialog.llmProvider();
         m_llmApiKey = dialog.llmApiKey();
         m_llmModel = dialog.llmModel();
-        m_llmApiKey = dialog.llmApiKey();
-        m_llmModel = dialog.llmModel();
         m_llmBaseUrl = dialog.llmBaseUrl();
         m_enableRelations = dialog.isRelationsEnabled();
         saveSettings();
         updateChildSettings();
         
         // Update TitleBar Visibility immediately
-        // We also need to check current engine if project is loaded
         bool isRpgMaker = (m_engineName.startsWith("RPG Maker"));
         bool showRelations = m_enableRelations && isRpgMaker;
-        m_titleBar->setRelationsVisible(showRelations);
+        if (m_titleBar) {
+             m_titleBar->setRelationsVisible(showRelations);
+        }
     }
 }
 

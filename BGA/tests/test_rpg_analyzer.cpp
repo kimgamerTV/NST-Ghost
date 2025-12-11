@@ -95,6 +95,71 @@ private slots:
         QVERIFY(strings.size() > 0);
     }
 
+    void testShortStrings()
+    {
+        // 1. Create a mock file with short strings
+        QString mockFileName = "short_strings.json";
+        QString mockFilePath = dataPath + "/" + mockFileName;
+        
+        QJsonArray choices;
+        choices.append("Yes");
+        choices.append("No");
+        choices.append("A");
+        choices.append("Hi");
+        
+        QJsonArray parameters;
+        parameters.append(choices); // Index 0: Array of choices
+        parameters.append(1);       // Index 1: Cancel Type
+        
+        QJsonObject command;
+        command.insert("code", 102); // Show Choices
+        command.insert("indent", 0);
+        command.insert("parameters", parameters);
+        
+        QJsonArray list;
+        list.append(command);
+        
+        QJsonObject event;
+        event.insert("id", 1);
+        event.insert("list", list);
+        
+        QJsonArray root;
+        root.append(QJsonValue::Null);
+        root.append(event);
+        
+        QJsonDocument doc(root);
+        QFile file(mockFilePath);
+        QVERIFY(file.open(QIODevice::WriteOnly));
+        file.write(doc.toJson());
+        file.close();
+        
+        // 2. Run Analyzer
+        core::engines::rpgm::RpgmAnalyzer analyzer;
+        core::AnalyzerOutput output = analyzer.analyze(tempDir->path());
+        
+        QJsonDocument outDoc = QJsonDocument::fromJson(output.payload);
+        QJsonArray strings = outDoc.object()["strings"].toArray();
+        
+        // 3. Verify
+        int foundCount = 0;
+        QStringList foundTexts;
+        for(const QJsonValue &val : strings) {
+            QJsonObject obj = val.toObject();
+            if (obj["path"].toString() == mockFilePath) {
+                QString text = obj["source"].toString();
+                foundTexts << text;
+                if (text == "Yes" || text == "No" || text == "A" || text == "Hi") {
+                    foundCount++;
+                }
+            }
+        }
+        
+        if (foundCount != 4) {
+            qDebug() << "Found texts in short_strings.json:" << foundTexts;
+        }
+        QCOMPARE(foundCount, 4);
+    }
+
     void testSave()
     {
         // 1. Setup a simple mock file
