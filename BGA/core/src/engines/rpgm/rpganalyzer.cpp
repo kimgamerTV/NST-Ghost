@@ -557,8 +557,20 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
             switch (code) {
                 // === Text Display Commands ===
                 case 101: // Show Text: Character Name/Face Setup
-                    // parameters[0] = character name (often empty or actor name)
-                    // Usually skip this as it's often system/actor names
+                    // parameters[4] = actor name (TRANSLATABLE!)
+                    if (params.size() > 4 && params[4].isString()) {
+                        QString actorName = params[4].toString();
+                        QString newKeyPath = currentKeyPath.isEmpty() ? "parameters[4]" : currentKeyPath + ".parameters[4]";
+                        
+                        if (!actorName.isEmpty() && !isSystemString(actorName)) {
+                            QJsonObject entry;
+                            entry.insert(QStringLiteral("source"), actorName);
+                            entry.insert(QStringLiteral("path"), filePath);
+                            entry.insert(QStringLiteral("key"), newKeyPath);
+                            extractedStrings.append(entry);
+                            extractedFromCommand = true;
+                        }
+                    }
                     break;
                     
                 case 401: // Show Text: Dialogue Line
@@ -806,7 +818,27 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
             "message4",
             "note",
             "nickname",
-            "profile"
+            "profile",
+            // System.json additions
+            "gameTitle",
+            "currencyUnit",
+            // Terms and messages
+            "terms",
+            "basic",
+            "commands",
+            "params",
+            "messages",
+            // Specific message keys
+            "actionFailure", "actorDamage", "actorDrain", "actorGain", "actorLoss", 
+            "actorNoDamage", "actorNoHit", "actorRecovery", "alwaysDash", "bgmVolume", 
+            "bgsVolume", "buffAdd", "buffRemove", "commandRemember", "counterAttack", 
+            "criticalToActor", "criticalToEnemy", "debuffAdd", "defeat", "emerge", 
+            "enemyDamage", "enemyDrain", "enemyGain", "enemyLoss", "enemyNoDamage", 
+            "enemyNoHit", "enemyRecovery", "escapeFailure", "escapeStart", "evasion", 
+            "expNext", "expTotal", "file", "levelUp", "loadMessage", "magicEvasion", 
+            "magicReflection", "meVolume", "obtainExp", "obtainGold", "obtainItem", 
+            "obtainSkill", "partyName", "possession", "preemptive", "saveMessage", 
+            "seVolume", "substitute", "surprise", "useItem", "victory"
         };
         
         // Keys to always ignore (contain filenames/technical data)
