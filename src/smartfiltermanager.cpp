@@ -9,6 +9,26 @@
 SmartFilterManager::SmartFilterManager(QObject *parent)
     : QObject(parent)
 {
+    // Initialize Python connection
+    try {
+        py::module_ sys = py::module_::import("sys");
+        sys.attr("path").attr("append")(".");
+        sys.attr("path").attr("append")("scripts");
+        
+        py::module_ ai_mod = py::module_::import("scripts.ai_smart_filter");
+        // Fallback if imported as just ai_smart_filter (depends on path)
+        if (ai_mod.is_none()) ai_mod = py::module_::import("ai_smart_filter");
+        
+        m_pyFilter = ai_mod.attr("AISmartFilter")();
+        
+        // Load initial state
+        m_pyFilter.attr("load_state")("ai_filter_config.json");
+        qDebug() << "AI Smart Filter initialized successfully.";
+    } catch (const std::exception &e) {
+        qDebug() << "Failed to initialize AI Smart Filter:" << e.what();
+        m_pyFilter = py::none();
+    }
+
     loadPatterns();
 }
 
@@ -37,6 +57,16 @@ void SmartFilterManager::learn(const QString &text)
         savePatterns();
         qDebug() << "SmartFilterManager: Learned pattern:" << pattern << "for engine:" << m_currentEngine;
     }
+    
+    // AI Learn
+    if (!m_pyFilter.is_none()) {
+        try {
+            m_pyFilter.attr("add_example")(text.toStdString());
+            m_pyFilter.attr("save_state")("ai_filter_config.json");
+        } catch (const std::exception &e) {
+            qDebug() << "AI learn error:" << e.what();
+        }
+    }
 }
 
 void SmartFilterManager::unlearn(const QString &text)
@@ -64,6 +94,16 @@ void SmartFilterManager::unlearn(const QString &text)
         
         savePatterns();
         qDebug() << "SmartFilterManager: Unlearned pattern:" << pattern << "for engine:" << m_currentEngine;
+    }
+
+    // AI Unlearn
+    if (!m_pyFilter.is_none()) {
+        try {
+            m_pyFilter.attr("remove_example")(text.toStdString());
+            m_pyFilter.attr("save_state")("ai_filter_config.json");
+        } catch (const std::exception &e) {
+            qDebug() << "AI unlearn error:" << e.what();
+        }
     }
 }
 
@@ -172,8 +212,96 @@ bool SmartFilterManager::shouldSkip(const QString &text) const
             return true;
         }
     }
+    
+    
+    // 3. Check AI
+    if (m_aiEnabled && !m_pyFilter.is_none()) {
+        try {
+            bool skip = m_pyFilter.attr("predict")(text.toStdString()).cast<bool>();
+            if (skip) {
+                // qDebug() << "AI Skipped:" << text;
+                return true;
+            }
+        } catch (const std::exception &e) {
+            // Be silent on prediction errors to avoid spam
+             // qDebug() << "AI predict error:" << e.what();
+        }
+    }
 
     return false;
+}
+
+QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
+{
+    QList<bool> results;
+    if (texts.isEmpty()) return results;
+    
+    results.reserve(texts.size());
+    
+    // 1. Pre-fill with Heuristic checks (if heuristic says skip, we don't need AI for that item, but we must align indices)
+    // Actually, predict_batch expects a list. 
+    // We should filter heuristics locally first. If heuristic skips, we pass "mock" or empty?
+    // No, cleaner logic:
+    // Identify indices that PASS heuristics. Gather them into a list for AI.
+    // Send to AI.
+    // Merge results.
+    
+    struct Task {
+        int index;
+        QString text;
+    };
+    QList<Task> aiTasks;
+    
+    for (int i = 0; i < texts.size(); ++i) {
+        bool skip = false;
+        QString text = texts[i];
+        
+        // Check Heuristics
+         if (isNumericOrSymbol(text) || isFilePath(text) || isVariableLike(text) || 
+            isCamelCase(text) || isSnakeCase(text) || isTagOrMarkup(text) || 
+            isTechnicalString(text) || isRepeatedSymbol(text)) {
+            skip = true;
+        } else {
+             // Check Learned Regex
+            for (const QRegularExpression &re : m_compiledPatterns) {
+                if (re.match(text).hasMatch()) {
+                    skip = true;
+                    break;
+                }
+            }
+        }
+        
+        results.append(skip); // Initial verdict
+        
+        if (!skip) {
+            aiTasks.append({i, text});
+        }
+    }
+    
+    // 2. AI Processing
+    if (!aiTasks.isEmpty() && m_aiEnabled && !m_pyFilter.is_none()) {
+        try {
+            py::list pyTexts;
+            for (const Task &task : aiTasks) {
+                pyTexts.append(task.text.toStdString());
+            }
+            
+            py::list pyResults = m_pyFilter.attr("predict_batch")(pyTexts).cast<py::list>();
+            
+            if (pyResults.size() == aiTasks.size()) {
+                 for (int j = 0; j < aiTasks.size(); ++j) {
+                     bool aiSkip = pyResults[j].cast<bool>();
+                     if (aiSkip) {
+                         results[aiTasks[j].index] = true;
+                     }
+                 }
+            }
+        } catch (const std::exception &e) {
+            qDebug() << "AI Batch Predict Error:" << e.what();
+        }
+    }
+    
+    return results;
 }
 
 QStringList SmartFilterManager::ignoredPatterns() const
@@ -185,6 +313,10 @@ void SmartFilterManager::savePatterns()
 {
     QSettings settings("MySoft", "NST");
     settings.setValue(QString("SmartFilter/%1/IgnoredPatterns").arg(m_currentEngine), m_ignoredPatterns);
+    
+    // Save AI Settings
+    settings.setValue("SmartFilter/AI/Enabled", m_aiEnabled);
+    settings.setValue("SmartFilter/AI/Threshold", m_aiThreshold);
 }
 
 void SmartFilterManager::loadPatterns()
@@ -196,6 +328,42 @@ void SmartFilterManager::loadPatterns()
     for (const QString &pattern : m_ignoredPatterns) {
         m_compiledPatterns.append(QRegularExpression(pattern));
     }
+    
+    // Load AI Settings
+    m_aiEnabled = settings.value("SmartFilter/AI/Enabled", true).toBool();
+    m_aiThreshold = settings.value("SmartFilter/AI/Threshold", 0.75).toDouble();
+    if (!m_pyFilter.is_none()) {
+        try {
+            m_pyFilter.attr("set_threshold")(m_aiThreshold);
+        } catch (...) {}
+    }
+}
+
+void SmartFilterManager::setAIEnabled(bool enabled)
+{
+    m_aiEnabled = enabled;
+    savePatterns();
+}
+
+bool SmartFilterManager::isAIEnabled() const
+{
+    return m_aiEnabled;
+}
+
+void SmartFilterManager::setAIThreshold(double threshold)
+{
+    m_aiThreshold = threshold;
+    if (!m_pyFilter.is_none()) {
+        try {
+            m_pyFilter.attr("set_threshold")(m_aiThreshold);
+        } catch (...) {}
+    }
+    savePatterns();
+}
+
+double SmartFilterManager::aiThreshold() const
+{
+    return m_aiThreshold;
 }
 
 bool SmartFilterManager::isNumericOrSymbol(const QString &text) const

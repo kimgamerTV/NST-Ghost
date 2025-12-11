@@ -8,8 +8,16 @@
 #include <QSettings>
 #include <QTimer>
 
+#pragma push_macro("slots")
+#undef slots
+#include <pybind11/embed.h>
+#pragma pop_macro("slots")
+
 int main(int argc, char *argv[])
 {
+    // Initialize Python Interpreter
+    pybind11::scoped_interpreter guard{};
+
     QApplication a(argc, argv);
 
     // Load the stylesheet

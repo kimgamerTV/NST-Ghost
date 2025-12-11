@@ -27,6 +27,8 @@ if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
     qt_standard_project_setup()
 endif()
 
+find_package(pybind11 REQUIRED)
+
 set(TS_FILES src/NST_en_US.ts)
 
 set(PROJECT_SOURCES
@@ -133,6 +135,7 @@ target_link_libraries(NST PRIVATE
     Qt${QT_VERSION_MAJOR}::Network
     BGACore
     QtLingo
+    pybind11::embed
 )
 
 

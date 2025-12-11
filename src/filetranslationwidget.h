@@ -55,6 +55,12 @@ public:
 
     void onUndoTranslation();
     
+    // AI Settings Access
+    void setAiFilterEnabled(bool enabled);
+    bool isAiFilterEnabled() const;
+    void setAiFilterThreshold(double threshold);
+    double aiFilterThreshold() const;
+
     void openFontManager(); // Added
     
 signals:
@@ -85,6 +91,10 @@ private slots:
     
     void onMarkAsIgnored();
     void onUnmarkAsIgnored();
+    
+    // AI Smart Filter
+    void onAILearnRequested();
+    void onAIUnlearnRequested();
     
     void processIncomingResults();
 

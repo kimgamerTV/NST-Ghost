@@ -219,7 +219,14 @@ void MainWindow::onSettingsActionTriggered()
     dialog.setLlmApiKey(m_llmApiKey);
     dialog.setLlmModel(m_llmModel);
     dialog.setLlmBaseUrl(m_llmBaseUrl);
+    dialog.setLlmBaseUrl(m_llmBaseUrl);
     dialog.setRelationsEnabled(m_enableRelations);
+    
+    // AI Filter
+    if (m_fileTranslationWidget) {
+        dialog.setAiFilterEnabled(m_fileTranslationWidget->isAiFilterEnabled());
+        dialog.setAiFilterThreshold(m_fileTranslationWidget->aiFilterThreshold());
+    }
 
     if (dialog.exec() == QDialog::Accepted) {
         m_apiKey = dialog.googleApiKey();
@@ -231,6 +238,13 @@ void MainWindow::onSettingsActionTriggered()
         m_llmModel = dialog.llmModel();
         m_llmBaseUrl = dialog.llmBaseUrl();
         m_enableRelations = dialog.isRelationsEnabled();
+        
+        // AI Filter
+        if (m_fileTranslationWidget) {
+            m_fileTranslationWidget->setAiFilterEnabled(dialog.isAiFilterEnabled());
+            m_fileTranslationWidget->setAiFilterThreshold(dialog.aiFilterThreshold());
+        }
+
         saveSettings();
         updateChildSettings();
         

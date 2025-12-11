@@ -92,6 +92,10 @@ FileTranslationWidget::FileTranslationWidget(TranslationServiceManager *serviceM
         }
     });
 
+    // Smart Filter Manager
+    m_smartFilterManager = new SmartFilterManager(this);
+    m_smartFilterManager->loadPatterns();
+
     // We assume translation service manager signals are connected here
     if (m_translationServiceManager) {
         connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, this, &FileTranslationWidget::onTranslationFinished);
@@ -504,6 +508,9 @@ void FileTranslationWidget::onTranslationTableViewCustomContextMenuRequested(con
     QAction *unmarkAsIgnoredAction = contextMenu.addAction("Unmark as Ignored");
     QAction *undoAction = contextMenu.addAction("Undo Translation");
     contextMenu.addSeparator();
+    QAction *aiLearnAction = contextMenu.addAction("AI Guard: Learn to Skip");
+    QAction *aiUnlearnAction = contextMenu.addAction("AI Guard: Unlearn Pattern");
+    contextMenu.addSeparator();
     QAction *selectAllAction = contextMenu.addAction("Select All");
 
     connect(translateAction, &QAction::triggered, this, &FileTranslationWidget::onTranslateSelectedTextWithService);
@@ -511,9 +518,56 @@ void FileTranslationWidget::onTranslationTableViewCustomContextMenuRequested(con
     connect(markAsIgnoredAction, &QAction::triggered, this, &FileTranslationWidget::onMarkAsIgnored);
     connect(unmarkAsIgnoredAction, &QAction::triggered, this, &FileTranslationWidget::onUnmarkAsIgnored);
     connect(undoAction, &QAction::triggered, this, &FileTranslationWidget::onUndoTranslation);
+    connect(aiLearnAction, &QAction::triggered, this, &FileTranslationWidget::onAILearnRequested);
+    connect(aiUnlearnAction, &QAction::triggered, this, &FileTranslationWidget::onAIUnlearnRequested);
     connect(selectAllAction, &QAction::triggered, this, &FileTranslationWidget::onSelectAllRequested);
 
     contextMenu.exec(ui->translationTableView->mapToGlobal(pos));
+}
+
+void FileTranslationWidget::onAILearnRequested()
+{
+    QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedRows();
+    int learnedCount = 0;
+    for (const QModelIndex &idx : selectedIndexes) {
+        // Source text is in column 1
+        QString text = m_translationModel->data(m_translationModel->index(idx.row(), 1)).toString();
+        if (!text.isEmpty()) {
+            m_smartFilterManager->learn(text);
+            learnedCount++;
+            
+            // Visual Feedback: Gray out the row
+            for (int col = 0; col < m_translationModel->columnCount(); ++col) {
+                 m_translationModel->setData(m_translationModel->index(idx.row(), col), QBrush(Qt::lightGray), Qt::BackgroundRole);
+            }
+        }
+    }
+    if (learnedCount > 0) {
+        // Optional: Maybe don't show popup if it's too frequent? User said "6-7 thousand rows".
+        // But context menu is manual. So popup is okay.
+        QMessageBox::information(this, "AI Guard", QString("AI has learned to skip %1 patterns.\nRows marked in gray.").arg(learnedCount));
+    }
+}
+
+void FileTranslationWidget::onAIUnlearnRequested()
+{
+    QModelIndexList selectedIndexes = ui->translationTableView->selectionModel()->selectedRows();
+    int unlearnedCount = 0;
+    for (const QModelIndex &idx : selectedIndexes) {
+         QString text = m_translationModel->data(m_translationModel->index(idx.row(), 1)).toString();
+         if (!text.isEmpty()) {
+             m_smartFilterManager->unlearn(text);
+             unlearnedCount++;
+             
+             // Visual Feedback: Restore background
+             for (int col = 0; col < m_translationModel->columnCount(); ++col) {
+                 m_translationModel->setData(m_translationModel->index(idx.row(), col), QVariant(), Qt::BackgroundRole);
+             }
+         }
+    }
+    if (unlearnedCount > 0) {
+        QMessageBox::information(this, "AI Guard", QString("AI has unlearned %1 patterns.").arg(unlearnedCount));
+    }
 }
 
 void FileTranslationWidget::onTranslateSelectedTextWithService()
@@ -850,16 +904,28 @@ void FileTranslationWidget::onTranslateSelectedFiles()
         const QJsonArray &entries = m_projectDataManager->getLoadedGameProjectData()[filePath];
         QStringList sourceTexts;
 
-        for (const QJsonValue &val : entries) {
-            QJsonObject obj = val.toObject();
+        // Batch filter optimization
+        QStringList allSources;
+        QList<int> originalIndices;
+        
+        for (int i = 0; i < entries.size(); ++i) {
+            QJsonObject obj = entries[i].toObject();
             QString source = obj["source"].toString();
             if (source.isEmpty()) continue;
+            allSources.append(source);
+            originalIndices.append(i); // Keep track if needed, though we just append
+        }
+        
+        if (allSources.isEmpty()) continue;
 
-            // Apply filters
-            if (m_smartFilterManager->shouldSkip(source)) continue;
-            if (isLikelyCode(source)) continue;
+        QList<bool> skipFlags = m_smartFilterManager->shouldSkipBatch(allSources);
+        // sourceTexts is already declared above
 
-            sourceTexts.append(source);
+        for (int i = 0; i < allSources.size(); ++i) {
+             if (skipFlags.value(i, false)) continue; // AI/Heuristic Skipped
+             if (isLikelyCode(allSources[i])) continue; // Local code check
+             
+             sourceTexts.append(allSources[i]);
         }
 
         if (!sourceTexts.isEmpty()) {
@@ -946,7 +1012,28 @@ void FileTranslationWidget::openFontManager()
     }
 }
 
+
 void FileTranslationWidget::onFontsLoaded(const QJsonArray &fonts)
 {
     m_gameFonts = fonts;
+}
+
+void FileTranslationWidget::setAiFilterEnabled(bool enabled)
+{
+    m_smartFilterManager->setAIEnabled(enabled);
+}
+
+bool FileTranslationWidget::isAiFilterEnabled() const
+{
+    return m_smartFilterManager->isAIEnabled();
+}
+
+void FileTranslationWidget::setAiFilterThreshold(double threshold)
+{
+    m_smartFilterManager->setAIThreshold(threshold);
+}
+
+double FileTranslationWidget::aiFilterThreshold() const
+{
+    return m_smartFilterManager->aiThreshold();
 }

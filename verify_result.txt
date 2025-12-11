@@ -1,0 +1,3 @@
+Prediction for 'Do Not Translate This': SKIP
+Prediction for 'Apple is a fruit': KEEP
+SUCCESS: AI Filter behaved as expected.

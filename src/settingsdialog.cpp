@@ -3,6 +3,8 @@
 
 #include <QMap>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
+#include <QLabel>
 #include <QFormLayout> // Ensure this is also included explicitly if not already by UI header
 
 SettingsDialog::SettingsDialog(QWidget *parent)
@@ -45,6 +47,30 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     }
     
     setupPluginsUI();
+
+    // AI Context Filter Settings (Programmatic Addition)
+    QGroupBox *aiFilterGroup = new QGroupBox("AI Context Filter", this);
+    QFormLayout *aiLayout = new QFormLayout(aiFilterGroup);
+    
+    m_enableAiFilterCheckBox = new QCheckBox("Enable AI Filter", this);
+    m_enableAiFilterCheckBox->setToolTip("Use AI to understand context and skip non-translatable text.");
+    
+    m_aiFilterThresholdSpinBox = new QDoubleSpinBox(this);
+    m_aiFilterThresholdSpinBox->setRange(0.0, 1.0);
+    m_aiFilterThresholdSpinBox->setSingleStep(0.05);
+    m_aiFilterThresholdSpinBox->setValue(0.75);
+    m_aiFilterThresholdSpinBox->setToolTip("Similarity Threshold (Higher = Stricter/Fewer Skips)");
+    
+    aiLayout->addRow(m_enableAiFilterCheckBox);
+    aiLayout->addRow("Sensitivity:", m_aiFilterThresholdSpinBox);
+    
+    QLabel *aiInfoLabel = new QLabel("<i>Extends Smart Filter heuristics with Deep Learning.</i>", this);
+    aiInfoLabel->setWordWrap(true);
+    aiLayout->addRow(aiInfoLabel);
+
+    // Add to main layout (find appropriate place, e.g. below basic settings)
+    // We can add it to the vertical layout
+    qobject_cast<QVBoxLayout*>(this->layout())->insertWidget(2, aiFilterGroup); // Index 2 is likely below basic settings
 }
 
 SettingsDialog::~SettingsDialog()
@@ -97,6 +123,26 @@ bool SettingsDialog::isRelationsEnabled() const
 void SettingsDialog::setRelationsEnabled(bool enabled)
 {
     m_enableRelationsCheckBox->setChecked(enabled);
+}
+
+bool SettingsDialog::isAiFilterEnabled() const
+{
+    return m_enableAiFilterCheckBox->isChecked();
+}
+
+double SettingsDialog::aiFilterThreshold() const
+{
+    return m_aiFilterThresholdSpinBox->value();
+}
+
+void SettingsDialog::setAiFilterEnabled(bool enabled)
+{
+    m_enableAiFilterCheckBox->setChecked(enabled);
+}
+
+void SettingsDialog::setAiFilterThreshold(double threshold)
+{
+    m_aiFilterThresholdSpinBox->setValue(threshold);
 }
 
 void SettingsDialog::setGoogleApiKey(const QString &apiKey)

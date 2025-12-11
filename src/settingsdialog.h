@@ -11,6 +11,7 @@ class QFormLayout;
 class QRadioButton;
 class QLabel;
 class QLineEdit;
+class QDoubleSpinBox;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -35,6 +36,10 @@ public:
     QString llmModel() const;
     QString llmBaseUrl() const;
     bool isRelationsEnabled() const;
+    
+    // AI Filter
+    bool isAiFilterEnabled() const;
+    double aiFilterThreshold() const;
 
     void setGoogleApiKey(const QString &apiKey);
     void setTargetLanguage(const QString &language);
@@ -44,6 +49,8 @@ public:
     void setLlmModel(const QString &model);
     void setLlmBaseUrl(const QString &baseUrl);
     void setRelationsEnabled(bool enabled);
+    void setAiFilterEnabled(bool enabled);
+    void setAiFilterThreshold(double threshold);
 
 private slots:
     void updateConfigPanel();
@@ -62,6 +69,8 @@ private:
     
     // Programmatic UI elements
     QCheckBox *m_enableRelationsCheckBox;
+    QCheckBox *m_enableAiFilterCheckBox;
+    QDoubleSpinBox *m_aiFilterThresholdSpinBox;
     
     void setupPluginsUI();
     void loadPluginList();

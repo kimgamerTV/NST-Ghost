@@ -1,0 +1,29 @@
+{
+	"BUILD_DIR" : "/home/jop/work/NST/NST/NST_autogen",
+	"CMAKE_BINARY_DIR" : "/home/jop/work/NST/NST",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/jop/work/NST/NST",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/jop/work/NST/NST",
+	"CMAKE_SOURCE_DIR" : "/home/jop/work/NST/NST",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Unix Makefiles",
+	"INCLUDE_DIR" : "/home/jop/work/NST/NST/NST_autogen/include",
+	"INPUTS" : 
+	[
+		"/home/jop/work/NST/NST/src/style.qss",
+		"/home/jop/work/NST/NST/src/icons/rpgm_icon.png",
+		"/home/jop/work/NST/NST/packaging/icons/icon-app.png",
+		"/home/jop/work/NST/NST/src/icons/renpy_icon.png",
+		"/home/jop/work/NST/NST/src/icons/unity_icon.png"
+	],
+	"LOCK_FILE" : "/home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "UVLADIE3JM",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "/usr/lib64/qt6/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Used.txt",
+	"SOURCE" : "/home/jop/work/NST/NST/src/resources.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}
