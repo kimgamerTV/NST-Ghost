@@ -9,6 +9,7 @@
 #include "customtitlebar.h"
 #include "realtimetranslationwidget.h"
 #include "filetranslationwidget.h"
+#include "relationshipwidget.h"
 #include "settingsdialog.h"
 #include "updatecontroller.h"
 #include "translationservicemanager.h"
@@ -67,16 +68,19 @@ private:
     // Widgets
     FileTranslationWidget *m_fileTranslationWidget;
     RealTimeTranslationWidget *m_realTimeWidget;
+    RelationshipWidget *m_relationshipWidget;
     
     // Managers / Controllers owned by MainWindow but shared/used by children
     TranslationServiceManager *m_translationServiceManager;
     UpdateController *m_updateController;
     
-    // Settings state
+    // Settings
     QString m_apiKey;
     QString m_targetLanguage;
     QString m_targetLanguageName;
     bool m_googleApi;
+    bool m_enableRelations; // New Setting
+    QString m_engineName;   // Cached engine name for visibility usage
     QString m_llmProvider;
     QString m_llmApiKey;
     QString m_llmModel;

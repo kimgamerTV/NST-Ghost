@@ -31,11 +31,18 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     m_realTimeButton->setText("Real-time");
     m_realTimeButton->setCheckable(true);
     m_realTimeButton->setCursor(Qt::PointingHandCursor);
+
+    m_relationsButton = new QPushButton(this);
+    m_relationsButton->setObjectName("navButton");
+    m_relationsButton->setText("Relations");
+    m_relationsButton->setCheckable(true);
+    m_relationsButton->setCursor(Qt::PointingHandCursor);
     
     // Exclusive checking
     QButtonGroup *navGroup = new QButtonGroup(this);
     navGroup->addButton(m_fileTransButton);
     navGroup->addButton(m_realTimeButton);
+    navGroup->addButton(m_relationsButton);
     navGroup->setExclusive(true);
     
     // Window controls
@@ -63,6 +70,7 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     m_layout->addSpacing(20);
     m_layout->addWidget(m_fileTransButton);
     m_layout->addWidget(m_realTimeButton);
+    m_layout->addWidget(m_relationsButton);
     m_layout->addStretch();
     m_layout->addWidget(m_minimizeButton);
     m_layout->addWidget(m_maximizeButton);
@@ -78,6 +86,7 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     
     connect(m_fileTransButton, &QPushButton::clicked, this, &CustomTitleBar::translateModeClicked);
     connect(m_realTimeButton, &QPushButton::clicked, this, &CustomTitleBar::realTimeModeClicked);
+    connect(m_relationsButton, &QPushButton::clicked, this, &CustomTitleBar::relationsModeClicked);
 }
 
 void CustomTitleBar::setTitle(const QString &title)
@@ -90,10 +99,15 @@ void CustomTitleBar::setIcon(const QIcon &icon)
     m_iconLabel->setPixmap(icon.pixmap(20, 20));
 }
 
+void CustomTitleBar::setRelationsVisible(bool visible)
+{
+    m_relationsButton->setVisible(visible);
+}
+
 void CustomTitleBar::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_clickPos = event->globalPos();
+        m_clickPos = event->globalPosition().toPoint();
         m_isDrag = true;
     }
     QWidget::mousePressEvent(event);
@@ -101,7 +115,7 @@ void CustomTitleBar::mousePressEvent(QMouseEvent *event)
 
 void CustomTitleBar::mouseMoveEvent(QMouseEvent *event)
 {
-    if (m_isDrag && (event->globalPos() - m_clickPos).manhattanLength() > QApplication::startDragDistance()) {
+    if (m_isDrag && (event->globalPosition().toPoint() - m_clickPos).manhattanLength() > QApplication::startDragDistance()) {
        // Drag logic is handled in MainWindow because we need to move the whole window
        // But we still emit a signal or handle it if we want to move here.
        // Actually, standard way is to handle move in MainWindow by checking where the press happened.
@@ -110,8 +124,8 @@ void CustomTitleBar::mouseMoveEvent(QMouseEvent *event)
            // Optional: Implement "snap out of maximize" behavior like Windows
            return; 
        }
-       window()->move(window()->pos() + event->globalPos() - m_clickPos);
-       m_clickPos = event->globalPos();
+       window()->move(window()->pos() + event->globalPosition().toPoint() - m_clickPos);
+       m_clickPos = event->globalPosition().toPoint();
     }
     QWidget::mouseMoveEvent(event);
 }

@@ -74,6 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
     m_realTimeWidget = new RealTimeTranslationWidget(this);
     m_stackedWidget->addWidget(m_realTimeWidget);
     
+    // Page 2: Relationship Widget
+    m_relationshipWidget = new RelationshipWidget(this);
+    m_stackedWidget->addWidget(m_relationshipWidget);
+    
     // Create a new container widget
     QWidget *mainContainer = new QWidget(this);
     QVBoxLayout *mainLayout = new QVBoxLayout(mainContainer);
@@ -102,6 +106,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_titleBar, &CustomTitleBar::realTimeModeClicked, this, [this]() {
         onNavigationChanged(1);
     });
+    connect(m_titleBar, &CustomTitleBar::relationsModeClicked, this, [this]() {
+        onNavigationChanged(2);
+    });
     
     // Enable mouse tracking for resizing and moving
     setMouseTracking(true);
@@ -116,6 +123,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::openMockData, m_fileTranslationWidget, &FileTranslationWidget::openMockData);
     connect(m_menuBar, &MenuBar::newProject, this, &MainWindow::onNewProject);
     connect(m_menuBar, &MenuBar::openProject, m_fileTranslationWidget, &FileTranslationWidget::onOpenProject);
+    connect(m_fileTranslationWidget, &FileTranslationWidget::projectLoaded, m_relationshipWidget, &RelationshipWidget::loadRelations);
+    
+    // Changing strategy: Connect to FileTranslationWidget signal if it exists, or add one.
+    // Let's assume for now I need to check FileTranslationWidget first.
     connect(m_menuBar, &MenuBar::settings, this, &MainWindow::onSettingsActionTriggered);
     connect(m_menuBar, &MenuBar::saveProject, this, &MainWindow::onSaveProject);
     connect(m_menuBar, &MenuBar::deployProject, this, &MainWindow::onDeployProject);
@@ -168,7 +179,13 @@ void MainWindow::onNewProject()
         return;
     }
 
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+
     QString engineName = dialog.selectedEngine();
+    // Update member
+    m_engineName = engineName;
     QString projectPath = dialog.projectPath();
 
     if (engineName.isEmpty() || projectPath.isEmpty()) {
@@ -177,6 +194,14 @@ void MainWindow::onNewProject()
     }
     
     m_fileTranslationWidget->onNewProject(engineName, projectPath);
+    
+    // Check Engine Capability for Relations
+    m_engineName = engineName; 
+    
+    bool isRpgMaker = (engineName.startsWith("RPG Maker"));
+    bool showRelations = m_enableRelations && isRpgMaker;
+    m_titleBar->setRelationsVisible(showRelations);
+    
     // Show file translation widget
     m_stackedWidget->setCurrentWidget(m_fileTranslationWidget);
 }
@@ -195,7 +220,9 @@ void MainWindow::onSettingsActionTriggered()
     dialog.setLlmProvider(m_llmProvider);
     dialog.setLlmApiKey(m_llmApiKey);
     dialog.setLlmModel(m_llmModel);
+    dialog.setLlmModel(m_llmModel);
     dialog.setLlmBaseUrl(m_llmBaseUrl);
+    dialog.setRelationsEnabled(m_enableRelations);
 
     QFile file(":/style.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
@@ -213,9 +240,18 @@ void MainWindow::onSettingsActionTriggered()
         m_llmProvider = dialog.llmProvider();
         m_llmApiKey = dialog.llmApiKey();
         m_llmModel = dialog.llmModel();
+        m_llmApiKey = dialog.llmApiKey();
+        m_llmModel = dialog.llmModel();
         m_llmBaseUrl = dialog.llmBaseUrl();
+        m_enableRelations = dialog.isRelationsEnabled();
         saveSettings();
         updateChildSettings();
+        
+        // Update TitleBar Visibility immediately
+        // We also need to check current engine if project is loaded
+        bool isRpgMaker = (m_engineName.startsWith("RPG Maker"));
+        bool showRelations = m_enableRelations && isRpgMaker;
+        m_titleBar->setRelationsVisible(showRelations);
     }
 }
 
@@ -227,14 +263,17 @@ void MainWindow::loadSettings()
      m_googleApi = settings.value("googleApi", false).toBool();
      m_llmProvider = settings.value("llmProvider").toString();
      m_llmApiKey = settings.value("llmApiKey").toString();
+     m_llmApiKey = settings.value("llmApiKey").toString();
      m_llmModel = settings.value("llmModel").toString();
      m_llmBaseUrl = settings.value("llmBaseUrl").toString();
+     m_enableRelations = settings.value("enableRelations", true).toBool(); // Default true
 }
 
 void MainWindow::saveSettings()
 {
      QSettings settings;
      settings.setValue("googleApiKey", m_apiKey);
+     settings.setValue("enableRelations", m_enableRelations);
      settings.setValue("targetLanguage", m_targetLanguage);
      settings.setValue("googleApi", m_googleApi);
      settings.setValue("llmProvider", m_llmProvider);

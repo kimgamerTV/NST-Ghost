@@ -52,6 +52,9 @@ public:
     void onUndoTranslation();
     
     void openFontManager(); // Added
+    
+signals:
+    void projectLoaded(const QString &projectPath);
 
 public slots:
     void openSearchDialog();

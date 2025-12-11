@@ -40,6 +40,13 @@ set(PROJECT_SOURCES
     src/shortcutcontroller.cpp
     src/bgadatamanager.cpp
     src/translationservicemanager.cpp
+    src/relationshipwidget.cpp
+    src/relationshipwidget.h
+    src/relationitem.cpp
+    src/relationitem.h
+    src/rpgrelationanalyzer.cpp
+    src/rpgrelationanalyzer.h
+    
     src/smartfiltermanager.cpp
     src/translationcontextmenu.cpp
     src/updatecontroller.cpp

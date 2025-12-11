@@ -34,6 +34,7 @@ public:
     QString llmApiKey() const;
     QString llmModel() const;
     QString llmBaseUrl() const;
+    bool isRelationsEnabled() const;
 
     void setGoogleApiKey(const QString &apiKey);
     void setTargetLanguage(const QString &language);
@@ -42,6 +43,7 @@ public:
     void setLlmApiKey(const QString &apiKey);
     void setLlmModel(const QString &model);
     void setLlmBaseUrl(const QString &baseUrl);
+    void setRelationsEnabled(bool enabled);
 
 private slots:
     void updateConfigPanel();
@@ -57,6 +59,9 @@ private:
     QCheckBox *pluginEnabledCheckBox;
     QWidget *pluginSettingsContainer;
     QFormLayout *pluginSettingsLayout;
+    
+    // Programmatic UI elements
+    QCheckBox *m_enableRelationsCheckBox;
     
     void setupPluginsUI();
     void loadPluginList();

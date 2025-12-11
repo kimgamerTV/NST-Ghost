@@ -2,6 +2,8 @@
 #include "ui_settingsdialog.h"
 
 #include <QMap>
+#include <QCheckBox>
+#include <QFormLayout> // Ensure this is also included explicitly if not already by UI header
 
 SettingsDialog::SettingsDialog(QWidget *parent)
     : QDialog(parent)
@@ -31,6 +33,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
     updateConfigPanel();
     updateLlmModelComboBox();
+    
+    // Add Relations Toggle Programmatically
+    m_enableRelationsCheckBox = new QCheckBox("Enable Data Relations Graph (RPG Maker)", this);
+    m_enableRelationsCheckBox->setToolTip("Show visual relationship graph for Common Events (Beta)");
+    
+    QFormLayout *basicLayout = qobject_cast<QFormLayout*>(ui->basicSettingsGroupBox->layout());
+    if (basicLayout) {
+        // Add row
+        basicLayout->addRow("Relations:", m_enableRelationsCheckBox);
+    }
     
     setupPluginsUI();
 }
@@ -75,6 +87,16 @@ QString SettingsDialog::llmBaseUrl() const
 QString SettingsDialog::llmModel() const
 {
     return ui->llmModelComboBox->currentText();
+}
+
+bool SettingsDialog::isRelationsEnabled() const
+{
+    return m_enableRelationsCheckBox->isChecked();
+}
+
+void SettingsDialog::setRelationsEnabled(bool enabled)
+{
+    m_enableRelationsCheckBox->setChecked(enabled);
 }
 
 void SettingsDialog::setGoogleApiKey(const QString &apiKey)

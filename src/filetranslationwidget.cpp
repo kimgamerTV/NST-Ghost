@@ -229,6 +229,8 @@ void FileTranslationWidget::onNewProject(const QString &engineName, const QStrin
     });
     
     m_loadFutureWatcher.setFuture(future);
+    
+    emit projectLoaded(projectPath);
 }
 
 void FileTranslationWidget::onLoadingFinished()
@@ -689,6 +691,8 @@ void FileTranslationWidget::onOpenProject()
              QMessageBox::warning(this, tr("Warning"), tr("The original game folder for this project was not found:\n%1\nYou can continue translating, but you won't be able to Deploy/Export until you fix the path.").arg(projectPath));
              // TODO: Allow fixing path
         }
+        
+        emit projectLoaded(projectPath);
     } else {
         QMessageBox::critical(this, tr("Error"), tr("Failed to load project file."));
         m_currentProjectFile.clear(); 
