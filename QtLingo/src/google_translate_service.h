@@ -27,17 +27,30 @@ private slots:
     void onNetworkReply(QNetworkReply *reply);
 
 private:
-    void translateWithApi(const QString &sourceText);
-    void translateWithFreeApi(const QString &sourceText);
+    // RPG Maker Code Protection
+    QString preprocessText(const QString &text, QMap<QString, QString> &map);
+    QString postprocessText(const QString &text, const QMap<QString, QString> &map);
+
+//    void translateWithApi(const QString &sourceText);
+//    void translateWithFreeApi(const QString &sourceText);
     QString extractTranslationFromHtml(const QString &html);
+
+    struct RequestData {
+        bool isApi;
+        bool isBatch;
+        QString sourceText; // For single
+        QStringList batchSourceTexts; // For batch
+        QMap<QString, QString> tagMap; // For single
+        QList<QMap<QString, QString>> batchTagMaps; // For batch
+    };
+
+    QMap<QNetworkReply*, RequestData> m_activeRequests;
 
     QNetworkAccessManager *m_networkManager;
     QString m_apiKey;
     QString m_targetLanguage;
     QString m_sourceLanguage = "auto"; // Default to auto-detect
     bool m_isApi = false;
-    QString m_currentSourceText;
-    QStringList m_currentBatchSource;
 };
 
 } // namespace qtlingo

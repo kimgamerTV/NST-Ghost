@@ -39,20 +39,76 @@ void GoogleTranslateService::setGoogleTranslateMode(bool isApi)
 
 void GoogleTranslateService::translate(const QString &sourceText)
 {
-    m_currentSourceText = sourceText;
+    // Preprocess: Mask RPGM codes
+    QMap<QString, QString> tagMap;
+    QString maskedText = preprocessText(sourceText, tagMap);
 
+    // Calls to old helpers removed as logic is now inlined below.
+    
+    // Store request data for the *most recent* request
+    // Note: helpers perform async calls. We unfortunately can't capture the reply easily here 
+    // without refactoring helpers to return it.
+    // Given the critical error state, I will manually inline the logic to capture the reply,
+    // ensuring the RequestData is stored properly.
+    
+    QNetworkReply *reply = nullptr;
     if (m_isApi) {
-        translateWithApi(sourceText);
+        // ... (Inline translateWithApi logic)
+        if (m_apiKey.isEmpty()) {
+            emit errorOccurred("API key is not set for Google Translate.");
+            return;
+        }
+        QUrl url("https://translation.googleapis.com/language/translate/v2");
+        QUrlQuery query;
+        query.addQueryItem("q", maskedText);
+        query.addQueryItem("target", m_targetLanguage);
+        query.addQueryItem("key", m_apiKey);
+        query.addQueryItem("format", "text");
+        if (m_sourceLanguage != "auto") query.addQueryItem("source", m_sourceLanguage);
+        url.setQuery(query);
+        QNetworkRequest request(url);
+        request.setAttribute(QNetworkRequest::User, QVariant(true));
+        reply = m_networkManager->get(request);
     } else {
-        translateWithFreeApi(sourceText);
+        // ... (Inline translateWithFreeApi logic)
+        QString urlString = QString("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%1&tl=%2&dt=t&q=%3")
+                            .arg(m_sourceLanguage)
+                            .arg(m_targetLanguage)
+                            .arg(QString(QUrl::toPercentEncoding(maskedText)));
+        QUrl url(urlString);
+        QNetworkRequest request(url);
+        request.setHeader(QNetworkRequest::UserAgentHeader, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+        request.setAttribute(QNetworkRequest::User, QVariant(false));
+        reply = m_networkManager->get(request);
+    }
+
+    if (reply) {
+        RequestData reqData;
+        reqData.isBatch = false;
+        reqData.isApi = m_isApi;
+        reqData.sourceText = sourceText;
+        reqData.tagMap = tagMap;
+        m_activeRequests.insert(reply, reqData);
     }
 }
 
 void GoogleTranslateService::batchTranslate(const QStringList &sourceTexts)
 {
-    m_currentBatchSource = sourceTexts;
-    if (sourceTexts.isEmpty()) return;
+    // batchTranslate impl
+    RequestData reqData;
+    reqData.isBatch = true;
+    reqData.isApi = m_isApi;
+    reqData.batchSourceTexts = sourceTexts;
+    
+    // Preprocess Batch
+    QStringList maskedTexts;
+    for (const QString &text : sourceTexts) {
+        QMap<QString, QString> map;
+        maskedTexts.append(preprocessText(text, map));
+        reqData.batchTagMaps.append(map);
+    }
 
+    QNetworkReply *reply = nullptr;
     if (m_isApi) {
         if (m_apiKey.isEmpty()) {
             emit errorOccurred("API key is not set for Google Translate.");
@@ -61,13 +117,12 @@ void GoogleTranslateService::batchTranslate(const QStringList &sourceTexts)
 
         QUrl url("https://translation.googleapis.com/language/translate/v2");
         QUrlQuery query;
-        for (const QString &text : sourceTexts) {
+        for (const QString &text : maskedTexts) {
             query.addQueryItem("q", text);
         }
         query.addQueryItem("target", m_targetLanguage);
         query.addQueryItem("key", m_apiKey);
         query.addQueryItem("format", "text");
-
         if (m_sourceLanguage != "auto") {
             query.addQueryItem("source", m_sourceLanguage);
         }
@@ -76,11 +131,11 @@ void GoogleTranslateService::batchTranslate(const QStringList &sourceTexts)
         QNetworkRequest request(url);
         request.setAttribute(QNetworkRequest::User, QVariant(true)); // Mark as API request
         request.setAttribute(static_cast<QNetworkRequest::Attribute>(QNetworkRequest::User + 1), QVariant(true)); // Mark as Batch
-        m_networkManager->get(request);
+        reply = m_networkManager->get(request);
 
     } else {
         // Free Mode (Workaround: Join with \n)
-        QString joinedText = sourceTexts.join("\n");
+        QString joinedText = maskedTexts.join("\n");
         
         // Use Google Translate's free web interface
         QString urlString = QString("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%1&tl=%2&dt=t&q=%3")
@@ -95,50 +150,24 @@ void GoogleTranslateService::batchTranslate(const QStringList &sourceTexts)
         request.setAttribute(QNetworkRequest::User, QVariant(false)); // Mark as free request
         request.setAttribute(static_cast<QNetworkRequest::Attribute>(QNetworkRequest::User + 1), QVariant(true)); // Mark as Batch
         
-        m_networkManager->get(request);
+        reply = m_networkManager->get(request);
+    }
+    
+    if (reply) {
+        m_activeRequests.insert(reply, reqData);
     }
 }
 
-void GoogleTranslateService::translateWithApi(const QString &sourceText)
-{
-    if (m_apiKey.isEmpty()) {
-        emit errorOccurred("API key is not set for Google Translate.");
-        return;
-    }
+// Refactored helpers to RETURN reply or take reference?
+// Since I can't easily change header, I'll essentially reimplement 'translate' to use the logic inline or modify these.
+// Waiting on header change capability. I DID change header to remove members.
+// So I should comment these out or unused them, and put logic in 'translate'.
+// Or better: update these to return QNetworkReply* and change header.
+// I'll update 'translate' to do the work directly and ignore these helpers for now to avoid signature mismatch errors if I don't update header signatures.
+// Wait, I didn't update helpers signatures in header.
+// So I will implement 'translate' fully and LEAVE these empty or unused.
+// Actually, safer to keep logic in 'translate'.
 
-    QUrl url("https://translation.googleapis.com/language/translate/v2");
-    QUrlQuery query;
-    query.addQueryItem("q", sourceText);
-    query.addQueryItem("target", m_targetLanguage);
-    query.addQueryItem("key", m_apiKey);
-    query.addQueryItem("format", "text");
-
-    if (m_sourceLanguage != "auto") {
-        query.addQueryItem("source", m_sourceLanguage);
-    }
-
-    url.setQuery(query);
-    QNetworkRequest request(url);
-    request.setAttribute(QNetworkRequest::User, QVariant(true)); // Mark as API request
-    m_networkManager->get(request);
-}
-
-void GoogleTranslateService::translateWithFreeApi(const QString &sourceText)
-{
-    // Use Google Translate's free web interface
-    QString urlString = QString("https://translate.googleapis.com/translate_a/single?client=gtx&sl=%1&tl=%2&dt=t&q=%3")
-                        .arg(m_sourceLanguage)
-                        .arg(m_targetLanguage)
-                        .arg(QString(QUrl::toPercentEncoding(sourceText)));
-
-    QUrl url(urlString);
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::UserAgentHeader,
-                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
-    request.setAttribute(QNetworkRequest::User, QVariant(false)); // Mark as free request
-
-    m_networkManager->get(request);
-}
 
 QString GoogleTranslateService::extractTranslationFromHtml(const QString &html)
 {
@@ -171,18 +200,25 @@ QString GoogleTranslateService::extractTranslationFromHtml(const QString &html)
 
 void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
 {
+    // Retrieve request state
+    if (!m_activeRequests.contains(reply)) {
+        // Unknown reply or already processed?
+        reply->deleteLater();
+        return;
+    }
+    RequestData reqData = m_activeRequests.take(reply);
+
     TranslationResult result;
-    result.sourceText = m_currentSourceText;
+    result.sourceText = reqData.sourceText;
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray responseData = reply->readAll();
-        bool isApiRequest = reply->request().attribute(QNetworkRequest::User).toBool();
-        bool isBatchRequest = reply->request().attribute(static_cast<QNetworkRequest::Attribute>(QNetworkRequest::User + 1)).toBool();
+        // bool isApiRequest = ... (We trust reqData.isApi)
+        bool isApiRequest = reqData.isApi;
+        bool isBatchRequest = reqData.isBatch;
 
         if (isApiRequest) {
             // Parse official API response
-            // qDebug() << "Google Translate API Response:" << responseData; // Commented out to reduce noise
-
             QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
             QJsonObject jsonObj = jsonDoc.object();
             QJsonObject dataObj = jsonObj["data"].toObject();
@@ -190,11 +226,17 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
 
             if (isBatchRequest) {
                  QList<TranslationResult> results;
-                 if (translations.size() == m_currentBatchSource.size()) {
+                 if (translations.size() == reqData.batchSourceTexts.size()) {
                      for (int i = 0; i < translations.size(); ++i) {
                          TranslationResult r;
-                         r.sourceText = m_currentBatchSource.at(i);
-                         r.translatedText = translations[i].toObject()["translatedText"].toString();
+                         r.sourceText = reqData.batchSourceTexts.at(i);
+                         QString rawTranslated = translations[i].toObject()["translatedText"].toString();
+                         // Postprocess Batch
+                         if (i < reqData.batchTagMaps.size()) {
+                             r.translatedText = postprocessText(rawTranslated, reqData.batchTagMaps[i]);
+                         } else {
+                             r.translatedText = rawTranslated;
+                         }
                          results.append(r);
                      }
                      emit batchTranslationFinished(results);
@@ -203,7 +245,8 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
                  }
             } else {
                 if (!translations.isEmpty()) {
-                    result.translatedText = translations[0].toObject()["translatedText"].toString();
+                    QString rawTranslated = translations[0].toObject()["translatedText"].toString();
+                    result.translatedText = postprocessText(rawTranslated, reqData.tagMap);
                     emit translationFinished(result);
                 } else {
                     emit errorOccurred("No translation found in API response");
@@ -211,21 +254,23 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
             }
         } else {
             // Parse free API response
-            // qDebug() << "Google Translate Free API Response:" << responseData;
             QString fullTranslation = extractTranslationFromHtml(QString::fromUtf8(responseData));
             
             if (isBatchRequest) {
                 // Split by \n
                 QStringList splitted = fullTranslation.split('\n');
-                // Handle potential mismatch if Google normalized newlines or something.
-                // Best effort: pad or trim
                 
                 QList<TranslationResult> results;
-                for (int i = 0; i < m_currentBatchSource.size(); ++i) {
+                for (int i = 0; i < reqData.batchSourceTexts.size(); ++i) {
                     TranslationResult r;
-                    r.sourceText = m_currentBatchSource.at(i);
+                    r.sourceText = reqData.batchSourceTexts.at(i);
                     if (i < splitted.size()) {
-                        r.translatedText = splitted.at(i);
+                        QString rawTranslated = splitted.at(i);
+                        if (i < reqData.batchTagMaps.size()) {
+                            r.translatedText = postprocessText(rawTranslated, reqData.batchTagMaps[i]);
+                        } else {
+                            r.translatedText = rawTranslated;
+                        }
                     } else {
                         r.translatedText = ""; // Mismatch case
                     }
@@ -233,7 +278,7 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
                 }
                 emit batchTranslationFinished(results);
             } else {
-                result.translatedText = fullTranslation;
+                result.translatedText = postprocessText(fullTranslation, reqData.tagMap);
                 emit translationFinished(result);
             }
         }
@@ -244,6 +289,53 @@ void GoogleTranslateService::onNetworkReply(QNetworkReply *reply)
     }
 
     reply->deleteLater();
+}
+
+QString GoogleTranslateService::preprocessText(const QString &text, QMap<QString, QString> &map)
+{
+    QString result;
+    map.clear();
+    // Regex for RPGM Codes: \V[n], \I[n], \C[n], \., \|, \!, \$, etc.
+    // Matches backslash followed by:
+    // 1. Alphanumeric Word + Optional [Digits]
+    // 2. OR Non-Alphanumeric character (symbol)
+    QRegularExpression re("\\\\([A-Za-z]+(?:\\[\\d+\\])?|[^A-Za-z0-9\\s])");
+
+    int lastPos = 0;
+    int tagCounter = 0;
+    QRegularExpressionMatchIterator i = re.globalMatch(text);
+    while (i.hasNext()) {
+        QRegularExpressionMatch match = i.next();
+        result.append(text.mid(lastPos, match.capturedStart() - lastPos));
+
+        QString original = match.captured(0);
+        // Use a format that translation likely won't touch.
+        // Spaces help isolate it so Google ignores it.
+        QString placeholder = QString(" __TAG_%1__ ").arg(tagCounter++);
+        map.insert(placeholder.trimmed(), original);
+
+        result.append(placeholder);
+        lastPos = match.capturedEnd();
+    }
+    result.append(text.mid(lastPos));
+
+    return result;
+}
+
+QString GoogleTranslateService::postprocessText(const QString &text, const QMap<QString, QString> &map)
+{
+    QString result = text;
+    QMapIterator<QString, QString> i(map);
+    while (i.hasNext()) {
+        i.next();
+        QString tag = i.key(); // "__TAG_0__"
+        QString original = i.value();
+
+        // Regex to find tag with potential extra spaces/formatting
+        QString pattern = QString("\\s*%1\\s*").arg(QRegularExpression::escape(tag));
+        result.replace(QRegularExpression(pattern), original);
+    }
+    return result;
 }
 
 } // namespace qtlingo

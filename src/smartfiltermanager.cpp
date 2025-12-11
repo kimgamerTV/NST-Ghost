@@ -208,7 +208,7 @@ bool SmartFilterManager::isNumericOrSymbol(const QString &text) const
 bool SmartFilterManager::isFilePath(const QString &text) const
 {
     // Simple check for file extensions or path separators
-    return text.contains("/") || text.contains("\\") || text.contains(".png") || text.contains(".ogg") || text.contains(".json");
+    return text.contains("/") || text.contains(".png") || text.contains(".ogg") || text.contains(".json");
 }
 
 bool SmartFilterManager::isVariableLike(const QString &text) const

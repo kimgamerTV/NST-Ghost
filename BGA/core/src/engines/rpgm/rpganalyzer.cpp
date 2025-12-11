@@ -863,8 +863,8 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
         return true;
     }
 
-    // Paths (contains / or \)
-    if (text.contains('/') || text.contains('\\')) {
+    // Paths (contains /)
+    if (text.contains('/')) {
         return true;
     }
 
