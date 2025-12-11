@@ -661,6 +661,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 123: // Control Self Switch
                 case 124: // Control Timer
                     // Pure logic - no translatable content
+                    extractedFromCommand = true;
                     break;
                 
                 // === Game Progression Commands ===
@@ -670,6 +671,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 128: // Change Armors
                 case 129: // Change Party Member
                     // System commands - no text
+                    extractedFromCommand = true;
                     break;
                 
                 // === Screen Commands ===
@@ -679,6 +681,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 204: // Scroll Map
                 case 205: // Set Movement Route
                     // Map/movement commands - no text
+                    extractedFromCommand = true;
                     break;
                 
                 case 231: // Show Picture
@@ -705,6 +708,7 @@ void RpgmAnalyzer::extractStringsFromJsonValue(const QJsonValue &jsonValue, QJso
                 case 314: // Recover All
                 case 339: // Force Action
                     // Battle system commands - no text
+                    extractedFromCommand = true;
                     break;
                 
                 // === Actor Commands ===
