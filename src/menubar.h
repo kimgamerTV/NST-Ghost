@@ -19,6 +19,7 @@ signals:
     void exit();
     void fontManager();
     void pluginManager();
+    void editEngineScript(); // Renamed from editRpgmScript
 
     // View signals
     void toggleContext(bool checked);
@@ -45,6 +46,7 @@ private:
     QAction *exitAction;
     QAction *fontManagerAction;
     QAction *pluginManagerAction;
+    QAction *editEngineScriptAction; // Renamed from editRpgmScriptAction
 
     // View actions
     QAction *toggleContextAction;

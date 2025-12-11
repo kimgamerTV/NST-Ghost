@@ -57,6 +57,8 @@ set(PROJECT_SOURCES
     src/projectdatamanager.cpp
     src/mainwindow.h
     src/menubar.h
+    src/scripteditordialog.cpp
+    src/scripteditordialog.h
     src/loadprojectdialog.h
     src/searchdialog.h
     src/settingsdialog.h

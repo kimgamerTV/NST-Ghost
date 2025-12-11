@@ -990,6 +990,27 @@ bool RpgmAnalyzer::isSystemString(const QString &text)
     return false;
 }
 
+
+QString RpgmAnalyzer::getScriptPath(const QString &projectPath) const
+{
+    QDir projectDir(projectPath);
+    QString scriptPath = projectDir.absoluteFilePath("www/js/rpg_windows.js"); // Check for MV/MZ structure
+    
+    QFile scriptFile(scriptPath);
+    if (!scriptFile.exists()) {
+        // Try alternate path for different RPG Maker versions or deployment structures if needed
+        scriptPath = projectDir.absoluteFilePath("js/rpg_windows.js");
+        scriptFile.setFileName(scriptPath);
+    }
+    
+    return scriptPath; 
+}
+
+QString RpgmAnalyzer::getScriptTarget() const
+{
+    return "Window_Base.prototype.convertEscapeCharacters";
+}
+
 } // namespace rpgm
 } // namespace engines
 } // namespace core

@@ -9,8 +9,13 @@ namespace rpgm {
 
 class RpgmAnalyzer : public core::IGameAnalyzer {
 public:
-    core::AnalyzerOutput analyze(const QString &inputPath) override;
-    bool save(const QString &outputPath, const QJsonArray &texts) override; // Implement save method
+    core::    AnalyzerOutput analyze(const QString &inputPath) override;
+    bool save(const QString &outputPath, const QJsonArray &texts) override;
+
+    bool canEditScript() const override { return true; }
+    QString getScriptPath(const QString &projectPath) const override;
+    QString getScriptTarget() const override; // Matching base class signature
+ // Implement save method
 private:
     void extractStringsFromJsonValue(const QJsonValue &jsonValue, QJsonArray &extractedStrings, const QString &filePath, const QString &currentKeyPath = "");
     bool updateJsonValue(QJsonDocument &doc, const QString &keyPath, const QString &newValue);

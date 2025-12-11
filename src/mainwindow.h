@@ -37,7 +37,8 @@ private slots:
     void onFontsLoaded(const QJsonArray &fonts);
     void onFontManagerActionTriggered();
     void onPluginManagerActionTriggered();
-    
+    void onEditEngineScript(); // Renamed from onEditRpgmScript
+
     // View slots (delegated)
     void onToggleContext(bool checked);
     void onHideCompleted(bool checked);

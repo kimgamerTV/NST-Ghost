@@ -235,3 +235,20 @@ bool BGADataManager::exportStringsToGameProject(const QString &engineName, const
 
     return true;
 }
+
+QPair<QString, QString> BGADataManager::getScriptDetails(const QString &engineName, const QString &projectPath)
+{
+    auto analyzer = core::createAnalyzer(engineName);
+    if (!analyzer) {
+        return qMakePair(QString(), QString());
+    }
+    
+    if (analyzer->canEditScript()) {
+        QString path = analyzer->getScriptPath(projectPath);
+        QString target = analyzer->getScriptTarget();
+        return qMakePair(path, target);
+    }
+    
+    return qMakePair(QString(), QString());
+}
+

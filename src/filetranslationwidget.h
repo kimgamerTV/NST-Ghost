@@ -38,6 +38,10 @@ public:
                      const QString &llmProvider, const QString &llmApiKey, 
                      const QString &llmModel, const QString &llmBaseUrl);
     
+    // Accessor for ProjectDataManager
+    ProjectDataManager* getProjectDataManager() const { return m_projectDataManager; }
+    BGADataManager* getBGADataManager() const { return m_bgaDataManager; } // Added accessor
+
     // Actions triggered from Main Menu
     void onToggleContext(bool checked);
     void onHideCompleted(bool checked);

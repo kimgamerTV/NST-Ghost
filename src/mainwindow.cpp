@@ -2,7 +2,9 @@
 #include "./ui_mainwindow.h"
 #include "plugindebuggerdialog.h"
 #include "pluginmanagerdialog.h"
+#include "pluginmanagerdialog.h"
 #include "loadprojectdialog.h"
+#include "scripteditordialog.h" // Added include
 
 #ifdef HAS_LUA
 #include "plugins/LuaScriptManager.h"
@@ -133,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
     connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
     connect(m_menuBar, &MenuBar::pluginManager, this, &MainWindow::onPluginManagerActionTriggered);
+    connect(m_menuBar, &MenuBar::editEngineScript, this, &MainWindow::onEditEngineScript); // Renamed
     connect(m_menuBar, &MenuBar::toggleContext, this, &MainWindow::onToggleContext);
     connect(m_menuBar, &MenuBar::hideCompleted, this, &MainWindow::onHideCompleted);
     connect(m_menuBar, &MenuBar::exportSmartFilterRules, this, &MainWindow::onExportSmartFilterRules);
@@ -196,38 +199,7 @@ void MainWindow::onNewProject()
     m_fileTranslationWidget->onNewProject(engineName, projectPath);
     
     // Check Engine Capability for Relations
-    m_engineName = engineName; 
-    
-    bool isRpgMaker = (engineName.startsWith("RPG Maker"));
-    bool showRelations = m_enableRelations && isRpgMaker;
-    m_titleBar->setRelationsVisible(showRelations);
-    
-    // Show file translation widget
-    m_stackedWidget->setCurrentWidget(m_fileTranslationWidget);
-}
-
-void MainWindow::onOpenMockData()
-{
-    m_fileTranslationWidget->openMockData();
-}
-
-void MainWindow::onSettingsActionTriggered()
-{
-    SettingsDialog dialog(this);
-    dialog.setGoogleApiKey(m_apiKey);
-    dialog.setTargetLanguage(m_targetLanguage);
-    dialog.setGoogleApi(m_googleApi);
-    dialog.setLlmProvider(m_llmProvider);
-    dialog.setLlmApiKey(m_llmApiKey);
-    dialog.setLlmModel(m_llmModel);
-    dialog.setLlmModel(m_llmModel);
-    dialog.setLlmBaseUrl(m_llmBaseUrl);
-    dialog.setRelationsEnabled(m_enableRelations);
-
-    QFile file(":/style.qss");
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        QTextStream stream(&file);
-        QString styleSheet = stream.readAll();
+ฟ       QString styleSheet = stream.readAll();
         dialog.setStyleSheet(styleSheet);
         file.close();
     }
@@ -310,6 +282,40 @@ void MainWindow::onExportSmartFilterRules() { m_fileTranslationWidget->onExportS
 void MainWindow::onImportSmartFilterRules() { m_fileTranslationWidget->onImportSmartFilterRules(); }
 void MainWindow::onSaveProject() { m_fileTranslationWidget->onSaveProject(); }
 void MainWindow::onDeployProject() { m_fileTranslationWidget->onDeployProject(); }
+
+void MainWindow::onEditEngineScript()
+{
+    if (!m_fileTranslationWidget || !m_fileTranslationWidget->getProjectDataManager() || !m_fileTranslationWidget->getBGADataManager()) {
+        QMessageBox::warning(this, "Error", "Data manager not available.");
+        return;
+    }
+
+    QString projectPath = m_fileTranslationWidget->getProjectDataManager()->getProjectPath();
+    QString engineName = m_fileTranslationWidget->getProjectDataManager()->getEngineName();
+
+    if (projectPath.isEmpty()) {
+        QMessageBox::warning(this, "No Project", "No project is currently loaded.");
+        return;
+    }
+    
+    QPair<QString, QString> scriptDetails = m_fileTranslationWidget->getBGADataManager()->getScriptDetails(engineName, projectPath);
+    QString scriptPath = scriptDetails.first;
+    QString targetFunction = scriptDetails.second;
+
+    if (scriptPath.isEmpty()) {
+         QMessageBox::information(this, "Not Supported", "Script editing not supported for engine: " + engineName);
+         return;
+    }
+
+    QFile scriptFile(scriptPath);
+    if (!scriptFile.exists()) {
+        QMessageBox::warning(this, "File Not Found", "Could not find script file in the project directory.\nExpected at: " + scriptPath);
+        return;
+    }
+
+    ScriptEditorDialog dialog(scriptPath, targetFunction, this);
+    dialog.exec();
+}
 
 void MainWindow::onNavigationChanged(int index)
 {
