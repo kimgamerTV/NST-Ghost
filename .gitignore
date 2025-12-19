@@ -30,3 +30,7 @@
 *.swp
 .DS_Store
 Thumbs.db
+
+
+
+BGA/bga_rs/target/*

@@ -1,4 +1,4 @@
-BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o: \
+tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o: \
  /home/jop/work/NST/NST/BGA/tests/test_rpg_analyzer.cpp \
  /usr/include/stdc-predef.h /usr/include/qt6/QtTest/QtTest \
  /usr/include/qt6/QtTest/QtTestDepends /usr/include/qt6/QtCore/QtCore \

@@ -1,4 +1,4 @@
-BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o: \
+CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
@@ -356,6 +356,5 @@ BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o: \
  /usr/include/qt6/QtCore/qjsonparseerror.h \
  /usr/include/qt6/QtCore/QStringList \
  /usr/include/qt6/QtCore/qstringlist.h \
- /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \
- /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \
- /home/jop/work/NST/NST/BGA/core/include/core/engines/renpy/renpyanalyzer.h
+ /home/jop/work/NST/NST/BGA/core/include/core/bga_rust_bridge.h \
+ /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/QJsonArray

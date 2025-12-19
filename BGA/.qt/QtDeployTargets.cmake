@@ -1,0 +1,6 @@
+set(__QT_DEPLOY_TARGET_BGACoreTests_FILE /home/jop/work/NST/NST/BGA/tests/BGACoreTests)
+set(__QT_DEPLOY_TARGET_BGACoreTests_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_TestRpgAnalyzer_FILE /home/jop/work/NST/NST/BGA/tests/TestRpgAnalyzer)
+set(__QT_DEPLOY_TARGET_TestRpgAnalyzer_TYPE EXECUTABLE)
+set(__QT_DEPLOY_TARGET_BGACore_FILE /home/jop/work/NST/NST/BGA/libBGACore.so)
+set(__QT_DEPLOY_TARGET_BGACore_TYPE SHARED_LIBRARY)

@@ -33,6 +33,7 @@ BGACoreTests: \
   /usr/lib/gcc/x86_64-redhat-linux/15/libgcc.a \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtend.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o \
+  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libicui18n.so.77 \
   /usr/lib64/libicuuc.so.77 \
   /usr/lib64/libzstd.so.1 \
@@ -43,7 +44,6 @@ BGACoreTests: \
   /usr/lib64/libb2.so.1 \
   /usr/lib64/libpcre2-16.so.0 \
   /usr/lib64/libcrypto.so.3 \
-  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libicudata.so.77 \
   /usr/lib64/libpcre2-8.so.0 \
   /usr/lib64/libcap.so.2 \
@@ -117,6 +117,8 @@ CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o:
 
+/lib64/ld-linux-x86-64.so.2:
+
 /usr/lib64/libicui18n.so.77:
 
 /usr/lib64/libicuuc.so.77:
@@ -136,8 +138,6 @@ CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o:
 /usr/lib64/libpcre2-16.so.0:
 
 /usr/lib64/libcrypto.so.3:
-
-/lib64/ld-linux-x86-64.so.2:
 
 /usr/lib64/libicudata.so.77:
 

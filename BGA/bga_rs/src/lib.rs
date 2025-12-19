@@ -1,39 +1,13 @@
-use std::ffi::{CStr, CString};
-use std::os::raw::c_char;
+//! BGA (Background Game Analyzer) - Rust Core Library
+//!
+//! This library provides game string extraction and injection for various game engines.
 
-#[no_mangle]
-pub extern "C" fn analyze_rpgm(path: *const c_char) -> *mut c_char {
-    let c_str = unsafe {
-        if path.is_null() {
-            return CString::new("{\"error\": \"Null path pointer\"}").unwrap().into_raw();
-        }
-        CStr::from_ptr(path)
-    };
+pub mod analyzer;
+pub mod engines;
+mod ffi;
 
-    let r_str = match c_str.to_str() {
-        Ok(s) => s,
-        Err(_) => return CString::new("{\"error\": \"Invalid UTF-8 path\"}").unwrap().into_raw(),
-    };
-    
-    // Placeholder for actual logic
-    let json_output =  serde_json::json!({
-        "engine": "rpgm",
-        "source": r_str,
-        "strings": [],
-        "fonts": [],
-        "filesProcessed": 0,
-        "filesFailed": 0
-    });
+pub use analyzer::{AnalyzerOutput, GameAnalyzer, TextEntry};
+pub use engines::{renpy::RenpyAnalyzer, rpgm::RpgmAnalyzer, unity::UnityAnalyzer};
 
-    let result = json_output.to_string();
-    
-    CString::new(result).unwrap().into_raw()
-}
-
-#[no_mangle]
-pub extern "C" fn free_string(s: *mut c_char) {
-    if s.is_null() { return; }
-    unsafe {
-        let _ = CString::from_raw(s);
-    };
-}
+// Re-export FFI functions
+pub use ffi::*;

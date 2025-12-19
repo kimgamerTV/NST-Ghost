@@ -8,13 +8,14 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "" "BGA/BGACore_autogen/timestamp" "custom" "BGA/BGACore_autogen/deps"
-  "/home/jop/work/NST/NST/BGA/BGACore_autogen/mocs_compilation.cpp" "BGA/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o" "gcc" "BGA/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp" "BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o" "gcc" "BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/core/src/engines/renpy/renpyanalyzer.cpp" "BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o" "gcc" "BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp" "BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o" "gcc" "BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp" "BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o" "gcc" "BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o.d"
-  "" "BGA/libBGACore.so" "gcc" "BGA/CMakeFiles/BGACore.dir/link.d"
+  "" "BGACore_autogen/timestamp" "custom" "BGACore_autogen/deps"
+  "/home/jop/work/NST/NST/BGA/BGACore_autogen/mocs_compilation.cpp" "CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o" "gcc" "CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp" "CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o" "gcc" "CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/core/src/bga_rust_bridge.cpp" "CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o" "gcc" "CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/core/src/engines/renpy/renpyanalyzer.cpp" "CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o" "gcc" "CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp" "CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o" "gcc" "CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp" "CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o" "gcc" "CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o.d"
+  "" "libBGACore.so" "gcc" "CMakeFiles/BGACore.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

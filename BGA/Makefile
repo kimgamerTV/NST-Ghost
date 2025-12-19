@@ -57,33 +57,13 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/jop/work/NST/NST
+CMAKE_SOURCE_DIR = /home/jop/work/NST/NST/BGA
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/jop/work/NST/NST
+CMAKE_BINARY_DIR = /home/jop/work/NST/NST/BGA
 
 #=============================================================================
 # Targets provided globally by CMake.
-
-# Special rule for the target package
-package: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool..."
-	cd /home/jop/work/NST/NST && /usr/bin/cpack --config ./CPackConfig.cmake
-.PHONY : package
-
-# Special rule for the target package
-package/fast: package
-.PHONY : package/fast
-
-# Special rule for the target package_source
-package_source:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Run CPack packaging tool for source..."
-	cd /home/jop/work/NST/NST && /usr/bin/cpack --config ./CPackSourceConfig.cmake /home/jop/work/NST/NST/CPackSourceConfig.cmake
-.PHONY : package_source
-
-# Special rule for the target package_source
-package_source/fast: package_source
-.PHONY : package_source/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -152,14 +132,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/jop/work/NST/NST && $(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/CMakeFiles /home/jop/work/NST/NST/BGA//CMakeFiles/progress.marks
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/BGA/CMakeFiles /home/jop/work/NST/NST/BGA//CMakeFiles/progress.marks
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/BGA/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/clean
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean
 .PHONY : clean
 
 # The main clean target
@@ -168,68 +148,155 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/preinstall
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/preinstall
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/jop/work/NST/NST && $(CMAKE_COMMAND) -P /home/jop/work/NST/NST/CMakeFiles/VerifyGlobs.cmake
-	cd /home/jop/work/NST/NST && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-# Convenience name for target.
-BGA/CMakeFiles/BGACore.dir/rule:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/CMakeFiles/BGACore.dir/rule
-.PHONY : BGA/CMakeFiles/BGACore.dir/rule
+#=============================================================================
+# Target rules for targets named bga_rust
 
-# Convenience name for target.
-BGACore: BGA/CMakeFiles/BGACore.dir/rule
+# Build rule for target.
+bga_rust: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bga_rust
+.PHONY : bga_rust
+
+# fast build rule for target.
+bga_rust/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/bga_rust.dir/build.make CMakeFiles/bga_rust.dir/build
+.PHONY : bga_rust/fast
+
+#=============================================================================
+# Target rules for targets named BGACore
+
+# Build rule for target.
+BGACore: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACore
 .PHONY : BGACore
 
 # fast build rule for target.
 BGACore/fast:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/build
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/build
 .PHONY : BGACore/fast
 
-# Convenience name for target.
-BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/rule:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/rule
-.PHONY : BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/rule
+#=============================================================================
+# Target rules for targets named BGACore_autogen_timestamp_deps
 
-# Convenience name for target.
-BGACore_autogen_timestamp_deps: BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/rule
+# Build rule for target.
+BGACore_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACore_autogen_timestamp_deps
 .PHONY : BGACore_autogen_timestamp_deps
 
 # fast build rule for target.
 BGACore_autogen_timestamp_deps/fast:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/build.make BGA/CMakeFiles/BGACore_autogen_timestamp_deps.dir/build
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore_autogen_timestamp_deps.dir/build.make CMakeFiles/BGACore_autogen_timestamp_deps.dir/build
 .PHONY : BGACore_autogen_timestamp_deps/fast
 
-# Convenience name for target.
-BGA/CMakeFiles/BGACore_autogen.dir/rule:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGA/CMakeFiles/BGACore_autogen.dir/rule
-.PHONY : BGA/CMakeFiles/BGACore_autogen.dir/rule
+#=============================================================================
+# Target rules for targets named BGACore_autogen
 
-# Convenience name for target.
-BGACore_autogen: BGA/CMakeFiles/BGACore_autogen.dir/rule
+# Build rule for target.
+BGACore_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACore_autogen
 .PHONY : BGACore_autogen
 
 # fast build rule for target.
 BGACore_autogen/fast:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore_autogen.dir/build.make BGA/CMakeFiles/BGACore_autogen.dir/build
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore_autogen.dir/build.make CMakeFiles/BGACore_autogen.dir/build
 .PHONY : BGACore_autogen/fast
+
+#=============================================================================
+# Target rules for targets named BGACoreTests
+
+# Build rule for target.
+BGACoreTests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACoreTests
+.PHONY : BGACoreTests
+
+# fast build rule for target.
+BGACoreTests/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/BGACoreTests.dir/build.make tests/CMakeFiles/BGACoreTests.dir/build
+.PHONY : BGACoreTests/fast
+
+#=============================================================================
+# Target rules for targets named TestRpgAnalyzer
+
+# Build rule for target.
+TestRpgAnalyzer: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TestRpgAnalyzer
+.PHONY : TestRpgAnalyzer
+
+# fast build rule for target.
+TestRpgAnalyzer/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/TestRpgAnalyzer.dir/build.make tests/CMakeFiles/TestRpgAnalyzer.dir/build
+.PHONY : TestRpgAnalyzer/fast
+
+#=============================================================================
+# Target rules for targets named BGACoreTests_autogen_timestamp_deps
+
+# Build rule for target.
+BGACoreTests_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACoreTests_autogen_timestamp_deps
+.PHONY : BGACoreTests_autogen_timestamp_deps
+
+# fast build rule for target.
+BGACoreTests_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/BGACoreTests_autogen_timestamp_deps.dir/build.make tests/CMakeFiles/BGACoreTests_autogen_timestamp_deps.dir/build
+.PHONY : BGACoreTests_autogen_timestamp_deps/fast
+
+#=============================================================================
+# Target rules for targets named BGACoreTests_autogen
+
+# Build rule for target.
+BGACoreTests_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BGACoreTests_autogen
+.PHONY : BGACoreTests_autogen
+
+# fast build rule for target.
+BGACoreTests_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/BGACoreTests_autogen.dir/build.make tests/CMakeFiles/BGACoreTests_autogen.dir/build
+.PHONY : BGACoreTests_autogen/fast
+
+#=============================================================================
+# Target rules for targets named TestRpgAnalyzer_autogen_timestamp_deps
+
+# Build rule for target.
+TestRpgAnalyzer_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TestRpgAnalyzer_autogen_timestamp_deps
+.PHONY : TestRpgAnalyzer_autogen_timestamp_deps
+
+# fast build rule for target.
+TestRpgAnalyzer_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/build.make tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/build
+.PHONY : TestRpgAnalyzer_autogen_timestamp_deps/fast
+
+#=============================================================================
+# Target rules for targets named TestRpgAnalyzer_autogen
+
+# Build rule for target.
+TestRpgAnalyzer_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 TestRpgAnalyzer_autogen
+.PHONY : TestRpgAnalyzer_autogen
+
+# fast build rule for target.
+TestRpgAnalyzer_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build.make tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build
+.PHONY : TestRpgAnalyzer_autogen/fast
 
 BGACore_autogen/mocs_compilation.o: BGACore_autogen/mocs_compilation.cpp.o
 .PHONY : BGACore_autogen/mocs_compilation.o
 
 # target to build an object file
 BGACore_autogen/mocs_compilation.cpp.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o
 .PHONY : BGACore_autogen/mocs_compilation.cpp.o
 
 BGACore_autogen/mocs_compilation.i: BGACore_autogen/mocs_compilation.cpp.i
@@ -237,7 +304,7 @@ BGACore_autogen/mocs_compilation.i: BGACore_autogen/mocs_compilation.cpp.i
 
 # target to preprocess a source file
 BGACore_autogen/mocs_compilation.cpp.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.i
 .PHONY : BGACore_autogen/mocs_compilation.cpp.i
 
 BGACore_autogen/mocs_compilation.s: BGACore_autogen/mocs_compilation.cpp.s
@@ -245,7 +312,7 @@ BGACore_autogen/mocs_compilation.s: BGACore_autogen/mocs_compilation.cpp.s
 
 # target to generate assembly for a file
 BGACore_autogen/mocs_compilation.cpp.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.s
 .PHONY : BGACore_autogen/mocs_compilation.cpp.s
 
 core/src/analyzerfactory.o: core/src/analyzerfactory.cpp.o
@@ -253,7 +320,7 @@ core/src/analyzerfactory.o: core/src/analyzerfactory.cpp.o
 
 # target to build an object file
 core/src/analyzerfactory.cpp.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o
 .PHONY : core/src/analyzerfactory.cpp.o
 
 core/src/analyzerfactory.i: core/src/analyzerfactory.cpp.i
@@ -261,7 +328,7 @@ core/src/analyzerfactory.i: core/src/analyzerfactory.cpp.i
 
 # target to preprocess a source file
 core/src/analyzerfactory.cpp.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.i
 .PHONY : core/src/analyzerfactory.cpp.i
 
 core/src/analyzerfactory.s: core/src/analyzerfactory.cpp.s
@@ -269,15 +336,39 @@ core/src/analyzerfactory.s: core/src/analyzerfactory.cpp.s
 
 # target to generate assembly for a file
 core/src/analyzerfactory.cpp.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.s
 .PHONY : core/src/analyzerfactory.cpp.s
+
+core/src/bga_rust_bridge.o: core/src/bga_rust_bridge.cpp.o
+.PHONY : core/src/bga_rust_bridge.o
+
+# target to build an object file
+core/src/bga_rust_bridge.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o
+.PHONY : core/src/bga_rust_bridge.cpp.o
+
+core/src/bga_rust_bridge.i: core/src/bga_rust_bridge.cpp.i
+.PHONY : core/src/bga_rust_bridge.i
+
+# target to preprocess a source file
+core/src/bga_rust_bridge.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.i
+.PHONY : core/src/bga_rust_bridge.cpp.i
+
+core/src/bga_rust_bridge.s: core/src/bga_rust_bridge.cpp.s
+.PHONY : core/src/bga_rust_bridge.s
+
+# target to generate assembly for a file
+core/src/bga_rust_bridge.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.s
+.PHONY : core/src/bga_rust_bridge.cpp.s
 
 core/src/engines/renpy/renpyanalyzer.o: core/src/engines/renpy/renpyanalyzer.cpp.o
 .PHONY : core/src/engines/renpy/renpyanalyzer.o
 
 # target to build an object file
 core/src/engines/renpy/renpyanalyzer.cpp.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o
 .PHONY : core/src/engines/renpy/renpyanalyzer.cpp.o
 
 core/src/engines/renpy/renpyanalyzer.i: core/src/engines/renpy/renpyanalyzer.cpp.i
@@ -285,7 +376,7 @@ core/src/engines/renpy/renpyanalyzer.i: core/src/engines/renpy/renpyanalyzer.cpp
 
 # target to preprocess a source file
 core/src/engines/renpy/renpyanalyzer.cpp.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.i
 .PHONY : core/src/engines/renpy/renpyanalyzer.cpp.i
 
 core/src/engines/renpy/renpyanalyzer.s: core/src/engines/renpy/renpyanalyzer.cpp.s
@@ -293,7 +384,7 @@ core/src/engines/renpy/renpyanalyzer.s: core/src/engines/renpy/renpyanalyzer.cpp
 
 # target to generate assembly for a file
 core/src/engines/renpy/renpyanalyzer.cpp.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.s
 .PHONY : core/src/engines/renpy/renpyanalyzer.cpp.s
 
 core/src/engines/rpgm/rpganalyzer.o: core/src/engines/rpgm/rpganalyzer.cpp.o
@@ -301,7 +392,7 @@ core/src/engines/rpgm/rpganalyzer.o: core/src/engines/rpgm/rpganalyzer.cpp.o
 
 # target to build an object file
 core/src/engines/rpgm/rpganalyzer.cpp.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o
 .PHONY : core/src/engines/rpgm/rpganalyzer.cpp.o
 
 core/src/engines/rpgm/rpganalyzer.i: core/src/engines/rpgm/rpganalyzer.cpp.i
@@ -309,7 +400,7 @@ core/src/engines/rpgm/rpganalyzer.i: core/src/engines/rpgm/rpganalyzer.cpp.i
 
 # target to preprocess a source file
 core/src/engines/rpgm/rpganalyzer.cpp.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.i
 .PHONY : core/src/engines/rpgm/rpganalyzer.cpp.i
 
 core/src/engines/rpgm/rpganalyzer.s: core/src/engines/rpgm/rpganalyzer.cpp.s
@@ -317,7 +408,7 @@ core/src/engines/rpgm/rpganalyzer.s: core/src/engines/rpgm/rpganalyzer.cpp.s
 
 # target to generate assembly for a file
 core/src/engines/rpgm/rpganalyzer.cpp.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.s
 .PHONY : core/src/engines/rpgm/rpganalyzer.cpp.s
 
 core/src/engines/unity/unityanalyzer.o: core/src/engines/unity/unityanalyzer.cpp.o
@@ -325,7 +416,7 @@ core/src/engines/unity/unityanalyzer.o: core/src/engines/unity/unityanalyzer.cpp
 
 # target to build an object file
 core/src/engines/unity/unityanalyzer.cpp.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o
 .PHONY : core/src/engines/unity/unityanalyzer.cpp.o
 
 core/src/engines/unity/unityanalyzer.i: core/src/engines/unity/unityanalyzer.cpp.i
@@ -333,7 +424,7 @@ core/src/engines/unity/unityanalyzer.i: core/src/engines/unity/unityanalyzer.cpp
 
 # target to preprocess a source file
 core/src/engines/unity/unityanalyzer.cpp.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.i
 .PHONY : core/src/engines/unity/unityanalyzer.cpp.i
 
 core/src/engines/unity/unityanalyzer.s: core/src/engines/unity/unityanalyzer.cpp.s
@@ -341,7 +432,7 @@ core/src/engines/unity/unityanalyzer.s: core/src/engines/unity/unityanalyzer.cpp
 
 # target to generate assembly for a file
 core/src/engines/unity/unityanalyzer.cpp.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/BGACore.dir/build.make BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/BGACore.dir/build.make CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.s
 .PHONY : core/src/engines/unity/unityanalyzer.cpp.s
 
 # Help Target
@@ -355,18 +446,26 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
-	@echo "... package"
-	@echo "... package_source"
 	@echo "... rebuild_cache"
+	@echo "... BGACoreTests_autogen"
+	@echo "... BGACoreTests_autogen_timestamp_deps"
 	@echo "... BGACore_autogen"
 	@echo "... BGACore_autogen_timestamp_deps"
+	@echo "... TestRpgAnalyzer_autogen"
+	@echo "... TestRpgAnalyzer_autogen_timestamp_deps"
+	@echo "... bga_rust"
 	@echo "... BGACore"
+	@echo "... BGACoreTests"
+	@echo "... TestRpgAnalyzer"
 	@echo "... BGACore_autogen/mocs_compilation.o"
 	@echo "... BGACore_autogen/mocs_compilation.i"
 	@echo "... BGACore_autogen/mocs_compilation.s"
 	@echo "... core/src/analyzerfactory.o"
 	@echo "... core/src/analyzerfactory.i"
 	@echo "... core/src/analyzerfactory.s"
+	@echo "... core/src/bga_rust_bridge.o"
+	@echo "... core/src/bga_rust_bridge.i"
+	@echo "... core/src/bga_rust_bridge.s"
 	@echo "... core/src/engines/renpy/renpyanalyzer.o"
 	@echo "... core/src/engines/renpy/renpyanalyzer.i"
 	@echo "... core/src/engines/renpy/renpyanalyzer.s"
@@ -387,7 +486,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/jop/work/NST/NST && $(CMAKE_COMMAND) -P /home/jop/work/NST/NST/CMakeFiles/VerifyGlobs.cmake
-	cd /home/jop/work/NST/NST && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

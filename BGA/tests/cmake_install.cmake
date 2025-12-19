@@ -47,15 +47,15 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests")
     file(RPATH_CHECK
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests"
-         RPATH "\$ORIGIN:\$ORIGIN/../lib64")
+         RPATH "")
   endif()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/tests" TYPE EXECUTABLE FILES "/home/jop/work/NST/NST/BGA/tests/BGACoreTests")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests"
-         OLD_RPATH "\$ORIGIN:/home/jop/work/NST/NST/BGA:"
-         NEW_RPATH "\$ORIGIN:\$ORIGIN/../lib64")
+         OLD_RPATH "/home/jop/work/NST/NST/BGA:"
+         NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/BGACoreTests")
     endif()
@@ -67,15 +67,15 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer")
     file(RPATH_CHECK
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer"
-         RPATH "\$ORIGIN:\$ORIGIN/../lib64")
+         RPATH "")
   endif()
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/tests" TYPE EXECUTABLE FILES "/home/jop/work/NST/NST/BGA/tests/TestRpgAnalyzer")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer")
     file(RPATH_CHANGE
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer"
-         OLD_RPATH "\$ORIGIN:/home/jop/work/NST/NST/BGA:"
-         NEW_RPATH "\$ORIGIN:\$ORIGIN/../lib64")
+         OLD_RPATH "/home/jop/work/NST/NST/BGA:"
+         NEW_RPATH "")
     if(CMAKE_INSTALL_DO_STRIP)
       execute_process(COMMAND "/usr/bin/strip" "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/tests/TestRpgAnalyzer")
     endif()

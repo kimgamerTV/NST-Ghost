@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "" "BGA/tests/BGACoreTests_autogen/timestamp" "custom" "BGA/tests/BGACoreTests_autogen/deps"
-  "/home/jop/work/NST/NST/BGA/tests/BGACoreTests_autogen/mocs_compilation.cpp" "BGA/tests/CMakeFiles/BGACoreTests.dir/BGACoreTests_autogen/mocs_compilation.cpp.o" "gcc" "BGA/tests/CMakeFiles/BGACoreTests.dir/BGACoreTests_autogen/mocs_compilation.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/tests/test_analyzer_stub.cpp" "BGA/tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o" "gcc" "BGA/tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o.d"
-  "" "BGA/tests/BGACoreTests" "gcc" "BGA/tests/CMakeFiles/BGACoreTests.dir/link.d"
+  "" "tests/BGACoreTests_autogen/timestamp" "custom" "tests/BGACoreTests_autogen/deps"
+  "/home/jop/work/NST/NST/BGA/tests/BGACoreTests_autogen/mocs_compilation.cpp" "tests/CMakeFiles/BGACoreTests.dir/BGACoreTests_autogen/mocs_compilation.cpp.o" "gcc" "tests/CMakeFiles/BGACoreTests.dir/BGACoreTests_autogen/mocs_compilation.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/tests/test_analyzer_stub.cpp" "tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o" "gcc" "tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o.d"
+  "" "tests/BGACoreTests" "gcc" "tests/CMakeFiles/BGACoreTests.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

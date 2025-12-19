@@ -8,10 +8,10 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "" "BGA/tests/TestRpgAnalyzer_autogen/timestamp" "custom" "BGA/tests/TestRpgAnalyzer_autogen/deps"
-  "/home/jop/work/NST/NST/BGA/tests/TestRpgAnalyzer_autogen/mocs_compilation.cpp" "BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/TestRpgAnalyzer_autogen/mocs_compilation.cpp.o" "gcc" "BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/TestRpgAnalyzer_autogen/mocs_compilation.cpp.o.d"
-  "/home/jop/work/NST/NST/BGA/tests/test_rpg_analyzer.cpp" "BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o" "gcc" "BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o.d"
-  "" "BGA/tests/TestRpgAnalyzer" "gcc" "BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/link.d"
+  "" "tests/TestRpgAnalyzer_autogen/timestamp" "custom" "tests/TestRpgAnalyzer_autogen/deps"
+  "/home/jop/work/NST/NST/BGA/tests/TestRpgAnalyzer_autogen/mocs_compilation.cpp" "tests/CMakeFiles/TestRpgAnalyzer.dir/TestRpgAnalyzer_autogen/mocs_compilation.cpp.o" "gcc" "tests/CMakeFiles/TestRpgAnalyzer.dir/TestRpgAnalyzer_autogen/mocs_compilation.cpp.o.d"
+  "/home/jop/work/NST/NST/BGA/tests/test_rpg_analyzer.cpp" "tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o" "gcc" "tests/CMakeFiles/TestRpgAnalyzer.dir/test_rpg_analyzer.cpp.o.d"
+  "" "tests/TestRpgAnalyzer" "gcc" "tests/CMakeFiles/TestRpgAnalyzer.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

@@ -1,4 +1,4 @@
-BGA/tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o: \
+tests/CMakeFiles/BGACoreTests.dir/test_analyzer_stub.cpp.o: \
  /home/jop/work/NST/NST/BGA/tests/test_analyzer_stub.cpp \
  /usr/include/stdc-predef.h /usr/include/qt6/QtTest/QTest \
  /usr/include/qt6/QtTest/qtest.h /usr/include/qt6/QtTest/qttestglobal.h \

@@ -3,10 +3,14 @@ libBGACore.so: \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbeginS.o \
   CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o \
   CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o \
+  CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o \
   CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o \
   CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o \
   CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o \
   /usr/lib64/libQt6Core.so.6.10.1 \
+  bga_rs/target/release/libbga_rs.a \
+  /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libpthread.a \
+  /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libdl.a \
   /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
@@ -40,6 +44,8 @@ CMakeFiles/BGACore.dir/BGACore_autogen/mocs_compilation.cpp.o:
 
 CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o:
 
+CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o:
+
 CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o:
 
 CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o:
@@ -47,6 +53,12 @@ CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o:
 CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o:
 
 /usr/lib64/libQt6Core.so.6.10.1:
+
+bga_rs/target/release/libbga_rs.a:
+
+/usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libpthread.a:
+
+/usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libdl.a:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so:
 
