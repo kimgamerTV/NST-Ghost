@@ -1,7 +1,0 @@
-********* Start testing of TestRpgAnalyzer *********
-Config: Using QtTest library 6.10.1, Qt 6.10.1 (x86_64-little_endian-lp64 shared (dynamic) release build; by GCC 15.2.1 20251111 (Red Hat 15.2.1-4)), fedora 43
-PASS   : TestRpgAnalyzer::initTestCase()
-PASS   : TestRpgAnalyzer::testAnalyze()
-PASS   : TestRpgAnalyzer::cleanupTestCase()
-Totals: 3 passed, 0 failed, 0 skipped, 0 blacklisted, 4ms
-********* Finished testing of TestRpgAnalyzer *********
