@@ -1,6 +1,8 @@
 # Hashes of file build rules.
 c369ad1859e1497022919d0d081a4002 BGA/BGACore_autogen/timestamp
 f672985265164152f6a8045a0191ec37 BGA/CMakeFiles/BGACore_autogen
+f672985265164152f6a8045a0191ec37 BGA/CMakeFiles/bga_rust
+8c117cf57d8b545888af9b1966957148 BGA/bga_rs/target/release/libbga_rs.a
 5d30025bfbc475b064d3c74e546338bc BGA/tests/BGACoreTests_autogen/timestamp
 94426f3c792338c0a42eaebfb5bd061a BGA/tests/CMakeFiles/BGACoreTests_autogen
 94426f3c792338c0a42eaebfb5bd061a BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen

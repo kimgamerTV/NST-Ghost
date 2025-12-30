@@ -222,6 +222,19 @@ NST_autogen/fast:
 .PHONY : NST_autogen/fast
 
 #=============================================================================
+# Target rules for targets named bga_rust
+
+# Build rule for target.
+bga_rust: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 bga_rust
+.PHONY : bga_rust
+
+# fast build rule for target.
+bga_rust/fast:
+	$(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/bga_rust.dir/build.make BGA/CMakeFiles/bga_rust.dir/build
+.PHONY : bga_rust/fast
+
+#=============================================================================
 # Target rules for targets named BGACore
 
 # Build rule for target.
@@ -1398,6 +1411,7 @@ help:
 	@echo "... TestRpgAnalyzer_autogen_timestamp_deps"
 	@echo "... UnrpycPlugin_autogen"
 	@echo "... UnrpycPlugin_autogen_timestamp_deps"
+	@echo "... bga_rust"
 	@echo "... BGACore"
 	@echo "... BGACoreTests"
 	@echo "... Injection"

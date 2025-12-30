@@ -25,85 +25,145 @@ FileTranslationWidget::FileTranslationWidget(TranslationServiceManager *serviceM
 {
     ui->setupUi(this);
 
-    m_fileListModel = new QStandardItemModel(this);
-    ui->fileListView->setModel(m_fileListModel);
+    initializeModels();
+    setupFileListView();
+    setupTableView();
+    initializeManagers();
+    connectManagerSignals();
+    setupTimers();
 
-    // Set icon provider
-    QFileIconProvider *iconProvider = new QFileIconProvider();
+    connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::finished, this, &FileTranslationWidget::onLoadingFinished);
+    connect(ui->fileListView, &QListView::clicked, m_projectDataManager, &ProjectDataManager::onFileSelected);
+}
+
+/* =========================================================================
+ *  SETUP METHODS
+ * ========================================================================= */
+
+void FileTranslationWidget::initializeModels()
+{
+    m_fileListModel = new QStandardItemModel(this);
+    m_translationModel = new QStandardItemModel(this);
+    m_translationModel->setHorizontalHeaderLabels({"Context", "Source Text", "Translation"});
+}
+
+void FileTranslationWidget::setupFileListView()
+{
+    ui->fileListView->setModel(m_fileListModel);
     ui->fileListView->setIconSize(QSize(24, 24));
     ui->fileListView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     ui->fileListView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->fileListView, &QListView::customContextMenuRequested, this, &FileTranslationWidget::onFileListCustomContextMenuRequested);
+    
+    connect(ui->fileListView, &QListView::customContextMenuRequested, 
+            this, &FileTranslationWidget::onFileListCustomContextMenuRequested);
+}
 
-    m_translationModel = new QStandardItemModel(this);
+void FileTranslationWidget::setupTableView()
+{
     ui->translationTableView->setModel(m_translationModel);
-
-    // ===== Adjustment of Table View =====
+    
+    // Word wrap and display settings
     ui->translationTableView->setWordWrap(true);
     ui->translationTableView->setTextElideMode(Qt::ElideNone);
     ui->translationTableView->setAlternatingRowColors(true);
-
+    
+    // Header configuration
     ui->translationTableView->verticalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->translationTableView->verticalHeader()->setDefaultSectionSize(60);
-
     ui->translationTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->translationTableView->horizontalHeader()->setStretchLastSection(true);
-
-    m_translationModel->setHorizontalHeaderLabels(QStringList() << "Context" << "Source Text" << "Translation");
-
+    
+    // Column widths
     ui->translationTableView->setColumnWidth(0, 250);
     ui->translationTableView->setColumnWidth(1, 250);
-
+    
+    // Selection behavior
     ui->translationTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->translationTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
-
+    
+    // Grid
     ui->translationTableView->setShowGrid(true);
     ui->translationTableView->setGridStyle(Qt::SolidLine);
+    
+    // Context menu
+    ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->translationTableView, &QTableView::customContextMenuRequested, 
+            this, &FileTranslationWidget::onTranslationTableViewCustomContextMenuRequested);
+    connect(m_translationModel, &QStandardItemModel::dataChanged, 
+            this, &FileTranslationWidget::onTranslationDataChanged);
+    
+    // Splitter default sizes
+    ui->splitter->setSizes({250, 774});
+}
 
-    ui->splitter->setSizes(QList<int>() << 250 << 774);
-
-    // Managers
+void FileTranslationWidget::initializeManagers()
+{
+    // Project data manager
     m_projectDataManager = new ProjectDataManager(m_fileListModel, m_translationModel, this);
-    connect(m_projectDataManager, &ProjectDataManager::processingFinished, this, &FileTranslationWidget::onProjectProcessingFinished);
-
+    
+    // Search controller and dialog
     m_searchController = new SearchController(m_translationModel, ui->translationTableView, this);
     m_searchController->setTranslationModel(m_translationModel);
     m_searchController->setLoadedGameProjectData(&m_projectDataManager->getLoadedGameProjectData());
     m_searchController->setFileListModel(m_fileListModel);
-
+    
     m_searchDialog = new SearchDialog(this);
-    connect(m_searchDialog, &SearchDialog::searchRequested, this, &FileTranslationWidget::onSearchRequested);
-    connect(m_searchDialog, &SearchDialog::resultSelected, this, &FileTranslationWidget::onSearchResultSelected);
-    connect(m_searchDialog->lineEdit(), &QLineEdit::textChanged, m_searchController, &SearchController::onSearchQueryChanged);
-
+    
+    // Shortcut controller
     m_shortcutController = new ShortcutController(qobject_cast<QMainWindow*>(window()));
     m_shortcutController->createShortcuts();
-    connect(m_shortcutController, &ShortcutController::focusSearch, this, &FileTranslationWidget::openSearchDialog);
     m_shortcutController->createSelectAllShortcut(ui->translationTableView);
-    connect(m_shortcutController, &ShortcutController::selectAllRequested, this, &FileTranslationWidget::onSelectAllRequested);
-
+    
+    // BGA data manager
     m_bgaDataManager = new BGADataManager(this);
-    connect(m_bgaDataManager, &BGADataManager::errorOccurred, this, &FileTranslationWidget::onBGADataError);
-    connect(m_bgaDataManager, &BGADataManager::fontsLoaded, this, &FileTranslationWidget::onFontsLoaded); // Connect fontsLoaded
+    
+    // Smart filter manager
+    m_smartFilterManager = new SmartFilterManager(this);
+    m_smartFilterManager->loadPatterns();
+}
+
+void FileTranslationWidget::connectManagerSignals()
+{
+    // Project data manager
+    connect(m_projectDataManager, &ProjectDataManager::processingFinished, 
+            this, &FileTranslationWidget::onProjectProcessingFinished);
+    
+    // Search dialog
+    connect(m_searchDialog, &SearchDialog::searchRequested, 
+            this, &FileTranslationWidget::onSearchRequested);
+    connect(m_searchDialog, &SearchDialog::resultSelected, 
+            this, &FileTranslationWidget::onSearchResultSelected);
+    connect(m_searchDialog->lineEdit(), &QLineEdit::textChanged, 
+            m_searchController, &SearchController::onSearchQueryChanged);
+    
+    // Shortcut controller
+    connect(m_shortcutController, &ShortcutController::focusSearch, 
+            this, &FileTranslationWidget::openSearchDialog);
+    connect(m_shortcutController, &ShortcutController::selectAllRequested, 
+            this, &FileTranslationWidget::onSelectAllRequested);
+    
+    // BGA data manager
+    connect(m_bgaDataManager, &BGADataManager::errorOccurred, 
+            this, &FileTranslationWidget::onBGADataError);
+    connect(m_bgaDataManager, &BGADataManager::fontsLoaded, 
+            this, &FileTranslationWidget::onFontsLoaded);
     connect(m_bgaDataManager, &BGADataManager::progressUpdated, this, [this](int value, const QString &message) {
         if (m_progressDialog) {
             m_progressDialog->setValue(value);
             m_progressDialog->setLabelText(message);
         }
     });
-
-    // Smart Filter Manager
-    m_smartFilterManager = new SmartFilterManager(this);
-    m_smartFilterManager->loadPatterns();
-
-    // We assume translation service manager signals are connected here
+    
+    // Translation service manager
     if (m_translationServiceManager) {
-        connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, this, &FileTranslationWidget::onTranslationFinished);
-        connect(m_translationServiceManager, &TranslationServiceManager::errorOccurred, this, &FileTranslationWidget::onTranslationServiceError);
-        connect(m_translationServiceManager, &TranslationServiceManager::progressUpdated, this, [this](int current, int total) {
+        connect(m_translationServiceManager, &TranslationServiceManager::translationFinished, 
+                this, &FileTranslationWidget::onTranslationFinished);
+        connect(m_translationServiceManager, &TranslationServiceManager::errorOccurred, 
+                this, &FileTranslationWidget::onTranslationServiceError);
+        connect(m_translationServiceManager, &TranslationServiceManager::progressUpdated, 
+                this, [this](int current, int total) {
             if (total == 0) return;
-            // statusBar not available, could emit signal
-             
+            
             if (current == 1 && m_currentTranslatingFileIndex.isValid()) {
                 m_spinnerTimer->start(300);
             }
@@ -124,14 +184,19 @@ FileTranslationWidget::FileTranslationWidget(TranslationServiceManager *serviceM
             }
         });
     }
+}
 
-    // Spinner
+void FileTranslationWidget::setupTimers()
+{
+    // Spinner animation timer
     connect(m_spinnerTimer, &QTimer::timeout, this, [this]() {
         if (!m_currentTranslatingFileIndex.isValid()) return;
         QStandardItem *item = m_fileListModel->itemFromIndex(m_currentTranslatingFileIndex);
         if (!item) return;
+        
         static const QStringList spinners = {"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"};
         m_spinnerFrame = (m_spinnerFrame + 1) % spinners.size();
+        
         QString originalText = item->data(Qt::UserRole + 1).toString();
         if (originalText.isEmpty()) {
             originalText = item->text();
@@ -139,21 +204,24 @@ FileTranslationWidget::FileTranslationWidget(TranslationServiceManager *serviceM
         }
         item->setText(spinners[m_spinnerFrame] + " " + originalText);
     });
-
-    // UI Update Timer
+    
+    // UI batch update timer
     m_uiUpdateTimer = new QTimer(this);
     m_uiUpdateTimer->setInterval(100);
     m_uiUpdateTimer->setSingleShot(true);
     connect(m_uiUpdateTimer, &QTimer::timeout, this, [this]() {
         if (m_pendingUIUpdates.isEmpty()) return;
+        
         ui->translationTableView->setUpdatesEnabled(false);
         int minRow = INT_MAX, maxRow = 0;
+        
         for (const QModelIndex &idx : m_pendingUIUpdates) {
             if (idx.isValid() && idx.row() >= 0) {
                 if (idx.row() < minRow) minRow = idx.row();
                 if (idx.row() > maxRow) maxRow = idx.row();
             }
         }
+        
         if (minRow <= maxRow && minRow != INT_MAX) {
             QModelIndex topLeft = m_translationModel->index(minRow, 2);
             QModelIndex bottomRight = m_translationModel->index(maxRow, 2);
@@ -161,23 +229,15 @@ FileTranslationWidget::FileTranslationWidget(TranslationServiceManager *serviceM
                 emit m_translationModel->dataChanged(topLeft, bottomRight);
             }
         }
+        
         ui->translationTableView->setUpdatesEnabled(true);
         m_pendingUIUpdates.clear();
     });
-
+    
+    // Result processing timer
     m_resultProcessingTimer = new QTimer(this);
     m_resultProcessingTimer->setInterval(100);
     connect(m_resultProcessingTimer, &QTimer::timeout, this, &FileTranslationWidget::processIncomingResults);
-
-    ui->translationTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->translationTableView, &QTableView::customContextMenuRequested, this, &FileTranslationWidget::onTranslationTableViewCustomContextMenuRequested);
-    connect(m_translationModel, &QStandardItemModel::dataChanged, this, &FileTranslationWidget::onTranslationDataChanged);
-
-    m_smartFilterManager = new SmartFilterManager(this);
-    
-    connect(&m_loadFutureWatcher, &QFutureWatcher<QJsonArray>::finished, this, &FileTranslationWidget::onLoadingFinished);
-    
-    connect(ui->fileListView, &QListView::clicked, m_projectDataManager, &ProjectDataManager::onFileSelected);
 }
 
 FileTranslationWidget::~FileTranslationWidget()

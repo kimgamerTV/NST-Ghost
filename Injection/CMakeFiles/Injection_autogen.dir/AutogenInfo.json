@@ -7,7 +7,7 @@
 	"CMAKE_LIST_FILES" : 
 	[
 		"/home/jop/work/NST/NST/Injection/CMakeLists.txt",
-		"/home/jop/work/NST/NST/CMakeFiles/3.31.6/CMakeCCompiler.cmake",
+		"/home/jop/work/NST/NST/CMakeFiles/3.31.10/CMakeCCompiler.cmake",
 		"/usr/share/cmake/Modules/CMakeCInformation.cmake",
 		"/usr/share/cmake/Modules/CMakeLanguageInformation.cmake",
 		"/usr/share/cmake/Modules/Compiler/GNU-C.cmake",
@@ -162,7 +162,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/Injection/Injection_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.0\"",
+		"APP_VERSION=\"0.5.1\"",
 		"INJECTION_LIBRARY",
 		"Injection_EXPORTS",
 		"QT_CORE_LIB",
@@ -202,9 +202,9 @@
 	[
 		"/usr/lib64/ccache/c++",
 		"-std=gnu++17",
+		"-w",
 		"-dM",
 		"-E",
-		"-c",
 		"/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
 	],
 	"MOC_PREDEFS_FILE" : "/home/jop/work/NST/NST/Injection/Injection_autogen/moc_predefs.h",

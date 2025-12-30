@@ -3,13 +3,13 @@
 
 # compile C with /usr/lib64/ccache/cc
 # compile CXX with /usr/lib64/ccache/c++
-C_DEFINES = -DAPP_VERSION=\"0.5.0\" -DINJECTION_LIBRARY -DInjection_EXPORTS -DQT_CORE_LIB -DQT_NO_DEBUG
+C_DEFINES = -DAPP_VERSION=\"0.5.1\" -DINJECTION_LIBRARY -DInjection_EXPORTS -DQT_CORE_LIB -DQT_NO_DEBUG
 
 C_INCLUDES = -I/home/jop/work/NST/NST/Injection/Injection_autogen/include -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib64/qt6/mkspecs/linux-g++
 
 C_FLAGS = -fPIC
 
-CXX_DEFINES = -DAPP_VERSION=\"0.5.0\" -DINJECTION_LIBRARY -DInjection_EXPORTS -DQT_CORE_LIB -DQT_NO_DEBUG
+CXX_DEFINES = -DAPP_VERSION=\"0.5.1\" -DINJECTION_LIBRARY -DInjection_EXPORTS -DQT_CORE_LIB -DQT_NO_DEBUG
 
 CXX_INCLUDES = -I/home/jop/work/NST/NST/Injection/Injection_autogen/include -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib64/qt6/mkspecs/linux-g++
 

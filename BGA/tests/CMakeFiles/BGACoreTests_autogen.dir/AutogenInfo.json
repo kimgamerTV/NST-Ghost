@@ -1,6 +1,6 @@
 {
 	"BUILD_DIR" : "/home/jop/work/NST/NST/BGA/tests/BGACoreTests_autogen",
-	"CMAKE_BINARY_DIR" : "/home/jop/work/NST/NST/BGA",
+	"CMAKE_BINARY_DIR" : "/home/jop/work/NST/NST",
 	"CMAKE_CURRENT_BINARY_DIR" : "/home/jop/work/NST/NST/BGA/tests",
 	"CMAKE_CURRENT_SOURCE_DIR" : "/home/jop/work/NST/NST/BGA/tests",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
@@ -61,7 +61,7 @@
 		"/usr/lib64/cmake/Qt6Test/QtTestProperties.cmake",
 		"/usr/lib64/cmake/Qt6Test/Qt6TestVersionlessAliasTargets.cmake"
 	],
-	"CMAKE_SOURCE_DIR" : "/home/jop/work/NST/NST/BGA",
+	"CMAKE_SOURCE_DIR" : "/home/jop/work/NST/NST",
 	"CROSS_CONFIG" : false,
 	"DEP_FILE" : "/home/jop/work/NST/NST/BGA/tests/BGACoreTests_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "BGACoreTests_autogen/timestamp",
@@ -71,6 +71,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/BGA/tests/BGACoreTests_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
+		"APP_VERSION=\"0.5.1\"",
 		"QT_CORE_LIB",
 		"QT_NO_DEBUG",
 		"QT_TESTCASE_BUILDDIR=\"/home/jop/work/NST/NST/BGA/tests\"",
@@ -125,7 +126,7 @@
 	"PARALLEL" : 6,
 	"PARSE_CACHE_FILE" : "/home/jop/work/NST/NST/BGA/tests/CMakeFiles/BGACoreTests_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib64/qt6/libexec/moc",
-	"QT_UIC_EXECUTABLE" : "",
+	"QT_UIC_EXECUTABLE" : "/usr/lib64/qt6/libexec/uic",
 	"QT_VERSION_MAJOR" : 6,
 	"QT_VERSION_MINOR" : 10,
 	"SETTINGS_FILE" : "/home/jop/work/NST/NST/BGA/tests/CMakeFiles/BGACoreTests_autogen.dir/AutogenUsed.txt",

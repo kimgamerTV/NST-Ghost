@@ -8,7 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "" "tests/BGACoreTests_autogen/timestamp" "custom" "tests/BGACoreTests_autogen/deps"
+  "" "BGA/tests/BGACoreTests_autogen/timestamp" "custom" "BGA/tests/BGACoreTests_autogen/deps"
   )
 
 # Targets to which this target links which contain Fortran sources.

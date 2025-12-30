@@ -99,6 +99,14 @@ private slots:
     void processIncomingResults();
 
 private:
+    // Setup methods (constructor organization)
+    void initializeModels();
+    void initializeManagers();
+    void setupTableView();
+    void setupFileListView();
+    void connectManagerSignals();
+    void setupTimers();
+    
     void processNextTranslationJob();
     bool isLikelyCode(const QString &text) const;
 

@@ -9,6 +9,7 @@
 /home/jop/work/NST/NST/CMakeFiles/install/strip.dir
 /home/jop/work/NST/NST/CMakeFiles/NST_autogen_timestamp_deps.dir
 /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir
+/home/jop/work/NST/NST/BGA/CMakeFiles/bga_rust.dir
 /home/jop/work/NST/NST/BGA/CMakeFiles/BGACore.dir
 /home/jop/work/NST/NST/BGA/CMakeFiles/package.dir
 /home/jop/work/NST/NST/BGA/CMakeFiles/package_source.dir

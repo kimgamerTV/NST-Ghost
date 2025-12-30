@@ -121,7 +121,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.0\"",
+		"APP_VERSION=\"0.5.1\"",
 		"LuaTranslationPlugin_EXPORTS",
 		"QT_CORE_LIB",
 		"QT_NETWORK_LIB",
@@ -165,9 +165,9 @@
 	[
 		"/usr/lib64/ccache/c++",
 		"-std=gnu++20",
+		"-w",
 		"-dM",
 		"-E",
-		"-c",
 		"/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
 	],
 	"MOC_PREDEFS_FILE" : "/home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/moc_predefs.h",
