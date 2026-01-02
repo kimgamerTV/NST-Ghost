@@ -35,6 +35,8 @@ if (WIN32)
     )
 endif()
 
+message(STATUS "Configuring Injection: WIN32=${WIN32}")
+
 
 if (WIN32)
     target_link_libraries(Injection PRIVATE Qt${QT_VERSION_MAJOR}::Core ws2_32)
