@@ -1243,6 +1243,30 @@ src/ui/filetranslationwidget.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s
 .PHONY : src/ui/filetranslationwidget.cpp.s
 
+src/ui/imagetranslationwidget.o: src/ui/imagetranslationwidget.cpp.o
+.PHONY : src/ui/imagetranslationwidget.o
+
+# target to build an object file
+src/ui/imagetranslationwidget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o
+.PHONY : src/ui/imagetranslationwidget.cpp.o
+
+src/ui/imagetranslationwidget.i: src/ui/imagetranslationwidget.cpp.i
+.PHONY : src/ui/imagetranslationwidget.i
+
+# target to preprocess a source file
+src/ui/imagetranslationwidget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.i
+.PHONY : src/ui/imagetranslationwidget.cpp.i
+
+src/ui/imagetranslationwidget.s: src/ui/imagetranslationwidget.cpp.s
+.PHONY : src/ui/imagetranslationwidget.s
+
+# target to generate assembly for a file
+src/ui/imagetranslationwidget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.s
+.PHONY : src/ui/imagetranslationwidget.cpp.s
+
 src/ui/mainwindow.o: src/ui/mainwindow.cpp.o
 .PHONY : src/ui/mainwindow.o
 
@@ -1514,6 +1538,9 @@ help:
 	@echo "... src/ui/filetranslationwidget.o"
 	@echo "... src/ui/filetranslationwidget.i"
 	@echo "... src/ui/filetranslationwidget.s"
+	@echo "... src/ui/imagetranslationwidget.o"
+	@echo "... src/ui/imagetranslationwidget.i"
+	@echo "... src/ui/imagetranslationwidget.s"
 	@echo "... src/ui/mainwindow.o"
 	@echo "... src/ui/mainwindow.i"
 	@echo "... src/ui/mainwindow.s"

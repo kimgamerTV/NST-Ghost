@@ -57,6 +57,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o.d"
   "CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o"
   "CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o.d"
+  "CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o"
+  "CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o.d"
   "CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o"
   "CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o.d"
   "CMakeFiles/NST.dir/src/ui/menubar.cpp.o"

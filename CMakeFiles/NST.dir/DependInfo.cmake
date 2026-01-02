@@ -36,6 +36,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/jop/work/NST/NST/src/plugins/PluginManager.cpp" "CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o" "gcc" "CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o.d"
   "/home/jop/work/NST/NST/src/ui/customtitlebar.cpp" "CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o.d"
   "/home/jop/work/NST/NST/src/ui/filetranslationwidget.cpp" "CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o.d"
+  "/home/jop/work/NST/NST/src/ui/imagetranslationwidget.cpp" "CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o.d"
   "/home/jop/work/NST/NST/src/ui/mainwindow.cpp" "CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o.d"
   "/home/jop/work/NST/NST/src/ui/menubar.cpp" "CMakeFiles/NST.dir/src/ui/menubar.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/menubar.cpp.o.d"
   "/home/jop/work/NST/NST/src/ui/realtimetranslationwidget.cpp" "CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o" "gcc" "CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o.d"

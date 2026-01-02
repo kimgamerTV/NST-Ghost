@@ -83,6 +83,8 @@ set(PROJECT_SOURCES
     src/ui/customtitlebar.h
     src/ui/realtimetranslationwidget.cpp
     src/ui/realtimetranslationwidget.h
+    src/ui/imagetranslationwidget.cpp
+    src/ui/imagetranslationwidget.h
     src/ui/filetranslationwidget.cpp
     src/ui/filetranslationwidget.h
     src/ui/filetranslationwidget.ui

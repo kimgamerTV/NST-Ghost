@@ -73,12 +73,19 @@ MainWindow::MainWindow(QWidget *parent)
     m_stackedWidget->addWidget(m_fileTranslationWidget); 
     
     // Page 1: Real-time Translation Widget
+    // Page 1: Real-time Translation Widget
     m_realTimeWidget = new RealTimeTranslationWidget(this);
-    m_stackedWidget->addWidget(m_realTimeWidget);
+    m_stackedWidget->addWidget(m_realTimeWidget); // Index 1
+
+    // Page 2: Image Translation Widget
+    m_imageTranslationWidget = new ImageTranslationWidget(m_translationServiceManager, this);
+    m_imageTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi, 
+                                          m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
+    m_stackedWidget->addWidget(m_imageTranslationWidget); // Index 2
     
-    // Page 2: Relationship Widget
+    // Page 3: Relationship Widget
     m_relationshipWidget = new RelationshipWidget(this);
-    m_stackedWidget->addWidget(m_relationshipWidget);
+    m_stackedWidget->addWidget(m_relationshipWidget); // Index 3
     
     // Create a new container widget
     QWidget *mainContainer = new QWidget(this);
@@ -108,8 +115,11 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_titleBar, &CustomTitleBar::realTimeModeClicked, this, [this]() {
         onNavigationChanged(1);
     });
-    connect(m_titleBar, &CustomTitleBar::relationsModeClicked, this, [this]() {
+    connect(m_titleBar, &CustomTitleBar::imageTranslationClicked, this, [this]() {
         onNavigationChanged(2);
+    });
+    connect(m_titleBar, &CustomTitleBar::relationsModeClicked, this, [this]() {
+        onNavigationChanged(3);
     });
     
     // Enable mouse tracking for resizing and moving
@@ -289,6 +299,10 @@ void MainWindow::updateChildSettings()
     if (m_fileTranslationWidget) {
         m_fileTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi,
                                              m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
+    }
+    if (m_imageTranslationWidget) {
+        m_imageTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi,
+                                              m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
     }
 }
 

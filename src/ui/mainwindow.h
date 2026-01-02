@@ -9,6 +9,7 @@
 #include "customtitlebar.h"
 #include "realtimetranslationwidget.h"
 #include "filetranslationwidget.h"
+#include "imagetranslationwidget.h"
 #include "relationshipwidget.h"
 #include "settingsdialog.h"
 #include "updatecontroller.h"
@@ -69,6 +70,7 @@ private:
     // Widgets
     FileTranslationWidget *m_fileTranslationWidget;
     RealTimeTranslationWidget *m_realTimeWidget;
+    ImageTranslationWidget *m_imageTranslationWidget; // New Widget
     RelationshipWidget *m_relationshipWidget;
     
     // Managers / Controllers owned by MainWindow but shared/used by children

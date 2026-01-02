@@ -23,6 +23,7 @@ signals:
     void closeClicked();
     void translateModeClicked(); // Switch to File Translation
     void realTimeModeClicked();  // Switch to Real-time Translation
+    void imageTranslationClicked(); // Switch to Image Translation
     void relationsModeClicked(); // Switch to Relations View
 
 protected:
@@ -38,6 +39,7 @@ private:
     // Navigation Buttons
     QPushButton *m_fileTransButton;
     QPushButton *m_realTimeButton;
+    QPushButton *m_imageTransButton;
     QPushButton *m_relationsButton;
     
     // Window Controls

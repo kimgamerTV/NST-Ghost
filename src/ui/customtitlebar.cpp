@@ -30,7 +30,14 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     m_realTimeButton->setObjectName("navButton");
     m_realTimeButton->setText("Real-time");
     m_realTimeButton->setCheckable(true);
+    m_realTimeButton->setCheckable(true);
     m_realTimeButton->setCursor(Qt::PointingHandCursor);
+
+    m_imageTransButton = new QPushButton(this);
+    m_imageTransButton->setObjectName("navButton");
+    m_imageTransButton->setText("Image Trans");
+    m_imageTransButton->setCheckable(true);
+    m_imageTransButton->setCursor(Qt::PointingHandCursor);
 
     m_relationsButton = new QPushButton(this);
     m_relationsButton->setObjectName("navButton");
@@ -42,6 +49,7 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     QButtonGroup *navGroup = new QButtonGroup(this);
     navGroup->addButton(m_fileTransButton);
     navGroup->addButton(m_realTimeButton);
+    navGroup->addButton(m_imageTransButton);
     navGroup->addButton(m_relationsButton);
     navGroup->setExclusive(true);
     
@@ -70,6 +78,7 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     m_layout->addSpacing(20);
     m_layout->addWidget(m_fileTransButton);
     m_layout->addWidget(m_realTimeButton);
+    m_layout->addWidget(m_imageTransButton);
     m_layout->addWidget(m_relationsButton);
     m_layout->addStretch();
     m_layout->addWidget(m_minimizeButton);
@@ -86,6 +95,7 @@ CustomTitleBar::CustomTitleBar(QWidget *parent)
     
     connect(m_fileTransButton, &QPushButton::clicked, this, &CustomTitleBar::translateModeClicked);
     connect(m_realTimeButton, &QPushButton::clicked, this, &CustomTitleBar::realTimeModeClicked);
+    connect(m_imageTransButton, &QPushButton::clicked, this, &CustomTitleBar::imageTranslationClicked);
     connect(m_relationsButton, &QPushButton::clicked, this, &CustomTitleBar::relationsModeClicked);
 }
 

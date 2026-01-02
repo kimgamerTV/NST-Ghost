@@ -668,6 +668,12 @@
 			null
 		],
 		[
+			"/home/jop/work/NST/NST/src/ui/imagetranslationwidget.h",
+			"MU",
+			"YPKJ5OE7LN/moc_imagetranslationwidget.cpp",
+			null
+		],
+		[
 			"/home/jop/work/NST/NST/src/ui/mainwindow.h",
 			"MU",
 			"YPKJ5OE7LN/moc_mainwindow.cpp",
@@ -865,6 +871,11 @@
 		[ "/home/jop/work/NST/NST/src/plugins/PluginManager.cpp", "MU", null ],
 		[ "/home/jop/work/NST/NST/src/ui/customtitlebar.cpp", "MU", null ],
 		[ "/home/jop/work/NST/NST/src/ui/filetranslationwidget.cpp", "MU", null ],
+		[
+			"/home/jop/work/NST/NST/src/ui/imagetranslationwidget.cpp",
+			"MU",
+			null
+		],
 		[ "/home/jop/work/NST/NST/src/ui/mainwindow.cpp", "MU", null ],
 		[ "/home/jop/work/NST/NST/src/ui/menubar.cpp", "MU", null ],
 		[
