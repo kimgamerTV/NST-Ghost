@@ -37,6 +37,11 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
           cmake --build . --config Release --parallel
       
+      - name: Test
+        run: |
+          cd build
+          ctest -C Release --output-on-failure
+
       - name: Package
         run: |
           cd build

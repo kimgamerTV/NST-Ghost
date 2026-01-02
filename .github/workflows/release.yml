@@ -154,9 +154,16 @@ jobs:
     with:
       version: ${{ needs.check-version.outputs.version }}
 
+  build-macos:
+    needs: check-version
+    if: needs.check-version.outputs.should_build == 'true'
+    uses: ./.github/workflows/release-macos.yml
+    with:
+      version: ${{ needs.check-version.outputs.version }}
+
   create-release:
-    needs: [check-version, build-linux, build-windows]
-    if: always() && needs.check-version.outputs.should_build == 'true' && (needs.build-linux.result == 'success' || needs.build-windows.result == 'success')
+    needs: [check-version, build-linux, build-windows, build-macos]
+    if: always() && needs.check-version.outputs.should_build == 'true' && (needs.build-linux.result == 'success' || needs.build-windows.result == 'success' || needs.build-macos.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -180,6 +187,15 @@ jobs:
         with:
           path: artifacts
           pattern: NST-*-Windows-*
+          merge-multiple: false
+        continue-on-error: true
+
+      - name: Download macOS artifacts
+        if: needs.build-macos.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: NST-*-macOS-*
           merge-multiple: false
         continue-on-error: true
       
@@ -229,6 +245,9 @@ jobs:
           ### Windows
           - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
           
+          ### macOS
+          - NST-${VERSION}-macOS.dmg - macOS Universal (or Intel/Apple Silicon) package
+          
           ### Linux
           - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
           - NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
@@ -241,6 +260,11 @@ jobs:
           1. Download NST-${VERSION}-Windows-x64-MSVC.zip
           2. Extract the ZIP file
           3. Run NST.exe
+          
+          ### macOS
+          1. Download NST-${VERSION}-macOS.dmg
+          2. Open the DMG file
+          3. Drag NST to Applications
           
           ### Linux
           **tar.gz:**
@@ -296,7 +320,7 @@ jobs:
           
           # Use GitHub CLI for uploading (more reliable than curl for large files)
           shopt -s nullglob
-          files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb artifacts/*/*.rpm artifacts/*/*.AppImage)
+          files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb artifacts/*/*.rpm artifacts/*/*.AppImage artifacts/*/*.dmg)
           
           if [ ${#files[@]} -eq 0 ]; then
             echo "Warning: No artifacts found to upload"
@@ -358,6 +382,7 @@ jobs:
                 *.deb) content_type="application/vnd.debian.binary-package" ;;
                 *.rpm) content_type="application/x-rpm" ;;
                 *.AppImage) content_type="application/x-executable" ;;
+                *.dmg) content_type="application/x-apple-diskimage" ;;
               esac
               
               upload_url="https://uploads.github.com/repos/${REPO}/releases/${RELEASE_ID}/assets?name=$(printf %s "$filename" | jq -sRr @uri)"
@@ -395,7 +420,7 @@ jobs:
           fi
 
   cleanup:
-    needs: [check-version, build-linux, build-windows, create-release]
+    needs: [check-version, build-linux, build-windows, build-macos, create-release]
     if: always()
     runs-on: ubuntu-latest
     
@@ -414,6 +439,7 @@ jobs:
             echo "### Build Status" >> $GITHUB_STEP_SUMMARY
             echo "- Linux: ${{ needs.build-linux.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "- Windows: ${{ needs.build-windows.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+            echo "- macOS: ${{ needs.build-macos.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### Release" >> $GITHUB_STEP_SUMMARY
             echo "[View Release](https://github.com/${{ github.repository }}/releases/tag/${{ needs.check-version.outputs.version_tag }})" >> $GITHUB_STEP_SUMMARY

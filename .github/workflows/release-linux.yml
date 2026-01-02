@@ -78,6 +78,11 @@ jobs:
       - name: Build
         run: cmake --build build --config Release --parallel $(nproc)
       
+      - name: Test
+        run: |
+          cd build
+          ctest --output-on-failure
+      
       - name: Install to staging directory
         run: |
           mkdir -p AppDir/usr/bin

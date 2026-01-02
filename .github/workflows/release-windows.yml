@@ -63,6 +63,12 @@ jobs:
         run: cmake --build build --config Release --parallel 4
         shell: pwsh
       
+      - name: Test
+        run: |
+          cd build
+          ctest -C Release --output-on-failure
+        shell: pwsh
+      
       - name: Install to staging directory
         run: |
           $installPrefix = "${{ github.workspace }}\build\install"
