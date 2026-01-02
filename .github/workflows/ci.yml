@@ -133,7 +133,7 @@ jobs:
           -DSKIP_QT_DEPLOY=ON
 
     - name: Build
-      run: cmake --build build --config Debug --parallel %NUMBER_OF_PROCESSORS%
+      run: cmake --build build --config Debug --parallel $env:NUMBER_OF_PROCESSORS
 
     - name: Test
       working-directory: build
