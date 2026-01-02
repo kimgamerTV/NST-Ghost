@@ -17,18 +17,23 @@ add_library(Injection SHARED
   Injection_global.h
   injection.cpp
   injection.h
-  min_hook/buffer.h
-  min_hook/buffer.c
-  min_hook/hde/hde32.h
-  min_hook/hde/hde32.c
-  min_hook/hde/hde64.h
-  min_hook/hde/hde64.c
-  min_hook/hook.c
-  min_hook/trampoline.h
-  min_hook/trampoline.c
-  min_hook/MinHook.h
   ${TS_FILES}
 )
+
+if (WIN32)
+    target_sources(Injection PRIVATE
+        min_hook/buffer.h
+        min_hook/buffer.c
+        min_hook/hde/hde32.h
+        min_hook/hde/hde32.c
+        min_hook/hde/hde64.h
+        min_hook/hde/hde64.c
+        min_hook/hook.c
+        min_hook/trampoline.h
+        min_hook/trampoline.c
+        min_hook/MinHook.h
+    )
+endif()
 
 
 if (WIN32)
