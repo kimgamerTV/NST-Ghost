@@ -1,4 +1,4 @@
-CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o: \
+BGA/CMakeFiles/BGACore.dir/core/src/engines/unity/unityanalyzer.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/engines/unity/unityanalyzer.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/engines/unity/unityanalyzer.h \

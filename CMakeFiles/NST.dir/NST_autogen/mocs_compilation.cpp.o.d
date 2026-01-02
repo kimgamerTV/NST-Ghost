@@ -1,8 +1,8 @@
 CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /home/jop/work/NST/NST/NST_autogen/mocs_compilation.cpp \
  /usr/include/stdc-predef.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_bgadatamanager.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/bgadatamanager.h \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/moc_searchcontroller.cpp \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/../../src/controllers/searchcontroller.h \
  /usr/include/qt6/QtCore/QObject /usr/include/qt6/QtCore/qobject.h \
  /usr/include/qt6/QtCore/qobjectdefs.h \
  /usr/include/qt6/QtCore/qnamespace.h /usr/include/qt6/QtCore/qglobal.h \
@@ -326,8 +326,6 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/c++/15/bits/sstream.tcc \
  /usr/include/c++/15/bits/chrono_io.h /usr/include/c++/15/iomanip \
  /usr/include/c++/15/bits/quoted_string.h \
- /usr/include/qt6/QtCore/QStringList \
- /usr/include/qt6/QtCore/qstringlist.h \
  /usr/include/qt6/QtGui/QStandardItemModel \
  /usr/include/qt6/QtGui/qstandarditemmodel.h \
  /usr/include/qt6/QtGui/qtguiglobal.h \
@@ -362,111 +360,43 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/c++/15/cassert /usr/include/qt6/QtCore/q20iterator.h \
  /usr/include/qt6/QtCore/qline.h /usr/include/qt6/QtGui/qpixmap.h \
  /usr/include/qt6/QtGui/qfont.h /usr/include/qt6/QtCore/qendian.h \
- /usr/include/qt6/QtGui/qicon.h /usr/include/qt6/QtCore/QMap \
- /usr/include/qt6/QtCore/qmap.h /usr/include/qt6/QtCore/QPair \
- /usr/include/qt6/QtCore/qpair.h /usr/include/qt6/QtCore/QJsonArray \
- /usr/include/qt6/QtCore/qjsonarray.h \
- /usr/include/qt6/QtCore/qjsonvalue.h \
- /usr/include/qt6/QtCore/qcborvalue.h \
- /usr/include/qt6/QtCore/qcborcommon.h \
- /usr/include/qt6/QtCore/qdatetime.h /usr/include/qt6/QtCore/qcalendar.h \
- /usr/include/qt6/QtCore/qlocale.h \
- /usr/include/qt6/QtCore/qregularexpression.h \
- /usr/include/qt6/QtCore/qurl.h /usr/include/qt6/QtCore/quuid.h \
- /usr/include/qt6/QtCore/qjsondocument.h \
- /usr/include/qt6/QtCore/qjsonparseerror.h \
- /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
- /usr/include/qt6/QtCore/QByteArray /usr/include/qt6/QtCore/qbytearray.h \
- /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/qstring.h \
- /usr/include/qt6/QtCore/QJsonArray \
- /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
- /usr/include/qt6/QtCore/QStringList \
- /usr/include/qt6/QtCore/qtmochelpers.h \
- /usr/include/qt6/QtCore/qtmocconstants.h \
- /usr/include/qt6/QtCore/q20algorithm.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_customprogressdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/customprogressdialog.h \
- /usr/include/qt6/QtWidgets/QDialog /usr/include/qt6/QtWidgets/qdialog.h \
+ /usr/include/qt6/QtGui/qicon.h /usr/include/qt6/QtWidgets/QTableView \
+ /usr/include/qt6/QtWidgets/qtableview.h \
  /usr/include/qt6/QtWidgets/qtwidgetsglobal.h \
  /usr/include/qt6/QtWidgets/qtwidgets-config.h \
  /usr/include/qt6/QtWidgets/qtwidgetsexports.h \
- /usr/include/qt6/QtWidgets/qwidget.h /usr/include/qt6/QtGui/qaction.h \
- /usr/include/qt6/QtGui/qkeysequence.h /usr/include/qt6/QtGui/qpalette.h \
- /usr/include/qt6/QtGui/qfontmetrics.h /usr/include/qt6/QtGui/qfontinfo.h \
+ /usr/include/qt6/QtWidgets/qabstractitemview.h \
+ /usr/include/qt6/QtWidgets/qabstractscrollarea.h \
+ /usr/include/qt6/QtWidgets/qframe.h /usr/include/qt6/QtWidgets/qwidget.h \
+ /usr/include/qt6/QtGui/qaction.h /usr/include/qt6/QtGui/qkeysequence.h \
+ /usr/include/qt6/QtGui/qpalette.h /usr/include/qt6/QtGui/qfontmetrics.h \
+ /usr/include/qt6/QtGui/qfontinfo.h \
  /usr/include/qt6/QtGui/qfontvariableaxis.h \
  /usr/include/qt6/QtWidgets/qsizepolicy.h \
  /usr/include/qt6/QtGui/qcursor.h /usr/include/qt6/QtGui/qbitmap.h \
- /usr/include/qt6/QtWidgets/QProgressBar \
- /usr/include/qt6/QtWidgets/qprogressbar.h \
- /usr/include/qt6/QtWidgets/qframe.h /usr/include/qt6/QtWidgets/QLabel \
- /usr/include/qt6/QtWidgets/qlabel.h /usr/include/qt6/QtGui/qpicture.h \
- /usr/include/qt6/QtCore/qiodevice.h \
- /usr/include/qt6/QtGui/qtextdocument.h \
- /usr/include/qt6/QtWidgets/QPushButton \
- /usr/include/qt6/QtWidgets/qpushbutton.h \
- /usr/include/qt6/QtWidgets/qabstractbutton.h \
- /usr/include/qt6/QtWidgets/QVBoxLayout \
- /usr/include/qt6/QtWidgets/qboxlayout.h \
- /usr/include/qt6/QtWidgets/qlayout.h \
- /usr/include/qt6/QtWidgets/qlayoutitem.h \
- /usr/include/qt6/QtWidgets/qboxlayout.h \
- /usr/include/qt6/QtWidgets/qgridlayout.h \
- /usr/include/qt6/QtGui/qtextcursor.h \
- /usr/include/qt6/QtGui/qtextformat.h /usr/include/qt6/QtGui/qpen.h \
- /usr/include/qt6/QtGui/qtextoption.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_customtitlebar.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/customtitlebar.h \
- /usr/include/qt6/QtWidgets/QWidget /usr/include/qt6/QtWidgets/qwidget.h \
- /usr/include/qt6/QtWidgets/QHBoxLayout \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_filetranslationwidget.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/filetranslationwidget.h \
- /usr/include/qt6/QtCore/QFutureWatcher \
- /usr/include/qt6/QtCore/qfuturewatcher.h \
- /usr/include/qt6/QtCore/qfuture.h \
- /usr/include/qt6/QtCore/qfutureinterface.h \
- /usr/include/qt6/QtCore/qmutex.h \
- /usr/include/qt6/QtCore/qdeadlinetimer.h \
- /usr/include/qt6/QtCore/qtsan_impl.h \
- /usr/include/qt6/QtCore/qresultstore.h \
- /usr/include/qt6/QtCore/qfuture_impl.h \
- /usr/include/qt6/QtCore/qthreadpool.h /usr/include/qt6/QtCore/qthread.h \
- /usr/include/c++/15/future /usr/include/c++/15/mutex \
- /usr/include/c++/15/bits/unique_lock.h \
- /usr/include/c++/15/condition_variable /usr/include/c++/15/stop_token \
- /usr/include/c++/15/bits/std_thread.h /usr/include/c++/15/semaphore \
- /usr/include/c++/15/bits/semaphore_base.h \
- /usr/include/c++/15/bits/atomic_timed_wait.h \
- /usr/include/c++/15/bits/this_thread_sleep.h /usr/include/sys/time.h \
- /usr/include/semaphore.h /usr/include/bits/semaphore.h \
- /usr/include/c++/15/bits/atomic_futex.h \
- /usr/include/qt6/QtCore/qrunnable.h /usr/include/qt6/QtCore/qexception.h \
- /usr/include/qt6/QtCore/qpromise.h \
- /usr/include/qt6/QtWidgets/QProgressDialog \
- /usr/include/qt6/QtWidgets/qprogressdialog.h \
- /usr/include/qt6/QtWidgets/qdialog.h /usr/include/qt6/QtCore/QTimer \
- /usr/include/qt6/QtCore/qtimer.h /usr/include/qt6/QtCore/qbasictimer.h \
- /usr/include/qt6/QtCore/qabstracteventdispatcher.h \
- /usr/include/qt6/QtCore/qeventloop.h /usr/include/qt6/QtCore/QQueue \
- /usr/include/qt6/QtCore/qqueue.h /usr/include/qt6/QtCore/QMultiMap \
- /usr/include/qt6/QtCore/QJsonObject \
- /usr/include/qt6/QtCore/qjsonobject.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/customprogressdialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/searchcontroller.h \
- /usr/include/qt6/QtWidgets/QTableView \
- /usr/include/qt6/QtWidgets/qtableview.h \
- /usr/include/qt6/QtWidgets/qabstractitemview.h \
- /usr/include/qt6/QtWidgets/qabstractscrollarea.h \
  /usr/include/qt6/QtCore/qitemselectionmodel.h \
  /usr/include/qt6/QtWidgets/qabstractitemdelegate.h \
  /usr/include/qt6/QtWidgets/qstyleoption.h \
+ /usr/include/qt6/QtCore/qlocale.h \
  /usr/include/qt6/QtWidgets/qabstractspinbox.h \
- /usr/include/qt6/QtGui/qvalidator.h /usr/include/qt6/QtWidgets/qslider.h \
+ /usr/include/qt6/QtGui/qvalidator.h \
+ /usr/include/qt6/QtCore/qregularexpression.h \
+ /usr/include/qt6/QtWidgets/qslider.h \
  /usr/include/qt6/QtWidgets/qabstractslider.h \
  /usr/include/qt6/QtWidgets/qstyle.h /usr/include/qt6/QtWidgets/qtabbar.h \
  /usr/include/qt6/QtWidgets/qtabwidget.h \
  /usr/include/qt6/QtWidgets/qrubberband.h \
- /usr/include/qt6/QtCore/QStringListModel \
- /usr/include/qt6/QtCore/qstringlistmodel.h \
+ /usr/include/qt6/QtCore/QJsonArray /usr/include/qt6/QtCore/qjsonarray.h \
+ /usr/include/qt6/QtCore/qjsonvalue.h \
+ /usr/include/qt6/QtCore/qcborvalue.h \
+ /usr/include/qt6/QtCore/qcborcommon.h \
+ /usr/include/qt6/QtCore/qdatetime.h /usr/include/qt6/QtCore/qcalendar.h \
+ /usr/include/qt6/QtCore/qurl.h /usr/include/qt6/QtCore/quuid.h \
+ /usr/include/qt6/QtCore/qjsondocument.h \
+ /usr/include/qt6/QtCore/qjsonparseerror.h /usr/include/qt6/QtCore/QMap \
+ /usr/include/qt6/QtCore/qmap.h /usr/include/qt6/QtCore/QStringListModel \
+ /usr/include/qt6/QtCore/qstringlistmodel.h /usr/include/qt6/QtCore/QPair \
+ /usr/include/qt6/QtCore/qpair.h \
  /usr/include/qt6/QtConcurrent/QtConcurrent \
  /usr/include/qt6/QtConcurrent/QtConcurrentDepends \
  /usr/include/qt6/QtCore/QtCore /usr/include/qt6/QtCore/QtCoreDepends \
@@ -484,6 +414,8 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/q26numeric.h \
  /usr/include/qt6/QtCore/qabstractanimation.h \
  /usr/include/qt6/QtCore/qabstracteventdispatcher.h \
+ /usr/include/qt6/QtCore/qeventloop.h \
+ /usr/include/qt6/QtCore/qdeadlinetimer.h \
  /usr/include/qt6/QtCore/qabstractitemmodel.h \
  /usr/include/qt6/QtCore/qabstractnativeeventfilter.h \
  /usr/include/qt6/QtCore/qabstractproxymodel.h \
@@ -493,8 +425,11 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qanystringview.h \
  /usr/include/qt6/QtCore/qapplicationstatic.h \
  /usr/include/qt6/QtCore/QMutex /usr/include/qt6/QtCore/qmutex.h \
+ /usr/include/qt6/QtCore/qtsan_impl.h \
  /usr/include/qt6/QtCore/qcoreapplication.h \
  /usr/include/qt6/QtCore/qcoreevent.h \
+ /usr/include/qt6/QtCore/qbasictimer.h \
+ /usr/include/qt6/QtCore/qabstracteventdispatcher.h \
  /usr/include/qt6/QtCore/qnativeinterface.h \
  /usr/include/qt6/QtCore/qcoreapplication_platform.h \
  /usr/include/qt6/QtCore/qarraydata.h \
@@ -507,9 +442,11 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qbasictimer.h \
  /usr/include/qt6/QtCore/qbindingstorage.h \
  /usr/include/qt6/QtCore/qbitarray.h /usr/include/qt6/QtCore/qbuffer.h \
+ /usr/include/qt6/QtCore/qiodevice.h /usr/include/qt6/QtCore/qbytearray.h \
  /usr/include/qt6/QtCore/qbytearrayalgorithms.h \
  /usr/include/qt6/QtCore/qbytearraylist.h \
  /usr/include/qt6/QtCore/qbytearraymatcher.h \
+ /usr/include/qt6/QtCore/q20algorithm.h \
  /usr/include/qt6/QtCore/qbytearrayview.h \
  /usr/include/qt6/QtCore/qcache.h /usr/include/qt6/QtCore/qcalendar.h \
  /usr/include/qt6/QtCore/qcborarray.h \
@@ -561,12 +498,31 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qfile.h /usr/include/qt6/QtCore/qfiledevice.h \
  /usr/include/qt6/QtCore/qfileinfo.h \
  /usr/include/qt6/QtCore/qfileselector.h /usr/include/qt6/QtCore/QObject \
+ /usr/include/qt6/QtCore/QStringList \
+ /usr/include/qt6/QtCore/qstringlist.h \
  /usr/include/qt6/QtCore/qfilesystemwatcher.h \
  /usr/include/qt6/QtCore/qflags.h /usr/include/qt6/QtCore/qforeach.h \
  /usr/include/qt6/QtCore/qfunctionpointer.h \
  /usr/include/qt6/QtCore/qfuture.h \
  /usr/include/qt6/QtCore/qfutureinterface.h \
+ /usr/include/qt6/QtCore/qmutex.h /usr/include/qt6/QtCore/qresultstore.h \
+ /usr/include/qt6/QtCore/qfuture_impl.h \
+ /usr/include/qt6/QtCore/qthreadpool.h /usr/include/qt6/QtCore/qthread.h \
+ /usr/include/c++/15/future /usr/include/c++/15/mutex \
+ /usr/include/c++/15/bits/unique_lock.h \
+ /usr/include/c++/15/condition_variable /usr/include/c++/15/stop_token \
+ /usr/include/c++/15/bits/std_thread.h /usr/include/c++/15/semaphore \
+ /usr/include/c++/15/bits/semaphore_base.h \
+ /usr/include/c++/15/bits/atomic_timed_wait.h \
+ /usr/include/c++/15/bits/this_thread_sleep.h /usr/include/sys/time.h \
+ /usr/include/semaphore.h /usr/include/bits/semaphore.h \
+ /usr/include/c++/15/bits/atomic_futex.h \
+ /usr/include/qt6/QtCore/qrunnable.h /usr/include/qt6/QtCore/qexception.h \
+ /usr/include/qt6/QtCore/qpromise.h \
+ /usr/include/qt6/QtCore/qfutureinterface.h \
  /usr/include/qt6/QtCore/qfuturesynchronizer.h \
+ /usr/include/qt6/QtCore/qfuture.h \
+ /usr/include/qt6/QtCore/qfuturewatcher.h \
  /usr/include/qt6/QtCore/qgenericatomic.h \
  /usr/include/qt6/QtCore/qglobalstatic.h /usr/include/qt6/QtCore/qhash.h \
  /usr/include/qt6/QtCore/qhashfunctions.h \
@@ -577,6 +533,7 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qitemselectionmodel.h \
  /usr/include/qt6/QtCore/qiterable.h /usr/include/qt6/QtCore/qiterator.h \
  /usr/include/qt6/QtCore/qjsondocument.h \
+ /usr/include/qt6/QtCore/qjsonobject.h \
  /usr/include/qt6/QtCore/qjsonparseerror.h \
  /usr/include/qt6/QtCore/qjsonvalue.h \
  /usr/include/qt6/QtCore/qlatin1stringmatcher.h \
@@ -619,8 +576,8 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qvariantanimation.h \
  /usr/include/qt6/QtCore/qeasingcurve.h \
  /usr/include/qt6/QtCore/qpropertyprivate.h \
- /usr/include/qt6/QtCore/qrandom.h /usr/include/c++/15/random \
- /usr/include/c++/15/bits/random.h \
+ /usr/include/qt6/QtCore/qqueue.h /usr/include/qt6/QtCore/qrandom.h \
+ /usr/include/c++/15/random /usr/include/c++/15/bits/random.h \
  /usr/include/c++/15/x86_64-redhat-linux/bits/opt_random.h \
  /usr/include/c++/15/bits/random.tcc \
  /usr/include/qt6/QtCore/qrangemodel.h \
@@ -765,7 +722,7 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qstaticlatin1stringmatcher.h \
  /usr/include/qt6/QtCore/qlatin1stringmatcher.h \
  /usr/include/qt6/QtCore/qstdlibdetection.h \
- /usr/include/qt6/QtCore/qstorageinfo.h \
+ /usr/include/qt6/QtCore/qstorageinfo.h /usr/include/qt6/QtCore/qstring.h \
  /usr/include/qt6/QtCore/qstringalgorithms.h \
  /usr/include/qt6/QtCore/qstringbuilder.h \
  /usr/include/qt6/QtCore/qstringconverter.h \
@@ -790,7 +747,8 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/qtextstream.h /usr/include/qt6/QtCore/qthread.h \
  /usr/include/qt6/QtCore/qthreadpool.h \
  /usr/include/qt6/QtCore/qthreadstorage.h \
- /usr/include/qt6/QtCore/qtimeline.h /usr/include/qt6/QtCore/qtimezone.h \
+ /usr/include/qt6/QtCore/qtimeline.h /usr/include/qt6/QtCore/qtimer.h \
+ /usr/include/qt6/QtCore/qtimezone.h \
  /usr/include/qt6/QtCore/qtipccommon.h \
  /usr/include/qt6/QtCore/qtmetamacros.h \
  /usr/include/qt6/QtCore/qtmocconstants.h \
@@ -811,9 +769,10 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtCore/quuid.h /usr/include/qt6/QtCore/qvariant.h \
  /usr/include/qt6/QtCore/qvariantanimation.h \
  /usr/include/qt6/QtCore/qvarianthash.h /usr/include/qt6/QtCore/QHash \
- /usr/include/qt6/QtCore/QVariant /usr/include/qt6/QtCore/qvariantlist.h \
- /usr/include/qt6/QtCore/QList /usr/include/qt6/QtCore/qvariantmap.h \
- /usr/include/qt6/QtCore/QMap /usr/include/qt6/QtCore/qvarlengtharray.h \
+ /usr/include/qt6/QtCore/QVariant /usr/include/qt6/QtCore/QString \
+ /usr/include/qt6/QtCore/qvariantlist.h /usr/include/qt6/QtCore/QList \
+ /usr/include/qt6/QtCore/qvariantmap.h /usr/include/qt6/QtCore/QMap \
+ /usr/include/qt6/QtCore/qvarlengtharray.h \
  /usr/include/qt6/QtCore/qvector.h \
  /usr/include/qt6/QtCore/qversionnumber.h \
  /usr/include/qt6/QtCore/qwaitcondition.h \
@@ -854,14 +813,104 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtConcurrent/qtaskbuilder.h \
  /usr/include/qt6/QtConcurrent/qtconcurrentthreadengine.h \
  /usr/include/qt6/QtConcurrent/qtconcurrentversion.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/searchdialog.h \
+ /usr/include/qt6/QtCore/qtmochelpers.h \
+ /usr/include/qt6/QtCore/qtmocconstants.h \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/moc_shortcutcontroller.cpp \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/../../src/controllers/shortcutcontroller.h \
+ /usr/include/qt6/QtGui/QShortcut /usr/include/qt6/QtGui/qshortcut.h \
+ /usr/include/qt6/QtWidgets/QMainWindow \
+ /usr/include/qt6/QtWidgets/qmainwindow.h \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/moc_updatecontroller.cpp \
+ /home/jop/work/NST/NST/NST_autogen/METKDVI4SS/../../src/controllers/updatecontroller.h \
+ /usr/include/qt6/QtNetwork/QNetworkAccessManager \
+ /usr/include/qt6/QtNetwork/qnetworkaccessmanager.h \
+ /usr/include/qt6/QtNetwork/qtnetworkglobal.h \
+ /usr/include/qt6/QtNetwork/qtnetwork-config.h \
+ /usr/include/qt6/QtNetwork/qtnetworkexports.h \
+ /usr/include/qt6/QtNetwork/qnetworkrequest.h \
+ /usr/include/qt6/QtNetwork/qhttpheaders.h \
+ /usr/include/qt6/QtCore/QSharedDataPointer /usr/include/qt6/QtCore/QUrl \
+ /usr/include/qt6/QtCore/q26numeric.h \
+ /usr/include/qt6/QtNetwork/QSslConfiguration \
+ /usr/include/qt6/QtNetwork/qsslconfiguration.h \
+ /usr/include/qt6/QtNetwork/qsslsocket.h \
+ /usr/include/qt6/QtNetwork/qtcpsocket.h \
+ /usr/include/qt6/QtNetwork/qabstractsocket.h \
+ /usr/include/qt6/QtNetwork/qhostaddress.h \
+ /usr/include/qt6/QtNetwork/qsslerror.h \
+ /usr/include/qt6/QtNetwork/qsslcertificate.h \
+ /usr/include/qt6/QtNetwork/qssl.h /usr/include/qt6/QtCore/QFlags \
+ /usr/include/qt6/QtNetwork/QSslPreSharedKeyAuthenticator \
+ /usr/include/qt6/QtNetwork/qsslpresharedkeyauthenticator.h \
+ /usr/include/qt6/QtCore/QMetaType /usr/include/qt6/QtNetwork/QSslError \
+ /usr/include/qt6/QtNetwork/qsslerror.h \
+ /home/jop/work/NST/NST/NST_autogen/PRMOGMWJPH/moc_translationserver.cpp \
+ /home/jop/work/NST/NST/NST_autogen/PRMOGMWJPH/../../src/core/translationserver.h \
+ /usr/include/qt6/QtNetwork/QTcpServer \
+ /usr/include/qt6/QtNetwork/qtcpserver.h \
+ /usr/include/qt6/QtNetwork/QTcpSocket \
+ /usr/include/qt6/QtNetwork/qtcpsocket.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_customprogressdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/customprogressdialog.h \
+ /usr/include/qt6/QtWidgets/QDialog /usr/include/qt6/QtWidgets/qdialog.h \
+ /usr/include/qt6/QtWidgets/QProgressBar \
+ /usr/include/qt6/QtWidgets/qprogressbar.h \
+ /usr/include/qt6/QtWidgets/QLabel /usr/include/qt6/QtWidgets/qlabel.h \
+ /usr/include/qt6/QtGui/qpicture.h /usr/include/qt6/QtGui/qtextdocument.h \
+ /usr/include/qt6/QtWidgets/QPushButton \
+ /usr/include/qt6/QtWidgets/qpushbutton.h \
+ /usr/include/qt6/QtWidgets/qabstractbutton.h \
+ /usr/include/qt6/QtWidgets/QVBoxLayout \
+ /usr/include/qt6/QtWidgets/qboxlayout.h \
+ /usr/include/qt6/QtWidgets/qlayout.h \
+ /usr/include/qt6/QtWidgets/qlayoutitem.h \
+ /usr/include/qt6/QtWidgets/qboxlayout.h \
+ /usr/include/qt6/QtWidgets/qgridlayout.h \
+ /usr/include/qt6/QtGui/qtextcursor.h \
+ /usr/include/qt6/QtGui/qtextformat.h /usr/include/qt6/QtGui/qpen.h \
+ /usr/include/qt6/QtGui/qtextoption.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_fontmanagerdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/fontmanagerdialog.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_loadprojectdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/loadprojectdialog.h \
+ /usr/include/qt6/QtCore/QStringList \
+ /usr/include/qt6/QtWidgets/QButtonGroup \
+ /usr/include/qt6/QtWidgets/qbuttongroup.h \
+ /usr/include/qt6/QtWidgets/QFrame /usr/include/qt6/QtWidgets/qframe.h \
+ /usr/include/qt6/QtWidgets/QScrollArea \
+ /usr/include/qt6/QtWidgets/qscrollarea.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_plugindebuggerdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/plugindebuggerdialog.h \
+ /usr/include/qt6/QtWidgets/QComboBox \
+ /usr/include/qt6/QtWidgets/qcombobox.h \
+ /usr/include/qt6/QtWidgets/QTextEdit \
+ /usr/include/qt6/QtWidgets/qtextedit.h \
+ /usr/include/qt6/QtWidgets/QHBoxLayout \
+ /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/luatranslationservice.h \
+ /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservice.h \
+ /home/jop/work/NST/NST/QtLingo/QtLingo_global.h \
+ /usr/include/qt6/QtCore/QString /usr/include/qt6/QtCore/QThread \
+ /usr/include/qt6/QtCore/QMutex /usr/include/lua.hpp /usr/include/lua.h \
+ /usr/include/luaconf.h /usr/include/luaconf-x86_64.h \
+ /usr/include/lualib.h /usr/include/lauxlib.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_pluginmanagerdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/pluginmanagerdialog.h \
+ /usr/include/qt6/QtWidgets/QListWidget \
+ /usr/include/qt6/QtWidgets/qlistwidget.h \
+ /usr/include/qt6/QtWidgets/qlistview.h \
+ /usr/include/qt6/QtWidgets/QCheckBox \
+ /usr/include/qt6/QtWidgets/qcheckbox.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_processselectordialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/processselectordialog.h \
  /usr/include/qt6/QtWidgets/QLineEdit \
  /usr/include/qt6/QtWidgets/qlineedit.h \
- /usr/include/qt6/QtWidgets/QTreeWidget \
- /usr/include/qt6/QtWidgets/qtreewidget.h \
- /usr/include/qt6/QtWidgets/qtreeview.h \
- /usr/include/qt6/QtWidgets/qtreewidgetitemiterator.h \
- /usr/include/qt6/QtGui/QKeyEvent /usr/include/qt6/QtGui/qevent.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_scripteditordialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/scripteditordialog.h \
+ /usr/include/qt6/QtWidgets/QPlainTextEdit \
+ /usr/include/qt6/QtWidgets/qplaintextedit.h \
+ /usr/include/qt6/QtWidgets/qtextedit.h \
+ /usr/include/qt6/QtGui/qabstracttextdocumentlayout.h \
+ /usr/include/qt6/QtGui/qtextlayout.h /usr/include/qt6/QtGui/qevent.h \
  /usr/include/qt6/QtGui/qeventpoint.h /usr/include/qt6/QtGui/qvector2d.h \
  /usr/include/qt6/QtGui/qvectornd.h \
  /usr/include/qt6/QtGui/qpointingdevice.h \
@@ -873,20 +922,30 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/qt6/QtGui/qguiapplication.h \
  /usr/include/qt6/QtGui/qinputmethod.h \
  /usr/include/qt6/QtGui/qguiapplication_platform.h \
+ /usr/include/qt6/QtGui/qglyphrun.h /usr/include/qt6/QtGui/qrawfont.h \
+ /usr/include/qt6/QtGui/qfontdatabase.h \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_searchdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/searchdialog.h \
+ /usr/include/qt6/QtWidgets/QTreeWidget \
+ /usr/include/qt6/QtWidgets/qtreewidget.h \
+ /usr/include/qt6/QtWidgets/qtreeview.h \
+ /usr/include/qt6/QtWidgets/qtreewidgetitemiterator.h \
+ /usr/include/qt6/QtGui/QKeyEvent /usr/include/qt6/QtGui/qevent.h \
  /usr/include/qt6/QtCore/QPropertyAnimation \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/shortcutcontroller.h \
- /usr/include/qt6/QtGui/QShortcut /usr/include/qt6/QtGui/qshortcut.h \
- /usr/include/qt6/QtWidgets/QMainWindow \
- /usr/include/qt6/QtWidgets/qmainwindow.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/bgadatamanager.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/translationservicemanager.h \
- /usr/include/qt6/QtCore/QList /usr/include/qt6/QtCore/QPointer \
- /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservice.h \
- /home/jop/work/NST/NST/QtLingo/QtLingo_global.h \
- /usr/include/qt6/QtCore/QString \
- /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservicefactory.h \
- /usr/include/qt6/QtCore/QVariantMap \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/smartfiltermanager.h \
+ /usr/include/qt6/QtCore/QTimer \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/moc_settingsdialog.cpp \
+ /home/jop/work/NST/NST/NST_autogen/RGRURCYE3Z/../../src/dialogs/settingsdialog.h \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/moc_bgadatamanager.cpp \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/../../src/managers/bgadatamanager.h \
+ /home/jop/work/NST/NST/BGA/core/include/core/gameanalyzer.h \
+ /usr/include/qt6/QtCore/QByteArray /usr/include/qt6/QtCore/QJsonArray \
+ /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/moc_projectdatamanager.cpp \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/../../src/managers/projectdatamanager.h \
+ /usr/include/qt6/QtCore/QJsonObject \
+ /usr/include/qt6/QtCore/QFutureWatcher /usr/include/qt6/QtCore/QSet \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/moc_smartfiltermanager.cpp \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/../../src/managers/smartfiltermanager.h \
  /usr/include/qt6/QtCore/QRegularExpression \
  /usr/include/qt6/QtCore/QSettings /usr/include/pybind11/embed.h \
  /usr/include/pybind11/pybind11.h /usr/include/pybind11/detail/class.h \
@@ -1020,100 +1079,12 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /usr/include/pybind11/detail/init.h /usr/include/pybind11/gil.h \
  /usr/include/pybind11/gil_safe_call_once.h \
  /usr/include/pybind11/typing.h /usr/include/pybind11/eval.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/projectdatamanager.h \
- /usr/include/qt6/QtCore/QSet \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_fontmanagerdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/fontmanagerdialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_loadprojectdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/loadprojectdialog.h \
- /usr/include/qt6/QtWidgets/QButtonGroup \
- /usr/include/qt6/QtWidgets/qbuttongroup.h \
- /usr/include/qt6/QtWidgets/QFrame /usr/include/qt6/QtWidgets/qframe.h \
- /usr/include/qt6/QtWidgets/QScrollArea \
- /usr/include/qt6/QtWidgets/qscrollarea.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_mainwindow.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/mainwindow.h \
- /usr/include/qt6/QtWidgets/QStackedWidget \
- /usr/include/qt6/QtWidgets/qstackedwidget.h \
- /usr/include/qt6/QtCore/QSharedPointer \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/menubar.h \
- /usr/include/qt6/QtWidgets/QMenuBar \
- /usr/include/qt6/QtWidgets/qmenubar.h /usr/include/qt6/QtWidgets/qmenu.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/customtitlebar.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/realtimetranslationwidget.h \
- /usr/include/qt6/QtWidgets/QSpinBox \
- /usr/include/qt6/QtWidgets/qspinbox.h \
- /usr/include/qt6/QtWidgets/QTextEdit \
- /usr/include/qt6/QtWidgets/qtextedit.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/translationserver.h \
- /usr/include/qt6/QtNetwork/QTcpServer \
- /usr/include/qt6/QtNetwork/qtcpserver.h \
- /usr/include/qt6/QtNetwork/qtnetworkglobal.h \
- /usr/include/qt6/QtNetwork/qtnetwork-config.h \
- /usr/include/qt6/QtNetwork/qtnetworkexports.h \
- /usr/include/qt6/QtNetwork/qabstractsocket.h \
- /usr/include/qt6/QtNetwork/qhostaddress.h \
- /usr/include/qt6/QtNetwork/QTcpSocket \
- /usr/include/qt6/QtNetwork/qtcpsocket.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/filetranslationwidget.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/relationshipwidget.h \
- /usr/include/qt6/QtWidgets/QSlider /usr/include/qt6/QtWidgets/qslider.h \
- /usr/include/qt6/QtWidgets/QGraphicsView \
- /usr/include/qt6/QtWidgets/qgraphicsview.h \
- /usr/include/qt6/QtGui/qpainter.h \
- /usr/include/qt6/QtWidgets/qscrollarea.h \
- /usr/include/qt6/QtWidgets/qgraphicsscene.h \
- /usr/include/qt6/QtWidgets/QGraphicsScene \
- /usr/include/qt6/QtWidgets/qgraphicsscene.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/relationitem.h \
- /usr/include/qt6/QtWidgets/QGraphicsObject \
- /usr/include/qt6/QtWidgets/qgraphicsitem.h \
- /usr/include/qt6/QtGui/qpainterpath.h \
- /usr/include/qt6/QtWidgets/QGraphicsLineItem /usr/include/qt6/QtGui/QPen \
- /usr/include/qt6/QtGui/qpen.h /usr/include/qt6/QtGui/QBrush \
- /usr/include/qt6/QtGui/qbrush.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/rpgrelationanalyzer.h \
- /usr/include/qt6/QtCore/QJsonDocument /usr/include/qt6/QtCore/QFile \
- /usr/include/qt6/QtCore/QDebug \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/settingsdialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/updatecontroller.h \
- /usr/include/qt6/QtNetwork/QNetworkAccessManager \
- /usr/include/qt6/QtNetwork/qnetworkaccessmanager.h \
- /usr/include/qt6/QtNetwork/qnetworkrequest.h \
- /usr/include/qt6/QtNetwork/qhttpheaders.h \
- /usr/include/qt6/QtCore/QSharedDataPointer /usr/include/qt6/QtCore/QUrl \
- /usr/include/qt6/QtCore/q26numeric.h \
- /usr/include/qt6/QtNetwork/QSslConfiguration \
- /usr/include/qt6/QtNetwork/qsslconfiguration.h \
- /usr/include/qt6/QtNetwork/qsslsocket.h \
- /usr/include/qt6/QtNetwork/qtcpsocket.h \
- /usr/include/qt6/QtNetwork/qsslerror.h \
- /usr/include/qt6/QtNetwork/qsslcertificate.h \
- /usr/include/qt6/QtNetwork/qssl.h /usr/include/qt6/QtCore/QFlags \
- /usr/include/qt6/QtNetwork/QSslPreSharedKeyAuthenticator \
- /usr/include/qt6/QtNetwork/qsslpresharedkeyauthenticator.h \
- /usr/include/qt6/QtCore/QMetaType \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/fontmanagerdialog.h \
- /usr/include/qt6/QtNetwork/QSslError \
- /usr/include/qt6/QtNetwork/qsslerror.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_menubar.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/menubar.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_plugindebuggerdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/plugindebuggerdialog.h \
- /usr/include/qt6/QtWidgets/QComboBox \
- /usr/include/qt6/QtWidgets/qcombobox.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/plugins/LuaTranslationPlugin/luatranslationservice.h \
- /usr/include/qt6/QtCore/QThread /usr/include/qt6/QtCore/QMutex \
- /usr/include/lua.hpp /usr/include/lua.h /usr/include/luaconf.h \
- /usr/include/luaconf-x86_64.h /usr/include/lualib.h \
- /usr/include/lauxlib.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_pluginmanagerdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/pluginmanagerdialog.h \
- /usr/include/qt6/QtWidgets/QListWidget \
- /usr/include/qt6/QtWidgets/qlistwidget.h \
- /usr/include/qt6/QtWidgets/qlistview.h \
- /usr/include/qt6/QtWidgets/QCheckBox \
- /usr/include/qt6/QtWidgets/qcheckbox.h \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/moc_translationservicemanager.cpp \
+ /home/jop/work/NST/NST/NST_autogen/I5UM235HFU/../../src/managers/translationservicemanager.h \
+ /usr/include/qt6/QtCore/QList /usr/include/qt6/QtCore/QPointer \
+ /usr/include/qt6/QtCore/QQueue \
+ /home/jop/work/NST/NST/QtLingo/include/qtlingo/translationservicefactory.h \
+ /usr/include/qt6/QtCore/QVariantMap \
  /home/jop/work/NST/NST/NST_autogen/OX2KLQLOGU/moc_LuaPlugin.cpp \
  /home/jop/work/NST/NST/NST_autogen/OX2KLQLOGU/../../src/plugins/LuaPlugin.h \
  /usr/include/qt6/QtCore/QVariant \
@@ -1126,42 +1097,67 @@ CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o: \
  /home/jop/work/NST/NST/NST_autogen/OX2KLQLOGU/../../src/plugins/PluginManager.h \
  /usr/include/qt6/QtCore/QPluginLoader /usr/include/qt6/QtCore/QVector \
  /home/jop/work/NST/NST/NST_autogen/OX2KLQLOGU/../../src/plugins/IPlugin.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_processselectordialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/processselectordialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_projectdatamanager.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/projectdatamanager.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_realtimetranslationwidget.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/realtimetranslationwidget.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_relationitem.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/relationitem.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_relationshipwidget.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/relationshipwidget.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_scripteditordialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/scripteditordialog.h \
- /usr/include/qt6/QtWidgets/QPlainTextEdit \
- /usr/include/qt6/QtWidgets/qplaintextedit.h \
- /usr/include/qt6/QtWidgets/qtextedit.h \
- /usr/include/qt6/QtGui/qabstracttextdocumentlayout.h \
- /usr/include/qt6/QtGui/qtextlayout.h /usr/include/qt6/QtGui/qevent.h \
- /usr/include/qt6/QtGui/qglyphrun.h /usr/include/qt6/QtGui/qrawfont.h \
- /usr/include/qt6/QtGui/qfontdatabase.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_searchcontroller.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/searchcontroller.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_searchdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/searchdialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_settingsdialog.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/settingsdialog.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_shortcutcontroller.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/shortcutcontroller.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_smartfiltermanager.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/smartfiltermanager.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_translationcontextmenu.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/translationcontextmenu.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_customtitlebar.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/customtitlebar.h \
+ /usr/include/qt6/QtWidgets/QWidget /usr/include/qt6/QtWidgets/qwidget.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_filetranslationwidget.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/filetranslationwidget.h \
+ /usr/include/qt6/QtWidgets/QProgressDialog \
+ /usr/include/qt6/QtWidgets/qprogressdialog.h \
+ /usr/include/qt6/QtWidgets/qdialog.h /usr/include/qt6/QtCore/QMultiMap \
+ /home/jop/work/NST/NST/src/dialogs/customprogressdialog.h \
+ /home/jop/work/NST/NST/src/controllers/searchcontroller.h \
+ /home/jop/work/NST/NST/src/dialogs/searchdialog.h \
+ /home/jop/work/NST/NST/src/controllers/shortcutcontroller.h \
+ /home/jop/work/NST/NST/src/managers/bgadatamanager.h \
+ /home/jop/work/NST/NST/src/managers/translationservicemanager.h \
+ /home/jop/work/NST/NST/src/managers/smartfiltermanager.h \
+ /home/jop/work/NST/NST/src/managers/projectdatamanager.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_mainwindow.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/mainwindow.h \
+ /usr/include/qt6/QtWidgets/QStackedWidget \
+ /usr/include/qt6/QtWidgets/qstackedwidget.h \
+ /usr/include/qt6/QtCore/QSharedPointer \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/menubar.h \
+ /usr/include/qt6/QtWidgets/QMenuBar \
+ /usr/include/qt6/QtWidgets/qmenubar.h /usr/include/qt6/QtWidgets/qmenu.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/customtitlebar.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/realtimetranslationwidget.h \
+ /usr/include/qt6/QtWidgets/QSpinBox \
+ /usr/include/qt6/QtWidgets/qspinbox.h \
+ /home/jop/work/NST/NST/src/core/translationserver.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/filetranslationwidget.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/relationshipwidget.h \
+ /usr/include/qt6/QtWidgets/QSlider /usr/include/qt6/QtWidgets/qslider.h \
+ /usr/include/qt6/QtWidgets/QGraphicsView \
+ /usr/include/qt6/QtWidgets/qgraphicsview.h \
+ /usr/include/qt6/QtGui/qpainter.h \
+ /usr/include/qt6/QtWidgets/qscrollarea.h \
+ /usr/include/qt6/QtWidgets/qgraphicsscene.h \
+ /usr/include/qt6/QtWidgets/QGraphicsScene \
+ /usr/include/qt6/QtWidgets/qgraphicsscene.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/relationitem.h \
+ /usr/include/qt6/QtWidgets/QGraphicsObject \
+ /usr/include/qt6/QtWidgets/qgraphicsitem.h \
+ /usr/include/qt6/QtGui/qpainterpath.h \
+ /usr/include/qt6/QtWidgets/QGraphicsLineItem /usr/include/qt6/QtGui/QPen \
+ /usr/include/qt6/QtGui/qpen.h /usr/include/qt6/QtGui/QBrush \
+ /usr/include/qt6/QtGui/qbrush.h \
+ /home/jop/work/NST/NST/src/core/rpgrelationanalyzer.h \
+ /usr/include/qt6/QtCore/QJsonDocument /usr/include/qt6/QtCore/QFile \
+ /usr/include/qt6/QtCore/QDebug \
+ /home/jop/work/NST/NST/src/dialogs/settingsdialog.h \
+ /home/jop/work/NST/NST/src/controllers/updatecontroller.h \
+ /home/jop/work/NST/NST/src/dialogs/fontmanagerdialog.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_menubar.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/menubar.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_realtimetranslationwidget.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/realtimetranslationwidget.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_relationitem.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/relationitem.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_relationshipwidget.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/relationshipwidget.h \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/moc_translationcontextmenu.cpp \
+ /home/jop/work/NST/NST/NST_autogen/YPKJ5OE7LN/../../src/ui/translationcontextmenu.h \
  /usr/include/qt6/QtCore/QModelIndex \
- /usr/include/qt6/QtCore/QItemSelectionModel \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_translationserver.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/translationserver.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_translationservicemanager.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/translationservicemanager.h \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/moc_updatecontroller.cpp \
- /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/../../src/updatecontroller.h
+ /usr/include/qt6/QtCore/QItemSelectionModel

@@ -85,6 +85,16 @@ package_source:
 package_source/fast: package_source
 .PHONY : package_source/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
@@ -633,269 +643,461 @@ NST_autogen/mocs_compilation.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.s
 .PHONY : NST_autogen/mocs_compilation.cpp.s
 
-src/bgadatamanager.o: src/bgadatamanager.cpp.o
-.PHONY : src/bgadatamanager.o
+src/controllers/searchcontroller.o: src/controllers/searchcontroller.cpp.o
+.PHONY : src/controllers/searchcontroller.o
 
 # target to build an object file
-src/bgadatamanager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/bgadatamanager.cpp.o
-.PHONY : src/bgadatamanager.cpp.o
+src/controllers/searchcontroller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/searchcontroller.cpp.o
+.PHONY : src/controllers/searchcontroller.cpp.o
 
-src/bgadatamanager.i: src/bgadatamanager.cpp.i
-.PHONY : src/bgadatamanager.i
+src/controllers/searchcontroller.i: src/controllers/searchcontroller.cpp.i
+.PHONY : src/controllers/searchcontroller.i
 
 # target to preprocess a source file
-src/bgadatamanager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/bgadatamanager.cpp.i
-.PHONY : src/bgadatamanager.cpp.i
+src/controllers/searchcontroller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/searchcontroller.cpp.i
+.PHONY : src/controllers/searchcontroller.cpp.i
 
-src/bgadatamanager.s: src/bgadatamanager.cpp.s
-.PHONY : src/bgadatamanager.s
+src/controllers/searchcontroller.s: src/controllers/searchcontroller.cpp.s
+.PHONY : src/controllers/searchcontroller.s
 
 # target to generate assembly for a file
-src/bgadatamanager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/bgadatamanager.cpp.s
-.PHONY : src/bgadatamanager.cpp.s
+src/controllers/searchcontroller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/searchcontroller.cpp.s
+.PHONY : src/controllers/searchcontroller.cpp.s
 
-src/customprogressdialog.o: src/customprogressdialog.cpp.o
-.PHONY : src/customprogressdialog.o
+src/controllers/shortcutcontroller.o: src/controllers/shortcutcontroller.cpp.o
+.PHONY : src/controllers/shortcutcontroller.o
 
 # target to build an object file
-src/customprogressdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customprogressdialog.cpp.o
-.PHONY : src/customprogressdialog.cpp.o
+src/controllers/shortcutcontroller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/shortcutcontroller.cpp.o
+.PHONY : src/controllers/shortcutcontroller.cpp.o
 
-src/customprogressdialog.i: src/customprogressdialog.cpp.i
-.PHONY : src/customprogressdialog.i
+src/controllers/shortcutcontroller.i: src/controllers/shortcutcontroller.cpp.i
+.PHONY : src/controllers/shortcutcontroller.i
 
 # target to preprocess a source file
-src/customprogressdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customprogressdialog.cpp.i
-.PHONY : src/customprogressdialog.cpp.i
+src/controllers/shortcutcontroller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/shortcutcontroller.cpp.i
+.PHONY : src/controllers/shortcutcontroller.cpp.i
 
-src/customprogressdialog.s: src/customprogressdialog.cpp.s
-.PHONY : src/customprogressdialog.s
+src/controllers/shortcutcontroller.s: src/controllers/shortcutcontroller.cpp.s
+.PHONY : src/controllers/shortcutcontroller.s
 
 # target to generate assembly for a file
-src/customprogressdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customprogressdialog.cpp.s
-.PHONY : src/customprogressdialog.cpp.s
+src/controllers/shortcutcontroller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/shortcutcontroller.cpp.s
+.PHONY : src/controllers/shortcutcontroller.cpp.s
 
-src/customtitlebar.o: src/customtitlebar.cpp.o
-.PHONY : src/customtitlebar.o
+src/controllers/updatecontroller.o: src/controllers/updatecontroller.cpp.o
+.PHONY : src/controllers/updatecontroller.o
 
 # target to build an object file
-src/customtitlebar.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customtitlebar.cpp.o
-.PHONY : src/customtitlebar.cpp.o
+src/controllers/updatecontroller.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/updatecontroller.cpp.o
+.PHONY : src/controllers/updatecontroller.cpp.o
 
-src/customtitlebar.i: src/customtitlebar.cpp.i
-.PHONY : src/customtitlebar.i
+src/controllers/updatecontroller.i: src/controllers/updatecontroller.cpp.i
+.PHONY : src/controllers/updatecontroller.i
 
 # target to preprocess a source file
-src/customtitlebar.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customtitlebar.cpp.i
-.PHONY : src/customtitlebar.cpp.i
+src/controllers/updatecontroller.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/updatecontroller.cpp.i
+.PHONY : src/controllers/updatecontroller.cpp.i
 
-src/customtitlebar.s: src/customtitlebar.cpp.s
-.PHONY : src/customtitlebar.s
+src/controllers/updatecontroller.s: src/controllers/updatecontroller.cpp.s
+.PHONY : src/controllers/updatecontroller.s
 
 # target to generate assembly for a file
-src/customtitlebar.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/customtitlebar.cpp.s
-.PHONY : src/customtitlebar.cpp.s
+src/controllers/updatecontroller.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/controllers/updatecontroller.cpp.s
+.PHONY : src/controllers/updatecontroller.cpp.s
 
-src/filetranslationwidget.o: src/filetranslationwidget.cpp.o
-.PHONY : src/filetranslationwidget.o
+src/core/main.o: src/core/main.cpp.o
+.PHONY : src/core/main.o
 
 # target to build an object file
-src/filetranslationwidget.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/filetranslationwidget.cpp.o
-.PHONY : src/filetranslationwidget.cpp.o
+src/core/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/main.cpp.o
+.PHONY : src/core/main.cpp.o
 
-src/filetranslationwidget.i: src/filetranslationwidget.cpp.i
-.PHONY : src/filetranslationwidget.i
+src/core/main.i: src/core/main.cpp.i
+.PHONY : src/core/main.i
 
 # target to preprocess a source file
-src/filetranslationwidget.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/filetranslationwidget.cpp.i
-.PHONY : src/filetranslationwidget.cpp.i
+src/core/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/main.cpp.i
+.PHONY : src/core/main.cpp.i
 
-src/filetranslationwidget.s: src/filetranslationwidget.cpp.s
-.PHONY : src/filetranslationwidget.s
+src/core/main.s: src/core/main.cpp.s
+.PHONY : src/core/main.s
 
 # target to generate assembly for a file
-src/filetranslationwidget.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/filetranslationwidget.cpp.s
-.PHONY : src/filetranslationwidget.cpp.s
+src/core/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/main.cpp.s
+.PHONY : src/core/main.cpp.s
 
-src/fontmanagerdialog.o: src/fontmanagerdialog.cpp.o
-.PHONY : src/fontmanagerdialog.o
+src/core/rpgrelationanalyzer.o: src/core/rpgrelationanalyzer.cpp.o
+.PHONY : src/core/rpgrelationanalyzer.o
 
 # target to build an object file
-src/fontmanagerdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/fontmanagerdialog.cpp.o
-.PHONY : src/fontmanagerdialog.cpp.o
+src/core/rpgrelationanalyzer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/rpgrelationanalyzer.cpp.o
+.PHONY : src/core/rpgrelationanalyzer.cpp.o
 
-src/fontmanagerdialog.i: src/fontmanagerdialog.cpp.i
-.PHONY : src/fontmanagerdialog.i
+src/core/rpgrelationanalyzer.i: src/core/rpgrelationanalyzer.cpp.i
+.PHONY : src/core/rpgrelationanalyzer.i
 
 # target to preprocess a source file
-src/fontmanagerdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/fontmanagerdialog.cpp.i
-.PHONY : src/fontmanagerdialog.cpp.i
+src/core/rpgrelationanalyzer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/rpgrelationanalyzer.cpp.i
+.PHONY : src/core/rpgrelationanalyzer.cpp.i
 
-src/fontmanagerdialog.s: src/fontmanagerdialog.cpp.s
-.PHONY : src/fontmanagerdialog.s
+src/core/rpgrelationanalyzer.s: src/core/rpgrelationanalyzer.cpp.s
+.PHONY : src/core/rpgrelationanalyzer.s
 
 # target to generate assembly for a file
-src/fontmanagerdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/fontmanagerdialog.cpp.s
-.PHONY : src/fontmanagerdialog.cpp.s
+src/core/rpgrelationanalyzer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/rpgrelationanalyzer.cpp.s
+.PHONY : src/core/rpgrelationanalyzer.cpp.s
 
-src/loadprojectdialog.o: src/loadprojectdialog.cpp.o
-.PHONY : src/loadprojectdialog.o
+src/core/translationserver.o: src/core/translationserver.cpp.o
+.PHONY : src/core/translationserver.o
 
 # target to build an object file
-src/loadprojectdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/loadprojectdialog.cpp.o
-.PHONY : src/loadprojectdialog.cpp.o
+src/core/translationserver.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/translationserver.cpp.o
+.PHONY : src/core/translationserver.cpp.o
 
-src/loadprojectdialog.i: src/loadprojectdialog.cpp.i
-.PHONY : src/loadprojectdialog.i
+src/core/translationserver.i: src/core/translationserver.cpp.i
+.PHONY : src/core/translationserver.i
 
 # target to preprocess a source file
-src/loadprojectdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/loadprojectdialog.cpp.i
-.PHONY : src/loadprojectdialog.cpp.i
+src/core/translationserver.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/translationserver.cpp.i
+.PHONY : src/core/translationserver.cpp.i
 
-src/loadprojectdialog.s: src/loadprojectdialog.cpp.s
-.PHONY : src/loadprojectdialog.s
+src/core/translationserver.s: src/core/translationserver.cpp.s
+.PHONY : src/core/translationserver.s
 
 # target to generate assembly for a file
-src/loadprojectdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/loadprojectdialog.cpp.s
-.PHONY : src/loadprojectdialog.cpp.s
+src/core/translationserver.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/core/translationserver.cpp.s
+.PHONY : src/core/translationserver.cpp.s
 
-src/main.o: src/main.cpp.o
-.PHONY : src/main.o
+src/dialogs/customprogressdialog.o: src/dialogs/customprogressdialog.cpp.o
+.PHONY : src/dialogs/customprogressdialog.o
 
 # target to build an object file
-src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/main.cpp.o
-.PHONY : src/main.cpp.o
+src/dialogs/customprogressdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/customprogressdialog.cpp.o
+.PHONY : src/dialogs/customprogressdialog.cpp.o
 
-src/main.i: src/main.cpp.i
-.PHONY : src/main.i
+src/dialogs/customprogressdialog.i: src/dialogs/customprogressdialog.cpp.i
+.PHONY : src/dialogs/customprogressdialog.i
 
 # target to preprocess a source file
-src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/main.cpp.i
-.PHONY : src/main.cpp.i
+src/dialogs/customprogressdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/customprogressdialog.cpp.i
+.PHONY : src/dialogs/customprogressdialog.cpp.i
 
-src/main.s: src/main.cpp.s
-.PHONY : src/main.s
+src/dialogs/customprogressdialog.s: src/dialogs/customprogressdialog.cpp.s
+.PHONY : src/dialogs/customprogressdialog.s
 
 # target to generate assembly for a file
-src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/main.cpp.s
-.PHONY : src/main.cpp.s
+src/dialogs/customprogressdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/customprogressdialog.cpp.s
+.PHONY : src/dialogs/customprogressdialog.cpp.s
 
-src/mainwindow.o: src/mainwindow.cpp.o
-.PHONY : src/mainwindow.o
+src/dialogs/fontmanagerdialog.o: src/dialogs/fontmanagerdialog.cpp.o
+.PHONY : src/dialogs/fontmanagerdialog.o
 
 # target to build an object file
-src/mainwindow.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/mainwindow.cpp.o
-.PHONY : src/mainwindow.cpp.o
+src/dialogs/fontmanagerdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/fontmanagerdialog.cpp.o
+.PHONY : src/dialogs/fontmanagerdialog.cpp.o
 
-src/mainwindow.i: src/mainwindow.cpp.i
-.PHONY : src/mainwindow.i
+src/dialogs/fontmanagerdialog.i: src/dialogs/fontmanagerdialog.cpp.i
+.PHONY : src/dialogs/fontmanagerdialog.i
 
 # target to preprocess a source file
-src/mainwindow.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/mainwindow.cpp.i
-.PHONY : src/mainwindow.cpp.i
+src/dialogs/fontmanagerdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/fontmanagerdialog.cpp.i
+.PHONY : src/dialogs/fontmanagerdialog.cpp.i
 
-src/mainwindow.s: src/mainwindow.cpp.s
-.PHONY : src/mainwindow.s
+src/dialogs/fontmanagerdialog.s: src/dialogs/fontmanagerdialog.cpp.s
+.PHONY : src/dialogs/fontmanagerdialog.s
 
 # target to generate assembly for a file
-src/mainwindow.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/mainwindow.cpp.s
-.PHONY : src/mainwindow.cpp.s
+src/dialogs/fontmanagerdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/fontmanagerdialog.cpp.s
+.PHONY : src/dialogs/fontmanagerdialog.cpp.s
 
-src/menubar.o: src/menubar.cpp.o
-.PHONY : src/menubar.o
+src/dialogs/loadprojectdialog.o: src/dialogs/loadprojectdialog.cpp.o
+.PHONY : src/dialogs/loadprojectdialog.o
 
 # target to build an object file
-src/menubar.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/menubar.cpp.o
-.PHONY : src/menubar.cpp.o
+src/dialogs/loadprojectdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/loadprojectdialog.cpp.o
+.PHONY : src/dialogs/loadprojectdialog.cpp.o
 
-src/menubar.i: src/menubar.cpp.i
-.PHONY : src/menubar.i
+src/dialogs/loadprojectdialog.i: src/dialogs/loadprojectdialog.cpp.i
+.PHONY : src/dialogs/loadprojectdialog.i
 
 # target to preprocess a source file
-src/menubar.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/menubar.cpp.i
-.PHONY : src/menubar.cpp.i
+src/dialogs/loadprojectdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/loadprojectdialog.cpp.i
+.PHONY : src/dialogs/loadprojectdialog.cpp.i
 
-src/menubar.s: src/menubar.cpp.s
-.PHONY : src/menubar.s
+src/dialogs/loadprojectdialog.s: src/dialogs/loadprojectdialog.cpp.s
+.PHONY : src/dialogs/loadprojectdialog.s
 
 # target to generate assembly for a file
-src/menubar.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/menubar.cpp.s
-.PHONY : src/menubar.cpp.s
+src/dialogs/loadprojectdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/loadprojectdialog.cpp.s
+.PHONY : src/dialogs/loadprojectdialog.cpp.s
 
-src/plugindebuggerdialog.o: src/plugindebuggerdialog.cpp.o
-.PHONY : src/plugindebuggerdialog.o
+src/dialogs/plugindebuggerdialog.o: src/dialogs/plugindebuggerdialog.cpp.o
+.PHONY : src/dialogs/plugindebuggerdialog.o
 
 # target to build an object file
-src/plugindebuggerdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/plugindebuggerdialog.cpp.o
-.PHONY : src/plugindebuggerdialog.cpp.o
+src/dialogs/plugindebuggerdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/plugindebuggerdialog.cpp.o
+.PHONY : src/dialogs/plugindebuggerdialog.cpp.o
 
-src/plugindebuggerdialog.i: src/plugindebuggerdialog.cpp.i
-.PHONY : src/plugindebuggerdialog.i
+src/dialogs/plugindebuggerdialog.i: src/dialogs/plugindebuggerdialog.cpp.i
+.PHONY : src/dialogs/plugindebuggerdialog.i
 
 # target to preprocess a source file
-src/plugindebuggerdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/plugindebuggerdialog.cpp.i
-.PHONY : src/plugindebuggerdialog.cpp.i
+src/dialogs/plugindebuggerdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/plugindebuggerdialog.cpp.i
+.PHONY : src/dialogs/plugindebuggerdialog.cpp.i
 
-src/plugindebuggerdialog.s: src/plugindebuggerdialog.cpp.s
-.PHONY : src/plugindebuggerdialog.s
+src/dialogs/plugindebuggerdialog.s: src/dialogs/plugindebuggerdialog.cpp.s
+.PHONY : src/dialogs/plugindebuggerdialog.s
 
 # target to generate assembly for a file
-src/plugindebuggerdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/plugindebuggerdialog.cpp.s
-.PHONY : src/plugindebuggerdialog.cpp.s
+src/dialogs/plugindebuggerdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/plugindebuggerdialog.cpp.s
+.PHONY : src/dialogs/plugindebuggerdialog.cpp.s
 
-src/pluginmanagerdialog.o: src/pluginmanagerdialog.cpp.o
-.PHONY : src/pluginmanagerdialog.o
+src/dialogs/pluginmanagerdialog.o: src/dialogs/pluginmanagerdialog.cpp.o
+.PHONY : src/dialogs/pluginmanagerdialog.o
 
 # target to build an object file
-src/pluginmanagerdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/pluginmanagerdialog.cpp.o
-.PHONY : src/pluginmanagerdialog.cpp.o
+src/dialogs/pluginmanagerdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/pluginmanagerdialog.cpp.o
+.PHONY : src/dialogs/pluginmanagerdialog.cpp.o
 
-src/pluginmanagerdialog.i: src/pluginmanagerdialog.cpp.i
-.PHONY : src/pluginmanagerdialog.i
+src/dialogs/pluginmanagerdialog.i: src/dialogs/pluginmanagerdialog.cpp.i
+.PHONY : src/dialogs/pluginmanagerdialog.i
 
 # target to preprocess a source file
-src/pluginmanagerdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/pluginmanagerdialog.cpp.i
-.PHONY : src/pluginmanagerdialog.cpp.i
+src/dialogs/pluginmanagerdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/pluginmanagerdialog.cpp.i
+.PHONY : src/dialogs/pluginmanagerdialog.cpp.i
 
-src/pluginmanagerdialog.s: src/pluginmanagerdialog.cpp.s
-.PHONY : src/pluginmanagerdialog.s
+src/dialogs/pluginmanagerdialog.s: src/dialogs/pluginmanagerdialog.cpp.s
+.PHONY : src/dialogs/pluginmanagerdialog.s
 
 # target to generate assembly for a file
-src/pluginmanagerdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/pluginmanagerdialog.cpp.s
-.PHONY : src/pluginmanagerdialog.cpp.s
+src/dialogs/pluginmanagerdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/pluginmanagerdialog.cpp.s
+.PHONY : src/dialogs/pluginmanagerdialog.cpp.s
+
+src/dialogs/processselectordialog.o: src/dialogs/processselectordialog.cpp.o
+.PHONY : src/dialogs/processselectordialog.o
+
+# target to build an object file
+src/dialogs/processselectordialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o
+.PHONY : src/dialogs/processselectordialog.cpp.o
+
+src/dialogs/processselectordialog.i: src/dialogs/processselectordialog.cpp.i
+.PHONY : src/dialogs/processselectordialog.i
+
+# target to preprocess a source file
+src/dialogs/processselectordialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.i
+.PHONY : src/dialogs/processselectordialog.cpp.i
+
+src/dialogs/processselectordialog.s: src/dialogs/processselectordialog.cpp.s
+.PHONY : src/dialogs/processselectordialog.s
+
+# target to generate assembly for a file
+src/dialogs/processselectordialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.s
+.PHONY : src/dialogs/processselectordialog.cpp.s
+
+src/dialogs/scripteditordialog.o: src/dialogs/scripteditordialog.cpp.o
+.PHONY : src/dialogs/scripteditordialog.o
+
+# target to build an object file
+src/dialogs/scripteditordialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/scripteditordialog.cpp.o
+.PHONY : src/dialogs/scripteditordialog.cpp.o
+
+src/dialogs/scripteditordialog.i: src/dialogs/scripteditordialog.cpp.i
+.PHONY : src/dialogs/scripteditordialog.i
+
+# target to preprocess a source file
+src/dialogs/scripteditordialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/scripteditordialog.cpp.i
+.PHONY : src/dialogs/scripteditordialog.cpp.i
+
+src/dialogs/scripteditordialog.s: src/dialogs/scripteditordialog.cpp.s
+.PHONY : src/dialogs/scripteditordialog.s
+
+# target to generate assembly for a file
+src/dialogs/scripteditordialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/scripteditordialog.cpp.s
+.PHONY : src/dialogs/scripteditordialog.cpp.s
+
+src/dialogs/searchdialog.o: src/dialogs/searchdialog.cpp.o
+.PHONY : src/dialogs/searchdialog.o
+
+# target to build an object file
+src/dialogs/searchdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/searchdialog.cpp.o
+.PHONY : src/dialogs/searchdialog.cpp.o
+
+src/dialogs/searchdialog.i: src/dialogs/searchdialog.cpp.i
+.PHONY : src/dialogs/searchdialog.i
+
+# target to preprocess a source file
+src/dialogs/searchdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/searchdialog.cpp.i
+.PHONY : src/dialogs/searchdialog.cpp.i
+
+src/dialogs/searchdialog.s: src/dialogs/searchdialog.cpp.s
+.PHONY : src/dialogs/searchdialog.s
+
+# target to generate assembly for a file
+src/dialogs/searchdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/searchdialog.cpp.s
+.PHONY : src/dialogs/searchdialog.cpp.s
+
+src/dialogs/settingsdialog.o: src/dialogs/settingsdialog.cpp.o
+.PHONY : src/dialogs/settingsdialog.o
+
+# target to build an object file
+src/dialogs/settingsdialog.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/settingsdialog.cpp.o
+.PHONY : src/dialogs/settingsdialog.cpp.o
+
+src/dialogs/settingsdialog.i: src/dialogs/settingsdialog.cpp.i
+.PHONY : src/dialogs/settingsdialog.i
+
+# target to preprocess a source file
+src/dialogs/settingsdialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/settingsdialog.cpp.i
+.PHONY : src/dialogs/settingsdialog.cpp.i
+
+src/dialogs/settingsdialog.s: src/dialogs/settingsdialog.cpp.s
+.PHONY : src/dialogs/settingsdialog.s
+
+# target to generate assembly for a file
+src/dialogs/settingsdialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/dialogs/settingsdialog.cpp.s
+.PHONY : src/dialogs/settingsdialog.cpp.s
+
+src/managers/bgadatamanager.o: src/managers/bgadatamanager.cpp.o
+.PHONY : src/managers/bgadatamanager.o
+
+# target to build an object file
+src/managers/bgadatamanager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/bgadatamanager.cpp.o
+.PHONY : src/managers/bgadatamanager.cpp.o
+
+src/managers/bgadatamanager.i: src/managers/bgadatamanager.cpp.i
+.PHONY : src/managers/bgadatamanager.i
+
+# target to preprocess a source file
+src/managers/bgadatamanager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/bgadatamanager.cpp.i
+.PHONY : src/managers/bgadatamanager.cpp.i
+
+src/managers/bgadatamanager.s: src/managers/bgadatamanager.cpp.s
+.PHONY : src/managers/bgadatamanager.s
+
+# target to generate assembly for a file
+src/managers/bgadatamanager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/bgadatamanager.cpp.s
+.PHONY : src/managers/bgadatamanager.cpp.s
+
+src/managers/projectdatamanager.o: src/managers/projectdatamanager.cpp.o
+.PHONY : src/managers/projectdatamanager.o
+
+# target to build an object file
+src/managers/projectdatamanager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/projectdatamanager.cpp.o
+.PHONY : src/managers/projectdatamanager.cpp.o
+
+src/managers/projectdatamanager.i: src/managers/projectdatamanager.cpp.i
+.PHONY : src/managers/projectdatamanager.i
+
+# target to preprocess a source file
+src/managers/projectdatamanager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/projectdatamanager.cpp.i
+.PHONY : src/managers/projectdatamanager.cpp.i
+
+src/managers/projectdatamanager.s: src/managers/projectdatamanager.cpp.s
+.PHONY : src/managers/projectdatamanager.s
+
+# target to generate assembly for a file
+src/managers/projectdatamanager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/projectdatamanager.cpp.s
+.PHONY : src/managers/projectdatamanager.cpp.s
+
+src/managers/smartfiltermanager.o: src/managers/smartfiltermanager.cpp.o
+.PHONY : src/managers/smartfiltermanager.o
+
+# target to build an object file
+src/managers/smartfiltermanager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/smartfiltermanager.cpp.o
+.PHONY : src/managers/smartfiltermanager.cpp.o
+
+src/managers/smartfiltermanager.i: src/managers/smartfiltermanager.cpp.i
+.PHONY : src/managers/smartfiltermanager.i
+
+# target to preprocess a source file
+src/managers/smartfiltermanager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/smartfiltermanager.cpp.i
+.PHONY : src/managers/smartfiltermanager.cpp.i
+
+src/managers/smartfiltermanager.s: src/managers/smartfiltermanager.cpp.s
+.PHONY : src/managers/smartfiltermanager.s
+
+# target to generate assembly for a file
+src/managers/smartfiltermanager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/smartfiltermanager.cpp.s
+.PHONY : src/managers/smartfiltermanager.cpp.s
+
+src/managers/translationservicemanager.o: src/managers/translationservicemanager.cpp.o
+.PHONY : src/managers/translationservicemanager.o
+
+# target to build an object file
+src/managers/translationservicemanager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/translationservicemanager.cpp.o
+.PHONY : src/managers/translationservicemanager.cpp.o
+
+src/managers/translationservicemanager.i: src/managers/translationservicemanager.cpp.i
+.PHONY : src/managers/translationservicemanager.i
+
+# target to preprocess a source file
+src/managers/translationservicemanager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/translationservicemanager.cpp.i
+.PHONY : src/managers/translationservicemanager.cpp.i
+
+src/managers/translationservicemanager.s: src/managers/translationservicemanager.cpp.s
+.PHONY : src/managers/translationservicemanager.s
+
+# target to generate assembly for a file
+src/managers/translationservicemanager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/managers/translationservicemanager.cpp.s
+.PHONY : src/managers/translationservicemanager.cpp.s
 
 src/plugins/LuaPlugin.o: src/plugins/LuaPlugin.cpp.o
 .PHONY : src/plugins/LuaPlugin.o
@@ -993,389 +1195,197 @@ src/plugins/PluginManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.s
 .PHONY : src/plugins/PluginManager.cpp.s
 
-src/processselectordialog.o: src/processselectordialog.cpp.o
-.PHONY : src/processselectordialog.o
+src/ui/customtitlebar.o: src/ui/customtitlebar.cpp.o
+.PHONY : src/ui/customtitlebar.o
 
 # target to build an object file
-src/processselectordialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/processselectordialog.cpp.o
-.PHONY : src/processselectordialog.cpp.o
+src/ui/customtitlebar.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o
+.PHONY : src/ui/customtitlebar.cpp.o
 
-src/processselectordialog.i: src/processselectordialog.cpp.i
-.PHONY : src/processselectordialog.i
+src/ui/customtitlebar.i: src/ui/customtitlebar.cpp.i
+.PHONY : src/ui/customtitlebar.i
 
 # target to preprocess a source file
-src/processselectordialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/processselectordialog.cpp.i
-.PHONY : src/processselectordialog.cpp.i
+src/ui/customtitlebar.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.i
+.PHONY : src/ui/customtitlebar.cpp.i
 
-src/processselectordialog.s: src/processselectordialog.cpp.s
-.PHONY : src/processselectordialog.s
+src/ui/customtitlebar.s: src/ui/customtitlebar.cpp.s
+.PHONY : src/ui/customtitlebar.s
 
 # target to generate assembly for a file
-src/processselectordialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/processselectordialog.cpp.s
-.PHONY : src/processselectordialog.cpp.s
+src/ui/customtitlebar.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.s
+.PHONY : src/ui/customtitlebar.cpp.s
 
-src/projectdatamanager.o: src/projectdatamanager.cpp.o
-.PHONY : src/projectdatamanager.o
+src/ui/filetranslationwidget.o: src/ui/filetranslationwidget.cpp.o
+.PHONY : src/ui/filetranslationwidget.o
 
 # target to build an object file
-src/projectdatamanager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/projectdatamanager.cpp.o
-.PHONY : src/projectdatamanager.cpp.o
+src/ui/filetranslationwidget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o
+.PHONY : src/ui/filetranslationwidget.cpp.o
 
-src/projectdatamanager.i: src/projectdatamanager.cpp.i
-.PHONY : src/projectdatamanager.i
+src/ui/filetranslationwidget.i: src/ui/filetranslationwidget.cpp.i
+.PHONY : src/ui/filetranslationwidget.i
 
 # target to preprocess a source file
-src/projectdatamanager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/projectdatamanager.cpp.i
-.PHONY : src/projectdatamanager.cpp.i
+src/ui/filetranslationwidget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.i
+.PHONY : src/ui/filetranslationwidget.cpp.i
 
-src/projectdatamanager.s: src/projectdatamanager.cpp.s
-.PHONY : src/projectdatamanager.s
+src/ui/filetranslationwidget.s: src/ui/filetranslationwidget.cpp.s
+.PHONY : src/ui/filetranslationwidget.s
 
 # target to generate assembly for a file
-src/projectdatamanager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/projectdatamanager.cpp.s
-.PHONY : src/projectdatamanager.cpp.s
+src/ui/filetranslationwidget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s
+.PHONY : src/ui/filetranslationwidget.cpp.s
 
-src/realtimetranslationwidget.o: src/realtimetranslationwidget.cpp.o
-.PHONY : src/realtimetranslationwidget.o
+src/ui/mainwindow.o: src/ui/mainwindow.cpp.o
+.PHONY : src/ui/mainwindow.o
 
 # target to build an object file
-src/realtimetranslationwidget.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/realtimetranslationwidget.cpp.o
-.PHONY : src/realtimetranslationwidget.cpp.o
+src/ui/mainwindow.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o
+.PHONY : src/ui/mainwindow.cpp.o
 
-src/realtimetranslationwidget.i: src/realtimetranslationwidget.cpp.i
-.PHONY : src/realtimetranslationwidget.i
+src/ui/mainwindow.i: src/ui/mainwindow.cpp.i
+.PHONY : src/ui/mainwindow.i
 
 # target to preprocess a source file
-src/realtimetranslationwidget.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/realtimetranslationwidget.cpp.i
-.PHONY : src/realtimetranslationwidget.cpp.i
+src/ui/mainwindow.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/mainwindow.cpp.i
+.PHONY : src/ui/mainwindow.cpp.i
 
-src/realtimetranslationwidget.s: src/realtimetranslationwidget.cpp.s
-.PHONY : src/realtimetranslationwidget.s
+src/ui/mainwindow.s: src/ui/mainwindow.cpp.s
+.PHONY : src/ui/mainwindow.s
 
 # target to generate assembly for a file
-src/realtimetranslationwidget.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/realtimetranslationwidget.cpp.s
-.PHONY : src/realtimetranslationwidget.cpp.s
+src/ui/mainwindow.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/mainwindow.cpp.s
+.PHONY : src/ui/mainwindow.cpp.s
 
-src/relationitem.o: src/relationitem.cpp.o
-.PHONY : src/relationitem.o
+src/ui/menubar.o: src/ui/menubar.cpp.o
+.PHONY : src/ui/menubar.o
 
 # target to build an object file
-src/relationitem.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationitem.cpp.o
-.PHONY : src/relationitem.cpp.o
+src/ui/menubar.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/menubar.cpp.o
+.PHONY : src/ui/menubar.cpp.o
 
-src/relationitem.i: src/relationitem.cpp.i
-.PHONY : src/relationitem.i
+src/ui/menubar.i: src/ui/menubar.cpp.i
+.PHONY : src/ui/menubar.i
 
 # target to preprocess a source file
-src/relationitem.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationitem.cpp.i
-.PHONY : src/relationitem.cpp.i
+src/ui/menubar.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/menubar.cpp.i
+.PHONY : src/ui/menubar.cpp.i
 
-src/relationitem.s: src/relationitem.cpp.s
-.PHONY : src/relationitem.s
+src/ui/menubar.s: src/ui/menubar.cpp.s
+.PHONY : src/ui/menubar.s
 
 # target to generate assembly for a file
-src/relationitem.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationitem.cpp.s
-.PHONY : src/relationitem.cpp.s
+src/ui/menubar.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/menubar.cpp.s
+.PHONY : src/ui/menubar.cpp.s
 
-src/relationshipwidget.o: src/relationshipwidget.cpp.o
-.PHONY : src/relationshipwidget.o
+src/ui/realtimetranslationwidget.o: src/ui/realtimetranslationwidget.cpp.o
+.PHONY : src/ui/realtimetranslationwidget.o
 
 # target to build an object file
-src/relationshipwidget.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationshipwidget.cpp.o
-.PHONY : src/relationshipwidget.cpp.o
+src/ui/realtimetranslationwidget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o
+.PHONY : src/ui/realtimetranslationwidget.cpp.o
 
-src/relationshipwidget.i: src/relationshipwidget.cpp.i
-.PHONY : src/relationshipwidget.i
+src/ui/realtimetranslationwidget.i: src/ui/realtimetranslationwidget.cpp.i
+.PHONY : src/ui/realtimetranslationwidget.i
 
 # target to preprocess a source file
-src/relationshipwidget.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationshipwidget.cpp.i
-.PHONY : src/relationshipwidget.cpp.i
+src/ui/realtimetranslationwidget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.i
+.PHONY : src/ui/realtimetranslationwidget.cpp.i
 
-src/relationshipwidget.s: src/relationshipwidget.cpp.s
-.PHONY : src/relationshipwidget.s
+src/ui/realtimetranslationwidget.s: src/ui/realtimetranslationwidget.cpp.s
+.PHONY : src/ui/realtimetranslationwidget.s
 
 # target to generate assembly for a file
-src/relationshipwidget.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/relationshipwidget.cpp.s
-.PHONY : src/relationshipwidget.cpp.s
+src/ui/realtimetranslationwidget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.s
+.PHONY : src/ui/realtimetranslationwidget.cpp.s
 
-src/rpgrelationanalyzer.o: src/rpgrelationanalyzer.cpp.o
-.PHONY : src/rpgrelationanalyzer.o
+src/ui/relationitem.o: src/ui/relationitem.cpp.o
+.PHONY : src/ui/relationitem.o
 
 # target to build an object file
-src/rpgrelationanalyzer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/rpgrelationanalyzer.cpp.o
-.PHONY : src/rpgrelationanalyzer.cpp.o
+src/ui/relationitem.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationitem.cpp.o
+.PHONY : src/ui/relationitem.cpp.o
 
-src/rpgrelationanalyzer.i: src/rpgrelationanalyzer.cpp.i
-.PHONY : src/rpgrelationanalyzer.i
+src/ui/relationitem.i: src/ui/relationitem.cpp.i
+.PHONY : src/ui/relationitem.i
 
 # target to preprocess a source file
-src/rpgrelationanalyzer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/rpgrelationanalyzer.cpp.i
-.PHONY : src/rpgrelationanalyzer.cpp.i
+src/ui/relationitem.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationitem.cpp.i
+.PHONY : src/ui/relationitem.cpp.i
 
-src/rpgrelationanalyzer.s: src/rpgrelationanalyzer.cpp.s
-.PHONY : src/rpgrelationanalyzer.s
+src/ui/relationitem.s: src/ui/relationitem.cpp.s
+.PHONY : src/ui/relationitem.s
 
 # target to generate assembly for a file
-src/rpgrelationanalyzer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/rpgrelationanalyzer.cpp.s
-.PHONY : src/rpgrelationanalyzer.cpp.s
+src/ui/relationitem.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationitem.cpp.s
+.PHONY : src/ui/relationitem.cpp.s
 
-src/scripteditordialog.o: src/scripteditordialog.cpp.o
-.PHONY : src/scripteditordialog.o
+src/ui/relationshipwidget.o: src/ui/relationshipwidget.cpp.o
+.PHONY : src/ui/relationshipwidget.o
 
 # target to build an object file
-src/scripteditordialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/scripteditordialog.cpp.o
-.PHONY : src/scripteditordialog.cpp.o
+src/ui/relationshipwidget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationshipwidget.cpp.o
+.PHONY : src/ui/relationshipwidget.cpp.o
 
-src/scripteditordialog.i: src/scripteditordialog.cpp.i
-.PHONY : src/scripteditordialog.i
+src/ui/relationshipwidget.i: src/ui/relationshipwidget.cpp.i
+.PHONY : src/ui/relationshipwidget.i
 
 # target to preprocess a source file
-src/scripteditordialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/scripteditordialog.cpp.i
-.PHONY : src/scripteditordialog.cpp.i
+src/ui/relationshipwidget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationshipwidget.cpp.i
+.PHONY : src/ui/relationshipwidget.cpp.i
 
-src/scripteditordialog.s: src/scripteditordialog.cpp.s
-.PHONY : src/scripteditordialog.s
+src/ui/relationshipwidget.s: src/ui/relationshipwidget.cpp.s
+.PHONY : src/ui/relationshipwidget.s
 
 # target to generate assembly for a file
-src/scripteditordialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/scripteditordialog.cpp.s
-.PHONY : src/scripteditordialog.cpp.s
+src/ui/relationshipwidget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/relationshipwidget.cpp.s
+.PHONY : src/ui/relationshipwidget.cpp.s
 
-src/searchcontroller.o: src/searchcontroller.cpp.o
-.PHONY : src/searchcontroller.o
+src/ui/translationcontextmenu.o: src/ui/translationcontextmenu.cpp.o
+.PHONY : src/ui/translationcontextmenu.o
 
 # target to build an object file
-src/searchcontroller.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchcontroller.cpp.o
-.PHONY : src/searchcontroller.cpp.o
+src/ui/translationcontextmenu.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/translationcontextmenu.cpp.o
+.PHONY : src/ui/translationcontextmenu.cpp.o
 
-src/searchcontroller.i: src/searchcontroller.cpp.i
-.PHONY : src/searchcontroller.i
-
-# target to preprocess a source file
-src/searchcontroller.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchcontroller.cpp.i
-.PHONY : src/searchcontroller.cpp.i
-
-src/searchcontroller.s: src/searchcontroller.cpp.s
-.PHONY : src/searchcontroller.s
-
-# target to generate assembly for a file
-src/searchcontroller.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchcontroller.cpp.s
-.PHONY : src/searchcontroller.cpp.s
-
-src/searchdialog.o: src/searchdialog.cpp.o
-.PHONY : src/searchdialog.o
-
-# target to build an object file
-src/searchdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchdialog.cpp.o
-.PHONY : src/searchdialog.cpp.o
-
-src/searchdialog.i: src/searchdialog.cpp.i
-.PHONY : src/searchdialog.i
+src/ui/translationcontextmenu.i: src/ui/translationcontextmenu.cpp.i
+.PHONY : src/ui/translationcontextmenu.i
 
 # target to preprocess a source file
-src/searchdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchdialog.cpp.i
-.PHONY : src/searchdialog.cpp.i
+src/ui/translationcontextmenu.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/translationcontextmenu.cpp.i
+.PHONY : src/ui/translationcontextmenu.cpp.i
 
-src/searchdialog.s: src/searchdialog.cpp.s
-.PHONY : src/searchdialog.s
-
-# target to generate assembly for a file
-src/searchdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/searchdialog.cpp.s
-.PHONY : src/searchdialog.cpp.s
-
-src/settingsdialog.o: src/settingsdialog.cpp.o
-.PHONY : src/settingsdialog.o
-
-# target to build an object file
-src/settingsdialog.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/settingsdialog.cpp.o
-.PHONY : src/settingsdialog.cpp.o
-
-src/settingsdialog.i: src/settingsdialog.cpp.i
-.PHONY : src/settingsdialog.i
-
-# target to preprocess a source file
-src/settingsdialog.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/settingsdialog.cpp.i
-.PHONY : src/settingsdialog.cpp.i
-
-src/settingsdialog.s: src/settingsdialog.cpp.s
-.PHONY : src/settingsdialog.s
+src/ui/translationcontextmenu.s: src/ui/translationcontextmenu.cpp.s
+.PHONY : src/ui/translationcontextmenu.s
 
 # target to generate assembly for a file
-src/settingsdialog.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/settingsdialog.cpp.s
-.PHONY : src/settingsdialog.cpp.s
-
-src/shortcutcontroller.o: src/shortcutcontroller.cpp.o
-.PHONY : src/shortcutcontroller.o
-
-# target to build an object file
-src/shortcutcontroller.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/shortcutcontroller.cpp.o
-.PHONY : src/shortcutcontroller.cpp.o
-
-src/shortcutcontroller.i: src/shortcutcontroller.cpp.i
-.PHONY : src/shortcutcontroller.i
-
-# target to preprocess a source file
-src/shortcutcontroller.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/shortcutcontroller.cpp.i
-.PHONY : src/shortcutcontroller.cpp.i
-
-src/shortcutcontroller.s: src/shortcutcontroller.cpp.s
-.PHONY : src/shortcutcontroller.s
-
-# target to generate assembly for a file
-src/shortcutcontroller.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/shortcutcontroller.cpp.s
-.PHONY : src/shortcutcontroller.cpp.s
-
-src/smartfiltermanager.o: src/smartfiltermanager.cpp.o
-.PHONY : src/smartfiltermanager.o
-
-# target to build an object file
-src/smartfiltermanager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/smartfiltermanager.cpp.o
-.PHONY : src/smartfiltermanager.cpp.o
-
-src/smartfiltermanager.i: src/smartfiltermanager.cpp.i
-.PHONY : src/smartfiltermanager.i
-
-# target to preprocess a source file
-src/smartfiltermanager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/smartfiltermanager.cpp.i
-.PHONY : src/smartfiltermanager.cpp.i
-
-src/smartfiltermanager.s: src/smartfiltermanager.cpp.s
-.PHONY : src/smartfiltermanager.s
-
-# target to generate assembly for a file
-src/smartfiltermanager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/smartfiltermanager.cpp.s
-.PHONY : src/smartfiltermanager.cpp.s
-
-src/translationcontextmenu.o: src/translationcontextmenu.cpp.o
-.PHONY : src/translationcontextmenu.o
-
-# target to build an object file
-src/translationcontextmenu.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationcontextmenu.cpp.o
-.PHONY : src/translationcontextmenu.cpp.o
-
-src/translationcontextmenu.i: src/translationcontextmenu.cpp.i
-.PHONY : src/translationcontextmenu.i
-
-# target to preprocess a source file
-src/translationcontextmenu.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationcontextmenu.cpp.i
-.PHONY : src/translationcontextmenu.cpp.i
-
-src/translationcontextmenu.s: src/translationcontextmenu.cpp.s
-.PHONY : src/translationcontextmenu.s
-
-# target to generate assembly for a file
-src/translationcontextmenu.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationcontextmenu.cpp.s
-.PHONY : src/translationcontextmenu.cpp.s
-
-src/translationserver.o: src/translationserver.cpp.o
-.PHONY : src/translationserver.o
-
-# target to build an object file
-src/translationserver.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationserver.cpp.o
-.PHONY : src/translationserver.cpp.o
-
-src/translationserver.i: src/translationserver.cpp.i
-.PHONY : src/translationserver.i
-
-# target to preprocess a source file
-src/translationserver.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationserver.cpp.i
-.PHONY : src/translationserver.cpp.i
-
-src/translationserver.s: src/translationserver.cpp.s
-.PHONY : src/translationserver.s
-
-# target to generate assembly for a file
-src/translationserver.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationserver.cpp.s
-.PHONY : src/translationserver.cpp.s
-
-src/translationservicemanager.o: src/translationservicemanager.cpp.o
-.PHONY : src/translationservicemanager.o
-
-# target to build an object file
-src/translationservicemanager.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationservicemanager.cpp.o
-.PHONY : src/translationservicemanager.cpp.o
-
-src/translationservicemanager.i: src/translationservicemanager.cpp.i
-.PHONY : src/translationservicemanager.i
-
-# target to preprocess a source file
-src/translationservicemanager.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationservicemanager.cpp.i
-.PHONY : src/translationservicemanager.cpp.i
-
-src/translationservicemanager.s: src/translationservicemanager.cpp.s
-.PHONY : src/translationservicemanager.s
-
-# target to generate assembly for a file
-src/translationservicemanager.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/translationservicemanager.cpp.s
-.PHONY : src/translationservicemanager.cpp.s
-
-src/updatecontroller.o: src/updatecontroller.cpp.o
-.PHONY : src/updatecontroller.o
-
-# target to build an object file
-src/updatecontroller.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/updatecontroller.cpp.o
-.PHONY : src/updatecontroller.cpp.o
-
-src/updatecontroller.i: src/updatecontroller.cpp.i
-.PHONY : src/updatecontroller.i
-
-# target to preprocess a source file
-src/updatecontroller.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/updatecontroller.cpp.i
-.PHONY : src/updatecontroller.cpp.i
-
-src/updatecontroller.s: src/updatecontroller.cpp.s
-.PHONY : src/updatecontroller.s
-
-# target to generate assembly for a file
-src/updatecontroller.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/updatecontroller.cpp.s
-.PHONY : src/updatecontroller.cpp.s
+src/ui/translationcontextmenu.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/translationcontextmenu.cpp.s
+.PHONY : src/ui/translationcontextmenu.cpp.s
 
 # Help Target
 help:
@@ -1391,6 +1401,7 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... BGACoreTests_autogen"
 	@echo "... BGACoreTests_autogen_timestamp_deps"
 	@echo "... BGACore_autogen"
@@ -1428,39 +1439,63 @@ help:
 	@echo "... NST_autogen/mocs_compilation.o"
 	@echo "... NST_autogen/mocs_compilation.i"
 	@echo "... NST_autogen/mocs_compilation.s"
-	@echo "... src/bgadatamanager.o"
-	@echo "... src/bgadatamanager.i"
-	@echo "... src/bgadatamanager.s"
-	@echo "... src/customprogressdialog.o"
-	@echo "... src/customprogressdialog.i"
-	@echo "... src/customprogressdialog.s"
-	@echo "... src/customtitlebar.o"
-	@echo "... src/customtitlebar.i"
-	@echo "... src/customtitlebar.s"
-	@echo "... src/filetranslationwidget.o"
-	@echo "... src/filetranslationwidget.i"
-	@echo "... src/filetranslationwidget.s"
-	@echo "... src/fontmanagerdialog.o"
-	@echo "... src/fontmanagerdialog.i"
-	@echo "... src/fontmanagerdialog.s"
-	@echo "... src/loadprojectdialog.o"
-	@echo "... src/loadprojectdialog.i"
-	@echo "... src/loadprojectdialog.s"
-	@echo "... src/main.o"
-	@echo "... src/main.i"
-	@echo "... src/main.s"
-	@echo "... src/mainwindow.o"
-	@echo "... src/mainwindow.i"
-	@echo "... src/mainwindow.s"
-	@echo "... src/menubar.o"
-	@echo "... src/menubar.i"
-	@echo "... src/menubar.s"
-	@echo "... src/plugindebuggerdialog.o"
-	@echo "... src/plugindebuggerdialog.i"
-	@echo "... src/plugindebuggerdialog.s"
-	@echo "... src/pluginmanagerdialog.o"
-	@echo "... src/pluginmanagerdialog.i"
-	@echo "... src/pluginmanagerdialog.s"
+	@echo "... src/controllers/searchcontroller.o"
+	@echo "... src/controllers/searchcontroller.i"
+	@echo "... src/controllers/searchcontroller.s"
+	@echo "... src/controllers/shortcutcontroller.o"
+	@echo "... src/controllers/shortcutcontroller.i"
+	@echo "... src/controllers/shortcutcontroller.s"
+	@echo "... src/controllers/updatecontroller.o"
+	@echo "... src/controllers/updatecontroller.i"
+	@echo "... src/controllers/updatecontroller.s"
+	@echo "... src/core/main.o"
+	@echo "... src/core/main.i"
+	@echo "... src/core/main.s"
+	@echo "... src/core/rpgrelationanalyzer.o"
+	@echo "... src/core/rpgrelationanalyzer.i"
+	@echo "... src/core/rpgrelationanalyzer.s"
+	@echo "... src/core/translationserver.o"
+	@echo "... src/core/translationserver.i"
+	@echo "... src/core/translationserver.s"
+	@echo "... src/dialogs/customprogressdialog.o"
+	@echo "... src/dialogs/customprogressdialog.i"
+	@echo "... src/dialogs/customprogressdialog.s"
+	@echo "... src/dialogs/fontmanagerdialog.o"
+	@echo "... src/dialogs/fontmanagerdialog.i"
+	@echo "... src/dialogs/fontmanagerdialog.s"
+	@echo "... src/dialogs/loadprojectdialog.o"
+	@echo "... src/dialogs/loadprojectdialog.i"
+	@echo "... src/dialogs/loadprojectdialog.s"
+	@echo "... src/dialogs/plugindebuggerdialog.o"
+	@echo "... src/dialogs/plugindebuggerdialog.i"
+	@echo "... src/dialogs/plugindebuggerdialog.s"
+	@echo "... src/dialogs/pluginmanagerdialog.o"
+	@echo "... src/dialogs/pluginmanagerdialog.i"
+	@echo "... src/dialogs/pluginmanagerdialog.s"
+	@echo "... src/dialogs/processselectordialog.o"
+	@echo "... src/dialogs/processselectordialog.i"
+	@echo "... src/dialogs/processselectordialog.s"
+	@echo "... src/dialogs/scripteditordialog.o"
+	@echo "... src/dialogs/scripteditordialog.i"
+	@echo "... src/dialogs/scripteditordialog.s"
+	@echo "... src/dialogs/searchdialog.o"
+	@echo "... src/dialogs/searchdialog.i"
+	@echo "... src/dialogs/searchdialog.s"
+	@echo "... src/dialogs/settingsdialog.o"
+	@echo "... src/dialogs/settingsdialog.i"
+	@echo "... src/dialogs/settingsdialog.s"
+	@echo "... src/managers/bgadatamanager.o"
+	@echo "... src/managers/bgadatamanager.i"
+	@echo "... src/managers/bgadatamanager.s"
+	@echo "... src/managers/projectdatamanager.o"
+	@echo "... src/managers/projectdatamanager.i"
+	@echo "... src/managers/projectdatamanager.s"
+	@echo "... src/managers/smartfiltermanager.o"
+	@echo "... src/managers/smartfiltermanager.i"
+	@echo "... src/managers/smartfiltermanager.s"
+	@echo "... src/managers/translationservicemanager.o"
+	@echo "... src/managers/translationservicemanager.i"
+	@echo "... src/managers/translationservicemanager.s"
 	@echo "... src/plugins/LuaPlugin.o"
 	@echo "... src/plugins/LuaPlugin.i"
 	@echo "... src/plugins/LuaPlugin.s"
@@ -1473,54 +1508,30 @@ help:
 	@echo "... src/plugins/PluginManager.o"
 	@echo "... src/plugins/PluginManager.i"
 	@echo "... src/plugins/PluginManager.s"
-	@echo "... src/processselectordialog.o"
-	@echo "... src/processselectordialog.i"
-	@echo "... src/processselectordialog.s"
-	@echo "... src/projectdatamanager.o"
-	@echo "... src/projectdatamanager.i"
-	@echo "... src/projectdatamanager.s"
-	@echo "... src/realtimetranslationwidget.o"
-	@echo "... src/realtimetranslationwidget.i"
-	@echo "... src/realtimetranslationwidget.s"
-	@echo "... src/relationitem.o"
-	@echo "... src/relationitem.i"
-	@echo "... src/relationitem.s"
-	@echo "... src/relationshipwidget.o"
-	@echo "... src/relationshipwidget.i"
-	@echo "... src/relationshipwidget.s"
-	@echo "... src/rpgrelationanalyzer.o"
-	@echo "... src/rpgrelationanalyzer.i"
-	@echo "... src/rpgrelationanalyzer.s"
-	@echo "... src/scripteditordialog.o"
-	@echo "... src/scripteditordialog.i"
-	@echo "... src/scripteditordialog.s"
-	@echo "... src/searchcontroller.o"
-	@echo "... src/searchcontroller.i"
-	@echo "... src/searchcontroller.s"
-	@echo "... src/searchdialog.o"
-	@echo "... src/searchdialog.i"
-	@echo "... src/searchdialog.s"
-	@echo "... src/settingsdialog.o"
-	@echo "... src/settingsdialog.i"
-	@echo "... src/settingsdialog.s"
-	@echo "... src/shortcutcontroller.o"
-	@echo "... src/shortcutcontroller.i"
-	@echo "... src/shortcutcontroller.s"
-	@echo "... src/smartfiltermanager.o"
-	@echo "... src/smartfiltermanager.i"
-	@echo "... src/smartfiltermanager.s"
-	@echo "... src/translationcontextmenu.o"
-	@echo "... src/translationcontextmenu.i"
-	@echo "... src/translationcontextmenu.s"
-	@echo "... src/translationserver.o"
-	@echo "... src/translationserver.i"
-	@echo "... src/translationserver.s"
-	@echo "... src/translationservicemanager.o"
-	@echo "... src/translationservicemanager.i"
-	@echo "... src/translationservicemanager.s"
-	@echo "... src/updatecontroller.o"
-	@echo "... src/updatecontroller.i"
-	@echo "... src/updatecontroller.s"
+	@echo "... src/ui/customtitlebar.o"
+	@echo "... src/ui/customtitlebar.i"
+	@echo "... src/ui/customtitlebar.s"
+	@echo "... src/ui/filetranslationwidget.o"
+	@echo "... src/ui/filetranslationwidget.i"
+	@echo "... src/ui/filetranslationwidget.s"
+	@echo "... src/ui/mainwindow.o"
+	@echo "... src/ui/mainwindow.i"
+	@echo "... src/ui/mainwindow.s"
+	@echo "... src/ui/menubar.o"
+	@echo "... src/ui/menubar.i"
+	@echo "... src/ui/menubar.s"
+	@echo "... src/ui/realtimetranslationwidget.o"
+	@echo "... src/ui/realtimetranslationwidget.i"
+	@echo "... src/ui/realtimetranslationwidget.s"
+	@echo "... src/ui/relationitem.o"
+	@echo "... src/ui/relationitem.i"
+	@echo "... src/ui/relationitem.s"
+	@echo "... src/ui/relationshipwidget.o"
+	@echo "... src/ui/relationshipwidget.i"
+	@echo "... src/ui/relationshipwidget.s"
+	@echo "... src/ui/translationcontextmenu.o"
+	@echo "... src/ui/translationcontextmenu.i"
+	@echo "... src/ui/translationcontextmenu.s"
 .PHONY : help
 
 

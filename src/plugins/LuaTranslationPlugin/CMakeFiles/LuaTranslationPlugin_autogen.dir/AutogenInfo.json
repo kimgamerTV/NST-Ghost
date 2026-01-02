@@ -121,7 +121,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.1\"",
+		"APP_VERSION=\"0.5.2\"",
 		"LuaTranslationPlugin_EXPORTS",
 		"QT_CORE_LIB",
 		"QT_NETWORK_LIB",

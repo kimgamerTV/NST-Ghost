@@ -83,7 +83,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/src/plugins/UnrpycPlugin/UnrpycPlugin_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.1\"",
+		"APP_VERSION=\"0.5.2\"",
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
 		"QT_NO_DEBUG",

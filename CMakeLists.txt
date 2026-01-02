@@ -34,62 +34,62 @@ find_package(pybind11 REQUIRED)
 set(TS_FILES src/NST_en_US.ts)
 
 set(PROJECT_SOURCES
-    src/main.cpp
-    src/mainwindow.cpp
-    src/menubar.cpp
-    src/loadprojectdialog.cpp
-    src/searchdialog.cpp
-    src/settingsdialog.cpp
-    src/searchcontroller.cpp
-    src/shortcutcontroller.cpp
-    src/bgadatamanager.cpp
-    src/translationservicemanager.cpp
-    src/relationshipwidget.cpp
-    src/relationshipwidget.h
-    src/relationitem.cpp
-    src/relationitem.h
-    src/rpgrelationanalyzer.cpp
-    src/rpgrelationanalyzer.h
+    src/core/main.cpp
+    src/ui/mainwindow.cpp
+    src/ui/menubar.cpp
+    src/dialogs/loadprojectdialog.cpp
+    src/dialogs/searchdialog.cpp
+    src/dialogs/settingsdialog.cpp
+    src/controllers/searchcontroller.cpp
+    src/controllers/shortcutcontroller.cpp
+    src/managers/bgadatamanager.cpp
+    src/managers/translationservicemanager.cpp
+    src/ui/relationshipwidget.cpp
+    src/ui/relationshipwidget.h
+    src/ui/relationitem.cpp
+    src/ui/relationitem.h
+    src/core/rpgrelationanalyzer.cpp
+    src/core/rpgrelationanalyzer.h
     
-    src/smartfiltermanager.cpp
-    src/translationcontextmenu.cpp
-    src/updatecontroller.cpp
-    src/fontmanagerdialog.cpp
-    src/pluginmanagerdialog.cpp
-    src/plugindebuggerdialog.cpp
+    src/managers/smartfiltermanager.cpp
+    src/ui/translationcontextmenu.cpp
+    src/controllers/updatecontroller.cpp
+    src/dialogs/fontmanagerdialog.cpp
+    src/dialogs/pluginmanagerdialog.cpp
+    src/dialogs/plugindebuggerdialog.cpp
     src/plugins/LuaTranslationPlugin/luatranslationservice.cpp
-    src/projectdatamanager.cpp
-    src/mainwindow.h
-    src/menubar.h
-    src/scripteditordialog.cpp
-    src/scripteditordialog.h
-    src/loadprojectdialog.h
-    src/searchdialog.h
-    src/settingsdialog.h
-    src/fontmanagerdialog.h
-    src/pluginmanagerdialog.h
-    src/plugindebuggerdialog.h
+    src/managers/projectdatamanager.cpp
+    src/ui/mainwindow.h
+    src/ui/menubar.h
+    src/dialogs/scripteditordialog.cpp
+    src/dialogs/scripteditordialog.h
+    src/dialogs/loadprojectdialog.h
+    src/dialogs/searchdialog.h
+    src/dialogs/settingsdialog.h
+    src/dialogs/fontmanagerdialog.h
+    src/dialogs/pluginmanagerdialog.h
+    src/dialogs/plugindebuggerdialog.h
     src/plugins/LuaTranslationPlugin/luatranslationservice.h
-    src/searchcontroller.h
-    src/shortcutcontroller.h
-    src/bgadatamanager.h
-    src/translationservicemanager.h
-    src/translationcontextmenu.h
-    src/updatecontroller.h
-    src/customprogressdialog.cpp
-    src/customprogressdialog.h
-    src/projectdatamanager.h
-    src/customtitlebar.cpp
-    src/customtitlebar.h
-    src/realtimetranslationwidget.cpp
-    src/realtimetranslationwidget.h
-    src/filetranslationwidget.cpp
-    src/filetranslationwidget.h
-    src/filetranslationwidget.ui
-    src/translationserver.cpp
-    src/translationserver.h
-    src/processselectordialog.cpp
-    src/processselectordialog.h
+    src/controllers/searchcontroller.h
+    src/controllers/shortcutcontroller.h
+    src/managers/bgadatamanager.h
+    src/managers/translationservicemanager.h
+    src/ui/translationcontextmenu.h
+    src/controllers/updatecontroller.h
+    src/dialogs/customprogressdialog.cpp
+    src/dialogs/customprogressdialog.h
+    src/managers/projectdatamanager.h
+    src/ui/customtitlebar.cpp
+    src/ui/customtitlebar.h
+    src/ui/realtimetranslationwidget.cpp
+    src/ui/realtimetranslationwidget.h
+    src/ui/filetranslationwidget.cpp
+    src/ui/filetranslationwidget.h
+    src/ui/filetranslationwidget.ui
+    src/core/translationserver.cpp
+    src/core/translationserver.h
+    src/dialogs/processselectordialog.cpp
+    src/dialogs/processselectordialog.h
     src/resources.qrc
 )
 
@@ -156,7 +156,16 @@ else()
     message(WARNING "Lua not found (LUA_FOUND and Lua_FOUND are false)")
 endif()
 
-target_include_directories(NST PRIVATE ${CMAKE_SOURCE_DIR}/BGA/core/include ${CMAKE_SOURCE_DIR}/QtLingo/include ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(NST PRIVATE 
+    ${CMAKE_SOURCE_DIR}/BGA/core/include 
+    ${CMAKE_SOURCE_DIR}/QtLingo/include 
+    ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_SOURCE_DIR}/src/ui
+    ${CMAKE_SOURCE_DIR}/src/dialogs
+    ${CMAKE_SOURCE_DIR}/src/managers
+    ${CMAKE_SOURCE_DIR}/src/core
+    ${CMAKE_SOURCE_DIR}/src/controllers
+)
 
 # Copy scripts to build directory
 file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})

@@ -142,7 +142,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/BGA/BGACore_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.1\"",
+		"APP_VERSION=\"0.5.2\"",
 		"BGACore_EXPORTS",
 		"QT_CORE_LIB",
 		"QT_NO_DEBUG"

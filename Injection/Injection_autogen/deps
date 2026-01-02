@@ -1,19 +1,9 @@
 Injection_autogen/timestamp: \
-	/home/jop/work/NST/NST/CMakeFiles/3.31.6/CMakeCCompiler.cmake \
+	/home/jop/work/NST/NST/CMakeFiles/3.31.10/CMakeCCompiler.cmake \
 	/home/jop/work/NST/NST/Injection/CMakeLists.txt \
 	/home/jop/work/NST/NST/Injection/Injection_global.h \
 	/home/jop/work/NST/NST/Injection/injection.cpp \
 	/home/jop/work/NST/NST/Injection/injection.h \
-	/home/jop/work/NST/NST/Injection/min_hook/MinHook.h \
-	/home/jop/work/NST/NST/Injection/min_hook/buffer.c \
-	/home/jop/work/NST/NST/Injection/min_hook/buffer.h \
-	/home/jop/work/NST/NST/Injection/min_hook/hde/hde32.c \
-	/home/jop/work/NST/NST/Injection/min_hook/hde/hde32.h \
-	/home/jop/work/NST/NST/Injection/min_hook/hde/hde64.c \
-	/home/jop/work/NST/NST/Injection/min_hook/hde/hde64.h \
-	/home/jop/work/NST/NST/Injection/min_hook/hook.c \
-	/home/jop/work/NST/NST/Injection/min_hook/trampoline.c \
-	/home/jop/work/NST/NST/Injection/min_hook/trampoline.h \
 	/usr/lib64/cmake/Qt6/Qt6Config.cmake \
 	/usr/lib64/cmake/Qt6/Qt6ConfigExtras.cmake \
 	/usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake \

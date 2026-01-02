@@ -1,4 +1,4 @@
-CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o: \
+BGA/CMakeFiles/BGACore.dir/core/src/analyzerfactory.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/analyzerfactory.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/analyzerfactory.h \

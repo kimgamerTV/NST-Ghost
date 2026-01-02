@@ -9,11 +9,11 @@
 	"INCLUDE_DIR" : "/home/jop/work/NST/NST/NST_autogen/include",
 	"INPUTS" : 
 	[
-		"/home/jop/work/NST/NST/src/style.qss",
-		"/home/jop/work/NST/NST/src/icons/rpgm_icon.png",
-		"/home/jop/work/NST/NST/packaging/icons/icon-app.png",
-		"/home/jop/work/NST/NST/src/icons/renpy_icon.png",
-		"/home/jop/work/NST/NST/src/icons/unity_icon.png"
+		"/home/jop/work/NST/NST/src/ui/style.qss",
+		"/home/jop/work/NST/NST/src/ui/icons/rpgm_icon.png",
+		"/home/jop/work/NST/NST/src/ui/icons/renpy_icon.png",
+		"/home/jop/work/NST/NST/src/ui/icons/unity_icon.png",
+		"/home/jop/work/NST/NST/packaging/icons/icon-app.png"
 	],
 	"LOCK_FILE" : "/home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Lock.lock",
 	"MULTI_CONFIG" : false,

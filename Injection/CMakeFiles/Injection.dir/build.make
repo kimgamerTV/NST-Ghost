@@ -107,101 +107,21 @@ Injection/CMakeFiles/Injection.dir/injection.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Injection.dir/injection.cpp.s"
 	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/Injection/injection.cpp -o CMakeFiles/Injection.dir/injection.cpp.s
 
-Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o: Injection/CMakeFiles/Injection.dir/flags.make
-Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o: Injection/min_hook/buffer.c
-Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o -MF CMakeFiles/Injection.dir/min_hook/buffer.c.o.d -o CMakeFiles/Injection.dir/min_hook/buffer.c.o -c /home/jop/work/NST/NST/Injection/min_hook/buffer.c
-
-Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/Injection.dir/min_hook/buffer.c.i"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jop/work/NST/NST/Injection/min_hook/buffer.c > CMakeFiles/Injection.dir/min_hook/buffer.c.i
-
-Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/Injection.dir/min_hook/buffer.c.s"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jop/work/NST/NST/Injection/min_hook/buffer.c -o CMakeFiles/Injection.dir/min_hook/buffer.c.s
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o: Injection/CMakeFiles/Injection.dir/flags.make
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o: Injection/min_hook/hde/hde32.c
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o -MF CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o.d -o CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o -c /home/jop/work/NST/NST/Injection/min_hook/hde/hde32.c
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/Injection.dir/min_hook/hde/hde32.c.i"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jop/work/NST/NST/Injection/min_hook/hde/hde32.c > CMakeFiles/Injection.dir/min_hook/hde/hde32.c.i
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/Injection.dir/min_hook/hde/hde32.c.s"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jop/work/NST/NST/Injection/min_hook/hde/hde32.c -o CMakeFiles/Injection.dir/min_hook/hde/hde32.c.s
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o: Injection/CMakeFiles/Injection.dir/flags.make
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o: Injection/min_hook/hde/hde64.c
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o -MF CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o.d -o CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o -c /home/jop/work/NST/NST/Injection/min_hook/hde/hde64.c
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/Injection.dir/min_hook/hde/hde64.c.i"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jop/work/NST/NST/Injection/min_hook/hde/hde64.c > CMakeFiles/Injection.dir/min_hook/hde/hde64.c.i
-
-Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/Injection.dir/min_hook/hde/hde64.c.s"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jop/work/NST/NST/Injection/min_hook/hde/hde64.c -o CMakeFiles/Injection.dir/min_hook/hde/hde64.c.s
-
-Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o: Injection/CMakeFiles/Injection.dir/flags.make
-Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o: Injection/min_hook/hook.c
-Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o -MF CMakeFiles/Injection.dir/min_hook/hook.c.o.d -o CMakeFiles/Injection.dir/min_hook/hook.c.o -c /home/jop/work/NST/NST/Injection/min_hook/hook.c
-
-Injection/CMakeFiles/Injection.dir/min_hook/hook.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/Injection.dir/min_hook/hook.c.i"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jop/work/NST/NST/Injection/min_hook/hook.c > CMakeFiles/Injection.dir/min_hook/hook.c.i
-
-Injection/CMakeFiles/Injection.dir/min_hook/hook.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/Injection.dir/min_hook/hook.c.s"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jop/work/NST/NST/Injection/min_hook/hook.c -o CMakeFiles/Injection.dir/min_hook/hook.c.s
-
-Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o: Injection/CMakeFiles/Injection.dir/flags.make
-Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o: Injection/min_hook/trampoline.c
-Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building C object Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o -MF CMakeFiles/Injection.dir/min_hook/trampoline.c.o.d -o CMakeFiles/Injection.dir/min_hook/trampoline.c.o -c /home/jop/work/NST/NST/Injection/min_hook/trampoline.c
-
-Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/Injection.dir/min_hook/trampoline.c.i"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/jop/work/NST/NST/Injection/min_hook/trampoline.c > CMakeFiles/Injection.dir/min_hook/trampoline.c.i
-
-Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/Injection.dir/min_hook/trampoline.c.s"
-	cd /home/jop/work/NST/NST/Injection && /usr/lib64/ccache/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/jop/work/NST/NST/Injection/min_hook/trampoline.c -o CMakeFiles/Injection.dir/min_hook/trampoline.c.s
-
 # Object files for target Injection
 Injection_OBJECTS = \
 "CMakeFiles/Injection.dir/Injection_autogen/mocs_compilation.cpp.o" \
-"CMakeFiles/Injection.dir/injection.cpp.o" \
-"CMakeFiles/Injection.dir/min_hook/buffer.c.o" \
-"CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o" \
-"CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o" \
-"CMakeFiles/Injection.dir/min_hook/hook.c.o" \
-"CMakeFiles/Injection.dir/min_hook/trampoline.c.o"
+"CMakeFiles/Injection.dir/injection.cpp.o"
 
 # External object files for target Injection
 Injection_EXTERNAL_OBJECTS =
 
 Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/Injection_autogen/mocs_compilation.cpp.o
 Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/injection.cpp.o
-Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o
-Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o
-Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o
-Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o
-Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o
 Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/build.make
 Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/compiler_depend.ts
 Injection/libInjection.so: /usr/lib64/libQt6Core.so.6.10.1
 Injection/libInjection.so: Injection/CMakeFiles/Injection.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX shared library libInjection.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared library libInjection.so"
 	cd /home/jop/work/NST/NST/Injection && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Injection.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

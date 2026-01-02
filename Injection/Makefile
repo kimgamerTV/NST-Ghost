@@ -85,6 +85,16 @@ package_source:
 package_source/fast: package_source
 .PHONY : package_source/fast
 
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
+
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --cyan "Running CMake cache editor..."
@@ -272,126 +282,6 @@ injection.cpp.s:
 	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/injection.cpp.s
 .PHONY : injection.cpp.s
 
-min_hook/buffer.o: min_hook/buffer.c.o
-.PHONY : min_hook/buffer.o
-
-# target to build an object file
-min_hook/buffer.c.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.o
-.PHONY : min_hook/buffer.c.o
-
-min_hook/buffer.i: min_hook/buffer.c.i
-.PHONY : min_hook/buffer.i
-
-# target to preprocess a source file
-min_hook/buffer.c.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.i
-.PHONY : min_hook/buffer.c.i
-
-min_hook/buffer.s: min_hook/buffer.c.s
-.PHONY : min_hook/buffer.s
-
-# target to generate assembly for a file
-min_hook/buffer.c.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/buffer.c.s
-.PHONY : min_hook/buffer.c.s
-
-min_hook/hde/hde32.o: min_hook/hde/hde32.c.o
-.PHONY : min_hook/hde/hde32.o
-
-# target to build an object file
-min_hook/hde/hde32.c.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o
-.PHONY : min_hook/hde/hde32.c.o
-
-min_hook/hde/hde32.i: min_hook/hde/hde32.c.i
-.PHONY : min_hook/hde/hde32.i
-
-# target to preprocess a source file
-min_hook/hde/hde32.c.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.i
-.PHONY : min_hook/hde/hde32.c.i
-
-min_hook/hde/hde32.s: min_hook/hde/hde32.c.s
-.PHONY : min_hook/hde/hde32.s
-
-# target to generate assembly for a file
-min_hook/hde/hde32.c.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde32.c.s
-.PHONY : min_hook/hde/hde32.c.s
-
-min_hook/hde/hde64.o: min_hook/hde/hde64.c.o
-.PHONY : min_hook/hde/hde64.o
-
-# target to build an object file
-min_hook/hde/hde64.c.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o
-.PHONY : min_hook/hde/hde64.c.o
-
-min_hook/hde/hde64.i: min_hook/hde/hde64.c.i
-.PHONY : min_hook/hde/hde64.i
-
-# target to preprocess a source file
-min_hook/hde/hde64.c.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.i
-.PHONY : min_hook/hde/hde64.c.i
-
-min_hook/hde/hde64.s: min_hook/hde/hde64.c.s
-.PHONY : min_hook/hde/hde64.s
-
-# target to generate assembly for a file
-min_hook/hde/hde64.c.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hde/hde64.c.s
-.PHONY : min_hook/hde/hde64.c.s
-
-min_hook/hook.o: min_hook/hook.c.o
-.PHONY : min_hook/hook.o
-
-# target to build an object file
-min_hook/hook.c.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hook.c.o
-.PHONY : min_hook/hook.c.o
-
-min_hook/hook.i: min_hook/hook.c.i
-.PHONY : min_hook/hook.i
-
-# target to preprocess a source file
-min_hook/hook.c.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hook.c.i
-.PHONY : min_hook/hook.c.i
-
-min_hook/hook.s: min_hook/hook.c.s
-.PHONY : min_hook/hook.s
-
-# target to generate assembly for a file
-min_hook/hook.c.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/hook.c.s
-.PHONY : min_hook/hook.c.s
-
-min_hook/trampoline.o: min_hook/trampoline.c.o
-.PHONY : min_hook/trampoline.o
-
-# target to build an object file
-min_hook/trampoline.c.o:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.o
-.PHONY : min_hook/trampoline.c.o
-
-min_hook/trampoline.i: min_hook/trampoline.c.i
-.PHONY : min_hook/trampoline.i
-
-# target to preprocess a source file
-min_hook/trampoline.c.i:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.i
-.PHONY : min_hook/trampoline.c.i
-
-min_hook/trampoline.s: min_hook/trampoline.c.s
-.PHONY : min_hook/trampoline.s
-
-# target to generate assembly for a file
-min_hook/trampoline.c.s:
-	cd /home/jop/work/NST/NST && $(MAKE) $(MAKESILENT) -f Injection/CMakeFiles/Injection.dir/build.make Injection/CMakeFiles/Injection.dir/min_hook/trampoline.c.s
-.PHONY : min_hook/trampoline.c.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -406,6 +296,7 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
+	@echo "... test"
 	@echo "... Injection_autogen"
 	@echo "... Injection_autogen_timestamp_deps"
 	@echo "... Injection"
@@ -415,21 +306,6 @@ help:
 	@echo "... injection.o"
 	@echo "... injection.i"
 	@echo "... injection.s"
-	@echo "... min_hook/buffer.o"
-	@echo "... min_hook/buffer.i"
-	@echo "... min_hook/buffer.s"
-	@echo "... min_hook/hde/hde32.o"
-	@echo "... min_hook/hde/hde32.i"
-	@echo "... min_hook/hde/hde32.s"
-	@echo "... min_hook/hde/hde64.o"
-	@echo "... min_hook/hde/hde64.i"
-	@echo "... min_hook/hde/hde64.s"
-	@echo "... min_hook/hook.o"
-	@echo "... min_hook/hook.i"
-	@echo "... min_hook/hook.s"
-	@echo "... min_hook/trampoline.o"
-	@echo "... min_hook/trampoline.i"
-	@echo "... min_hook/trampoline.s"
 .PHONY : help
 
 

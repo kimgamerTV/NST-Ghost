@@ -1,4 +1,4 @@
-CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o: \
+BGA/CMakeFiles/BGACore.dir/core/src/engines/rpgm/rpganalyzer.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/engines/rpgm/rpganalyzer.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/engines/rpgm/rpganalyzer.h \

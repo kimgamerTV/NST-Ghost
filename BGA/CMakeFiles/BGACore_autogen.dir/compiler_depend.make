@@ -52,109 +52,566 @@ BGA/BGACore_autogen/timestamp: BGA/CMakeLists.txt \
   /usr/lib64/cmake/Qt6/QtPublicWalkLibsHelpers.cmake \
   /usr/lib64/cmake/Qt6/QtPublicWindowsHelpers.cmake \
   /usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake \
+  /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake \
+  BGA/CMakeFiles/3.31.10/CMakeCXXCompiler.cmake \
+  BGA/CMakeFiles/3.31.10/CMakeSystem.cmake \
+  BGA/CMakeLists.txt \
+  BGA/core/include/core/analyzerfactory.h \
+  BGA/core/include/core/bga_rust_bridge.h \
+  BGA/core/include/core/engines/renpy/renpyanalyzer.h \
+  BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  BGA/core/include/core/engines/unity/unityanalyzer.h \
+  BGA/core/include/core/gameanalyzer.h \
+  BGA/core/src/analyzerfactory.cpp \
+  BGA/core/src/bga_rust_bridge.cpp \
+  BGA/core/src/engines/renpy/renpyanalyzer.cpp \
+  BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /usr/lib64/cmake/Qt6/FindWrapAtomic.cmake \
+  /usr/lib64/cmake/Qt6/Qt6Config.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigExtras.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigVersionImpl.cmake \
+  /usr/lib64/cmake/Qt6/Qt6Dependencies.cmake \
+  /usr/lib64/cmake/Qt6/Qt6Targets.cmake \
+  /usr/lib64/cmake/Qt6/Qt6VersionlessAliasTargets.cmake \
+  /usr/lib64/cmake/Qt6/QtFeature.cmake \
+  /usr/lib64/cmake/Qt6/QtFeatureCommon.cmake \
+  /usr/lib64/cmake/Qt6/QtInstallPaths.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicAndroidHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicAppleHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeEarlyPolicyHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicDependencyHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicExternalProjectHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicFinalizerHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicFindPackageHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicGitHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicPluginHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicPluginHelpers_v2.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomCpeHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomDepHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomFileHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomOpsHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomPurlHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomPythonHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomQtEntityHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicTargetHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicTestHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicToolHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicWalkLibsHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicWindowsHelpers.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreAdditionalTargetInfo.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreConfig.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreConfigExtras.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreConfigVersion.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreConfigVersionImpl.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreDependencies.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreMacros.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreTargets-relwithdebinfo.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreTargets.cmake \
+  /usr/lib64/cmake/Qt6Core/Qt6CoreVersionlessAliasTargets.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsAdditionalTargetInfo.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfig.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfigVersion.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfigVersionImpl.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsDependencies.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsTargets-relwithdebinfo.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsTargets.cmake \
+  /usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsVersionlessTargets.cmake \
+  /usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in \
+  /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp \
+  /usr/share/cmake/Modules/CMakeCXXInformation.cmake \
+  /usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake \
+  /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake \
+  /usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineCompiler.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake \
+  /usr/share/cmake/Modules/CMakeDetermineSystem.cmake \
+  /usr/share/cmake/Modules/CMakeFindBinUtils.cmake \
+  /usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake \
+  /usr/share/cmake/Modules/CMakeGenericSystem.cmake \
+  /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake \
+  /usr/share/cmake/Modules/CMakeLanguageInformation.cmake \
+  /usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake \
+  /usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake \
+  /usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake \
+  /usr/share/cmake/Modules/CMakeSystem.cmake.in \
+  /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake \
+  /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake \
+  /usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake \
+  /usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake \
+  /usr/share/cmake/Modules/CMakeUnixFindMake.cmake \
+  /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake \
+  /usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake \
+  /usr/share/cmake/Modules/CheckIncludeFileCXX.cmake \
+  /usr/share/cmake/Modules/CheckLibraryExists.cmake \
+  /usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake \
+  /usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake \
+  /usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake \
+  /usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake \
+  /usr/share/cmake/Modules/Compiler/GNU.cmake \
+  /usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake \
+  /usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake \
+  /usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake \
+  /usr/share/cmake/Modules/FindPackageMessage.cmake \
+  /usr/share/cmake/Modules/FindThreads.cmake \
+  /usr/share/cmake/Modules/GNUInstallDirs.cmake \
+  /usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake \
+  /usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake \
+  /usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake \
+  /usr/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake \
+  /usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake \
+  /usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake \
+  /usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake \
+  /usr/share/cmake/Modules/Internal/FeatureTesting.cmake \
+  /usr/share/cmake/Modules/Linker/GNU-CXX.cmake \
+  /usr/share/cmake/Modules/Linker/GNU.cmake \
+  /usr/share/cmake/Modules/Platform/Linker/GNU.cmake \
+  /usr/share/cmake/Modules/Platform/Linker/Linux-GNU-CXX.cmake \
+  /usr/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake \
+  /usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake \
+  /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake \
+  /usr/share/cmake/Modules/Platform/Linux-GNU.cmake \
+  /usr/share/cmake/Modules/Platform/Linux-Initialize.cmake \
+  /usr/share/cmake/Modules/Platform/Linux.cmake \
+  /usr/share/cmake/Modules/Platform/UnixPaths.cmake \
+  BGA/CMakeLists.txt \
+  BGA/core/include/core/analyzerfactory.h \
+  BGA/core/include/core/bga_rust_bridge.h \
+  BGA/core/include/core/engines/renpy/renpyanalyzer.h \
+  BGA/core/include/core/engines/rpgm/rpganalyzer.h \
+  BGA/core/include/core/engines/unity/unityanalyzer.h \
+  BGA/core/include/core/gameanalyzer.h \
+  BGA/core/src/analyzerfactory.cpp \
+  BGA/core/src/bga_rust_bridge.cpp \
+  BGA/core/src/engines/renpy/renpyanalyzer.cpp \
+  BGA/core/src/engines/rpgm/rpganalyzer.cpp \
+  BGA/core/src/engines/unity/unityanalyzer.cpp \
+  /usr/bin/cmake \
+  /usr/lib64/cmake/Qt6/Qt6Config.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigExtras.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake \
+  /usr/lib64/cmake/Qt6/Qt6ConfigVersionImpl.cmake \
+  /usr/lib64/cmake/Qt6/Qt6Dependencies.cmake \
+  /usr/lib64/cmake/Qt6/Qt6Targets.cmake \
+  /usr/lib64/cmake/Qt6/Qt6VersionlessAliasTargets.cmake \
+  /usr/lib64/cmake/Qt6/QtFeature.cmake \
+  /usr/lib64/cmake/Qt6/QtFeatureCommon.cmake \
+  /usr/lib64/cmake/Qt6/QtInstallPaths.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicAndroidHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicAppleHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeEarlyPolicyHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicDependencyHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicExternalProjectHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicFinalizerHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicFindPackageHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicGitHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicPluginHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicPluginHelpers_v2.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomCpeHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomDepHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomFileHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomOpsHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomPurlHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomPythonHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomQtEntityHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicTargetHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicTestHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicToolHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicWalkLibsHelpers.cmake \
+  /usr/lib64/cmake/Qt6/QtPublicWindowsHelpers.cmake \
+  /usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake \
   /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake
 
 
+/usr/share/cmake/Modules/Platform/Linux-Initialize.cmake:
+
+/usr/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake:
+
+/usr/share/cmake/Modules/Platform/Linker/Linux-GNU-CXX.cmake:
+
+/usr/share/cmake/Modules/Platform/Linker/GNU.cmake:
+
+/usr/share/cmake/Modules/Internal/FeatureTesting.cmake:
+
+/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:
+
+/usr/share/cmake/Modules/Internal/CheckFlagCommonConfig.cmake:
+
+/usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake:
+
+/usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake:
+
+/usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake:
+
+/usr/share/cmake/Modules/FindPackageMessage.cmake:
+
+/usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake:
+
+/usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:
+
+/usr/lib64/cmake/Qt6/FindWrapAtomic.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicDependencyHelpers.cmake:
+
+BGA/CMakeFiles/3.31.10/CMakeSystem.cmake:
+
+/usr/lib64/cmake/Qt6/Qt6Config.cmake:
+
 /usr/share/cmake/Modules/CheckCXXCompilerFlag.cmake:
 
-/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:
+/usr/lib64/cmake/Qt6/QtPublicToolHelpers.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomDepHelpers.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicWalkLibsHelpers.cmake:
+
+BGA/core/include/core/engines/rpgm/rpganalyzer.h:
+
+/usr/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicTestHelpers.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicTargetHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake:
-
 /usr/lib64/cmake/Qt6/QtPublicSbomPythonHelpers.cmake:
+
+/usr/share/cmake/Modules/Platform/Linux-GNU.cmake:
+
+/usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Platform/Linux.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicSbomPurlHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomOpsHelpers.cmake:
+/usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomHelpers.cmake:
+/usr/lib64/cmake/Qt6/QtPublicSbomOpsHelpers.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicSbomQtEntityHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake:
+/usr/lib64/cmake/Qt6/QtFeature.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomCpeHelpers.cmake:
+/usr/share/cmake/Modules/Platform/UnixPaths.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicToolHelpers.cmake:
+/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomFileHelpers.cmake:
+/usr/share/cmake/Modules/FindThreads.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreConfigVersion.cmake:
 
 /usr/lib64/cmake/Qt6/Qt6ConfigExtras.cmake:
 
+/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake:
+
 BGA/core/src/engines/rpgm/rpganalyzer.cpp:
+
+/usr/share/cmake/Modules/GNUInstallDirs.cmake:
 
 BGA/core/include/core/gameanalyzer.h:
 
+BGA/core/src/bga_rust_bridge.cpp:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomCpeHelpers.cmake:
+
 /usr/lib64/cmake/Qt6/QtPublicPluginHelpers_v2.cmake:
+
+/usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake:
 
 /usr/lib64/cmake/Qt6/QtFeatureCommon.cmake:
 
+/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake:
+
 /usr/lib64/cmake/Qt6/Qt6Targets.cmake:
 
-BGA/core/src/engines/renpy/renpyanalyzer.cpp:
+BGA/CMakeFiles/3.31.10/CMakeCXXCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake:
 
 /usr/lib64/cmake/Qt6/Qt6VersionlessAliasTargets.cmake:
 
+/usr/lib64/cmake/Qt6/Qt6Dependencies.cmake:
+
 BGA/core/src/engines/unity/unityanalyzer.cpp:
+
+/usr/share/cmake/Modules/CMakeInitializeConfigs.cmake:
+
+/usr/share/cmake/Modules/Linker/GNU.cmake:
 
 BGA/core/include/core/engines/unity/unityanalyzer.h:
 
-/usr/lib64/cmake/Qt6/QtPublicPluginHelpers.cmake:
+/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicFindPackageHelpers.cmake:
 
-BGA/core/include/core/engines/renpy/renpyanalyzer.h:
-
-BGA/core/include/core/engines/rpgm/rpganalyzer.h:
-
 /usr/lib64/cmake/Qt6/QtPublicExternalProjectHelpers.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicPluginHelpers.cmake:
 
 BGA/core/include/core/analyzerfactory.h:
 
 /usr/lib64/cmake/Qt6/QtPublicSbomAttributionHelpers.cmake:
 
+/usr/lib64/cmake/Qt6/QtPublicSbomFileHelpers.cmake:
+
+/usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreAdditionalTargetInfo.cmake:
+
 /usr/bin/cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicCMakeEarlyPolicyHelpers.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreConfig.cmake:
+
+/usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake:
+
+/usr/share/cmake/Modules/Compiler/GNU.cmake:
 
 BGA/CMakeLists.txt:
 
 /usr/lib64/cmake/Qt6/QtPublicGitHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake:
-
 /usr/lib64/cmake/Qt6/Qt6ConfigVersionImpl.cmake:
 
-/usr/lib64/cmake/Qt6/Qt6Dependencies.cmake:
+/usr/share/cmake/Modules/CheckLibraryExists.cmake:
 
 BGA/core/src/analyzerfactory.cpp:
 
-/usr/lib64/cmake/Qt6/QtFeature.cmake:
-
-/usr/lib64/cmake/Qt6/QtPublicSbomDepHelpers.cmake:
-
-/usr/lib64/cmake/Qt6/Qt6Config.cmake:
-
-/usr/lib64/cmake/Qt6/QtPublicDependencyHelpers.cmake:
+BGA/core/include/core/bga_rust_bridge.h:
 
 /usr/lib64/cmake/Qt6/QtInstallPaths.cmake:
 
+/usr/lib64/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake:
+
+/usr/share/cmake/Modules/CMakeLanguageInformation.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomHelpers.cmake:
+
 /usr/lib64/cmake/Qt6/QtPublicAndroidHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicWindowsHelpers.cmake:
+/usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomSystemDepHelpers.cmake:
+
+/usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicAppleHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicSbomLicenseHelpers.cmake:
+/usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicCMakeEarlyPolicyHelpers.cmake:
+/usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeFindBinUtils.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicCMakeHelpers.cmake:
 
-/usr/lib64/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake:
+/usr/lib64/cmake/Qt6Core/Qt6CoreConfigExtras.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreConfigVersionImpl.cmake:
+
+/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreDependencies.cmake:
+
+/usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake:
+
+/usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreMacros.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsTargets-relwithdebinfo.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreTargets-relwithdebinfo.cmake:
+
+/usr/share/cmake/Modules/Linker/GNU-CXX.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsAdditionalTargetInfo.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreTargets.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsDependencies.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsTargets.cmake:
+
+/usr/lib64/cmake/Qt6Core/Qt6CoreVersionlessAliasTargets.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfig.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfigVersion.cmake:
+
+/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsConfigVersionImpl.cmake:
+
+/usr/lib64/cmake/Qt6CoreTools/Qt6CoreToolsVersionlessTargets.cmake:
+
+/usr/share/cmake/Modules/CMakeCXXInformation.cmake:
+
+/usr/share/cmake/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake:
+
+/usr/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:
+
+/usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake:
+
+/usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake:
+
+/usr/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicSbomGenerationHelpers.cmake:
+
+/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:
+
+/usr/share/cmake/Modules/CMakeGenericSystem.cmake:
+
+/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake:
+
+/usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake:
+
+/usr/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake:
+
+BGA/core/include/core/engines/renpy/renpyanalyzer.h:
+
+/usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake:
+
+/usr/share/cmake/Modules/CMakeSystem.cmake.in:
+
+/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake:
+
+/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake:
+
+/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake:
+
+/usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake:
+
+/usr/share/cmake/Modules/CMakeUnixFindMake.cmake:
+
+/usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake:
+
+BGA/core/src/engines/renpy/renpyanalyzer.cpp:
+
+/usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake:
+
+/usr/share/cmake/Modules/CheckIncludeFileCXX.cmake:
+
+/usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake:
+
+/usr/lib64/cmake/Qt6/QtPublicWindowsHelpers.cmake:
+
+/usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake:
+
+/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake:
+
+/usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake:
+
+/usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake:
 
 /usr/lib64/cmake/Qt6/QtPublicFinalizerHelpers.cmake:
+
+/usr/share/cmake/Modules/Compiler/GNU-CXX.cmake:

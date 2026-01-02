@@ -125,36 +125,6 @@
 			"MU",
 			"EWIEGA46WW/moc_injection.cpp",
 			null
-		],
-		[
-			"/home/jop/work/NST/NST/Injection/min_hook/MinHook.h",
-			"MU",
-			"N3TGP3LII3/moc_MinHook.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/Injection/min_hook/buffer.h",
-			"MU",
-			"N3TGP3LII3/moc_buffer.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/Injection/min_hook/hde/hde32.h",
-			"MU",
-			"I7THTTKQVV/moc_hde32.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/Injection/min_hook/hde/hde64.h",
-			"MU",
-			"I7THTTKQVV/moc_hde64.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/Injection/min_hook/trampoline.h",
-			"MU",
-			"N3TGP3LII3/moc_trampoline.cpp",
-			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -162,7 +132,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/Injection/Injection_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.1\"",
+		"APP_VERSION=\"0.5.2\"",
 		"INJECTION_LIBRARY",
 		"Injection_EXPORTS",
 		"QT_CORE_LIB",
@@ -220,12 +190,7 @@
 	"SETTINGS_FILE" : "/home/jop/work/NST/NST/Injection/CMakeFiles/Injection_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/home/jop/work/NST/NST/Injection/injection.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/Injection/min_hook/buffer.c", "MU", null ],
-		[ "/home/jop/work/NST/NST/Injection/min_hook/hde/hde32.c", "MU", null ],
-		[ "/home/jop/work/NST/NST/Injection/min_hook/hde/hde64.c", "MU", null ],
-		[ "/home/jop/work/NST/NST/Injection/min_hook/hook.c", "MU", null ],
-		[ "/home/jop/work/NST/NST/Injection/min_hook/trampoline.c", "MU", null ]
+		[ "/home/jop/work/NST/NST/Injection/injection.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

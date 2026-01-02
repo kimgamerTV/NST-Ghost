@@ -1,4 +1,4 @@
-CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o: \
+BGA/CMakeFiles/BGACore.dir/core/src/bga_rust_bridge.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/bga_rust_bridge.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/bga_rust_bridge.h \

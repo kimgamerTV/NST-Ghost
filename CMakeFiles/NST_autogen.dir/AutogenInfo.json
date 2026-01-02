@@ -7,61 +7,9 @@
 	"CMAKE_LIST_FILES" : 
 	[
 		"/home/jop/work/NST/NST/CMakeLists.txt",
-		"/usr/share/cmake/Modules/CMakeDetermineSystem.cmake",
-		"/usr/share/cmake/Modules/CMakeSystem.cmake.in",
 		"/home/jop/work/NST/NST/CMakeFiles/3.31.10/CMakeSystem.cmake",
 		"/usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake",
 		"/usr/share/cmake/Modules/Platform/Linux-Initialize.cmake",
-		"/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake",
-		"/usr/share/cmake/Modules/CMakeDetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Platform/Linux-Determine-CXX.cmake",
-		"/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake",
-		"/usr/share/cmake/Modules/CMakeCompilerIdDetection.cmake",
-		"/usr/share/cmake/Modules/Compiler/ADSP-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/ARMCC-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/ARMClang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/AppleClang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake",
-		"/usr/share/cmake/Modules/Compiler/Borland-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Clang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Clang-DetermineCompilerInternal.cmake",
-		"/usr/share/cmake/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Cray-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/CrayClang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Embarcadero-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Fujitsu-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/GHS-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/HP-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IAR-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Intel-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/MSVC-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/NVHPC-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/NVIDIA-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/OrangeC-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/PGI-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/PathScale-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/SCO-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/TI-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/TIClang-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/Tasking-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"/usr/share/cmake/Modules/Compiler/Watcom-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/XL-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"/usr/share/cmake/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake",
-		"/usr/share/cmake/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake",
-		"/usr/share/cmake/Modules/CMakeFindBinUtils.cmake",
-		"/usr/share/cmake/Modules/Compiler/GNU-FindBinUtils.cmake",
-		"/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in",
 		"/home/jop/work/NST/NST/CMakeFiles/3.31.10/CMakeCXXCompiler.cmake",
 		"/usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake",
 		"/usr/share/cmake/Modules/CMakeGenericSystem.cmake",
@@ -76,19 +24,6 @@
 		"/usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake",
 		"/usr/share/cmake/Modules/Platform/Linux-GNU.cmake",
 		"/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake",
-		"/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake",
-		"/usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake",
-		"/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake",
-		"/usr/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake",
-		"/usr/share/cmake/Modules/CMakeParseImplicitIncludeInfo.cmake",
-		"/usr/share/cmake/Modules/CMakeParseImplicitLinkInfo.cmake",
-		"/usr/share/cmake/Modules/CMakeParseLibraryArchitecture.cmake",
-		"/usr/share/cmake/Modules/CMakeTestCompilerCommon.cmake",
-		"/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp",
-		"/usr/share/cmake/Modules/CMakeDetermineCompilerSupport.cmake",
-		"/usr/share/cmake/Modules/Internal/FeatureTesting.cmake",
-		"/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in",
-		"/home/jop/work/NST/NST/CMakeFiles/3.31.10/CMakeCXXCompiler.cmake",
 		"/usr/share/cmake/Modules/Internal/CMakeCXXLinkerInformation.cmake",
 		"/usr/share/cmake/Modules/Internal/CMakeCommonLinkerInformation.cmake",
 		"/usr/share/cmake/Modules/Linker/GNU-CXX.cmake",
@@ -96,8 +31,6 @@
 		"/usr/share/cmake/Modules/Platform/Linker/Linux-GNU-CXX.cmake",
 		"/usr/share/cmake/Modules/Platform/Linker/Linux-GNU.cmake",
 		"/usr/share/cmake/Modules/Platform/Linker/GNU.cmake",
-		"/usr/share/cmake/Modules/Internal/CMakeInspectCXXLinker.cmake",
-		"/usr/share/cmake/Modules/CMakeCXXCompiler.cmake.in",
 		"/usr/lib64/cmake/Qt6/Qt6ConfigVersion.cmake",
 		"/usr/lib64/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
 		"/usr/lib64/cmake/Qt6/Qt6Config.cmake",
@@ -591,63 +524,111 @@
 	"HEADERS" : 
 	[
 		[
-			"/home/jop/work/NST/NST/src/bgadatamanager.h",
+			"/home/jop/work/NST/NST/src/controllers/searchcontroller.h",
 			"MU",
-			"UVLADIE3JM/moc_bgadatamanager.cpp",
+			"METKDVI4SS/moc_searchcontroller.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/customprogressdialog.h",
+			"/home/jop/work/NST/NST/src/controllers/shortcutcontroller.h",
 			"MU",
-			"UVLADIE3JM/moc_customprogressdialog.cpp",
+			"METKDVI4SS/moc_shortcutcontroller.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/customtitlebar.h",
+			"/home/jop/work/NST/NST/src/controllers/updatecontroller.h",
 			"MU",
-			"UVLADIE3JM/moc_customtitlebar.cpp",
+			"METKDVI4SS/moc_updatecontroller.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/filetranslationwidget.h",
+			"/home/jop/work/NST/NST/src/core/rpgrelationanalyzer.h",
 			"MU",
-			"UVLADIE3JM/moc_filetranslationwidget.cpp",
+			"PRMOGMWJPH/moc_rpgrelationanalyzer.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/fontmanagerdialog.h",
+			"/home/jop/work/NST/NST/src/core/translationserver.h",
 			"MU",
-			"UVLADIE3JM/moc_fontmanagerdialog.cpp",
+			"PRMOGMWJPH/moc_translationserver.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/loadprojectdialog.h",
+			"/home/jop/work/NST/NST/src/dialogs/customprogressdialog.h",
 			"MU",
-			"UVLADIE3JM/moc_loadprojectdialog.cpp",
+			"RGRURCYE3Z/moc_customprogressdialog.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/mainwindow.h",
+			"/home/jop/work/NST/NST/src/dialogs/fontmanagerdialog.h",
 			"MU",
-			"UVLADIE3JM/moc_mainwindow.cpp",
+			"RGRURCYE3Z/moc_fontmanagerdialog.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/menubar.h",
+			"/home/jop/work/NST/NST/src/dialogs/loadprojectdialog.h",
 			"MU",
-			"UVLADIE3JM/moc_menubar.cpp",
+			"RGRURCYE3Z/moc_loadprojectdialog.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/plugindebuggerdialog.h",
+			"/home/jop/work/NST/NST/src/dialogs/plugindebuggerdialog.h",
 			"MU",
-			"UVLADIE3JM/moc_plugindebuggerdialog.cpp",
+			"RGRURCYE3Z/moc_plugindebuggerdialog.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/pluginmanagerdialog.h",
+			"/home/jop/work/NST/NST/src/dialogs/pluginmanagerdialog.h",
 			"MU",
-			"UVLADIE3JM/moc_pluginmanagerdialog.cpp",
+			"RGRURCYE3Z/moc_pluginmanagerdialog.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/processselectordialog.h",
+			"MU",
+			"RGRURCYE3Z/moc_processselectordialog.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/scripteditordialog.h",
+			"MU",
+			"RGRURCYE3Z/moc_scripteditordialog.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/searchdialog.h",
+			"MU",
+			"RGRURCYE3Z/moc_searchdialog.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/settingsdialog.h",
+			"MU",
+			"RGRURCYE3Z/moc_settingsdialog.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/bgadatamanager.h",
+			"MU",
+			"I5UM235HFU/moc_bgadatamanager.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/projectdatamanager.h",
+			"MU",
+			"I5UM235HFU/moc_projectdatamanager.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/smartfiltermanager.h",
+			"MU",
+			"I5UM235HFU/moc_smartfiltermanager.cpp",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/translationservicemanager.h",
+			"MU",
+			"I5UM235HFU/moc_translationservicemanager.cpp",
 			null
 		],
 		[
@@ -675,99 +656,51 @@
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/processselectordialog.h",
+			"/home/jop/work/NST/NST/src/ui/customtitlebar.h",
 			"MU",
-			"UVLADIE3JM/moc_processselectordialog.cpp",
+			"YPKJ5OE7LN/moc_customtitlebar.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/projectdatamanager.h",
+			"/home/jop/work/NST/NST/src/ui/filetranslationwidget.h",
 			"MU",
-			"UVLADIE3JM/moc_projectdatamanager.cpp",
+			"YPKJ5OE7LN/moc_filetranslationwidget.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/realtimetranslationwidget.h",
+			"/home/jop/work/NST/NST/src/ui/mainwindow.h",
 			"MU",
-			"UVLADIE3JM/moc_realtimetranslationwidget.cpp",
+			"YPKJ5OE7LN/moc_mainwindow.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/relationitem.h",
+			"/home/jop/work/NST/NST/src/ui/menubar.h",
 			"MU",
-			"UVLADIE3JM/moc_relationitem.cpp",
+			"YPKJ5OE7LN/moc_menubar.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/relationshipwidget.h",
+			"/home/jop/work/NST/NST/src/ui/realtimetranslationwidget.h",
 			"MU",
-			"UVLADIE3JM/moc_relationshipwidget.cpp",
+			"YPKJ5OE7LN/moc_realtimetranslationwidget.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/rpgrelationanalyzer.h",
+			"/home/jop/work/NST/NST/src/ui/relationitem.h",
 			"MU",
-			"UVLADIE3JM/moc_rpgrelationanalyzer.cpp",
+			"YPKJ5OE7LN/moc_relationitem.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/scripteditordialog.h",
+			"/home/jop/work/NST/NST/src/ui/relationshipwidget.h",
 			"MU",
-			"UVLADIE3JM/moc_scripteditordialog.cpp",
+			"YPKJ5OE7LN/moc_relationshipwidget.cpp",
 			null
 		],
 		[
-			"/home/jop/work/NST/NST/src/searchcontroller.h",
+			"/home/jop/work/NST/NST/src/ui/translationcontextmenu.h",
 			"MU",
-			"UVLADIE3JM/moc_searchcontroller.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/searchdialog.h",
-			"MU",
-			"UVLADIE3JM/moc_searchdialog.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/settingsdialog.h",
-			"MU",
-			"UVLADIE3JM/moc_settingsdialog.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/shortcutcontroller.h",
-			"MU",
-			"UVLADIE3JM/moc_shortcutcontroller.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/smartfiltermanager.h",
-			"MU",
-			"UVLADIE3JM/moc_smartfiltermanager.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/translationcontextmenu.h",
-			"MU",
-			"UVLADIE3JM/moc_translationcontextmenu.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/translationserver.h",
-			"MU",
-			"UVLADIE3JM/moc_translationserver.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/translationservicemanager.h",
-			"MU",
-			"UVLADIE3JM/moc_translationservicemanager.cpp",
-			null
-		],
-		[
-			"/home/jop/work/NST/NST/src/updatecontroller.h",
-			"MU",
-			"UVLADIE3JM/moc_updatecontroller.cpp",
+			"YPKJ5OE7LN/moc_translationcontextmenu.cpp",
 			null
 		]
 	],
@@ -776,7 +709,7 @@
 	"MOC_COMPILATION_FILE" : "/home/jop/work/NST/NST/NST_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
-		"APP_VERSION=\"0.5.1\"",
+		"APP_VERSION=\"0.5.2\"",
 		"HAS_LUA=1",
 		"QT_CONCURRENT_LIB",
 		"QT_CORE_LIB",
@@ -797,6 +730,11 @@
 		"/home/jop/work/NST/NST/BGA/core/include",
 		"/home/jop/work/NST/NST/QtLingo/include",
 		"/home/jop/work/NST/NST/src",
+		"/home/jop/work/NST/NST/src/ui",
+		"/home/jop/work/NST/NST/src/dialogs",
+		"/home/jop/work/NST/NST/src/managers",
+		"/home/jop/work/NST/NST/src/core",
+		"/home/jop/work/NST/NST/src/controllers",
 		"/home/jop/work/NST/NST/QtLingo",
 		"/usr/include/qt6/QtCore",
 		"/usr/include/qt6",
@@ -846,17 +784,77 @@
 	"SETTINGS_FILE" : "/home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/home/jop/work/NST/NST/src/bgadatamanager.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/customprogressdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/customtitlebar.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/filetranslationwidget.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/fontmanagerdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/loadprojectdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/main.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/mainwindow.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/menubar.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/plugindebuggerdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/pluginmanagerdialog.cpp", "MU", null ],
+		[
+			"/home/jop/work/NST/NST/src/controllers/searchcontroller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/controllers/shortcutcontroller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/controllers/updatecontroller.cpp",
+			"MU",
+			null
+		],
+		[ "/home/jop/work/NST/NST/src/core/main.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/core/rpgrelationanalyzer.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/core/translationserver.cpp", "MU", null ],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/customprogressdialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/fontmanagerdialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/loadprojectdialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/plugindebuggerdialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/pluginmanagerdialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/processselectordialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/dialogs/scripteditordialog.cpp",
+			"MU",
+			null
+		],
+		[ "/home/jop/work/NST/NST/src/dialogs/searchdialog.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/dialogs/settingsdialog.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/managers/bgadatamanager.cpp", "MU", null ],
+		[
+			"/home/jop/work/NST/NST/src/managers/projectdatamanager.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/smartfiltermanager.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/jop/work/NST/NST/src/managers/translationservicemanager.cpp",
+			"MU",
+			null
+		],
 		[ "/home/jop/work/NST/NST/src/plugins/LuaPlugin.cpp", "MU", null ],
 		[ "/home/jop/work/NST/NST/src/plugins/LuaScriptManager.cpp", "MU", null ],
 		[
@@ -865,30 +863,22 @@
 			null
 		],
 		[ "/home/jop/work/NST/NST/src/plugins/PluginManager.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/processselectordialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/projectdatamanager.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/customtitlebar.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/filetranslationwidget.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/mainwindow.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/menubar.cpp", "MU", null ],
 		[
-			"/home/jop/work/NST/NST/src/realtimetranslationwidget.cpp",
+			"/home/jop/work/NST/NST/src/ui/realtimetranslationwidget.cpp",
 			"MU",
 			null
 		],
-		[ "/home/jop/work/NST/NST/src/relationitem.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/relationshipwidget.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/rpgrelationanalyzer.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/scripteditordialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/searchcontroller.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/searchdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/settingsdialog.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/shortcutcontroller.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/smartfiltermanager.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/translationcontextmenu.cpp", "MU", null ],
-		[ "/home/jop/work/NST/NST/src/translationserver.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/relationitem.cpp", "MU", null ],
+		[ "/home/jop/work/NST/NST/src/ui/relationshipwidget.cpp", "MU", null ],
 		[
-			"/home/jop/work/NST/NST/src/translationservicemanager.cpp",
+			"/home/jop/work/NST/NST/src/ui/translationcontextmenu.cpp",
 			"MU",
 			null
-		],
-		[ "/home/jop/work/NST/NST/src/updatecontroller.cpp", "MU", null ]
+		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

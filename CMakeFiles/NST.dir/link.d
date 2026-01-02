@@ -3,34 +3,34 @@ NST: \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crti.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbegin.o \
   CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o \
-  CMakeFiles/NST.dir/src/main.cpp.o \
-  CMakeFiles/NST.dir/src/mainwindow.cpp.o \
-  CMakeFiles/NST.dir/src/menubar.cpp.o \
-  CMakeFiles/NST.dir/src/loadprojectdialog.cpp.o \
-  CMakeFiles/NST.dir/src/searchdialog.cpp.o \
-  CMakeFiles/NST.dir/src/settingsdialog.cpp.o \
-  CMakeFiles/NST.dir/src/searchcontroller.cpp.o \
-  CMakeFiles/NST.dir/src/shortcutcontroller.cpp.o \
-  CMakeFiles/NST.dir/src/bgadatamanager.cpp.o \
-  CMakeFiles/NST.dir/src/translationservicemanager.cpp.o \
-  CMakeFiles/NST.dir/src/relationshipwidget.cpp.o \
-  CMakeFiles/NST.dir/src/relationitem.cpp.o \
-  CMakeFiles/NST.dir/src/rpgrelationanalyzer.cpp.o \
-  CMakeFiles/NST.dir/src/smartfiltermanager.cpp.o \
-  CMakeFiles/NST.dir/src/translationcontextmenu.cpp.o \
-  CMakeFiles/NST.dir/src/updatecontroller.cpp.o \
-  CMakeFiles/NST.dir/src/fontmanagerdialog.cpp.o \
-  CMakeFiles/NST.dir/src/pluginmanagerdialog.cpp.o \
-  CMakeFiles/NST.dir/src/plugindebuggerdialog.cpp.o \
+  CMakeFiles/NST.dir/src/core/main.cpp.o \
+  CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o \
+  CMakeFiles/NST.dir/src/ui/menubar.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/loadprojectdialog.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/searchdialog.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/settingsdialog.cpp.o \
+  CMakeFiles/NST.dir/src/controllers/searchcontroller.cpp.o \
+  CMakeFiles/NST.dir/src/controllers/shortcutcontroller.cpp.o \
+  CMakeFiles/NST.dir/src/managers/bgadatamanager.cpp.o \
+  CMakeFiles/NST.dir/src/managers/translationservicemanager.cpp.o \
+  CMakeFiles/NST.dir/src/ui/relationshipwidget.cpp.o \
+  CMakeFiles/NST.dir/src/ui/relationitem.cpp.o \
+  CMakeFiles/NST.dir/src/core/rpgrelationanalyzer.cpp.o \
+  CMakeFiles/NST.dir/src/managers/smartfiltermanager.cpp.o \
+  CMakeFiles/NST.dir/src/ui/translationcontextmenu.cpp.o \
+  CMakeFiles/NST.dir/src/controllers/updatecontroller.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/fontmanagerdialog.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/pluginmanagerdialog.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/plugindebuggerdialog.cpp.o \
   CMakeFiles/NST.dir/src/plugins/LuaTranslationPlugin/luatranslationservice.cpp.o \
-  CMakeFiles/NST.dir/src/projectdatamanager.cpp.o \
-  CMakeFiles/NST.dir/src/scripteditordialog.cpp.o \
-  CMakeFiles/NST.dir/src/customprogressdialog.cpp.o \
-  CMakeFiles/NST.dir/src/customtitlebar.cpp.o \
-  CMakeFiles/NST.dir/src/realtimetranslationwidget.cpp.o \
-  CMakeFiles/NST.dir/src/filetranslationwidget.cpp.o \
-  CMakeFiles/NST.dir/src/translationserver.cpp.o \
-  CMakeFiles/NST.dir/src/processselectordialog.cpp.o \
+  CMakeFiles/NST.dir/src/managers/projectdatamanager.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/scripteditordialog.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/customprogressdialog.cpp.o \
+  CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o \
+  CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o \
+  CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o \
+  CMakeFiles/NST.dir/src/core/translationserver.cpp.o \
+  CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o \
   CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o \
   CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o \
   CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o \
@@ -72,6 +72,7 @@ NST: \
   /usr/lib/gcc/x86_64-redhat-linux/15/libgcc.a \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtend.o \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o \
+  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libEGL.so.1 \
   /usr/lib64/libfontconfig.so.1 \
   /usr/lib64/libX11.so.6 \
@@ -100,7 +101,6 @@ NST: \
   /usr/lib64/libdouble-conversion.so.3 \
   /usr/lib64/libb2.so.1 \
   /usr/lib64/libpcre2-16.so.0 \
-  /lib64/ld-linux-x86-64.so.2 \
   /usr/lib64/libxml2.so.2 \
   /usr/lib64/libxcb.so.1 \
   /usr/lib64/libpcre2-8.so.0 \
@@ -149,61 +149,61 @@ NST: \
 
 CMakeFiles/NST.dir/NST_autogen/mocs_compilation.cpp.o:
 
-CMakeFiles/NST.dir/src/main.cpp.o:
+CMakeFiles/NST.dir/src/core/main.cpp.o:
 
-CMakeFiles/NST.dir/src/mainwindow.cpp.o:
+CMakeFiles/NST.dir/src/ui/mainwindow.cpp.o:
 
-CMakeFiles/NST.dir/src/menubar.cpp.o:
+CMakeFiles/NST.dir/src/ui/menubar.cpp.o:
 
-CMakeFiles/NST.dir/src/loadprojectdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/loadprojectdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/searchdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/searchdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/settingsdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/settingsdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/searchcontroller.cpp.o:
+CMakeFiles/NST.dir/src/controllers/searchcontroller.cpp.o:
 
-CMakeFiles/NST.dir/src/shortcutcontroller.cpp.o:
+CMakeFiles/NST.dir/src/controllers/shortcutcontroller.cpp.o:
 
-CMakeFiles/NST.dir/src/bgadatamanager.cpp.o:
+CMakeFiles/NST.dir/src/managers/bgadatamanager.cpp.o:
 
-CMakeFiles/NST.dir/src/translationservicemanager.cpp.o:
+CMakeFiles/NST.dir/src/managers/translationservicemanager.cpp.o:
 
-CMakeFiles/NST.dir/src/relationshipwidget.cpp.o:
+CMakeFiles/NST.dir/src/ui/relationshipwidget.cpp.o:
 
-CMakeFiles/NST.dir/src/relationitem.cpp.o:
+CMakeFiles/NST.dir/src/ui/relationitem.cpp.o:
 
-CMakeFiles/NST.dir/src/rpgrelationanalyzer.cpp.o:
+CMakeFiles/NST.dir/src/core/rpgrelationanalyzer.cpp.o:
 
-CMakeFiles/NST.dir/src/smartfiltermanager.cpp.o:
+CMakeFiles/NST.dir/src/managers/smartfiltermanager.cpp.o:
 
-CMakeFiles/NST.dir/src/translationcontextmenu.cpp.o:
+CMakeFiles/NST.dir/src/ui/translationcontextmenu.cpp.o:
 
-CMakeFiles/NST.dir/src/updatecontroller.cpp.o:
+CMakeFiles/NST.dir/src/controllers/updatecontroller.cpp.o:
 
-CMakeFiles/NST.dir/src/fontmanagerdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/fontmanagerdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/pluginmanagerdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/pluginmanagerdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/plugindebuggerdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/plugindebuggerdialog.cpp.o:
 
 CMakeFiles/NST.dir/src/plugins/LuaTranslationPlugin/luatranslationservice.cpp.o:
 
-CMakeFiles/NST.dir/src/projectdatamanager.cpp.o:
+CMakeFiles/NST.dir/src/managers/projectdatamanager.cpp.o:
 
-CMakeFiles/NST.dir/src/scripteditordialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/scripteditordialog.cpp.o:
 
-CMakeFiles/NST.dir/src/customprogressdialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/customprogressdialog.cpp.o:
 
-CMakeFiles/NST.dir/src/customtitlebar.cpp.o:
+CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o:
 
-CMakeFiles/NST.dir/src/realtimetranslationwidget.cpp.o:
+CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o:
 
-CMakeFiles/NST.dir/src/filetranslationwidget.cpp.o:
+CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o:
 
-CMakeFiles/NST.dir/src/translationserver.cpp.o:
+CMakeFiles/NST.dir/src/core/translationserver.cpp.o:
 
-CMakeFiles/NST.dir/src/processselectordialog.cpp.o:
+CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o:
 
 CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o:
 
@@ -287,6 +287,8 @@ QtLingo/libQtLingo.so:
 
 /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/crtn.o:
 
+/lib64/ld-linux-x86-64.so.2:
+
 /usr/lib64/libEGL.so.1:
 
 /usr/lib64/libfontconfig.so.1:
@@ -342,8 +344,6 @@ QtLingo/libQtLingo.so:
 /usr/lib64/libb2.so.1:
 
 /usr/lib64/libpcre2-16.so.0:
-
-/lib64/ld-linux-x86-64.so.2:
 
 /usr/lib64/libxml2.so.2:
 

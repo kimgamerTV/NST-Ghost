@@ -3,11 +3,6 @@ libInjection.so: \
   /usr/lib/gcc/x86_64-redhat-linux/15/crtbeginS.o \
   CMakeFiles/Injection.dir/Injection_autogen/mocs_compilation.cpp.o \
   CMakeFiles/Injection.dir/injection.cpp.o \
-  CMakeFiles/Injection.dir/min_hook/buffer.c.o \
-  CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o \
-  CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o \
-  CMakeFiles/Injection.dir/min_hook/hook.c.o \
-  CMakeFiles/Injection.dir/min_hook/trampoline.c.o \
   /usr/lib64/libQt6Core.so.6.10.1 \
   /usr/lib/gcc/x86_64-redhat-linux/15/libstdc++.so \
   /usr/lib/gcc/x86_64-redhat-linux/15/../../../../lib64/libm.so \
@@ -41,16 +36,6 @@ libInjection.so: \
 CMakeFiles/Injection.dir/Injection_autogen/mocs_compilation.cpp.o:
 
 CMakeFiles/Injection.dir/injection.cpp.o:
-
-CMakeFiles/Injection.dir/min_hook/buffer.c.o:
-
-CMakeFiles/Injection.dir/min_hook/hde/hde32.c.o:
-
-CMakeFiles/Injection.dir/min_hook/hde/hde64.c.o:
-
-CMakeFiles/Injection.dir/min_hook/hook.c.o:
-
-CMakeFiles/Injection.dir/min_hook/trampoline.c.o:
 
 /usr/lib64/libQt6Core.so.6.10.1:
 

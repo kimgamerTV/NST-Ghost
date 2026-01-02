@@ -1,4 +1,4 @@
-CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o: \
+BGA/CMakeFiles/BGACore.dir/core/src/engines/renpy/renpyanalyzer.cpp.o: \
  /home/jop/work/NST/NST/BGA/core/src/engines/renpy/renpyanalyzer.cpp \
  /usr/include/stdc-predef.h \
  /home/jop/work/NST/NST/BGA/core/include/core/engines/renpy/renpyanalyzer.h \
