@@ -15,7 +15,11 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
 # Rust Library Build (bga_rs)
 # =============================================================================
 set(BGA_RS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bga_rs)
-set(BGA_RS_LIBRARY ${BGA_RS_DIR}/target/release/libbga_rs.a)
+if(MSVC)
+    set(BGA_RS_LIBRARY ${BGA_RS_DIR}/target/release/bga_rs.lib)
+else()
+    set(BGA_RS_LIBRARY ${BGA_RS_DIR}/target/release/libbga_rs.a)
+endif()
 
 # Custom command to build the Rust library
 add_custom_command(
