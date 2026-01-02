@@ -54,7 +54,13 @@ jobs:
             libxkbcommon-dev \
             libxkbcommon-x11-dev \
             librsvg2-bin \
-            liblua5.4-dev
+            liblua5.4-dev \
+            python3-dev
+      
+      - name: Install pybind11
+        run: |
+          pip install pybind11
+          echo "pybind11_DIR=$(python3 -m pybind11 --cmakedir)" >> $GITHUB_ENV
       
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
@@ -70,7 +76,7 @@ jobs:
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+            -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }};${{ env.pybind11_DIR }}" \
             -DCMAKE_INSTALL_PREFIX=/opt/nst \
             -DQT_DEPLOY_SUPPORT=OFF \
             -DSKIP_QT_DEPLOY=ON
