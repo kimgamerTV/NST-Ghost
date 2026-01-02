@@ -246,7 +246,7 @@ void Payload::connectAndLoop()
     
     // Convert IPv4 and IPv6 addresses from text to binary form
 #ifdef _WIN32
-    InetPton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
+    InetPtonA(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 #else
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 #endif
