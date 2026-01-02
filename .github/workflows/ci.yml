@@ -21,6 +21,16 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install pybind11
+      run: |
+        pip install pybind11
+        echo "pybind11_DIR=$(python3 -m pybind11 --cmakedir)" >> $GITHUB_ENV
+
     - name: Install dependencies
       run: |
         sudo apt-get update
@@ -54,8 +64,10 @@ jobs:
           libxkbcommon-dev \
           libxkbcommon-x11-dev \
           liblua5.4-dev \
-          python3-dev \
-          pybind11-dev
+          libxkbcommon-dev \
+          libxkbcommon-x11-dev \
+          liblua5.4-dev \
+          python3-dev
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -70,7 +82,7 @@ jobs:
         cmake -S . -B build \
           -G Ninja \
           -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}" \
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }};${{ env.pybind11_DIR }}" \
           -DQT_DEPLOY_SUPPORT=OFF \
           -DSKIP_QT_DEPLOY=ON
 
@@ -104,6 +116,10 @@ jobs:
         target: 'desktop'
         arch: 'win64_msvc2022_64'
         cache: true
+
+    - name: Install Lua
+      run: vcpkg install lua:x64-windows
+      shell: pwsh
 
     - name: Configure CMake
       run: |
