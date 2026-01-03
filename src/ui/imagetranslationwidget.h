@@ -12,7 +12,7 @@
 #include <QGraphicsScene>
 #include <QLineEdit>
 #include <QJsonArray>
-#include <QCheckBox>
+#include <QButtonGroup>
 #include <qtlingo/translationservice.h>
 
 class TranslationServiceManager;
@@ -30,10 +30,11 @@ public:
 
 public slots:
     void onLoadImage();
-    void onDetectText();
+    void onSaveImage();
     void onTranslate();
-    void onCopyText();
-    void onOverlayModeChanged(bool checked);
+    void onViewModeChanged(int id);
+    void onPeekPressed();
+    void onPeekReleased();
 
 private slots:
     void onTranslationFinished(const qtlingo::TranslationResult &result);
@@ -42,17 +43,30 @@ private slots:
 private:
     void setupUi();
     void displayImage(const QString &path);
-    void drawDetections(bool showTranslated = false);
-    void drawOverlayMode();  // Google Lens style
+    void updateViewMode(); // Refreshes view based on current mode
+    
+    // View Modes
+    enum ViewMode {
+        Original,
+        Clean,
+        Translated
+    };
     
     // UI Elements
+    // Toolbar
     QPushButton *m_btnLoad;
-    QPushButton *m_btnDetect;
+    QPushButton *m_btnSave;
     QPushButton *m_btnTranslate;
-    QPushButton *m_btnCopy;
+    
     QComboBox *m_comboSourceLang;
     QLineEdit *m_editTargetLang;
-    QCheckBox *m_chkOverlayMode;
+    
+    // Comparison / View Controls
+    QButtonGroup *m_viewGroup;
+    QPushButton *m_btnViewOriginal;
+    QPushButton *m_btnViewClean;
+    QPushButton *m_btnViewTranslated;
+    QPushButton *m_btnPeekOriginal; // Hold to compare
     
     QGraphicsView *m_imageView;
     QGraphicsScene *m_imageScene;
@@ -62,7 +76,10 @@ private:
     QJsonArray m_detections;
     QStringList m_translatedTexts;
     bool m_hasDetected = false;
-    bool m_overlayMode = false;
+    
+    ViewMode m_currentViewMode = Original;
+    QString m_inpaintedImagePath;
+
     
     // Translation state
     TranslationServiceManager *m_translationManager;
