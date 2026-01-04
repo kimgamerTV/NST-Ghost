@@ -8,8 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 # =============================================================================
 # Rust Library Build (bga_rs)
@@ -71,7 +70,7 @@ set_target_properties(BGACore PROPERTIES
 # Linking
 # =============================================================================
 target_link_libraries(BGACore PRIVATE 
-    Qt${QT_VERSION_MAJOR}::Core
+    Qt6::Core
     ${BGA_RS_LIBRARY}
 )
 

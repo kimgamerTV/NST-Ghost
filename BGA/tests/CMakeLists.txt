@@ -1,4 +1,4 @@
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
+find_package(Qt6 REQUIRED COMPONENTS Test)
 
 add_executable(BGACoreTests
     test_analyzer_stub.cpp
@@ -7,8 +7,8 @@ add_executable(BGACoreTests
 target_link_libraries(BGACoreTests
     PRIVATE
         BGACore
-        Qt${QT_VERSION_MAJOR}::Core
-        Qt${QT_VERSION_MAJOR}::Test
+        Qt6::Core
+        Qt6::Test
 )
 
 add_test(NAME BGACoreTests COMMAND BGACoreTests)
@@ -24,8 +24,8 @@ add_executable(TestRpgAnalyzer
 target_link_libraries(TestRpgAnalyzer
     PRIVATE
         BGACore
-        Qt${QT_VERSION_MAJOR}::Core
-        Qt${QT_VERSION_MAJOR}::Test
+        Qt6::Core
+        Qt6::Test
 )
 
 add_test(NAME TestRpgAnalyzer COMMAND TestRpgAnalyzer)

@@ -8,8 +8,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core LinguistTools)
 
 set(TS_FILES Injection_en_US.ts)
 
@@ -39,9 +38,9 @@ message(STATUS "Configuring Injection: WIN32=${WIN32}")
 
 
 if (WIN32)
-    target_link_libraries(Injection PRIVATE Qt${QT_VERSION_MAJOR}::Core ws2_32)
+    target_link_libraries(Injection PRIVATE Qt6::Core ws2_32)
 else()
-    target_link_libraries(Injection PRIVATE Qt${QT_VERSION_MAJOR}::Core)
+    target_link_libraries(Injection PRIVATE Qt6::Core)
 endif()
 
 target_compile_definitions(Injection PRIVATE INJECTION_LIBRARY)

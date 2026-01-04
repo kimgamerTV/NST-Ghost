@@ -17,7 +17,7 @@ target_include_directories(BGACore
 
 target_link_libraries(BGACore
     PUBLIC
-        Qt${QT_VERSION_MAJOR}::Core
+        Qt6::Core
 )
 
 

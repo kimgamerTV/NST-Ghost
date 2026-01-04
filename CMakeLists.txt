@@ -18,14 +18,13 @@ if(UNIX AND NOT APPLE)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 endif()
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
+find_package(Qt6 REQUIRED COMPONENTS Widgets LinguistTools Concurrent Network)
 find_package(Lua REQUIRED)
 message(STATUS "LUA_INCLUDE_DIR: ${LUA_INCLUDE_DIR}")
 message(STATUS "LUA_LIBRARIES: ${LUA_LIBRARIES}")
 
 # Use qt_standard_project_setup for Qt 6.3+
-if(QT_VERSION_MAJOR EQUAL 6 AND QT_VERSION_MINOR GREATER_EQUAL 3)
+if(Qt6_VERSION_MAJOR EQUAL 6 AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
     qt_standard_project_setup()
 endif()
 
@@ -117,29 +116,16 @@ add_subdirectory(QtLingo)
 # Add plugins subdirectory
 add_subdirectory(src/plugins)
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(NST
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
     )
     qt_create_translation(QM_FILES ${PROJECT_SOURCES} ${TS_FILES})
-else()
-    if(ANDROID)
-        add_library(NST SHARED
-            ${PROJECT_SOURCES}
-        )
-    else()
-        add_executable(NST
-            ${PROJECT_SOURCES}
-        )
-    endif()
-    qt5_create_translation(QM_FILES ${PROJECT_SOURCES} ${TS_FILES})
-endif()
 
 target_link_libraries(NST PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::Network
+    Qt6::Widgets
+    Qt6::Concurrent
+    Qt6::Network
     BGACore
     QtLingo
     pybind11::embed
@@ -183,7 +169,7 @@ add_custom_command(TARGET NST POST_BUILD
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
 # explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
+if(${Qt6_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.NST)
 endif()
 
@@ -240,7 +226,7 @@ else()
     # Fallback for older Qt versions or when SKIP_QT_DEPLOY is ON
     if(WIN32 AND NOT SKIP_QT_DEPLOY)
         # Find windeployqt
-        get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+        get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
         get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
         find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${_qt_bin_dir}")
         
@@ -317,7 +303,7 @@ else()
     
     # macOS: Bundle Qt frameworks
     if(APPLE AND NOT SKIP_QT_DEPLOY)
-        get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+        get_target_property(_qmake_executable Qt6::qmake IMPORTED_LOCATION)
         get_filename_component(_qt_bin_dir "${_qmake_executable}" DIRECTORY)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
         

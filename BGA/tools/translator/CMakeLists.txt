@@ -5,5 +5,5 @@ add_executable(BGATranslator
 target_link_libraries(BGATranslator
     PRIVATE
         BGACore
-        Qt${QT_VERSION_MAJOR}::Core
+        Qt6::Core
 )

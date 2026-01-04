@@ -5,7 +5,7 @@ add_executable(BGARunner
 target_link_libraries(BGARunner
     PRIVATE
         BGACore
-        Qt${QT_VERSION_MAJOR}::Core
+        Qt6::Core
 )
 
 install(TARGETS BGARunner

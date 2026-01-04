@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(LuaTranslationPlugin LANGUAGES CXX)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Network)
+find_package(Qt6 REQUIRED COMPONENTS Core Network)
 find_package(Lua REQUIRED)
 
 add_library(LuaTranslationPlugin SHARED
@@ -18,8 +17,8 @@ target_include_directories(LuaTranslationPlugin PRIVATE
 )
 
 target_link_libraries(LuaTranslationPlugin PRIVATE 
-    Qt${QT_VERSION_MAJOR}::Core 
-    Qt${QT_VERSION_MAJOR}::Network
+    Qt6::Core 
+    Qt6::Network
     QtLingo
     ${LUA_LIBRARIES}
 )
