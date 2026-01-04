@@ -13,6 +13,8 @@
 #include <QLineEdit>
 #include <QJsonArray>
 #include <QButtonGroup>
+#include <QListWidget>
+#include <QSplitter>
 #include <qtlingo/translationservice.h>
 
 class TranslationServiceManager;
@@ -29,9 +31,13 @@ public:
                      const QString &llmModel, const QString &llmBaseUrl);
 
 public slots:
-    void onLoadImage();
+    void onAddImages();      // Multi-file dialog (replaces onLoadImage)
+    void onRemoveImage();    // Remove selected from queue
+    void onClearAll();       // Clear entire queue
     void onSaveImage();
-    void onTranslate();
+    void onTranslate();      // Translate current image only
+    void onTranslateAll();   // Batch translate all pending
+    void onStopTranslation(); // Cancel operation
     void onViewModeChanged(int id);
     void onPeekPressed();
     void onPeekReleased();
@@ -39,11 +45,14 @@ public slots:
 private slots:
     void onTranslationFinished(const qtlingo::TranslationResult &result);
     void onTranslationError(const QString &message);
+    void onImageSelected(int row); // Switch displayed image
 
 private:
     void setupUi();
     void displayImage(const QString &path);
     void updateViewMode(); // Refreshes view based on current mode
+    bool processImage(int index); // Process single image (OCR + inpaint + translate)
+    void updateListItemStatus(int index, int status); // Update icon in list
     
     // View Modes
     enum ViewMode {
@@ -52,11 +61,34 @@ private:
         Translated
     };
     
+    // Image Item for queue
+    struct ImageItem {
+        QString path;
+        enum Status { Pending = 0, Processing = 1, Completed = 2, Error = 3 };
+        Status status = Pending;
+        QJsonArray detections;
+        QStringList translatedTexts;
+        QString inpaintedPath;
+    };
+    
+    // Image queue
+    QList<ImageItem> m_imageQueue;
+    int m_currentQueueIndex = -1;
+    bool m_isBatchProcessing = false;
+    bool m_cancelRequested = false;
+    
     // UI Elements
+    // Left sidebar
+    QListWidget *m_imageListWidget;
+    QPushButton *m_btnRemove;
+    QPushButton *m_btnClear;
+    
     // Toolbar
     QPushButton *m_btnLoad;
     QPushButton *m_btnSave;
     QPushButton *m_btnTranslate;
+    QPushButton *m_btnTranslateAll;
+    QPushButton *m_btnStop;
     
     QComboBox *m_comboSourceLang;
     QLineEdit *m_editTargetLang;
@@ -72,6 +104,7 @@ private:
     QGraphicsScene *m_imageScene;
     QLabel *m_statusLabel;
     
+    // Legacy single-image (now per-item in queue)
     QString m_currentImagePath;
     QJsonArray m_detections;
     QStringList m_translatedTexts;

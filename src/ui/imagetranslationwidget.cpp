@@ -111,10 +111,10 @@ void ImageTranslationWidget::setupUi()
     QHBoxLayout *toolbarLayout = new QHBoxLayout(topToolbar);
     toolbarLayout->setContentsMargins(15, 10, 15, 10);
     
-    m_btnLoad = new QPushButton("Open Image", this);
+    m_btnLoad = new QPushButton("Add Images", this);
     m_btnLoad->setIcon(QIcon::fromTheme("document-open"));
     m_btnLoad->setStyleSheet("QPushButton { padding: 6px 12px; background-color: #444; border-radius: 4px; color: white; } QPushButton:hover { background-color: #555; }");
-    connect(m_btnLoad, &QPushButton::clicked, this, &ImageTranslationWidget::onLoadImage);
+    connect(m_btnLoad, &QPushButton::clicked, this, &ImageTranslationWidget::onAddImages);
     
     m_btnSave = new QPushButton("Save Result", this);
     m_btnSave->setEnabled(false);
@@ -136,10 +136,19 @@ void ImageTranslationWidget::setupUi()
     m_editTargetLang->setAlignment(Qt::AlignCenter);
     m_editTargetLang->setStyleSheet("padding: 5px;");
     
-    m_btnTranslate = new QPushButton("RUN TRANSLATION", this);
+    m_btnTranslate = new QPushButton("Translate", this);
     m_btnTranslate->setIcon(QIcon::fromTheme("system-run"));
     m_btnTranslate->setStyleSheet("QPushButton { padding: 8px 16px; background-color: #007ACC; border-radius: 4px; color: white; font-weight: bold; } QPushButton:hover { background-color: #0098FF; }");
     connect(m_btnTranslate, &QPushButton::clicked, this, &ImageTranslationWidget::onTranslate);
+    
+    m_btnTranslateAll = new QPushButton("Translate All", this);
+    m_btnTranslateAll->setStyleSheet("QPushButton { padding: 8px 16px; background-color: #28A745; border-radius: 4px; color: white; font-weight: bold; } QPushButton:hover { background-color: #2FCB50; }");
+    connect(m_btnTranslateAll, &QPushButton::clicked, this, &ImageTranslationWidget::onTranslateAll);
+    
+    m_btnStop = new QPushButton("Stop", this);
+    m_btnStop->setStyleSheet("QPushButton { padding: 8px 16px; background-color: #DC3545; border-radius: 4px; color: white; font-weight: bold; } QPushButton:hover { background-color: #E04555; }");
+    m_btnStop->setVisible(false);
+    connect(m_btnStop, &QPushButton::clicked, this, &ImageTranslationWidget::onStopTranslation);
     
     toolbarLayout->addWidget(m_btnLoad);
     toolbarLayout->addWidget(m_btnSave);
@@ -149,16 +158,72 @@ void ImageTranslationWidget::setupUi()
     toolbarLayout->addWidget(m_editTargetLang);
     toolbarLayout->addSpacing(20);
     toolbarLayout->addWidget(m_btnTranslate);
+    toolbarLayout->addWidget(m_btnTranslateAll);
+    toolbarLayout->addWidget(m_btnStop);
     
     mainLayout->addWidget(topToolbar);
     
-    // --- MAIN CONTENT (Image View) ---
+    // --- MAIN CONTENT (Splitter: Left Sidebar + Image View) ---
+    QSplitter *splitter = new QSplitter(Qt::Horizontal, this);
+    splitter->setStyleSheet("QSplitter::handle { background-color: #3E3E3E; }");
+    
+    // Left Sidebar - Image List
+    QWidget *leftSidebar = new QWidget(this);
+    leftSidebar->setMinimumWidth(180);
+    leftSidebar->setMaximumWidth(300);
+    leftSidebar->setStyleSheet("background-color: #252526;");
+    QVBoxLayout *sidebarLayout = new QVBoxLayout(leftSidebar);
+    sidebarLayout->setContentsMargins(5, 5, 5, 5);
+    sidebarLayout->setSpacing(5);
+    
+    QLabel *sidebarTitle = new QLabel("Images", this);
+    sidebarTitle->setStyleSheet("color: #AAAAAA; font-weight: bold; padding: 5px;");
+    sidebarLayout->addWidget(sidebarTitle);
+    
+    m_imageListWidget = new QListWidget(this);
+    m_imageListWidget->setStyleSheet(
+        "QListWidget { background-color: #1E1E1E; border: 1px solid #3E3E3E; color: white; }"
+        "QListWidget::item { padding: 8px; border-bottom: 1px solid #333; }"
+        "QListWidget::item:selected { background-color: #094771; }"
+        "QListWidget::item:hover { background-color: #2A2D2E; }"
+    );
+    m_imageListWidget->setIconSize(QSize(40, 40));
+    connect(m_imageListWidget, &QListWidget::currentRowChanged, this, &ImageTranslationWidget::onImageSelected);
+    sidebarLayout->addWidget(m_imageListWidget, 1);
+    
+    // Sidebar buttons
+    QHBoxLayout *sidebarBtnLayout = new QHBoxLayout();
+    m_btnRemove = new QPushButton("Remove", this);
+    m_btnRemove->setStyleSheet("QPushButton { padding: 5px 10px; background-color: #444; border-radius: 3px; color: white; } QPushButton:hover { background-color: #555; }");
+    connect(m_btnRemove, &QPushButton::clicked, this, &ImageTranslationWidget::onRemoveImage);
+    
+    m_btnClear = new QPushButton("Clear All", this);
+    m_btnClear->setStyleSheet("QPushButton { padding: 5px 10px; background-color: #444; border-radius: 3px; color: white; } QPushButton:hover { background-color: #555; }");
+    connect(m_btnClear, &QPushButton::clicked, this, &ImageTranslationWidget::onClearAll);
+    
+    sidebarBtnLayout->addWidget(m_btnRemove);
+    sidebarBtnLayout->addWidget(m_btnClear);
+    sidebarLayout->addLayout(sidebarBtnLayout);
+    
+    splitter->addWidget(leftSidebar);
+    
+    // Right Content - Image View
+    QWidget *rightContent = new QWidget(this);
+    QVBoxLayout *rightLayout = new QVBoxLayout(rightContent);
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setSpacing(0);
+    
     m_imageScene = new QGraphicsScene(this);
     m_imageView = new QGraphicsView(m_imageScene);
     m_imageView->setRenderHint(QPainter::Antialiasing);
     m_imageView->setDragMode(QGraphicsView::ScrollHandDrag);
     m_imageView->setStyleSheet("background-color: #1E1E1E; border: none;");
-    mainLayout->addWidget(m_imageView, 1);
+    rightLayout->addWidget(m_imageView, 1);
+    
+    splitter->addWidget(rightContent);
+    splitter->setSizes({200, 600});
+    
+    mainLayout->addWidget(splitter, 1);
     
     // --- BOTTOM CONTROL BAR (Floating Style) ---
     QWidget *bottomBar = new QWidget(this);
@@ -221,16 +286,125 @@ void ImageTranslationWidget::setupUi()
     mainLayout->addWidget(bottomBar);
 }
 
-void ImageTranslationWidget::onLoadImage()
+void ImageTranslationWidget::onAddImages()
 {
-    QString path = QFileDialog::getOpenFileName(this, "Open Image", "", "Images (*.png *.jpg *.jpeg *.bmp)");
-    if (!path.isEmpty()) {
-        displayImage(path);
-        m_hasDetected = false;
-        m_detections = QJsonArray();
-        m_translatedTexts.clear();
-        m_inpaintedImagePath.clear();
+    QStringList paths = QFileDialog::getOpenFileNames(this, "Add Images", "", "Images (*.png *.jpg *.jpeg *.bmp)");
+    
+    for (const QString &path : paths) {
+        // Avoid duplicates
+        bool exists = false;
+        for (const ImageItem &item : m_imageQueue) {
+            if (item.path == path) {
+                exists = true;
+                break;
+            }
+        }
+        
+        if (!exists) {
+            ImageItem item;
+            item.path = path;
+            item.status = ImageItem::Pending;
+            m_imageQueue.append(item);
+            
+            // Add to list widget with thumbnail
+            QFileInfo fi(path);
+            QListWidgetItem *listItem = new QListWidgetItem(fi.fileName());
+            QPixmap thumb(path);
+            if (!thumb.isNull()) {
+                listItem->setIcon(QIcon(thumb.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+            }
+            listItem->setToolTip(path);
+            m_imageListWidget->addItem(listItem);
+        }
     }
+    
+    // Auto-select first if none selected
+    if (m_currentQueueIndex < 0 && !m_imageQueue.isEmpty()) {
+        m_imageListWidget->setCurrentRow(0);
+    }
+}
+
+void ImageTranslationWidget::onRemoveImage()
+{
+    int row = m_imageListWidget->currentRow();
+    if (row >= 0 && row < m_imageQueue.size()) {
+        m_imageQueue.removeAt(row);
+        delete m_imageListWidget->takeItem(row);
+        
+        if (m_imageQueue.isEmpty()) {
+            m_currentQueueIndex = -1;
+            m_imageScene->clear();
+            m_currentImagePath.clear();
+        } else if (row <= m_currentQueueIndex) {
+            m_currentQueueIndex = qMax(0, m_currentQueueIndex - 1);
+            m_imageListWidget->setCurrentRow(m_currentQueueIndex);
+        }
+    }
+}
+
+void ImageTranslationWidget::onClearAll()
+{
+    m_imageQueue.clear();
+    m_imageListWidget->clear();
+    m_currentQueueIndex = -1;
+    m_imageScene->clear();
+    m_currentImagePath.clear();
+    m_detections = QJsonArray();
+    m_translatedTexts.clear();
+    m_inpaintedImagePath.clear();
+    m_statusLabel->setText("Ready.");
+}
+
+void ImageTranslationWidget::onImageSelected(int row)
+{
+    if (row < 0 || row >= m_imageQueue.size()) return;
+    
+    m_currentQueueIndex = row;
+    const ImageItem &item = m_imageQueue[row];
+    
+    // Load image data from queue
+    m_currentImagePath = item.path;
+    m_detections = item.detections;
+    m_translatedTexts = item.translatedTexts;
+    m_inpaintedImagePath = item.inpaintedPath;
+    
+    // Update view
+    if (item.status == ImageItem::Completed && !item.translatedTexts.isEmpty()) {
+        m_currentViewMode = Translated;
+        m_viewGroup->button(Translated)->setChecked(true);
+    } else {
+        m_currentViewMode = Original;
+        m_viewGroup->button(Original)->setChecked(true);
+    }
+    
+    updateViewMode();
+    
+    // Update status display
+    QString statusStr;
+    switch (item.status) {
+        case ImageItem::Pending: statusStr = "Pending"; break;
+        case ImageItem::Processing: statusStr = "Processing..."; break;
+        case ImageItem::Completed: statusStr = "Completed"; break;
+        case ImageItem::Error: statusStr = "Error"; break;
+    }
+    m_statusLabel->setText(QString("Image: %1 [%2]").arg(QFileInfo(item.path).fileName(), statusStr));
+}
+
+void ImageTranslationWidget::updateListItemStatus(int index, int status)
+{
+    if (index < 0 || index >= m_imageListWidget->count()) return;
+    
+    QListWidgetItem *item = m_imageListWidget->item(index);
+    QString emoji;
+    switch (status) {
+        case ImageItem::Pending: emoji = "🕐 "; break;
+        case ImageItem::Processing: emoji = "⏳ "; break;
+        case ImageItem::Completed: emoji = "✅ "; break;
+        case ImageItem::Error: emoji = "❌ "; break;
+    }
+    
+    QString fileName = QFileInfo(m_imageQueue[index].path).fileName();
+    item->setText(emoji + fileName);
 }
 
 void ImageTranslationWidget::displayImage(const QString &path)
@@ -243,16 +417,114 @@ void ImageTranslationWidget::displayImage(const QString &path)
         m_imageScene->addPixmap(pixmap);
         m_imageView->setSceneRect(pixmap.rect());
         m_imageView->fitInView(m_imageScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-        m_statusLabel->setText("Image Loaded: " + QFileInfo(path).fileName());
-    } else {
-        QMessageBox::warning(this, "Error", "Failed to load image.");
+    }
+}
+
+bool ImageTranslationWidget::processImage(int index)
+{
+    if (index < 0 || index >= m_imageQueue.size()) return false;
+    if (d->translator.is_none()) return false;
+    
+    ImageItem &item = m_imageQueue[index];
+    QString imagePath = item.path;
+    QString fileName = QFileInfo(imagePath).fileName();
+    
+    try {
+        QString sourceLang = m_comboSourceLang->currentData().toString();
+        
+        // Step 1: OCR
+        m_statusLabel->setText(QString("Processing %1/%2: %3 - OCR...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
+        QApplication::processEvents();
+        if (m_cancelRequested) return false;
+        
+        std::string resInfo = d->translator.attr("translate_image")(
+            imagePath.toStdString(),
+            sourceLang.toStdString(),
+            "th"
+        ).cast<std::string>();
+        
+        QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(resInfo).toUtf8());
+        if (!doc.isArray()) {
+            item.status = ImageItem::Error;
+            return false;
+        }
+        item.detections = doc.array();
+        
+        if (item.detections.isEmpty()) {
+            item.status = ImageItem::Completed;
+            return true; // No text = still success
+        }
+        
+        // Step 2: Inpainting
+        m_statusLabel->setText(QString("Processing %1/%2: %3 - Inpainting...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
+        QApplication::processEvents();
+        if (m_cancelRequested) return false;
+        
+        QString detectionsJson = QString::fromUtf8(QJsonDocument(item.detections).toJson(QJsonDocument::Compact));
+        std::string enrichedJsonStr = d->translator.attr("inpaint_text_regions")(
+            imagePath.toStdString(),
+            detectionsJson.toStdString()
+        ).cast<std::string>();
+        
+        QJsonDocument enrichedDoc = QJsonDocument::fromJson(QString::fromStdString(enrichedJsonStr).toUtf8());
+        if (enrichedDoc.isObject()) {
+            QJsonObject root = enrichedDoc.object();
+            item.inpaintedPath = root["inpainted_path"].toString();
+            if (root.contains("detections")) {
+                item.detections = root["detections"].toArray();
+            }
+        }
+        
+        // Step 3: Translation
+        m_statusLabel->setText(QString("Processing %1/%2: %3 - Translating...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
+        QApplication::processEvents();
+        if (m_cancelRequested) return false;
+        
+        item.translatedTexts.clear();
+        QStringList textsToTranslate;
+        for (const QJsonValue &val : item.detections) {
+            textsToTranslate.append(val.toObject()["text"].toString());
+        }
+        
+        // Synchronous translation for batch (simplified)
+        QVariantMap settings;
+        settings["targetLanguage"] = m_editTargetLang->text();
+        settings["googleApi"] = m_googleApi;
+        settings["googleApiKey"] = m_apiKey;
+        
+        // Store current values for callback
+        m_detections = item.detections;
+        m_translatedTexts.clear();
+        m_currentTranslationIndex = 0;
+        m_inpaintedImagePath = item.inpaintedPath;
+        m_currentImagePath = imagePath;
+        
+        m_translationManager->translate("Google Translate", textsToTranslate, settings);
+        
+        // Wait for translations (blocking event loop processing)
+        while (m_currentTranslationIndex < item.detections.size() && !m_cancelRequested) {
+            QApplication::processEvents();
+        }
+        
+        if (m_cancelRequested) return false;
+        
+        // Copy results back to item
+        item.translatedTexts = m_translatedTexts;
+        item.status = ImageItem::Completed;
+        
+        return true;
+        
+    } catch (const std::exception &e) {
+        qDebug() << "Process error:" << e.what();
+        item.status = ImageItem::Error;
+        return false;
     }
 }
 
 void ImageTranslationWidget::onTranslate()
 {
-    if (m_currentImagePath.isEmpty()) {
-        QMessageBox::warning(this, "Warning", "Please load an image first.");
+    if (m_currentQueueIndex < 0 || m_currentQueueIndex >= m_imageQueue.size()) {
+        QMessageBox::warning(this, "Warning", "Please select an image first.");
         return;
     }
     
@@ -260,99 +532,98 @@ void ImageTranslationWidget::onTranslate()
         QMessageBox::critical(this, "Error", "OCR/AI backend not initialized.");
         return;
     }
-
-    m_statusLabel->setText("Status: Analyzing Image (AI)...");
-    m_btnTranslate->setEnabled(false);
-    m_btnSave->setEnabled(false);
-    QApplication::processEvents();
-
-    // Step 1: Detect Text & Inpaint (Python Side)
-    // We execute this in the main thread for now to keep pybind11 simple, 
-    // though ideally it should be threaded.
     
-    try {
-        // A. Translate Image Method does detection + basic translation, but we need raw detection first
-        // actually let's use the 'translate_image' for detection roughly first or 'readText' if available?
-        // Revisiting python script: 'translate_image' does detection.
-        // But 'inpaint_text_regions' needs bounding boxes.
-        
-        // Let's call Python: translate_image (for OCR) -> then inpaint_text_regions
-        
-        QString sourceLang = m_comboSourceLang->currentData().toString();
-        
-        m_statusLabel->setText("Status: 1/3 Performing OCR & Detection...");
-        QApplication::processEvents();
-        
-        std::string resInfo = d->translator.attr("translate_image")(
-            m_currentImagePath.toStdString(),
-            sourceLang.toStdString(),
-            "th" // dummy target
-        ).cast<std::string>();
-        
-        QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(resInfo).toUtf8());
-        if (!doc.isArray()) {
-            m_statusLabel->setText("Status: Error (No text found or invalid response)");
-            m_btnTranslate->setEnabled(true);
-            return;
-        }
-        m_detections = doc.array();
-        
-        if (m_detections.isEmpty()) {
-             m_statusLabel->setText("Status: No text detected.");
-             m_btnTranslate->setEnabled(true);
-             return;
-        }
+    m_cancelRequested = false;
+    m_btnTranslate->setEnabled(false);
+    m_btnTranslateAll->setEnabled(false);
+    m_btnStop->setVisible(true);
+    
+    int idx = m_currentQueueIndex;
+    m_imageQueue[idx].status = ImageItem::Processing;
+    updateListItemStatus(idx, ImageItem::Processing);
+    
+    bool ok = processImage(idx);
+    
+    m_imageQueue[idx].status = ok ? ImageItem::Completed : ImageItem::Error;
+    updateListItemStatus(idx, m_imageQueue[idx].status);
+    
+    // Reload data for display
+    onImageSelected(idx);
+    
+    m_btnTranslate->setEnabled(true);
+    m_btnTranslateAll->setEnabled(true);
+    m_btnStop->setVisible(false);
+    m_btnSave->setEnabled(ok);
+    m_statusLabel->setText(ok ? "Finished." : "Error during translation.");
+}
 
-        // Step 2: Advanced Analysis & Inpainting (LaMa)
-        m_statusLabel->setText("Status: 2/3 AI Inpainting (LaMa) & Color Extraction...");
-        QApplication::processEvents();
-        
-        QString detectionsJson = QString::fromUtf8(QJsonDocument(m_detections).toJson(QJsonDocument::Compact));
-        std::string enrichedJsonStr = d->translator.attr("inpaint_text_regions")(
-            m_currentImagePath.toStdString(),
-            detectionsJson.toStdString()
-        ).cast<std::string>();
-        
-        QJsonDocument enrichedDoc = QJsonDocument::fromJson(QString::fromStdString(enrichedJsonStr).toUtf8());
-        if (enrichedDoc.isObject()) {
-             QJsonObject root = enrichedDoc.object();
-             m_inpaintedImagePath = root["inpainted_path"].toString();
-             if (root.contains("detections")) {
-                 m_detections = root["detections"].toArray(); // Enriched with angles/colors
-             }
-        }
-        
-    } catch (const std::exception &e) {
-        QString errorMsg = QString::fromUtf8(e.what());
-        qDebug() << "AI Backend Error:" << errorMsg;
-        m_statusLabel->setText("Error: " + errorMsg);
-        m_btnTranslate->setEnabled(true);
+void ImageTranslationWidget::onTranslateAll()
+{
+    if (m_imageQueue.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "Please add images first.");
         return;
     }
     
-    // Step 3: Run Text Translation
-    m_statusLabel->setText("Status: 3/3 Translating Text...");
-    m_translatedTexts.clear();
-    m_translatedTexts.reserve(m_detections.size());
-    
-    QStringList textsToTranslate;
-    for (const QJsonValue &val : m_detections) {
-        textsToTranslate.append(val.toObject()["text"].toString());
+    if (d->translator.is_none()) {
+        QMessageBox::critical(this, "Error", "OCR/AI backend not initialized.");
+        return;
     }
     
-    // Prepare Settings
-    QVariantMap settings;
-    settings["targetLanguage"] = m_editTargetLang->text();
-    settings["googleApi"] = m_googleApi;
-    settings["googleApiKey"] = m_apiKey;
+    m_isBatchProcessing = true;
+    m_cancelRequested = false;
+    m_btnTranslate->setEnabled(false);
+    m_btnTranslateAll->setEnabled(false);
+    m_btnStop->setVisible(true);
     
-    // Use Translation Service
-    QString serviceName = "Google Translate"; // Default
-    // Note: LLM settings handled by TranslationServiceManager internal logic
+    int completed = 0, errors = 0;
     
-    m_currentTranslationIndex = 0;
-    // Trigger translation
-    m_translationManager->translate(serviceName, textsToTranslate, settings);
+    for (int i = 0; i < m_imageQueue.size(); ++i) {
+        if (m_cancelRequested) {
+            m_statusLabel->setText(QString("Stopped. Completed: %1, Errors: %2").arg(completed).arg(errors));
+            break;
+        }
+        
+        if (m_imageQueue[i].status == ImageItem::Pending) {
+            m_currentQueueIndex = i;
+            m_imageListWidget->setCurrentRow(i);
+            
+            m_imageQueue[i].status = ImageItem::Processing;
+            updateListItemStatus(i, ImageItem::Processing);
+            
+            bool ok = processImage(i);
+            
+            if (ok) {
+                m_imageQueue[i].status = ImageItem::Completed;
+                completed++;
+            } else if (!m_cancelRequested) {
+                m_imageQueue[i].status = ImageItem::Error;
+                errors++;
+            }
+            updateListItemStatus(i, m_imageQueue[i].status);
+            
+            QApplication::processEvents();
+        }
+    }
+    
+    m_isBatchProcessing = false;
+    m_btnTranslate->setEnabled(true);
+    m_btnTranslateAll->setEnabled(true);
+    m_btnStop->setVisible(false);
+    
+    if (!m_cancelRequested) {
+        m_statusLabel->setText(QString("Batch Complete. Completed: %1, Errors: %2").arg(completed).arg(errors));
+    }
+    
+    // Refresh current view
+    if (m_currentQueueIndex >= 0) {
+        onImageSelected(m_currentQueueIndex);
+    }
+}
+
+void ImageTranslationWidget::onStopTranslation()
+{
+    m_cancelRequested = true;
+    m_statusLabel->setText("Stopping...");
 }
 
 void ImageTranslationWidget::onTranslationFinished(const qtlingo::TranslationResult &result)
@@ -360,12 +631,24 @@ void ImageTranslationWidget::onTranslationFinished(const qtlingo::TranslationRes
     m_translatedTexts.append(result.translatedText);
     m_currentTranslationIndex++;
     
-    int pct = (m_currentTranslationIndex * 100) / m_detections.size();
+    // Guard against division by zero
+    int total = m_detections.size();
+    if (total <= 0) {
+        // No detections - mark as finished
+        m_statusLabel->setText("Status: Finished (no text).");
+        m_btnTranslate->setEnabled(true);
+        m_btnTranslateAll->setEnabled(true);
+        m_btnSave->setEnabled(true);
+        return;
+    }
+    
+    int pct = (m_currentTranslationIndex * 100) / total;
     m_statusLabel->setText(QString("Status: Translating... %1%").arg(pct));
     
-    if (m_currentTranslationIndex >= m_detections.size()) {
+    if (m_currentTranslationIndex >= total) {
         m_statusLabel->setText("Status: Finished.");
         m_btnTranslate->setEnabled(true);
+        m_btnTranslateAll->setEnabled(true);
         m_btnSave->setEnabled(true);
         
         // Auto-switch to Translated View on finish
