@@ -475,6 +475,11 @@ void ImageTranslationWidget::onTranslationFinished(const qtlingo::TranslationRes
     m_translatedTexts.append(result.translatedText);
     m_currentTranslationIndex++;
     
+    // Update queue persistence
+    if (m_currentQueueIndex >= 0 && m_currentQueueIndex < m_imageQueue.size()) {
+        m_imageQueue[m_currentQueueIndex].translatedTexts = m_translatedTexts;
+    }
+    
     // Guard against division by zero
     int total = m_detections.size();
     if (total <= 0) {
@@ -561,8 +566,6 @@ void ImageTranslationWidget::updateViewMode()
         }
     }
     
-    // Add Base Image
-    m_imageScene->addPixmap(displayPixmap);
     
     // Render Text if in Translated Mode
     if (m_currentViewMode == Translated && !m_translatedTexts.isEmpty()) {
@@ -654,8 +657,7 @@ void ImageTranslationWidget::updateViewMode()
             }
         }
         
-        // Re-add to scene since we modified the pixmap
-        m_imageScene->clear();
-        m_imageScene->addPixmap(displayPixmap);
     }
+    
+    m_imageScene->addPixmap(displayPixmap);
 }
