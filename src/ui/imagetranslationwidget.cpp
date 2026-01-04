@@ -483,18 +483,32 @@ void ImageTranslationWidget::updateViewMode()
                 pixmapPainter.rotate(angle);
                 pixmapPainter.translate(-centerX, -centerY);
                 
-                QPainterPath path;
-                path.addText(x + (w - fm.horizontalAdvance(translatedText))/2, y + (h + fm.ascent() - fm.descent())/2, font, translatedText);
+                // Calculate text position (centered in bbox)
+                int textX = x + (w - fm.horizontalAdvance(translatedText)) / 2;
+                int textY = y + (h + fm.ascent() - fm.descent()) / 2;
                 
-                QPen pen(haloColor);
-                pen.setWidth(3);
-                pixmapPainter.setPen(pen);
-                pixmapPainter.setBrush(Qt::NoBrush);
-                pixmapPainter.drawPath(path);
+                // Multi-pass shadow/halo drawing technique
+                // Draw text multiple times with offset positions for smooth halo effect
+                // This avoids the "hollow" issue with QPainterPath stroke on complex glyphs
                 
-                pixmapPainter.setPen(Qt::NoPen);
-                pixmapPainter.setBrush(textColor);
-                pixmapPainter.drawPath(path);
+                int haloSize = 3;  // Halo thickness in pixels
+                pixmapPainter.setPen(haloColor);
+                
+                // Draw halo in 8 directions + 4 diagonal midpoints for smooth coverage
+                const int offsets[][2] = {
+                    {-haloSize, 0}, {haloSize, 0}, {0, -haloSize}, {0, haloSize},  // 4 cardinal
+                    {-haloSize, -haloSize}, {haloSize, -haloSize}, {-haloSize, haloSize}, {haloSize, haloSize},  // 4 diagonal
+                    {-haloSize/2, -haloSize}, {haloSize/2, -haloSize}, {-haloSize/2, haloSize}, {haloSize/2, haloSize},  // 4 more for smoothness
+                    {-haloSize, -haloSize/2}, {haloSize, -haloSize/2}, {-haloSize, haloSize/2}, {haloSize, haloSize/2}   // 4 more
+                };
+                
+                for (const auto& offset : offsets) {
+                    pixmapPainter.drawText(textX + offset[0], textY + offset[1], translatedText);
+                }
+                
+                // Draw main text on top
+                pixmapPainter.setPen(textColor);
+                pixmapPainter.drawText(textX, textY, translatedText);
                 
                 pixmapPainter.restore();
             }
