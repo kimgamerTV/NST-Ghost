@@ -24,6 +24,8 @@ ImageProcessorWorker::ImageProcessorWorker(QObject *parent)
 
 ImageProcessorWorker::~ImageProcessorWorker()
 {
+    // Must acquire GIL before destroying Python objects to avoid crash on exit
+    py::gil_scoped_acquire acquire;
     delete d;
 }
 

@@ -172,8 +172,13 @@ target_include_directories(NST PRIVATE
     ${CMAKE_SOURCE_DIR}/src/controllers
 )
 
-# Copy scripts to build directory
-file(COPY ${CMAKE_SOURCE_DIR}/scripts DESTINATION ${CMAKE_BINARY_DIR})
+# Copy scripts to build directory on every build
+add_custom_command(TARGET NST POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/scripts
+        ${CMAKE_BINARY_DIR}/scripts
+    COMMENT "Syncing Python scripts to build directory..."
+)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
