@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 {
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
+    pybind11::gil_scoped_release release;
 
     QApplication a(argc, argv);
 

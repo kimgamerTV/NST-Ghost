@@ -328,6 +328,25 @@ QListWidget::item:hover { background-color: #2A2D2E; }</string>
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QTextEdit" name="m_logConsole">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
+          </size>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #111; color: #00FF00; border-top: 1px solid #444; font-family: Monospace;</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -434,16 +453,26 @@ QListWidget::item:hover { background-color: #2A2D2E; }</string>
         </item>
        </layout>
       </item>
-      <item>
-       <widget class="QPushButton" name="m_btnPeekOriginal">
-        <property name="text">
-         <string>Peek Original</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QPushButton { margin-left: 20px; padding: 6px 12px; background-color: #444; border-radius: 4px; color: white; } QPushButton:pressed { background-color: #666; }</string>
-        </property>
-       </widget>
-      </item>
+       <item>
+        <widget class="QCheckBox" name="m_chkDevMode">
+         <property name="text">
+          <string>Dev Mode</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: #AAAAAA; margin-right: 10px;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="m_btnPeekOriginal">
+         <property name="text">
+          <string>Peek Original</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton { margin-left: 20px; padding: 6px 12px; background-color: #444; border-radius: 4px; color: white; } QPushButton:pressed { background-color: #666; }</string>
+         </property>
+        </widget>
+       </item>
       <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">

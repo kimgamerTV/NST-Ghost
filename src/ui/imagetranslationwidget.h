@@ -18,6 +18,8 @@
 #include <qtlingo/translationservice.h>
 
 class TranslationServiceManager;
+class ImageProcessorWorker;
+class QThread;
 
 namespace Ui {
 class ImageTranslationWidget;
@@ -102,6 +104,22 @@ private:
     TranslationServiceManager *m_translationManager;
     int m_currentTranslationIndex = 0;
     
+    // Background Processing
+    QThread *m_workerThread;
+    ImageProcessorWorker *m_worker;
+    
+signals:
+    void processImageRequested(const QString &path, const QString &sourceLang);
+    
+private slots:
+    void onDevModeToggled(bool checked);
+    // Worker slots
+    void onWorkerInitialized(bool success, const QString &status, bool useGpu, const QString &deviceName);
+    void onWorkerProgress(const QString &message);
+    void onWorkerProcessingFinished(const QString &imagePath, const QJsonArray &detections, const QString &inpaintedPath);
+    void onWorkerError(const QString &message);
+
+private:
     // Settings
     QString m_apiKey;
     QString m_targetLanguage;
@@ -110,10 +128,6 @@ private:
     QString m_llmApiKey;
     QString m_llmModel;
     QString m_llmBaseUrl;
-    
-    // PIMPL to hide Python dependencies
-    struct Private;
-    Private *d;
 };
 
 #endif // IMAGETRANSLATIONWIDGET_H

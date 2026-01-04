@@ -11,6 +11,7 @@ SmartFilterManager::SmartFilterManager(QObject *parent)
 {
     // Initialize Python connection
     try {
+        py::gil_scoped_acquire acquire;
         py::module_ sys = py::module_::import("sys");
         sys.attr("path").attr("append")(".");
         sys.attr("path").attr("append")("scripts");
@@ -61,6 +62,7 @@ void SmartFilterManager::learn(const QString &text)
     // AI Learn
     if (!m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             m_pyFilter.attr("add_example")(text.toStdString());
             m_pyFilter.attr("save_state")("ai_filter_config.json");
         } catch (const std::exception &e) {
@@ -99,6 +101,7 @@ void SmartFilterManager::unlearn(const QString &text)
     // AI Unlearn
     if (!m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             m_pyFilter.attr("remove_example")(text.toStdString());
             m_pyFilter.attr("save_state")("ai_filter_config.json");
         } catch (const std::exception &e) {
@@ -217,6 +220,7 @@ bool SmartFilterManager::shouldSkip(const QString &text) const
     // 3. Check AI
     if (m_aiEnabled && !m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             bool skip = m_pyFilter.attr("predict")(text.toStdString()).cast<bool>();
             if (skip) {
                 // qDebug() << "AI Skipped:" << text;
@@ -281,6 +285,7 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
     // 2. AI Processing
     if (!aiTasks.isEmpty() && m_aiEnabled && !m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             py::list pyTexts;
             for (const Task &task : aiTasks) {
                 pyTexts.append(task.text.toStdString());
@@ -334,6 +339,7 @@ void SmartFilterManager::loadPatterns()
     m_aiThreshold = settings.value("SmartFilter/AI/Threshold", 0.75).toDouble();
     if (!m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }
@@ -355,6 +361,7 @@ void SmartFilterManager::setAIThreshold(double threshold)
     m_aiThreshold = threshold;
     if (!m_pyFilter.is_none()) {
         try {
+            py::gil_scoped_acquire acquire;
             m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }

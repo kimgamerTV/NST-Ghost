@@ -1,6 +1,8 @@
 #include "imagetranslationwidget.h"
 #include "ui_imagetranslationwidget.h"
 #include "translationservicemanager.h"
+#include "imageprocessorworker.h"
+#include <QThread>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
@@ -14,24 +16,15 @@
 #include <QPen>
 #include <QPainter>
 #include <QFontMetrics>
+#include <QDateTime>
 
-#if defined(slots)
-#undef slots
-#endif
-#include <pybind11/embed.h>
-#include <pybind11/stl.h>
-namespace py = pybind11;
 
-struct ImageTranslationWidget::Private {
-    py::object translator;
-};
 
 ImageTranslationWidget::ImageTranslationWidget(TranslationServiceManager *translationManager, QWidget *parent)
     : QWidget(parent)
     , m_translationManager(translationManager)
     , m_imageScene(new QGraphicsScene(this))
     , ui(new Ui::ImageTranslationWidget)
-    , d(new Private)
 {
     ui->setupUi(this);
     
@@ -68,6 +61,8 @@ ImageTranslationWidget::ImageTranslationWidget(TranslationServiceManager *transl
     connect(ui->m_btnPeekOriginal, &QPushButton::pressed, this, &ImageTranslationWidget::onPeekPressed);
     connect(ui->m_btnPeekOriginal, &QPushButton::released, this, &ImageTranslationWidget::onPeekReleased);
     
+    connect(ui->m_chkDevMode, &QCheckBox::toggled, this, &ImageTranslationWidget::onDevModeToggled);
+    
     // Connect to translation manager signals
     if (m_translationManager) {
         connect(m_translationManager, &TranslationServiceManager::translationFinished,
@@ -76,49 +71,29 @@ ImageTranslationWidget::ImageTranslationWidget(TranslationServiceManager *transl
                 this, &ImageTranslationWidget::onTranslationError);
     }
     
-    // Initialize Python
-    try {
-        py::module_ sys = py::module_::import("sys");
-        sys.attr("path").attr("append")(".");
-        sys.attr("path").attr("append")("scripts");
-        
-        py::module_ mod = py::module_::import("scripts.image_translator");
-        if (mod.is_none()) mod = py::module_::import("image_translator");
-        
-        d->translator = mod.attr("ImageTranslator")();
-        
-        // Get detailed device info
-        py::dict deviceInfo = d->translator.attr("get_device_info")().cast<py::dict>();
-        bool available = deviceInfo["available"].cast<bool>();
-        bool useGpu = deviceInfo["use_gpu"].cast<bool>();
-        QString deviceName = QString::fromStdString(deviceInfo["device_name"].cast<std::string>());
-        QString gpuStatus = QString::fromStdString(deviceInfo["status"].cast<std::string>());
-        
-        if (!available) {
-            ui->m_statusLabel->setText("Status: EasyOCR not found. Running in Mock Mode.");
-            ui->m_statusLabel->setStyleSheet("color: orange;");
-        } else if (useGpu) {
-            ui->m_statusLabel->setText(QString("Status: Ready (%1)").arg(deviceName));
-            ui->m_statusLabel->setStyleSheet("color: #00FF7F;"); // Spring green
-        } else {
-            // CPU mode - show warning with reason
-            ui->m_statusLabel->setText(QString("Status: Ready (CPU Mode) - %1").arg(gpuStatus));
-            ui->m_statusLabel->setStyleSheet("color: #FFD700;"); // Gold/yellow warning
-        }
-        
-        qDebug() << "ImageTranslator initialized:" << gpuStatus;
-        
-    } catch (const std::exception &e) {
-        qDebug() << "Failed to init ImageTranslator:" << e.what();
-        ui->m_statusLabel->setText(QString("Status: Error init Python: %1").arg(e.what()));
-        ui->m_statusLabel->setStyleSheet("color: red;");
-        d->translator = py::none();
-    }
+    // Initialize Worker Thread
+    m_workerThread = new QThread(this);
+    m_worker = new ImageProcessorWorker();
+    m_worker->moveToThread(m_workerThread);
+    
+    // Connect Worker Signals
+    connect(m_workerThread, &QThread::started, m_worker, &ImageProcessorWorker::initialize);
+    connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+    
+    connect(this, &ImageTranslationWidget::processImageRequested, m_worker, &ImageProcessorWorker::processImage);
+    
+    connect(m_worker, &ImageProcessorWorker::initialized, this, &ImageTranslationWidget::onWorkerInitialized);
+    connect(m_worker, &ImageProcessorWorker::progress, this, &ImageTranslationWidget::onWorkerProgress);
+    connect(m_worker, &ImageProcessorWorker::processingFinished, this, &ImageTranslationWidget::onWorkerProcessingFinished);
+    connect(m_worker, &ImageProcessorWorker::errorOccurred, this, &ImageTranslationWidget::onWorkerError);
+    
+    m_workerThread->start();
 }
 
 ImageTranslationWidget::~ImageTranslationWidget()
 {
-    delete d;
+    m_workerThread->quit();
+    m_workerThread->wait();
     delete ui;
 }
 
@@ -278,102 +253,147 @@ void ImageTranslationWidget::displayImage(const QString &path)
 bool ImageTranslationWidget::processImage(int index)
 {
     if (index < 0 || index >= m_imageQueue.size()) return false;
-    if (d->translator.is_none()) return false;
+    
+    // We don't check d->translator here anymore, we check if worker is ready via status or assume it is
+    // For now, let's assume if the thread is running, we can request
     
     ImageItem &item = m_imageQueue[index];
     QString imagePath = item.path;
-    QString fileName = QFileInfo(imagePath).fileName();
+    QString sourceLang = ui->m_comboSourceLang->currentData().toString();
     
-    try {
-        QString sourceLang = ui->m_comboSourceLang->currentData().toString();
-        
-        // Step 1: OCR
-        ui->m_statusLabel->setText(QString("Processing %1/%2: %3 - OCR...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
-        QApplication::processEvents();
-        if (m_cancelRequested) return false;
-        
-        std::string resInfo = d->translator.attr("translate_image")(
-            imagePath.toStdString(),
-            sourceLang.toStdString(),
-            "th"
-        ).cast<std::string>();
-        
-        QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(resInfo).toUtf8());
-        if (!doc.isArray()) {
-            item.status = ImageItem::Error;
-            return false;
+    emit processImageRequested(imagePath, sourceLang);
+    return true; // Started async
+}
+
+void ImageTranslationWidget::onDevModeToggled(bool checked)
+{
+    ui->m_logConsole->setVisible(checked);
+}
+
+void ImageTranslationWidget::onWorkerInitialized(bool success, const QString &status, bool useGpu, const QString &deviceName)
+{
+    if (!success) {
+        ui->m_statusLabel->setText("Status: " + status);
+        ui->m_statusLabel->setStyleSheet("color: red;");
+        ui->m_logConsole->append(QString("<font color='red'>[%1] Init Error: %2</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(status));
+    } else {
+         if (useGpu) {
+            ui->m_statusLabel->setText(QString("Status: Ready (%1)").arg(deviceName));
+            ui->m_statusLabel->setStyleSheet("color: #00FF7F;"); 
+            ui->m_logConsole->append(QString("<font color='#00FF7F'>[%1] Initialized GPU: %2</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(deviceName));
+        } else {
+            ui->m_statusLabel->setText(QString("Status: Ready (CPU Mode) - %1").arg(status));
+            ui->m_statusLabel->setStyleSheet("color: #FFD700;");
+            ui->m_logConsole->append(QString("<font color='#FFD700'>[%1] Initialized CPU: %2</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(status));
         }
-        item.detections = doc.array();
-        
-        if (item.detections.isEmpty()) {
-            item.status = ImageItem::Completed;
-            return true; // No text = still success
-        }
-        
-        // Step 2: Inpainting
-        ui->m_statusLabel->setText(QString("Processing %1/%2: %3 - Inpainting...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
-        QApplication::processEvents();
-        if (m_cancelRequested) return false;
-        
-        QString detectionsJson = QString::fromUtf8(QJsonDocument(item.detections).toJson(QJsonDocument::Compact));
-        std::string enrichedJsonStr = d->translator.attr("inpaint_text_regions")(
-            imagePath.toStdString(),
-            detectionsJson.toStdString()
-        ).cast<std::string>();
-        
-        QJsonDocument enrichedDoc = QJsonDocument::fromJson(QString::fromStdString(enrichedJsonStr).toUtf8());
-        if (enrichedDoc.isObject()) {
-            QJsonObject root = enrichedDoc.object();
-            item.inpaintedPath = root["inpainted_path"].toString();
-            if (root.contains("detections")) {
-                item.detections = root["detections"].toArray();
-            }
-        }
-        
-        // Step 3: Translation
-        ui->m_statusLabel->setText(QString("Processing %1/%2: %3 - Translating...").arg(index + 1).arg(m_imageQueue.size()).arg(fileName));
-        QApplication::processEvents();
-        if (m_cancelRequested) return false;
-        
-        item.translatedTexts.clear();
-        QStringList textsToTranslate;
-        for (const QJsonValue &val : item.detections) {
-            textsToTranslate.append(val.toObject()["text"].toString());
-        }
-        
-        // Synchronous translation for batch (simplified)
-        QVariantMap settings;
-        settings["targetLanguage"] = ui->m_editTargetLang->text();
-        settings["googleApi"] = m_googleApi;
-        settings["googleApiKey"] = m_apiKey;
-        
-        // Store current values for callback
-        m_detections = item.detections;
-        m_translatedTexts.clear();
-        m_currentTranslationIndex = 0;
-        m_inpaintedImagePath = item.inpaintedPath;
-        m_currentImagePath = imagePath;
-        
-        m_translationManager->translate("Google Translate", textsToTranslate, settings);
-        
-        // Wait for translations (blocking event loop processing)
-        while (m_currentTranslationIndex < item.detections.size() && !m_cancelRequested) {
-            QApplication::processEvents();
-        }
-        
-        if (m_cancelRequested) return false;
-        
-        // Copy results back to item
-        item.translatedTexts = m_translatedTexts;
-        item.status = ImageItem::Completed;
-        
-        return true;
-        
-    } catch (const std::exception &e) {
-        qDebug() << "Process error:" << e.what();
-        item.status = ImageItem::Error;
-        return false;
     }
+}
+
+void ImageTranslationWidget::onWorkerProgress(const QString &message)
+{
+    int idx = m_currentQueueIndex;
+    if (idx >= 0 && idx < m_imageQueue.size()) {
+        ui->m_statusLabel->setText(QString("Processing %1/%2: %3").arg(idx + 1).arg(m_imageQueue.size()).arg(message));
+    } else {
+        ui->m_statusLabel->setText(message);
+    }
+    
+    ui->m_logConsole->append(QString("[%1] %2").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
+}
+
+void ImageTranslationWidget::onWorkerProcessingFinished(const QString &imagePath, const QJsonArray &detections, const QString &inpaintedPath)
+{
+    // Find the item
+    int idx = -1;
+    for(int i=0; i<m_imageQueue.size(); ++i) {
+        if(m_imageQueue[i].path == imagePath) {
+            idx = i;
+            break;
+        }
+    }
+    
+    if (idx == -1) return;
+    
+    ImageItem &item = m_imageQueue[idx];
+    item.detections = detections;
+    item.inpaintedPath = inpaintedPath;
+    
+    // Continue to Translation Step (Main Thread)
+    // Synchronous translation for now, but on main thread so it's safer for UI updates
+    item.translatedTexts.clear();
+    
+    if (detections.isEmpty()) {
+        item.status = ImageItem::Completed;
+        updateListItemStatus(idx, m_imageQueue[idx].status);
+        onImageSelected(idx); // Refresh
+        
+        // If batch, proceed
+        if (m_isBatchProcessing && !m_cancelRequested) {
+             // Trigger next one
+             QTimer::singleShot(0, this, [this](){
+                 // Find next pending
+                 for(int i=0; i<m_imageQueue.size(); ++i) {
+                     if (m_imageQueue[i].status == ImageItem::Pending) {
+                         m_currentQueueIndex = i;
+                         ui->m_imageListWidget->setCurrentRow(i);
+                         m_imageQueue[i].status = ImageItem::Processing;
+                         updateListItemStatus(i, ImageItem::Processing);
+                         processImage(i);
+                         return;
+                     }
+                 }
+                 // All done
+                 m_isBatchProcessing = false;
+                 ui->m_btnTranslate->setEnabled(true);
+                 ui->m_btnTranslateAll->setEnabled(true);
+                 ui->m_btnStop->setVisible(false);
+                 ui->m_statusLabel->setText("Batch Complete.");
+             });
+        } else {
+            ui->m_statusLabel->setText("Finished (no text).");
+            ui->m_btnTranslate->setEnabled(true);
+            ui->m_btnTranslateAll->setEnabled(true);
+            ui->m_btnStop->setVisible(false);
+             ui->m_btnSave->setEnabled(true);
+        }
+        return;
+    }
+
+    QStringList textsToTranslate;
+    for (const QJsonValue &val : detections) {
+        textsToTranslate.append(val.toObject()["text"].toString());
+    }
+    
+    QVariantMap settings;
+    settings["targetLanguage"] = ui->m_editTargetLang->text();
+    settings["googleApi"] = m_googleApi;
+    settings["googleApiKey"] = m_apiKey;
+    
+    // Store context
+    m_detections = detections;
+    m_translatedTexts.clear();
+    m_currentTranslationIndex = 0;
+    m_inpaintedImagePath = inpaintedPath;
+    
+    ui->m_statusLabel->setText("Translating...");
+    m_translationManager->translate("Google Translate", textsToTranslate, settings);
+    
+    ui->m_logConsole->append(QString("<font color='#00FF00'>[%1] Finished processing %2. found %3 detections.</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(imagePath).arg(detections.size()));
+}
+
+void ImageTranslationWidget::onWorkerError(const QString &message)
+{
+    ui->m_statusLabel->setText("Error: " + message);
+    if (m_currentQueueIndex >= 0) {
+        m_imageQueue[m_currentQueueIndex].status = ImageItem::Error;
+        updateListItemStatus(m_currentQueueIndex, ImageItem::Error);
+    }
+    
+    ui->m_logConsole->append(QString("<font color='red'>[%1] Error: %2</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(message));
+    
+    ui->m_btnTranslate->setEnabled(true);
+    ui->m_btnTranslateAll->setEnabled(true);
+    ui->m_btnStop->setVisible(false);
 }
 
 void ImageTranslationWidget::onTranslate()
@@ -383,33 +403,31 @@ void ImageTranslationWidget::onTranslate()
         return;
     }
     
-    if (d->translator.is_none()) {
-        QMessageBox::critical(this, "Error", "OCR/AI backend not initialized.");
-        return;
-    }
+    // We assume worker is initialized if buttons are enabled. 
+    // Ideally we track m_backendReady but UI enabling logic handles most cases.
     
     m_cancelRequested = false;
     ui->m_btnTranslate->setEnabled(false);
     ui->m_btnTranslateAll->setEnabled(false);
     ui->m_btnStop->setVisible(true);
+    ui->m_btnSave->setEnabled(false);
     
     int idx = m_currentQueueIndex;
     m_imageQueue[idx].status = ImageItem::Processing;
     updateListItemStatus(idx, ImageItem::Processing);
     
-    bool ok = processImage(idx);
+    // Async call
+    if (!processImage(idx)) {
+         m_imageQueue[idx].status = ImageItem::Error;
+         updateListItemStatus(idx, ImageItem::Error);
+         ui->m_btnTranslate->setEnabled(true);
+         ui->m_btnTranslateAll->setEnabled(true);
+         ui->m_btnStop->setVisible(false);
+         ui->m_statusLabel->setText("Failed to start processing.");
+         return;
+    }
     
-    m_imageQueue[idx].status = ok ? ImageItem::Completed : ImageItem::Error;
-    updateListItemStatus(idx, m_imageQueue[idx].status);
-    
-    // Reload data for display
-    onImageSelected(idx);
-    
-    ui->m_btnTranslate->setEnabled(true);
-    ui->m_btnTranslateAll->setEnabled(true);
-    ui->m_btnStop->setVisible(false);
-    ui->m_btnSave->setEnabled(ok);
-    ui->m_statusLabel->setText(ok ? "Finished." : "Error during translation.");
+    // Returns immediately, results handled in slots
 }
 
 void ImageTranslationWidget::onTranslateAll()
@@ -419,61 +437,32 @@ void ImageTranslationWidget::onTranslateAll()
         return;
     }
     
-    if (d->translator.is_none()) {
-        QMessageBox::critical(this, "Error", "OCR/AI backend not initialized.");
-        return;
-    }
-    
     m_isBatchProcessing = true;
     m_cancelRequested = false;
     ui->m_btnTranslate->setEnabled(false);
     ui->m_btnTranslateAll->setEnabled(false);
     ui->m_btnStop->setVisible(true);
     
-    int completed = 0, errors = 0;
-    
-    for (int i = 0; i < m_imageQueue.size(); ++i) {
-        if (m_cancelRequested) {
-            ui->m_statusLabel->setText(QString("Stopped. Completed: %1, Errors: %2").arg(completed).arg(errors));
-            break;
-        }
-        
+    // Find first pending and start
+    for(int i=0; i<m_imageQueue.size(); ++i) {
         if (m_imageQueue[i].status == ImageItem::Pending) {
-            m_currentQueueIndex = i;
-            ui->m_imageListWidget->setCurrentRow(i);
-            
-            m_imageQueue[i].status = ImageItem::Processing;
-            updateListItemStatus(i, ImageItem::Processing);
-            
-            bool ok = processImage(i);
-            
-            if (ok) {
-                m_imageQueue[i].status = ImageItem::Completed;
-                completed++;
-            } else if (!m_cancelRequested) {
-                m_imageQueue[i].status = ImageItem::Error;
-                errors++;
-            }
-            updateListItemStatus(i, m_imageQueue[i].status);
-            
-            QApplication::processEvents();
+             m_currentQueueIndex = i;
+             ui->m_imageListWidget->setCurrentRow(i);
+             m_imageQueue[i].status = ImageItem::Processing;
+             updateListItemStatus(i, ImageItem::Processing);
+             processImage(i);
+             return;
         }
     }
     
+    // If nothing pending
     m_isBatchProcessing = false;
     ui->m_btnTranslate->setEnabled(true);
     ui->m_btnTranslateAll->setEnabled(true);
     ui->m_btnStop->setVisible(false);
-    
-    if (!m_cancelRequested) {
-        ui->m_statusLabel->setText(QString("Batch Complete. Completed: %1, Errors: %2").arg(completed).arg(errors));
-    }
-    
-    // Refresh current view
-    if (m_currentQueueIndex >= 0) {
-        onImageSelected(m_currentQueueIndex);
-    }
+    ui->m_statusLabel->setText("Nothing to translate.");
 }
+
 
 void ImageTranslationWidget::onStopTranslation()
 {
