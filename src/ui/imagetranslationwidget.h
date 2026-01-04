@@ -19,6 +19,10 @@
 
 class TranslationServiceManager;
 
+namespace Ui {
+class ImageTranslationWidget;
+}
+
 class ImageTranslationWidget : public QWidget
 {
     Q_OBJECT
@@ -77,32 +81,12 @@ private:
     bool m_isBatchProcessing = false;
     bool m_cancelRequested = false;
     
-    // UI Elements
-    // Left sidebar
-    QListWidget *m_imageListWidget;
-    QPushButton *m_btnRemove;
-    QPushButton *m_btnClear;
-    
-    // Toolbar
-    QPushButton *m_btnLoad;
-    QPushButton *m_btnSave;
-    QPushButton *m_btnTranslate;
-    QPushButton *m_btnTranslateAll;
-    QPushButton *m_btnStop;
-    
-    QComboBox *m_comboSourceLang;
-    QLineEdit *m_editTargetLang;
-    
-    // Comparison / View Controls
+    // View Controls logic
     QButtonGroup *m_viewGroup;
-    QPushButton *m_btnViewOriginal;
-    QPushButton *m_btnViewClean;
-    QPushButton *m_btnViewTranslated;
-    QPushButton *m_btnPeekOriginal; // Hold to compare
-    
-    QGraphicsView *m_imageView;
     QGraphicsScene *m_imageScene;
-    QLabel *m_statusLabel;
+
+private:
+    Ui::ImageTranslationWidget *ui;
     
     // Legacy single-image (now per-item in queue)
     QString m_currentImagePath;

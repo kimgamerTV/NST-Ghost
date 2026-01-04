@@ -88,6 +88,7 @@ set(PROJECT_SOURCES
     src/ui/filetranslationwidget.cpp
     src/ui/filetranslationwidget.h
     src/ui/filetranslationwidget.ui
+    src/ui/imagetranslationwidget.ui
     src/core/translationserver.cpp
     src/core/translationserver.h
     src/dialogs/processselectordialog.cpp
