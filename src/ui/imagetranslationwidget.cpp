@@ -500,10 +500,44 @@ void ImageTranslationWidget::onTranslationFinished(const qtlingo::TranslationRes
         ui->m_btnTranslateAll->setEnabled(true);
         ui->m_btnSave->setEnabled(true);
         
+        // Mark as completed
+        if (m_currentQueueIndex >= 0 && m_currentQueueIndex < m_imageQueue.size()) {
+             m_imageQueue[m_currentQueueIndex].status = ImageItem::Completed;
+             updateListItemStatus(m_currentQueueIndex, ImageItem::Completed);
+        }
+        
         // Auto-switch to Translated View on finish
         m_currentViewMode = Translated;
         m_viewGroup->button(Translated)->setChecked(true);
         updateViewMode();
+        
+        // Continue Batch Processing
+        if (m_isBatchProcessing && !m_cancelRequested) {
+             // Find next pending
+             bool foundNext = false;
+             for(int i=0; i<m_imageQueue.size(); ++i) {
+                if (m_imageQueue[i].status == ImageItem::Pending) {
+                     m_currentQueueIndex = i;
+                     // UI Update
+                     ui->m_imageListWidget->setCurrentRow(i);
+                     m_imageQueue[i].status = ImageItem::Processing;
+                     updateListItemStatus(i, ImageItem::Processing);
+                     
+                     // Small delay to let UI refresh slightly or just process
+                     QTimer::singleShot(100, this, [this, i](){
+                         processImage(i);
+                     });
+                     foundNext = true;
+                     return;
+                }
+             }
+             
+             if (!foundNext) {
+                 m_isBatchProcessing = false;
+                 ui->m_statusLabel->setText("Batch Processing Finished.");
+                 ui->m_btnStop->setVisible(false);
+             }
+        }
     }
 }
 
