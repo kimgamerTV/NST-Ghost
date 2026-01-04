@@ -51,14 +51,27 @@ ImageTranslationWidget::ImageTranslationWidget(TranslationServiceManager *transl
         
         d->translator = mod.attr("ImageTranslator")();
         
-        bool available = d->translator.attr("is_available")().cast<bool>();
+        // Get detailed device info
+        py::dict deviceInfo = d->translator.attr("get_device_info")().cast<py::dict>();
+        bool available = deviceInfo["available"].cast<bool>();
+        bool useGpu = deviceInfo["use_gpu"].cast<bool>();
+        QString deviceName = QString::fromStdString(deviceInfo["device_name"].cast<std::string>());
+        QString gpuStatus = QString::fromStdString(deviceInfo["status"].cast<std::string>());
+        
         if (!available) {
             m_statusLabel->setText("Status: EasyOCR not found. Running in Mock Mode.");
             m_statusLabel->setStyleSheet("color: orange;");
+        } else if (useGpu) {
+            m_statusLabel->setText(QString("Status: Ready (%1)").arg(deviceName));
+            m_statusLabel->setStyleSheet("color: #00FF7F;"); // Spring green
         } else {
-            m_statusLabel->setText("Status: Ready (EasyOCR Active)");
-            m_statusLabel->setStyleSheet("color: green;");
+            // CPU mode - show warning with reason
+            m_statusLabel->setText(QString("Status: Ready (CPU Mode) - %1").arg(gpuStatus));
+            m_statusLabel->setStyleSheet("color: #FFD700;"); // Gold/yellow warning
         }
+        
+        qDebug() << "ImageTranslator initialized:" << gpuStatus;
+        
     } catch (const std::exception &e) {
         qDebug() << "Failed to init ImageTranslator:" << e.what();
         m_statusLabel->setText(QString("Status: Error init Python: %1").arg(e.what()));

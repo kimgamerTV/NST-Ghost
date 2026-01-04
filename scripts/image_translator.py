@@ -13,22 +13,87 @@ logger = logging.getLogger("ImageTranslator")
 class ImageTranslator:
     def __init__(self):
         self.reader = None
-        self.use_gpu = True
+        self.use_gpu = False
         self.available = False
+        self.gpu_status = "Unknown"
+        self.device_name = "CPU"
         
         try:
             import easyocr
             import torch
-            self.use_gpu = torch.cuda.is_available()
-            logger.info(f"EasyOCR initialized. GPU Available: {self.use_gpu}")
             self.easyocr = easyocr
+            self.torch = torch
+            
+            # Step 1: Check if CUDA/ROCm is available
+            if torch.cuda.is_available():
+                device_name = torch.cuda.get_device_name(0)
+                gpu_arch = "unknown"
+                
+                # Try to get GPU architecture for AMD
+                try:
+                    if hasattr(torch.version, 'hip'):
+                        # ROCm - try to get actual architecture
+                        props = torch.cuda.get_device_properties(0)
+                        gpu_arch = getattr(props, 'gcnArchName', 'unknown')
+                except:
+                    pass
+                
+                # Step 2: Actually TEST the GPU with a small operation
+                try:
+                    logger.info(f"Testing GPU: {device_name} (arch: {gpu_arch})")
+                    test_tensor = torch.zeros(10, 10, device='cuda')
+                    result = torch.matmul(test_tensor, test_tensor)
+                    del test_tensor, result
+                    torch.cuda.empty_cache()
+                    
+                    # GPU works!
+                    self.use_gpu = True
+                    self.device_name = device_name
+                    self.gpu_status = f"GPU Active: {device_name}"
+                    logger.info(f"GPU test PASSED: {device_name}")
+                    
+                except Exception as gpu_error:
+                    # GPU failed - likely unsupported architecture
+                    error_msg = str(gpu_error)
+                    logger.warning(f"GPU test FAILED: {error_msg}")
+                    
+                    if "rocBLAS" in error_msg or "TensileLibrary" in error_msg:
+                        self.gpu_status = f"GPU Not Supported: {device_name} (architecture not supported by ROCm). Using CPU."
+                        logger.warning(f"AMD GPU '{device_name}' with arch '{gpu_arch}' is not supported by ROCm. Falling back to CPU.")
+                    elif "CUDA" in error_msg:
+                        self.gpu_status = f"CUDA Error: {device_name}. Using CPU."
+                        logger.warning(f"NVIDIA GPU error. Falling back to CPU.")
+                    else:
+                        self.gpu_status = f"GPU Error: {error_msg[:50]}. Using CPU."
+                    
+                    self.use_gpu = False
+                    self.device_name = "CPU (GPU fallback)"
+            else:
+                # No GPU detected at all
+                self.gpu_status = "No GPU detected. Using CPU."
+                self.device_name = "CPU"
+                logger.info("No CUDA/ROCm GPU available. Using CPU mode.")
+            
             self.available = True
-        except ImportError:
-            logger.warning("EasyOCR or Torch not found. Running in MOCK mode.")
+            logger.info(f"ImageTranslator ready. Device: {self.device_name}, GPU: {self.use_gpu}")
+            
+        except ImportError as e:
+            logger.warning(f"EasyOCR or Torch not found: {e}. Running in MOCK mode.")
+            self.gpu_status = "Dependencies missing. Running in MOCK mode."
             self.available = False
         except Exception as e:
             logger.error(f"Failed to initialize EasyOCR: {e}")
+            self.gpu_status = f"Init Error: {str(e)[:50]}"
             self.available = False
+    
+    def get_device_info(self):
+        """Return device information for UI display."""
+        return {
+            "available": self.available,
+            "use_gpu": self.use_gpu,
+            "device_name": self.device_name,
+            "status": self.gpu_status
+        }
 
     def is_available(self):
         return self.available
