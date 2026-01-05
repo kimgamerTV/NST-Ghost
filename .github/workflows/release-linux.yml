@@ -227,16 +227,19 @@ jobs:
           wget -q https://github.com/QuasarApp/CQtDeployer/releases/download/v1.6.2365/CQtDeployer_1.6.2365_Linux_x86_64.deb
           sudo dpkg -i CQtDeployer_1.6.2365_Linux_x86_64.deb
           
+          echo "Checking qmake..."
+          ls -l ${{ env.QT_ROOT_DIR }}/bin/qmake
+          ${{ env.QT_ROOT_DIR }}/bin/qmake -v
+          
           # Run CQtDeployer
-          # -bin: Path to the executable
-          # -libDir: Where to look for extra libs (we have our custom/moved libs in usr/bin currently)
-          # -qmake: Path to qmake to find Qt libs
-          # -targetDir: Output directory (AppDir/usr will ensure structure usr/bin, usr/lib)
-          cqtdeployer -bin AppDir/usr/bin/NST \
-            -libDir AppDir/usr/bin \
+          # Use absolute paths and build artifact as source to avoid confusion
+          # -verbose 2: Info level logging
+          cqtdeployer -bin $(pwd)/build/NST \
+            -libDir $(pwd)/AppDir/usr/bin \
             -qmake ${{ env.QT_ROOT_DIR }}/bin/qmake \
-            -targetDir AppDir/usr \
-            -always-overwrite
+            -targetDir $(pwd)/AppDir/usr \
+            -always-overwrite \
+            -verbose 2
       
       - name: Add Qt Wayland plugins
         run: |
