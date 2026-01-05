@@ -1,13 +1,13 @@
 name: Release Manager
-
-on:
+'on':
   push:
-    branches: [main]
+    branches:
+      - main
     paths:
-      - 'CMakeLists.txt'
-      - '.github/workflows/release*.yml'
+      - CMakeLists.txt
+      - .github/workflows/release*.yml
     tags:
-      - 'v*'
+      - v*
   workflow_dispatch:
     inputs:
       version:
@@ -15,31 +15,29 @@ on:
         required: false
         type: string
       force_build:
-        description: 'Force rebuild even if artifacts exist'
+        description: Force rebuild even if artifacts exist
         required: false
         type: boolean
         default: false
-
 jobs:
   check-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.get_version.outputs.version }}
-      version_tag: ${{ steps.get_version.outputs.version_tag }}
-      should_build: ${{ steps.check_build.outputs.should_build }}
-      release_exists: ${{ steps.check_release.outputs.exists }}
-      release_id: ${{ steps.check_release.outputs.release_id }}
-    
+      version: '${{ steps.get_version.outputs.version }}'
+      version_tag: '${{ steps.get_version.outputs.version_tag }}'
+      should_build: '${{ steps.check_build.outputs.should_build }}'
+      release_exists: '${{ steps.check_release.outputs.exists }}'
+      release_id: '${{ steps.check_release.outputs.release_id }}'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
       - name: Extract version from CMakeLists.txt
         id: get_version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.version }}" ]; then
+        run: >
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{
+          inputs.version }}" ]; then
             VERSION_TAG="${{ inputs.version }}"
             VERSION="${VERSION_TAG#v}"
           elif [ "${{ github.ref_type }}" = "tag" ]; then
@@ -49,23 +47,25 @@ jobs:
             VERSION=$(grep -oP 'project\(NST VERSION \K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
             VERSION_TAG="v${VERSION}"
           fi
-          
+
+
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
           echo "version_tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
+
           echo "Found version: ${VERSION} (tag: ${VERSION_TAG})"
-      
       - name: Check if release exists
         id: check_release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           VERSION_TAG="${{ steps.get_version.outputs.version_tag }}"
-          
+
           response=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/tags/${VERSION_TAG}" || echo '{}')
-          
+
           release_id=$(echo "$response" | jq -r '.id // empty')
-          
+
           if [ -n "$release_id" ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
             echo "release_id=${release_id}" >> $GITHUB_OUTPUT
@@ -75,12 +75,11 @@ jobs:
             echo "release_id=" >> $GITHUB_OUTPUT
             echo "Release does not exist"
           fi
-      
       - name: Check if tag exists
         id: check_tag
         run: |
           VERSION_TAG="${{ steps.get_version.outputs.version_tag }}"
-          
+
           if git rev-parse "$VERSION_TAG" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
             echo "Tag ${VERSION_TAG} exists"
@@ -88,50 +87,60 @@ jobs:
             echo "exists=false" >> $GITHUB_OUTPUT
             echo "Tag ${VERSION_TAG} does not exist"
           fi
-      
       - name: Create tag if needed
-        if: steps.check_tag.outputs.exists == 'false' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: >-
+          steps.check_tag.outputs.exists == 'false' && github.event_name ==
+          'push' && github.ref == 'refs/heads/main'
         env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
+          PAT_TOKEN: '${{ secrets.PAT_TOKEN }}'
+        run: >
           VERSION_TAG="${{ steps.get_version.outputs.version_tag }}"
+
           VERSION="${{ steps.get_version.outputs.version }}"
-          
+
+
           git config user.name "github-actions[bot]"
+
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
+
           # ใช้ PAT แทน password
-          git remote set-url origin https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository }}.git
-          
+
+          git remote set-url origin
+          https://x-access-token:${PAT_TOKEN}@github.com/${{ github.repository
+          }}.git
+
+
           git tag -a "${VERSION_TAG}" -m "Release ${VERSION}"
+
           git push origin "${VERSION_TAG}"
-          
+
+
           echo "Created and pushed tag: ${VERSION_TAG}"
-      
       - name: Determine if build is needed
         id: check_build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
         run: |
           if [ "${{ inputs.force_build }}" = "true" ]; then
             echo "should_build=true" >> $GITHUB_OUTPUT
             echo "Force build requested"
             exit 0
           fi
-          
+
           if [ "${{ steps.check_release.outputs.exists }}" = "false" ]; then
             echo "should_build=true" >> $GITHUB_OUTPUT
             echo "Build needed: Release does not exist"
             exit 0
           fi
-          
+
           # Check if release has assets
           RELEASE_ID="${{ steps.check_release.outputs.release_id }}"
           assets=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
             "https://api.github.com/repos/${{ github.repository }}/releases/${RELEASE_ID}/assets")
-          
+
           asset_count=$(echo "$assets" | jq '. | length')
-          
+
           if [ "$asset_count" = "0" ]; then
             echo "should_build=true" >> $GITHUB_OUTPUT
             echo "Build needed: Release has no assets"
@@ -139,39 +148,40 @@ jobs:
             echo "should_build=false" >> $GITHUB_OUTPUT
             echo "Build not needed: Release already has ${asset_count} assets"
           fi
-
   build-linux:
     needs: check-version
     if: needs.check-version.outputs.should_build == 'true'
     uses: ./.github/workflows/release-linux.yml
     with:
-      version: ${{ needs.check-version.outputs.version }}
-
+      version: '${{ needs.check-version.outputs.version }}'
   build-windows:
     needs: check-version
     if: needs.check-version.outputs.should_build == 'true'
     uses: ./.github/workflows/release-windows.yml
     with:
-      version: ${{ needs.check-version.outputs.version }}
-
+      version: '${{ needs.check-version.outputs.version }}'
   build-macos:
     needs: check-version
     if: needs.check-version.outputs.should_build == 'true'
     uses: ./.github/workflows/release-macos.yml
     with:
-      version: ${{ needs.check-version.outputs.version }}
-
+      version: '${{ needs.check-version.outputs.version }}'
   create-release:
-    needs: [check-version, build-linux, build-windows, build-macos]
-    if: always() && needs.check-version.outputs.should_build == 'true' && (needs.build-linux.result == 'success' || needs.build-windows.result == 'success' || needs.build-macos.result == 'success')
+    needs:
+      - check-version
+      - build-linux
+      - build-windows
+      - build-macos
+    if: >-
+      always() && needs.check-version.outputs.should_build == 'true' &&
+      (needs.build-linux.result == 'success' || needs.build-windows.result ==
+      'success' || needs.build-macos.result == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
       - name: Download Linux artifacts
         if: needs.build-linux.result == 'success'
         uses: actions/download-artifact@v4
@@ -180,7 +190,6 @@ jobs:
           pattern: NST-*-Linux-*
           merge-multiple: false
         continue-on-error: true
-      
       - name: Download Windows artifacts
         if: needs.build-windows.result == 'success'
         uses: actions/download-artifact@v4
@@ -189,7 +198,6 @@ jobs:
           pattern: NST-*-Windows-*
           merge-multiple: false
         continue-on-error: true
-
       - name: Download macOS artifacts
         if: needs.build-macos.result == 'success'
         uses: actions/download-artifact@v4
@@ -198,40 +206,44 @@ jobs:
           pattern: NST-*-macOS-*
           merge-multiple: false
         continue-on-error: true
-      
       - name: List downloaded artifacts
         run: |
           echo "=== Downloaded artifacts ==="
           find artifacts -type f -ls || echo "No artifacts found"
-      
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq file python3 python3-pip
           pip3 install beautifulsoup4
-      
       - name: Generate manifest (optional)
         run: |
           if [ -f "scripts/generate_manifest.py" ]; then
             python3 scripts/generate_manifest.py || true
           fi
         continue-on-error: true
-      
       - name: Create or update release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        run: >
           set -euo pipefail
-          
+
+
           VERSION_TAG="${{ needs.check-version.outputs.version_tag }}"
+
           VERSION="${{ needs.check-version.outputs.version }}"
+
           REPO="${{ github.repository }}"
+
           API="https://api.github.com/repos/${REPO}"
-          
+
+
           echo "Processing release for ${VERSION_TAG}"
-          
+
+
           # Check if release exists
-          if [ "${{ needs.check-version.outputs.release_exists }}" = "true" ]; then
+
+          if [ "${{ needs.check-version.outputs.release_exists }}" = "true" ];
+          then
             RELEASE_ID="${{ needs.check-version.outputs.release_id }}"
             echo "Using existing release ID: ${RELEASE_ID}"
           else
@@ -239,60 +251,105 @@ jobs:
             
             # Create release body
             RELEASE_BODY="# Release ${VERSION}
-          
+
           ## Downloads
-          
+
+
           ### Windows
-          - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC runtime
-          
+
+          - NST-${VERSION}-Windows-x64-MSVC.zip - Windows x64 package with MSVC
+          runtime
+
+
           ### macOS
-          - NST-${VERSION}-macOS.dmg - macOS Universal (or Intel/Apple Silicon) package
-          
+
+          - NST-${VERSION}-macOS.dmg - macOS Universal (or Intel/Apple Silicon)
+          package
+
+
           ### Linux
-          - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install scripts
+
+          - NST-${VERSION}-Linux-x86_64.tar.gz - Portable archive with install
+          scripts
+
           - NST-${VERSION}-Linux-x86_64.deb - Debian/Ubuntu package
+
           - NST-${VERSION}-Linux-x86_64.rpm - Fedora/RHEL/CentOS package
-          - NST-${VERSION}-x86_64.AppImage - Universal Linux package (if available)
-          
+
+          - NST-${VERSION}-x86_64.AppImage - Universal Linux package (if
+          available)
+
+
           ## Installation
-          
+
+
           ### Windows
+
           1. Download NST-${VERSION}-Windows-x64-MSVC.zip
+
           2. Extract the ZIP file
+
           3. Run NST.exe
-          
+
+
           ### macOS
+
           1. Download NST-${VERSION}-macOS.dmg
+
           2. Open the DMG file
+
           3. Drag NST to Applications
-          
+
+
           ### Linux
+
           **tar.gz:**
+
           \\\`\\\`\\\`bash
+
           tar -xzf NST-${VERSION}-Linux-x86_64.tar.gz
+
           cd NST-${VERSION}
+
           sudo ./install.sh
+
           \\\`\\\`\\\`
-          
+
+
           **DEB (Debian/Ubuntu):**
+
           \\\`\\\`\\\`bash
+
           sudo dpkg -i NST-${VERSION}-Linux-x86_64.deb
+
           sudo apt-get install -f
+
           \\\`\\\`\\\`
-          
+
+
           **RPM (Fedora/RHEL/CentOS):**
+
           \\\`\\\`\\\`bash
+
           sudo rpm -i NST-${VERSION}-Linux-x86_64.rpm
+
           \\\`\\\`\\\`
-          
+
+
           **AppImage:**
+
           \\\`\\\`\\\`bash
+
           chmod +x NST-${VERSION}-x86_64.AppImage
+
           ./NST-${VERSION}-x86_64.AppImage
+
           \\\`\\\`\\\`
-          
+
+
           ## What's New
-          
+
+
           See CHANGELOG.md for details."
             
             create_resp=$(curl -s -X POST \
@@ -317,17 +374,25 @@ jobs:
             
             echo "Created release ID: ${RELEASE_ID}"
           fi
-          
-          # Use GitHub CLI for uploading (more reliable than curl for large files)
+
+
+          # Use GitHub CLI for uploading (more reliable than curl for large
+          files)
+
           shopt -s nullglob
-          files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb artifacts/*/*.rpm artifacts/*/*.AppImage artifacts/*/*.dmg)
-          
+
+          files=(artifacts/*/*.zip artifacts/*/*.tar.gz artifacts/*/*.deb
+          artifacts/*/*.rpm artifacts/*/*.AppImage artifacts/*/*.dmg)
+
+
           if [ ${#files[@]} -eq 0 ]; then
             echo "Warning: No artifacts found to upload"
             exit 0
           fi
-          
+
+
           # Install gh CLI if not available
+
           if ! command -v gh &> /dev/null; then
             echo "Installing GitHub CLI..."
             curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
@@ -335,12 +400,16 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y gh
           fi
-          
+
+
           echo "Uploading ${#files[@]} artifacts..."
-          
+
+
           upload_success=0
+
           upload_fail=0
-          
+
+
           for file in "${files[@]}"; do
             if [ ! -f "$file" ]; then
               continue
@@ -405,37 +474,61 @@ jobs:
             
             sleep 3
           done
-          
+
+
           echo ""
+
           echo "=== Upload Summary ==="
+
           echo "Success: ${upload_success}"
+
           echo "Failed: ${upload_fail}"
+
           echo ""
-          echo "Release URL: https://github.com/${REPO}/releases/tag/${VERSION_TAG}"
-          
+
+          echo "Release URL:
+          https://github.com/${REPO}/releases/tag/${VERSION_TAG}"
+
+
           # Exit with error if all uploads failed
+
           if [ ${upload_success} -eq 0 ] && [ ${upload_fail} -gt 0 ]; then
             echo "ERROR: All uploads failed!"
             exit 1
           fi
-
   cleanup:
-    needs: [check-version, build-linux, build-windows, build-macos, create-release]
+    needs:
+      - check-version
+      - build-linux
+      - build-windows
+      - build-macos
+      - create-release
     if: always()
     runs-on: ubuntu-latest
-    
     steps:
       - name: Summary
-        run: |
+        run: >
           echo "## Release Summary" >> $GITHUB_STEP_SUMMARY
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Version**: ${{ needs.check-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Tag**: ${{ needs.check-version.outputs.version_tag }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build Required**: ${{ needs.check-version.outputs.should_build }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Release Exists**: ${{ needs.check-version.outputs.release_exists }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "- **Version**: ${{ needs.check-version.outputs.version }}" >>
+          $GITHUB_STEP_SUMMARY
+
+          echo "- **Tag**: ${{ needs.check-version.outputs.version_tag }}" >>
+          $GITHUB_STEP_SUMMARY
+
+          echo "- **Build Required**: ${{
+          needs.check-version.outputs.should_build }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "- **Release Exists**: ${{
+          needs.check-version.outputs.release_exists }}" >> $GITHUB_STEP_SUMMARY
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          
-          if [ "${{ needs.check-version.outputs.should_build }}" = "true" ]; then
+
+
+          if [ "${{ needs.check-version.outputs.should_build }}" = "true" ];
+          then
             echo "### Build Status" >> $GITHUB_STEP_SUMMARY
             echo "- Linux: ${{ needs.build-linux.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "- Windows: ${{ needs.build-windows.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
