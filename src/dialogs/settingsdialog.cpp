@@ -12,6 +12,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     , ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    
+    // Populate Source Language
+    ui->sourceLanguageComboBox->addItem("Auto Detect", "auto");
+    ui->sourceLanguageComboBox->addItem("English", "en");
+    ui->sourceLanguageComboBox->addItem("Japanese", "ja");
+    ui->sourceLanguageComboBox->addItem("Korean", "ko");
+    ui->sourceLanguageComboBox->addItem("Chinese (Simplified)", "zh-CN");
+    // Add more if needed
 
     // Populate with some languages
     ui->targetLanguageComboBox->addItem("English", "en");
@@ -42,7 +50,14 @@ SettingsDialog::~SettingsDialog()
 
 QString SettingsDialog::googleApiKey() const
 {
+    // Fix: Access line edit in new location (check object name in UI)
+    // In new UI, it's still googleApiKeyEdit
     return ui->googleApiKeyEdit->text();
+}
+
+QString SettingsDialog::sourceLanguage() const
+{
+    return ui->sourceLanguageComboBox->currentData().toString();
 }
 
 QString SettingsDialog::targetLanguage() const
@@ -110,6 +125,14 @@ void SettingsDialog::setAiFilterThreshold(double threshold)
 void SettingsDialog::setGoogleApiKey(const QString &apiKey)
 {
     ui->googleApiKeyEdit->setText(apiKey);
+}
+
+void SettingsDialog::setSourceLanguage(const QString &language)
+{
+    int index = ui->sourceLanguageComboBox->findData(language);
+    if (index != -1) {
+        ui->sourceLanguageComboBox->setCurrentIndex(index);
+    }
 }
 
 void SettingsDialog::setTargetLanguage(const QString &language)

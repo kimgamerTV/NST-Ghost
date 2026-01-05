@@ -28,6 +28,7 @@ public:
     ~SettingsDialog();
 
     QString googleApiKey() const;
+    QString sourceLanguage() const;
     QString targetLanguage() const;
     QString targetLanguageName() const;
     bool isGoogleApi() const;
@@ -46,6 +47,7 @@ public:
     void setTranslationMode(int mode);
 
     void setGoogleApiKey(const QString &apiKey);
+    void setSourceLanguage(const QString &language);
     void setTargetLanguage(const QString &language);
     void setGoogleApi(bool isApi);
     void setLlmProvider(const QString &provider);
