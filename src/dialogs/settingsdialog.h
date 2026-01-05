@@ -40,6 +40,10 @@ public:
     // AI Filter
     bool isAiFilterEnabled() const;
     double aiFilterThreshold() const;
+    
+    // New logic for Sidebar layout
+    int translationMode() const;
+    void setTranslationMode(int mode);
 
     void setGoogleApiKey(const QString &apiKey);
     void setTargetLanguage(const QString &language);
@@ -60,17 +64,7 @@ private:
     Ui::SettingsDialog *ui;
     
     // Plugin UI members
-    QRadioButton *pluginsRadioButton;
-    QWidget *pluginsPage;
-    QListWidget *pluginListWidget;
-    QCheckBox *pluginEnabledCheckBox;
-    QWidget *pluginSettingsContainer;
-    QFormLayout *pluginSettingsLayout;
-    
-    // Programmatic UI elements
-    QCheckBox *m_enableRelationsCheckBox;
-    QCheckBox *m_enableAiFilterCheckBox;
-    QDoubleSpinBox *m_aiFilterThresholdSpinBox;
+
     
     void setupPluginsUI();
     void loadPluginList();

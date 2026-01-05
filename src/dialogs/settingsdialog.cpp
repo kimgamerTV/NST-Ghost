@@ -28,49 +28,11 @@ SettingsDialog::SettingsDialog(QWidget *parent)
     ui->targetLanguageComboBox->addItem("Hindi", "hi");
     ui->targetLanguageComboBox->addItem("Thai", "th");
 
-    connect(ui->quickTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
-    connect(ui->professionalTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
-    connect(ui->aiPoweredTranslateRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
     connect(ui->llmProviderComboBox, &QComboBox::currentIndexChanged, this, &SettingsDialog::updateLlmModelComboBox);
 
-    updateConfigPanel();
     updateLlmModelComboBox();
     
-    // Add Relations Toggle Programmatically
-    m_enableRelationsCheckBox = new QCheckBox("Enable Data Relations Graph (RPG Maker)", this);
-    m_enableRelationsCheckBox->setToolTip("Show visual relationship graph for Common Events (Beta)");
-    
-    QFormLayout *basicLayout = qobject_cast<QFormLayout*>(ui->basicSettingsGroupBox->layout());
-    if (basicLayout) {
-        // Add row
-        basicLayout->addRow("Relations:", m_enableRelationsCheckBox);
-    }
-    
     setupPluginsUI();
-
-    // AI Context Filter Settings (Programmatic Addition)
-    QGroupBox *aiFilterGroup = new QGroupBox("AI Context Filter", this);
-    QFormLayout *aiLayout = new QFormLayout(aiFilterGroup);
-    
-    m_enableAiFilterCheckBox = new QCheckBox("Enable AI Filter", this);
-    m_enableAiFilterCheckBox->setToolTip("Use AI to understand context and skip non-translatable text.");
-    
-    m_aiFilterThresholdSpinBox = new QDoubleSpinBox(this);
-    m_aiFilterThresholdSpinBox->setRange(0.0, 1.0);
-    m_aiFilterThresholdSpinBox->setSingleStep(0.05);
-    m_aiFilterThresholdSpinBox->setValue(0.75);
-    m_aiFilterThresholdSpinBox->setToolTip("Similarity Threshold (Higher = Stricter/Fewer Skips)");
-    
-    aiLayout->addRow(m_enableAiFilterCheckBox);
-    aiLayout->addRow("Sensitivity:", m_aiFilterThresholdSpinBox);
-    
-    QLabel *aiInfoLabel = new QLabel("<i>Extends Smart Filter heuristics with Deep Learning.</i>", this);
-    aiInfoLabel->setWordWrap(true);
-    aiLayout->addRow(aiInfoLabel);
-
-    // Add to main layout (find appropriate place, e.g. below basic settings)
-    // We can add it to the vertical layout
-    qobject_cast<QVBoxLayout*>(this->layout())->insertWidget(2, aiFilterGroup); // Index 2 is likely below basic settings
 }
 
 SettingsDialog::~SettingsDialog()
@@ -117,32 +79,32 @@ QString SettingsDialog::llmModel() const
 
 bool SettingsDialog::isRelationsEnabled() const
 {
-    return m_enableRelationsCheckBox->isChecked();
+    return ui->enableRelationsCheckBox->isChecked();
 }
 
 void SettingsDialog::setRelationsEnabled(bool enabled)
 {
-    m_enableRelationsCheckBox->setChecked(enabled);
+    ui->enableRelationsCheckBox->setChecked(enabled);
 }
 
 bool SettingsDialog::isAiFilterEnabled() const
 {
-    return m_enableAiFilterCheckBox->isChecked();
+    return ui->enableAiFilterCheckBox->isChecked();
 }
 
 double SettingsDialog::aiFilterThreshold() const
 {
-    return m_aiFilterThresholdSpinBox->value();
+    return ui->aiFilterThresholdSpinBox->value();
 }
 
 void SettingsDialog::setAiFilterEnabled(bool enabled)
 {
-    m_enableAiFilterCheckBox->setChecked(enabled);
+    ui->enableAiFilterCheckBox->setChecked(enabled);
 }
 
 void SettingsDialog::setAiFilterThreshold(double threshold)
 {
-    m_aiFilterThresholdSpinBox->setValue(threshold);
+    ui->aiFilterThresholdSpinBox->setValue(threshold);
 }
 
 void SettingsDialog::setGoogleApiKey(const QString &apiKey)
@@ -193,26 +155,44 @@ void SettingsDialog::setLlmModel(const QString &model)
 
 bool SettingsDialog::isGoogleApi() const
 {
-    return ui->professionalTranslateRadioButton->isChecked();
+    // Mode 1: Professional (Google API)
+    return ui->translatorModeComboBox->currentIndex() == 1;
 }
 
 void SettingsDialog::setGoogleApi(bool isApi)
 {
-    ui->professionalTranslateRadioButton->setChecked(isApi);
-    ui->quickTranslateRadioButton->setChecked(!isApi);
+    // Legacy support: if true, set to Professional (index 1), else Quick (index 0)
+    // Ideally, we should have a generic setTranslationMode(int mode)
+    if (isApi) {
+        ui->translatorModeComboBox->setCurrentIndex(1);
+    } else {
+        // Default to Quick if not API, unless it was already setting something else?
+        // This setter suggests a binary choice in the old logic.
+        if (ui->translatorModeComboBox->currentIndex() != 2 && ui->translatorModeComboBox->currentIndex() != 3) {
+             ui->translatorModeComboBox->setCurrentIndex(0);
+        }
+    }
+}
+
+// Helper to determine active mode more generically if needed
+// 0: Quick, 1: Pro, 2: LLM, 3: Plugins
+int SettingsDialog::translationMode() const
+{
+    return ui->translatorModeComboBox->currentIndex();
+}
+
+void SettingsDialog::setTranslationMode(int mode)
+{
+    if (mode >= 0 && mode < ui->translatorModeComboBox->count()) {
+        ui->translatorModeComboBox->setCurrentIndex(mode);
+    }
 }
 
 void SettingsDialog::updateConfigPanel()
 {
-    if (ui->quickTranslateRadioButton->isChecked()) {
-        ui->configStackedWidget->setCurrentIndex(0); // Page for Quick Translate
-    } else if (ui->professionalTranslateRadioButton->isChecked()) {
-        ui->configStackedWidget->setCurrentIndex(1); // Page for Professional (Google API)
-    } else if (ui->aiPoweredTranslateRadioButton->isChecked()) {
-        ui->configStackedWidget->setCurrentIndex(2); // Page for AI-Powered (LLM)
-    } else if (pluginsRadioButton->isChecked()) {
-        ui->configStackedWidget->setCurrentWidget(pluginsPage);
-    }
+    // Logic to enable/disable tabs or show specific pages is now handled by the Sidebar.
+    // We might want to disable specific pages if they are not active? 
+    // For now, let's allow the user to browse settings freely.
 }
 
 void SettingsDialog::updateLlmModelComboBox()
@@ -247,55 +227,20 @@ void SettingsDialog::updateLlmModelComboBox()
 
 void SettingsDialog::setupPluginsUI()
 {
-    // 1. Add "Plugins" Radio Button to the GroupBox
-    // We need to find the layout of translationModeGroupBox
-    // Accessing ui->translationModeGroupBox directly
+    // Removed RadioButton toggle connection as it's no longer used for page switching
     
-    pluginsRadioButton = new QRadioButton("🧩 Plugins (Lua)", this);
-    ui->translationModeGroupBox->layout()->addWidget(pluginsRadioButton);
+    connect(ui->pluginListWidget, &QListWidget::itemClicked, this, &SettingsDialog::onPluginSelected);
     
-    connect(pluginsRadioButton, &QRadioButton::toggled, this, &SettingsDialog::updateConfigPanel);
-    
-    // 2. Create Plugins Page
-    pluginsPage = new QWidget();
-    QHBoxLayout *pageLayout = new QHBoxLayout(pluginsPage);
-    
-    // Left: Plugin List
-    pluginListWidget = new QListWidget();
-    pluginListWidget->setFixedWidth(150);
-    connect(pluginListWidget, &QListWidget::itemClicked, this, &SettingsDialog::onPluginSelected);
-    
-    // Right: Settings Area
-    QVBoxLayout *rightLayout = new QVBoxLayout();
-    
-    pluginEnabledCheckBox = new QCheckBox("Enable Plugin");
-    pluginEnabledCheckBox->setEnabled(false); // Disabled until plugin selected
-    connect(pluginEnabledCheckBox, &QCheckBox::toggled, [this](bool checked){
-        // Save enabled state immediately or when saving settings?
-        // Let's save on accept, but we need to track it.
-        // Actually, simpler to write to QSettings immediately for now, or keep in memory.
-        // Let's write to QSettings immediately for simplicity in this iteration.
-        if (pluginListWidget->currentItem()) {
-             QString scriptName = pluginListWidget->currentItem()->text();
+    connect(ui->pluginEnabledCheckBox, &QCheckBox::toggled, [this](bool checked){
+        if (ui->pluginListWidget->currentItem()) {
+             QString scriptName = ui->pluginListWidget->currentItem()->text();
              QSettings settings(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
              settings.setValue("Plugins/" + scriptName + "/Enabled", checked);
         }
     });
-    
-    QScrollArea *scrollArea = new QScrollArea();
-    scrollArea->setWidgetResizable(true);
-    pluginSettingsContainer = new QWidget();
-    pluginSettingsLayout = new QFormLayout(pluginSettingsContainer);
-    scrollArea->setWidget(pluginSettingsContainer);
-    
-    rightLayout->addWidget(pluginEnabledCheckBox);
-    rightLayout->addWidget(scrollArea);
-    
-    pageLayout->addWidget(pluginListWidget);
-    pageLayout->addLayout(rightLayout);
-    
-    // Add to Stacked Widget
-    ui->configStackedWidget->addWidget(pluginsPage);
+
+    // Make sure we update the enabled state check
+    ui->pluginEnabledCheckBox->setEnabled(false);
     
     loadPluginList();
 }
@@ -309,7 +254,7 @@ void SettingsDialog::loadPluginList()
         scriptDir.cd("scripts");
     }
     
-    pluginListWidget->clear();
+    ui->pluginListWidget->clear();
     for (const QString &fileName : scriptDir.entryList({"*.lua"}, QDir::Files)) {
         // Filter logic (same as plugin)
         // For now, list all, or check for on_text_extract?
@@ -319,7 +264,7 @@ void SettingsDialog::loadPluginList()
         if (luaL_dofile(L, filePath.toStdString().c_str()) == LUA_OK) {
             lua_getglobal(L, "on_text_extract");
             if (lua_isfunction(L, -1)) {
-                 pluginListWidget->addItem(fileName);
+                 ui->pluginListWidget->addItem(fileName);
             }
         }
         lua_close(L);
@@ -335,10 +280,10 @@ void SettingsDialog::onPluginSelected(QListWidgetItem *item)
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "NST", "PluginSettings");
     bool enabled = settings.value("Plugins/" + scriptName + "/Enabled", false).toBool();
     
-    pluginEnabledCheckBox->setEnabled(true);
-    pluginEnabledCheckBox->blockSignals(true);
-    pluginEnabledCheckBox->setChecked(enabled);
-    pluginEnabledCheckBox->blockSignals(false);
+    ui->pluginEnabledCheckBox->setEnabled(true);
+    ui->pluginEnabledCheckBox->blockSignals(true);
+    ui->pluginEnabledCheckBox->setChecked(enabled);
+    ui->pluginEnabledCheckBox->blockSignals(false);
     
     // Load Settings Schema
     clearPluginSettingsUI();
@@ -370,7 +315,7 @@ void SettingsDialog::onPluginSelected(QListWidgetItem *item)
                 s.setValue("Plugins/" + scriptName + "/Settings/" + key, text);
             });
             
-            pluginSettingsLayout->addRow(label + ":", edit);
+            ui->formLayout_plugins->addRow(label + ":", edit);
         } else if (type == "dropdown") {
             QComboBox *combo = new QComboBox();
             QJsonArray options = field["options"].toArray();
@@ -389,7 +334,7 @@ void SettingsDialog::onPluginSelected(QListWidgetItem *item)
                 s.setValue("Plugins/" + scriptName + "/Settings/" + key, text);
             });
             
-            pluginSettingsLayout->addRow(label + ":", combo);
+            ui->formLayout_plugins->addRow(label + ":", combo);
         }
     }
 }
@@ -397,7 +342,7 @@ void SettingsDialog::onPluginSelected(QListWidgetItem *item)
 void SettingsDialog::clearPluginSettingsUI()
 {
     QLayoutItem *item;
-    while ((item = pluginSettingsLayout->takeAt(0)) != nullptr) {
+    while ((item = ui->formLayout_plugins->takeAt(0)) != nullptr) {
         delete item->widget();
         delete item;
     }
