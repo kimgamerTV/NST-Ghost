@@ -7,6 +7,8 @@
 #include <QTextStream>
 #include <QSettings>
 #include <QTimer>
+#include <cstdlib>
+#include <string>
 
 #pragma push_macro("slots")
 #undef slots
@@ -15,6 +17,18 @@
 
 int main(int argc, char *argv[])
 {
+    // Configure Python paths for AppImage before initializing interpreter
+#ifdef __linux__
+    const char* appdir = std::getenv("APPDIR");
+    if (appdir) {
+        // Running from AppImage - use bundled Python
+        static std::wstring pythonHome;
+        std::string appdirStr(appdir);
+        pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr";
+        Py_SetPythonHome(pythonHome.c_str());
+    }
+#endif
+
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
     pybind11::gil_scoped_release release;
