@@ -31,6 +31,25 @@ class ImageTranslator:
             # Also try to add local site-packages if running in a venv-like structure or specific locations
             # This helps if user installed to ~/.local/lib/pythonX.X/site-packages manually
             
+            # Check for VIRTUAL_ENV
+            venv_path = os.environ.get("VIRTUAL_ENV")
+            if venv_path:
+                import glob
+                # Look for site-packages in the venv
+                # Support both lib and lib64, and any python version
+                search_patterns = [
+                    os.path.join(venv_path, "lib", "python*", "site-packages"),
+                    os.path.join(venv_path, "lib64", "python*", "site-packages")
+                ]
+                
+                for pattern in search_patterns:
+                    for sp in glob.glob(pattern):
+                        if os.path.exists(sp) and sp not in sys.path:
+                            logger.info(f"Adding venv site-packages: {sp}")
+                            sys.path.append(sp)
+                            # Also add to front to prioritize venv over bundled? 
+                            # sys.path.insert(0, sp) # Maybe safer to append to avoid breaking bundled deps if any
+            
             import easyocr
             import torch
             self.easyocr = easyocr
