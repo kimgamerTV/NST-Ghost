@@ -1,0 +1,84 @@
+name: Manual Build (No Release)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g., v0.4.3) - defaults to CMakeLists.txt version if empty'
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - CMakeLists.txt
+      - .github/workflows/build-standalone.yml
+      - src/**
+      - scripts/**
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  check-version:
+    needs: ci
+    runs-on: ubuntu-latest
+    outputs:
+      version: '${{ steps.get_version.outputs.version }}'
+      version_tag: '${{ steps.get_version.outputs.version_tag }}'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Extract version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.version }}" ]; then
+            VERSION_TAG="${{ inputs.version }}"
+            VERSION="${VERSION_TAG#v}"
+          else
+            VERSION=$(grep -oP 'project\(NST VERSION \K[0-9]+\.[0-9]+\.[0-9]+' CMakeLists.txt)
+            VERSION_TAG="v${VERSION}"
+          fi
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version_tag=${VERSION_TAG}" >> $GITHUB_OUTPUT
+          
+          echo "Building version: ${VERSION} (tag: ${VERSION_TAG})"
+
+  build-linux:
+    needs: check-version
+    uses: ./.github/workflows/release-linux.yml
+    with:
+      version: '${{ needs.check-version.outputs.version }}'
+
+  build-windows:
+    needs: check-version
+    uses: ./.github/workflows/release-windows.yml
+    with:
+      version: '${{ needs.check-version.outputs.version }}'
+
+  build-macos:
+    needs: check-version
+    uses: ./.github/workflows/release-macos.yml
+    with:
+      version: '${{ needs.check-version.outputs.version }}'
+
+  summary:
+    needs: [check-version, build-linux, build-windows, build-macos]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version**: ${{ needs.check-version.outputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Ref**: ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Status" >> $GITHUB_STEP_SUMMARY
+          echo "- Linux: ${{ needs.build-linux.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Windows: ${{ needs.build-windows.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- macOS: ${{ needs.build-macos.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Artifacts are available in the summary page of this workflow run." >> $GITHUB_STEP_SUMMARY
