@@ -234,7 +234,7 @@ jobs:
           # -targetDir: Output directory (AppDir/usr will ensure structure usr/bin, usr/lib)
           cqtdeployer -bin AppDir/usr/bin/NST \
             -libDir AppDir/usr/bin \
-            -qmake ${{ env.Qt6_DIR }}/bin/qmake \
+            -qmake ${{ env.QT_ROOT_DIR }}/bin/qmake \
             -targetDir AppDir/usr \
             -always-overwrite
       
