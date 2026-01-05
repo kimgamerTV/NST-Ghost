@@ -1,4 +1,3 @@
-
 import sys
 import os
 import json
@@ -98,19 +97,73 @@ class ImageTranslator:
 
     def is_available(self):
         return self.available
-
-    def translate_image(self, image_path, source_lang='en', target_lang='th'):
+    
+    def preprocess_image(self, image_path):
         """
-        Translates text in an image.
-        Returns a JSON string containing list of detections:
-        [
-            {
-                "text": "Detected Text",
-                "bbox": [[x1, y1], [x2, y2], [x3, y3], [x4, y4]],
-                "confidence": 0.98
-            },
-            ...
-        ]
+        Pre-process image to improve OCR accuracy.
+        Returns path to processed image.
+        """
+        try:
+            import cv2
+            import numpy as np
+            from PIL import Image, ImageEnhance
+            import tempfile
+            
+            # Read image
+            img = cv2.imread(image_path)
+            if img is None:
+                return image_path
+            
+            # Convert to grayscale
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            
+            # Apply adaptive thresholding for better text contrast
+            # This works well for varying lighting conditions
+            processed = cv2.adaptiveThreshold(
+                gray, 255, 
+                cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                cv2.THRESH_BINARY, 
+                11, 2
+            )
+            
+            # Denoise
+            processed = cv2.fastNlMeansDenoising(processed, None, 10, 7, 21)
+            
+            # Sharpen the image
+            kernel = np.array([[-1,-1,-1],
+                             [-1, 9,-1],
+                             [-1,-1,-1]])
+            processed = cv2.filter2D(processed, -1, kernel)
+            
+            # Slight dilation to make text thicker (helps with thin fonts)
+            kernel = np.ones((2,2), np.uint8)
+            processed = cv2.dilate(processed, kernel, iterations=1)
+            
+            # Save processed image
+            temp_path = os.path.join(tempfile.gettempdir(), f"preprocessed_{os.path.basename(image_path)}")
+            cv2.imwrite(temp_path, processed)
+            
+            logger.info(f"Image preprocessed: {temp_path}")
+            return temp_path
+            
+        except Exception as e:
+            logger.warning(f"Preprocessing failed: {e}. Using original image.")
+            return image_path
+
+    def translate_image(self, image_path, source_lang='en', target_lang='th', 
+                       use_preprocessing=True, confidence_threshold=0.3):
+        """
+        Translates text in an image with enhanced accuracy.
+        
+        Args:
+            image_path: Path to image file
+            source_lang: Source language code
+            target_lang: Target language code (not used in OCR, for future translation)
+            use_preprocessing: Whether to preprocess image for better accuracy
+            confidence_threshold: Minimum confidence score (0-1) to include detection
+            
+        Returns:
+            JSON string containing list of detections with metadata
         """
         results = []
         
@@ -120,34 +173,100 @@ class ImageTranslator:
 
         if self.available:
             try:
-                # Initialize reader for the specific language if not already cached/loaded
-                # EasyOCR reader efficiently handles reloading usually, but we can optimize if needed.
-                # Use cached reader to avoid reloading model every time (30-50% speedup)
-                langs = [source_lang]
-                if 'en' not in langs: 
-                    langs.append('en')  # Always good to have english fallback
+                # Preprocess image if enabled
+                processed_path = image_path
+                if use_preprocessing:
+                    processed_path = self.preprocess_image(image_path)
                 
-                cache_key = tuple(sorted(langs))  # Create hashable key
-                if cache_key not in self.reader_cache:
-                    logger.info(f"Creating new EasyOCR reader for languages: {langs}")
-                    self.reader_cache[cache_key] = self.easyocr.Reader(langs, gpu=self.use_gpu)
+                # Strategy: For Japanese (and potentially other non-Latin languages), 
+                # running separate passes for the specific language and English often yields 
+                # better results than a single mixed-mode reader, especially for game UI 
+                # where text types are distinct (e.g., Pixel English vs Hi-Res Japanese).
+                
+                pass_results = []
+                
+                # Define passes based on source_lang
+                ocr_passes = []
+                if source_lang == 'ja':
+                    ocr_passes.append(['ja'])  # Dedicated Japanese pass
+                    ocr_passes.append(['en'])  # Dedicated English pass
                 else:
-                    logger.info(f"Using cached EasyOCR reader for languages: {langs}")
+                    # Default behavior for other languages
+                    langs = [source_lang]
+                    if 'en' not in langs: 
+                        langs.append('en')
+                    ocr_passes.append(langs)
+
+                # Execute OCR passes
+                merged_detections = []
                 
-                reader = self.reader_cache[cache_key]
-                
-                # detail=1 returns (bbox, text, prob)
-                detections = reader.readtext(image_path, detail=1)
-                
-                for bbox, text, prob in detections:
-                    # bbox is list of 4 points [[x,y], [x,y], ...], need to convert to list of lists for JSON
-                    bbox_list = [ [int(p[0]), int(p[1])] for p in bbox ]
+                for i, langs in enumerate(ocr_passes):
+                    logger.info(f"Running OCR pass {i+1}/{len(ocr_passes)} with languages: {langs}")
+                    
+                    cache_key = tuple(sorted(langs))
+                    if cache_key not in self.reader_cache:
+                        logger.info(f"Creating new EasyOCR reader for: {langs}")
+                        self.reader_cache[cache_key] = self.easyocr.Reader(
+                            langs, 
+                            gpu=self.use_gpu,
+                            verbose=False
+                        )
+                    
+                    reader = self.reader_cache[cache_key]
+                    
+                    # Run detections
+                    detections = reader.readtext(
+                        processed_path, 
+                        detail=1,
+                        paragraph=False,
+                        min_size=10,
+                        contrast_ths=0.1,
+                        adjust_contrast=0.5,
+                        width_ths=0.7,
+                        link_threshold=0.4,
+                        low_text=0.4,
+                        text_threshold=0.7
+                    )
+                    
+                    # Optional: Run on original if preprocessing was aggressive
+                    if use_preprocessing and processed_path != image_path:
+                        original_detections = reader.readtext(
+                            image_path,
+                            detail=1,
+                            paragraph=False,
+                            min_size=10,
+                            contrast_ths=0.1,
+                            adjust_contrast=0.5
+                        )
+                        detections = self._merge_detections(detections, original_detections)
+                    
+                    # Merge into main results
+                    if not merged_detections:
+                        merged_detections = detections
+                    else:
+                        merged_detections = self._merge_detections(merged_detections, detections)
+
+                for bbox, text, prob in merged_detections:
+                    # Filter by confidence threshold
+                    if prob < confidence_threshold:
+                        logger.debug(f"Skipping low confidence detection: '{text}' ({prob:.2f})")
+                        continue
+                    
+                    # Clean up detected text
+                    text = text.strip()
+                    if not text:
+                        continue
+                    
+                    # Convert bbox to list of integer coordinates
+                    bbox_list = [[int(p[0]), int(p[1])] for p in bbox]
                     
                     results.append({
                         "text": text,
                         "bbox": bbox_list,
                         "confidence": float(prob)
                     })
+                
+                logger.info(f"OCR completed: {len(results)} detections above threshold {confidence_threshold}")
                     
             except Exception as e:
                 logger.error(f"Error during OCR: {e}")
@@ -169,6 +288,58 @@ class ImageTranslator:
             ]
             
         return json.dumps(results, ensure_ascii=False)
+    
+    def _merge_detections(self, det1, det2, iou_threshold=0.5):
+        """
+        Merge two sets of detections, removing duplicates based on IoU.
+        Keeps detection with higher confidence.
+        """
+        import numpy as np
+        
+        def bbox_iou(box1, box2):
+            """Calculate IoU between two bounding boxes."""
+            # Convert to x_min, y_min, x_max, y_max format
+            x1_min = min(p[0] for p in box1)
+            y1_min = min(p[1] for p in box1)
+            x1_max = max(p[0] for p in box1)
+            y1_max = max(p[1] for p in box1)
+            
+            x2_min = min(p[0] for p in box2)
+            y2_min = min(p[1] for p in box2)
+            x2_max = max(p[0] for p in box2)
+            y2_max = max(p[1] for p in box2)
+            
+            # Calculate intersection
+            x_inter = max(0, min(x1_max, x2_max) - max(x1_min, x2_min))
+            y_inter = max(0, min(y1_max, y2_max) - max(y1_min, y2_min))
+            inter_area = x_inter * y_inter
+            
+            # Calculate union
+            box1_area = (x1_max - x1_min) * (y1_max - y1_min)
+            box2_area = (x2_max - x2_min) * (y2_max - y2_min)
+            union_area = box1_area + box2_area - inter_area
+            
+            return inter_area / union_area if union_area > 0 else 0
+        
+        merged = list(det1)
+        
+        for bbox2, text2, prob2 in det2:
+            is_duplicate = False
+            
+            for i, (bbox1, text1, prob1) in enumerate(merged):
+                iou = bbox_iou(bbox1, bbox2)
+                
+                if iou > iou_threshold:
+                    is_duplicate = True
+                    # Keep the one with higher confidence
+                    if prob2 > prob1:
+                        merged[i] = (bbox2, text2, prob2)
+                    break
+            
+            if not is_duplicate:
+                merged.append((bbox2, text2, prob2))
+        
+        return merged
 
     def inpaint_text_regions(self, image_path, detections_json):
         """
@@ -208,7 +379,7 @@ class ImageTranslator:
                 pts = np.array(bbox, dtype=np.int32)
                 cv2.fillPoly(mask, [pts], 255)
                 
-                # --- Advanced Analysis (Same as before) ---
+                # --- Advanced Analysis ---
                 x_min = max(0, min(p[0] for p in bbox))
                 y_min = max(0, min(p[1] for p in bbox))
                 x_max = min(img.shape[1], max(p[0] for p in bbox))
