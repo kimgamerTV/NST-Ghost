@@ -152,11 +152,21 @@ jobs:
           cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* usr/python/lib/python${PYTHON_VERSION}/ 2>/dev/null || true
           
           # Install dependencies into bundled site-packages
-          echo "Installing Python dependencies..."
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
-          pip install -r ../requirements.txt --target usr/python/lib/python${PYTHON_VERSION}/site-packages/ --no-deps
-          # Re-install dependencies of requirements without re-installing torch (to avoid gpu version pull)
-          pip install -r ../requirements.txt --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
+          # Use --index-url for PyTorch CPU to avoid pulling massive CUDA libs
+          # Use --extra-index-url for standard PyPI packages
+          # Use --no-cache-dir to save disk space on the runner
+          echo "Installing Python dependencies (CPU only)..."
+          pip install --no-cache-dir \
+            torch torchvision torchaudio \
+            --index-url https://download.pytorch.org/whl/cpu \
+            --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
+            
+          # Install other requirements, ensuring they don't trigger CUDA torch
+          pip install --no-cache-dir \
+            -r ../requirements.txt \
+            --index-url https://download.pytorch.org/whl/cpu \
+            --extra-index-url https://pypi.org/simple \
+            --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
           
           # Copy libpython shared library
           if [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" ]; then
