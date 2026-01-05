@@ -19,6 +19,18 @@ class ImageTranslator:
         self.device_name = "CPU"
         
         try:
+            # Try to add user site-packages to path to allow user-installed dependencies
+            import site
+            import sys
+            
+            # Add standard user site-packages
+            site_packages = site.getusersitepackages()
+            if os.path.exists(site_packages) and site_packages not in sys.path:
+                sys.path.append(site_packages)
+                
+            # Also try to add local site-packages if running in a venv-like structure or specific locations
+            # This helps if user installed to ~/.local/lib/pythonX.X/site-packages manually
+            
             import easyocr
             import torch
             self.easyocr = easyocr

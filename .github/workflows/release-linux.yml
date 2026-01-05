@@ -155,17 +155,11 @@ jobs:
           # Use --index-url for PyTorch CPU to avoid pulling massive CUDA libs
           # Use --extra-index-url for standard PyPI packages
           # Use --no-cache-dir to save disk space on the runner
-          echo "Installing Python dependencies (CPU only)..."
+          # Install minimal dependencies if needed (e.g. numpy, Pillow)
+          # We skip heavy AI libs (torch, easyocr) to let user manage them
+          echo "Installing minimal Python dependencies..."
           pip install --no-cache-dir \
-            torch torchvision torchaudio \
-            --index-url https://download.pytorch.org/whl/cpu \
-            --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
-            
-          # Install other requirements, ensuring they don't trigger CUDA torch
-          pip install --no-cache-dir \
-            -r ../requirements.txt \
-            --index-url https://download.pytorch.org/whl/cpu \
-            --extra-index-url https://pypi.org/simple \
+            numpy Pillow \
             --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
           
           # Copy libpython shared library
@@ -219,16 +213,9 @@ jobs:
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
           # Python: PYTHONHOME points to bundled Python, add scripts to PYTHONPATH
+          # Python: PYTHONHOME points to bundled Python, add scripts to PYTHONPATH
           # Note: PYTHONHOME is set in C++ code via Py_SetPythonHome when $APPDIR is detected
           export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
-
-          # Add PyTorch lib path to LD_LIBRARY_PATH
-          # It's usually in usr/python/lib/python*/site-packages/torch/lib
-          for TORCH_LIB in "${HERE}"/usr/python/lib/python*/site-packages/torch/lib; do
-              if [ -d "${TORCH_LIB}" ]; then
-                  export LD_LIBRARY_PATH="${TORCH_LIB}:${LD_LIBRARY_PATH}"
-              fi
-          done
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF

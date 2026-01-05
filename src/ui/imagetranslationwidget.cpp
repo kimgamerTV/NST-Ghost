@@ -321,6 +321,15 @@ void ImageTranslationWidget::onWorkerInitialized(bool success, const QString &st
         ui->m_statusLabel->setText("Status: " + status);
         ui->m_statusLabel->setStyleSheet("color: red;");
         ui->m_logConsole->append(QString("<font color='red'>[%1] Init Error: %2</font>").arg(QDateTime::currentDateTime().toString("HH:mm:ss")).arg(status));
+        
+        if (status.contains("Dependencies missing")) {
+            QMessageBox::warning(this, "Missing Dependencies", 
+                "The AI backend could not be initialized because some dependencies are missing.\n\n"
+                "Please install the following packages using pip:\n"
+                "pip install easyocr torch torchvision torchaudio simple-lama-inpainting\n\n"
+                "Note: You may need to choose the correct version for your GPU/CPU."
+            );
+        }
     } else {
          if (useGpu) {
             ui->m_statusLabel->setText(QString("Status: Ready (%1)").arg(deviceName));
