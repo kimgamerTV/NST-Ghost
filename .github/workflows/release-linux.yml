@@ -101,6 +101,9 @@ jobs:
           install -D -m 755 QtLingo/libQtLingo.so ../AppDir/usr/bin/libQtLingo.so
           cd ..
           
+          # Copy Python scripts
+          cp -r scripts AppDir/usr/bin/scripts
+          
           install -D -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/nst.desktop
           install -D -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg
       
@@ -189,9 +192,9 @@ jobs:
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python paths - use bundled Python stdlib
+          # Python paths - use bundled Python stdlib and scripts
           export PYTHONHOME="${HERE}/usr"
-          export PYTHONPATH="${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload"
+          export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload"
           
           # Disable user site-packages to avoid conflicts
           export PYTHONNOUSERSITE=1
