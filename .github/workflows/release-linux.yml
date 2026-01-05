@@ -175,29 +175,32 @@ jobs:
           cd AppDir
           PYTHON_VERSION=$(cat .python_version)
           
-          cat > AppRun << EOF
-#!/bin/bash
-SELF=\$(readlink -f "\$0")
-HERE=\${SELF%/*}
-
-# Standard paths
-export PATH="\${HERE}/usr/bin:\${PATH}"
-export LD_LIBRARY_PATH="\${HERE}/usr/lib:\${HERE}/usr/lib/x86_64-linux-gnu:\${HERE}/usr/bin:\${LD_LIBRARY_PATH}"
-
-# Qt plugin paths
-export QT_PLUGIN_PATH="\${HERE}/usr/plugins"
-export QML_IMPORT_PATH="\${HERE}/usr/qml"
-export QML2_IMPORT_PATH="\${HERE}/usr/qml"
-
-# Python paths - use bundled Python stdlib
-export PYTHONHOME="\${HERE}/usr"
-export PYTHONPATH="\${HERE}/usr/lib/python${PYTHON_VERSION}:\${HERE}/usr/lib/python${PYTHON_VERSION}/lib-dynload"
-
-# Disable user site-packages to avoid conflicts
-export PYTHONNOUSERSITE=1
-
-exec "\${HERE}/usr/bin/NST" "\$@"
-EOF
+          cat > AppRun << 'APPRUN_EOF'
+          #!/bin/bash
+          SELF=$(readlink -f "$0")
+          HERE=${SELF%/*}
+          
+          # Standard paths
+          export PATH="${HERE}/usr/bin:${PATH}"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          
+          # Qt plugin paths
+          export QT_PLUGIN_PATH="${HERE}/usr/plugins"
+          export QML_IMPORT_PATH="${HERE}/usr/qml"
+          export QML2_IMPORT_PATH="${HERE}/usr/qml"
+          
+          # Python paths - use bundled Python stdlib
+          export PYTHONHOME="${HERE}/usr"
+          export PYTHONPATH="${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload"
+          
+          # Disable user site-packages to avoid conflicts
+          export PYTHONNOUSERSITE=1
+          
+          exec "${HERE}/usr/bin/NST" "$@"
+          APPRUN_EOF
+          
+          # Replace placeholder with actual Python version
+          sed -i "s/__PYVER__/${PYTHON_VERSION}/g" AppRun
           chmod +x AppRun
       
       - name: Deploy Qt dependencies
