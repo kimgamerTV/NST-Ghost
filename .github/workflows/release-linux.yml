@@ -221,6 +221,14 @@ jobs:
           # Python: PYTHONHOME points to bundled Python, add scripts to PYTHONPATH
           # Note: PYTHONHOME is set in C++ code via Py_SetPythonHome when $APPDIR is detected
           export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
+
+          # Add PyTorch lib path to LD_LIBRARY_PATH
+          # It's usually in usr/python/lib/python*/site-packages/torch/lib
+          for TORCH_LIB in "${HERE}"/usr/python/lib/python*/site-packages/torch/lib; do
+              if [ -d "${TORCH_LIB}" ]; then
+                  export LD_LIBRARY_PATH="${TORCH_LIB}:${LD_LIBRARY_PATH}"
+              fi
+          done
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF
