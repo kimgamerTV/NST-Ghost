@@ -1,6 +1,12 @@
 name: Release macOS
 
 on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: 'Version number (e.g., 0.4.3)'
   push:
     tags:
       - 'v*'
