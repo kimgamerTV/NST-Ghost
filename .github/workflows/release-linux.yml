@@ -365,6 +365,13 @@ jobs:
           /usr/share/doc/*"
           fi
           
+          # Add bundled Python distribution
+          if [ -d "AppDir/usr/python" ] && [ "$(ls -A AppDir/usr/python 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/python
+          /usr/python/*"
+          fi
+          
           echo "=== Files to include in RPM ==="
           echo "$FILES_LIST"
           
