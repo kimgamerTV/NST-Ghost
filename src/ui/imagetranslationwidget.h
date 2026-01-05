@@ -15,6 +15,7 @@
 #include <QButtonGroup>
 #include <QListWidget>
 #include <QSplitter>
+#include <QCheckBox>
 #include <qtlingo/translationservice.h>
 
 class TranslationServiceManager;
