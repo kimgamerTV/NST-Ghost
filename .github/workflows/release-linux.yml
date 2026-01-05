@@ -178,27 +178,29 @@ jobs:
           cd AppDir
           PYTHON_VERSION=$(cat .python_version)
           
-          cat > AppRun << APPRUN_EOF
-#!/bin/bash
-SELF=\$(readlink -f "\$0")
-HERE=\${SELF%/*}
-
-# Standard paths
-export PATH="\${HERE}/usr/bin:\${PATH}"
-export LD_LIBRARY_PATH="\${HERE}/usr/lib:\${HERE}/usr/lib/x86_64-linux-gnu:\${HERE}/usr/bin:\${LD_LIBRARY_PATH}"
-
-# Qt plugin paths
-export QT_PLUGIN_PATH="\${HERE}/usr/plugins"
-export QML_IMPORT_PATH="\${HERE}/usr/qml"
-export QML2_IMPORT_PATH="\${HERE}/usr/qml"
-
-# Python: Add bundled stdlib and scripts to path
-# Note: PYTHONHOME is now set in C++ code via Py_SetPythonHome when \$APPDIR is detected
-export PYTHONPATH="\${HERE}/usr/bin:\${HERE}/usr/lib/python${PYTHON_VERSION}:\${PYTHONPATH}"
-
-exec "\${HERE}/usr/bin/NST" "\$@"
-APPRUN_EOF
+          cat > AppRun << 'APPRUN_EOF'
+          #!/bin/bash
+          SELF=$(readlink -f "$0")
+          HERE=${SELF%/*}
           
+          # Standard paths
+          export PATH="${HERE}/usr/bin:${PATH}"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          
+          # Qt plugin paths
+          export QT_PLUGIN_PATH="${HERE}/usr/plugins"
+          export QML_IMPORT_PATH="${HERE}/usr/qml"
+          export QML2_IMPORT_PATH="${HERE}/usr/qml"
+          
+          # Python: Add bundled stdlib and scripts to path
+          # Note: PYTHONHOME is set in C++ code via Py_SetPythonHome when $APPDIR is detected
+          export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/python__PYVER__:${PYTHONPATH}"
+          
+          exec "${HERE}/usr/bin/NST" "$@"
+          APPRUN_EOF
+          
+          # Replace placeholder with actual Python version
+          sed -i "s/__PYVER__/${PYTHON_VERSION}/g" AppRun
           chmod +x AppRun
       
       - name: Deploy Qt dependencies
