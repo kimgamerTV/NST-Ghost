@@ -60,7 +60,7 @@ void ImageProcessorWorker::initialize()
     }
 }
 
-void ImageProcessorWorker::processImage(const QString &imagePath, const QString &sourceLang)
+void ImageProcessorWorker::processImage(const QString &imagePath, const QString &sourceLang, bool useGcv, const QString &gcvKeyPath)
 {
     QString fileName = QFileInfo(imagePath).fileName();
     
@@ -80,13 +80,23 @@ void ImageProcessorWorker::processImage(const QString &imagePath, const QString 
         std::string resInfo = d->translator.attr("translate_image")(
             imagePath.toStdString(),
             sourceLang.toStdString(),
-            "th" // Target lang placeholder, not strictly used for OCR extraction
+            "th", // Target lang placeholder, not strictly used for OCR extraction
+            true, // use_preprocessing
+            0.3, // confidence_threshold
+            useGcv,
+            gcvKeyPath.toStdString()
         ).cast<std::string>();
         
         qDebug() << "Worker: OCR Finished. Parsing JSON...";
         
         QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(resInfo).toUtf8());
         if (!doc.isArray()) {
+            if (doc.isObject() && doc.object().contains("error")) {
+                 QString err = doc.object()["error"].toString();
+                 qDebug() << "Worker: Python returned error:" << err;
+                 emit errorOccurred(err);
+                 return;
+            }
             qDebug() << "Worker: Invalid OCR result format";
             emit errorOccurred("Invalid OCR result format");
             return;

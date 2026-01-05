@@ -19,7 +19,7 @@ public:
 
 public slots:
     void initialize();
-    void processImage(const QString &imagePath, const QString &sourceLang);
+    void processImage(const QString &imagePath, const QString &sourceLang, bool useGcv, const QString &gcvKeyPath);
 
 signals:
     void initialized(bool success, const QString &statusMessage, bool useGpu, const QString &deviceName);

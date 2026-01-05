@@ -17,6 +17,8 @@
 #include <QPainter>
 #include <QFontMetrics>
 #include <QDateTime>
+#include <QGroupBox>
+#include <QCheckBox>
 
 
 
@@ -46,6 +48,46 @@ ImageTranslationWidget::ImageTranslationWidget(TranslationServiceManager *transl
     ui->m_comboSourceLang->addItem("Japanese", "ja");
     ui->m_comboSourceLang->addItem("Chinese", "ch_sim");
     ui->m_comboSourceLang->addItem("Korean", "ko");
+
+    // --- GCV UI Setup (Programmatic) ---
+    QGroupBox *gcvGroup = new QGroupBox("OCR Engine", this);
+    QVBoxLayout *gcvLayout = new QVBoxLayout(gcvGroup);
+    
+    m_chkUseGcv = new QCheckBox("Use Google Cloud Vision", gcvGroup);
+    m_chkUseGcv->setToolTip("Requires Service Account Key JSON");
+    
+    QHBoxLayout *keyLayout = new QHBoxLayout();
+    m_editGcvKeyPath = new QLineEdit(gcvGroup);
+    m_editGcvKeyPath->setPlaceholderText("Path to service-account.json");
+    m_editGcvKeyPath->setEnabled(false);
+    
+    m_btnBrowseGcvKey = new QPushButton("...", gcvGroup);
+    m_btnBrowseGcvKey->setFixedWidth(30);
+    m_btnBrowseGcvKey->setEnabled(false);
+    
+    keyLayout->addWidget(m_editGcvKeyPath);
+    keyLayout->addWidget(m_btnBrowseGcvKey);
+    
+    gcvLayout->addWidget(m_chkUseGcv);
+    gcvLayout->addLayout(keyLayout);
+    
+    // Add to Side Panel (Assuming m_comboSourceLang is in the side panel layout)
+    if (ui->m_comboSourceLang->parentWidget() && ui->m_comboSourceLang->parentWidget()->layout()) {
+       ui->m_comboSourceLang->parentWidget()->layout()->addWidget(gcvGroup);
+    }
+    
+    // GCV Logic
+    connect(m_chkUseGcv, &QCheckBox::toggled, this, [this](bool checked){
+        m_editGcvKeyPath->setEnabled(checked);
+        m_btnBrowseGcvKey->setEnabled(checked);
+    });
+    
+    connect(m_btnBrowseGcvKey, &QPushButton::clicked, this, [this](){
+        QString path = QFileDialog::getOpenFileName(this, "Select GCV Key", "", "JSON (*.json)");
+        if (!path.isEmpty()) {
+            m_editGcvKeyPath->setText(path);
+        }
+    });
     
     // Connect UI signals
     connect(ui->m_btnLoad, &QPushButton::clicked, this, &ImageTranslationWidget::onAddImages);
@@ -261,7 +303,10 @@ bool ImageTranslationWidget::processImage(int index)
     QString imagePath = item.path;
     QString sourceLang = ui->m_comboSourceLang->currentData().toString();
     
-    emit processImageRequested(imagePath, sourceLang);
+    bool useGcv = m_chkUseGcv->isChecked();
+    QString gcvKey = m_editGcvKeyPath->text();
+    
+    emit processImageRequested(imagePath, sourceLang, useGcv, gcvKey);
     return true; // Started async
 }
 

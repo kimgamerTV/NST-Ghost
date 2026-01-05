@@ -109,7 +109,7 @@ private:
     ImageProcessorWorker *m_worker;
     
 signals:
-    void processImageRequested(const QString &path, const QString &sourceLang);
+    void processImageRequested(const QString &path, const QString &sourceLang, bool useGcv, const QString &gcvKeyPath);
     
 private slots:
     void onDevModeToggled(bool checked);
@@ -128,6 +128,11 @@ private:
     QString m_llmApiKey;
     QString m_llmModel;
     QString m_llmBaseUrl;
+    
+    // GCV Controls (Programmatic)
+    QCheckBox *m_chkUseGcv = nullptr;
+    QLineEdit *m_editGcvKeyPath = nullptr;
+    QPushButton *m_btnBrowseGcvKey = nullptr;
 };
 
 #endif // IMAGETRANSLATIONWIDGET_H

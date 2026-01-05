@@ -151,7 +151,8 @@ class ImageTranslator:
             return image_path
 
     def translate_image(self, image_path, source_lang='en', target_lang='th', 
-                       use_preprocessing=True, confidence_threshold=0.3):
+                       use_preprocessing=True, confidence_threshold=0.3, 
+                       use_gcv=False, gcv_key_path=""):
         """
         Translates text in an image with enhanced accuracy.
         
@@ -170,6 +171,18 @@ class ImageTranslator:
         if not os.path.exists(image_path):
             logger.error(f"Image not found: {image_path}")
             return json.dumps({"error": "Image file not found"})
+
+        # Google Cloud Vision Path
+        if use_gcv:
+            if not gcv_key_path or not os.path.exists(gcv_key_path):
+                logger.error("GCV requested but key file missing")
+                return json.dumps({"error": "Google Cloud Vision Key file not found"})
+            
+            try:
+                return self.translate_image_gcv(image_path, gcv_key_path)
+            except Exception as e:
+                logger.error(f"GCV Error: {e}")
+                return json.dumps({"error": f"Google Cloud Vision Error: {str(e)}"})
 
         if self.available:
             try:
@@ -340,6 +353,60 @@ class ImageTranslator:
                 merged.append((bbox2, text2, prob2))
         
         return merged
+
+    def translate_image_gcv(self, image_path, key_path):
+        """
+        Use Google Cloud Vision API for OCR.
+        """
+        try:
+            from google.cloud import vision
+            from google.oauth2 import service_account
+            import io
+        except ImportError:
+            return json.dumps({"error": "google-cloud-vision library not installed. Run 'pip install google-cloud-vision'"})
+
+        try:
+            credentials = service_account.Credentials.from_service_account_file(key_path)
+            client = vision.ImageAnnotatorClient(credentials=credentials)
+
+            with io.open(image_path, 'rb') as image_file:
+                content = image_file.read()
+
+            image = vision.Image(content=content)
+            response = client.text_detection(image=image)
+            texts = response.text_annotations
+
+            results = []
+            if texts:
+                # The first element is the entire text, specific words follow
+                # We want specific words/blocks for partial replacement usually, 
+                # but EasyOCR gives lines. GCV gives words or pages.
+                # Let's iterate from index 1 to get individual text blocks/words
+                # OR use the full_text_annotation if we want structure.
+                # For consistency with current EasyOCR usage (lines), let's try to group?
+                # Actually, simply taking texts[1:] is usually individual words.
+                # To get lines like EasyOCR, we might need full_text_annotation.pages...
+                
+                # Simple approach first: Use the words (texts[1:])
+                for text in texts[1:]:
+                    vertices = [[vertex.x, vertex.y] for vertex in text.bounding_poly.vertices]
+                    results.append({
+                        "text": text.description,
+                        "bbox": vertices,
+                        "confidence": 1.0 # GCV doesn't provide word-level confidence easily in this view, usually high
+                    })
+
+            if response.error.message:
+                raise Exception(
+                    '{}\nFor more info on error messages, check: '
+                    'https://cloud.google.com/apis/design/errors'.format(
+                        response.error.message))
+                        
+            return json.dumps(results, ensure_ascii=False)
+
+        except Exception as e:
+            logger.error(f"GCV Exception: {e}")
+            raise e
 
     def inpaint_text_regions(self, image_path, detections_json):
         """
