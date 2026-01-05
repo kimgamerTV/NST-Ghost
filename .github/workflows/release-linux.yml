@@ -185,6 +185,10 @@ jobs:
           SELF=$(readlink -f "$0")
           HERE=${SELF%/*}
           
+          # Set APPDIR for C++ code to detect bundled distribution
+          # This is automatically set inside AppImages, but we need it for tar.gz too
+          export APPDIR="${HERE}"
+          
           # Standard paths
           export PATH="${HERE}/usr/bin:${PATH}"
           export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${HERE}/usr/python/lib:${LD_LIBRARY_PATH}"
