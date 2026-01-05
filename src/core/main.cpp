@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 #ifdef __linux__
     const char* appdir = std::getenv("APPDIR");
     if (appdir) {
-        // Running from AppImage - use bundled Python
+        // Running from AppImage - use bundled Python at $APPDIR/usr/python
         static std::wstring pythonHome;
         std::string appdirStr(appdir);
-        pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr";
+        pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr/python";
         Py_SetPythonHome(pythonHome.c_str());
     }
 #endif
