@@ -151,6 +151,13 @@ jobs:
           # Copy Python stdlib
           cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* usr/python/lib/python${PYTHON_VERSION}/ 2>/dev/null || true
           
+          # Install dependencies into bundled site-packages
+          echo "Installing Python dependencies..."
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
+          pip install -r ../requirements.txt --target usr/python/lib/python${PYTHON_VERSION}/site-packages/ --no-deps
+          # Re-install dependencies of requirements without re-installing torch (to avoid gpu version pull)
+          pip install -r ../requirements.txt --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
+          
           # Copy libpython shared library
           if [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" ]; then
             cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* usr/python/lib/
@@ -166,8 +173,11 @@ jobs:
           rm -rf usr/python/lib/python${PYTHON_VERSION}/tkinter
           rm -rf usr/python/lib/python${PYTHON_VERSION}/turtle*
           rm -rf usr/python/lib/python${PYTHON_VERSION}/turtledemo
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/site-packages/pip
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/site-packages/setuptools
           find usr/python/lib/python${PYTHON_VERSION} -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
           find usr/python/lib/python${PYTHON_VERSION} -name "*.pyc" -delete 2>/dev/null || true
+
           
           # Save Python version for reference
           echo "${PYTHON_VERSION}" > .python_version

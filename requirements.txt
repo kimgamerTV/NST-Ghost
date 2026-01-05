@@ -1,0 +1,7 @@
+numpy
+opencv-python-headless
+Pillow
+easyocr
+sentence-transformers
+simple-lama-inpainting
+google-cloud-vision
