@@ -192,12 +192,15 @@ jobs:
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python paths - use bundled Python stdlib and scripts
+          # Python paths - use bundled stdlib but also allow system site-packages for ML deps
           export PYTHONHOME="${HERE}/usr"
-          export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload"
           
-          # Disable user site-packages to avoid conflicts
-          export PYTHONNOUSERSITE=1
+          # Get system Python site-packages paths
+          SYS_SITE_PACKAGES=$(python3 -c "import site; print(':'.join(site.getsitepackages()))" 2>/dev/null || echo "")
+          USER_SITE_PACKAGES=$(python3 -m site --user-site 2>/dev/null || echo "")
+          
+          # Build PYTHONPATH: bundled first, then system packages
+          export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload:${SYS_SITE_PACKAGES}:${USER_SITE_PACKAGES}"
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF

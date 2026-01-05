@@ -25,6 +25,16 @@ cmake ..
 cmake --build .
 ```
 
+## Image Translation (Optional)
+
+The Image Translation feature uses AI-powered OCR to detect and translate text in screenshots. To enable this feature, install the required Python packages:
+
+```bash
+pip install easyocr torch opencv-python Pillow numpy simple-lama-inpainting
+```
+
+> **Note:** These packages are large (~2GB). Without them, the app will run in "MOCK mode" for image translation.
+
 ## Contributing
 
 Please see the [CONTRIBUTING.md](CONTRIBUTING.md) file for details on how to contribute to this project.
