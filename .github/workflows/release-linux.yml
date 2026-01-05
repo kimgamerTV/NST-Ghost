@@ -133,50 +133,9 @@ jobs:
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
       
-      - name: Bundle Python stdlib
-        run: |
-          cd AppDir
-          
-          # Find Python version and paths
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-          PYTHON_PREFIX=$(python3 -c "import sys; print(sys.prefix)")
-          
-          echo "Python version: ${PYTHON_VERSION}"
-          echo "Python prefix: ${PYTHON_PREFIX}"
-          
-          # Create Python directories in AppDir
-          mkdir -p usr/lib/python${PYTHON_VERSION}
-          
-          # Copy Python stdlib (excluding test directories and pycache to save space)
-          cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* usr/lib/python${PYTHON_VERSION}/ 2>/dev/null || true
-          
-          # Remove unnecessary directories to reduce size
-          rm -rf usr/lib/python${PYTHON_VERSION}/test
-          rm -rf usr/lib/python${PYTHON_VERSION}/tests
-          rm -rf usr/lib/python${PYTHON_VERSION}/unittest/test
-          rm -rf usr/lib/python${PYTHON_VERSION}/idlelib
-          rm -rf usr/lib/python${PYTHON_VERSION}/tkinter
-          rm -rf usr/lib/python${PYTHON_VERSION}/turtle*
-          rm -rf usr/lib/python${PYTHON_VERSION}/turtledemo
-          find usr/lib/python${PYTHON_VERSION} -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-          find usr/lib/python${PYTHON_VERSION} -name "*.pyc" -delete 2>/dev/null || true
-          
-          # Also copy lib-dynload for native modules
-          if [ -d "${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/lib-dynload" ]; then
-            mkdir -p usr/lib/python${PYTHON_VERSION}/lib-dynload
-            cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/lib-dynload/* usr/lib/python${PYTHON_VERSION}/lib-dynload/ 2>/dev/null || true
-          fi
-          
-          # Save Python version for AppRun
-          echo "${PYTHON_VERSION}" > .python_version
-          
-          echo "Python stdlib bundled successfully"
-          du -sh usr/lib/python${PYTHON_VERSION} || true
-      
       - name: Create AppRun script
         run: |
           cd AppDir
-          PYTHON_VERSION=$(cat .python_version)
           
           cat > AppRun << 'APPRUN_EOF'
           #!/bin/bash
@@ -192,21 +151,12 @@ jobs:
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python paths - use bundled stdlib but also allow system site-packages for ML deps
-          export PYTHONHOME="${HERE}/usr"
-          
-          # Get system Python site-packages paths
-          SYS_SITE_PACKAGES=$(python3 -c "import site; print(':'.join(site.getsitepackages()))" 2>/dev/null || echo "")
-          USER_SITE_PACKAGES=$(python3 -m site --user-site 2>/dev/null || echo "")
-          
-          # Build PYTHONPATH: bundled first, then system packages
-          export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/python__PYVER__:${HERE}/usr/lib/python__PYVER__/lib-dynload:${SYS_SITE_PACKAGES}:${USER_SITE_PACKAGES}"
+          # Python: only add our scripts to path, use system Python for everything else
+          export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF
           
-          # Replace placeholder with actual Python version
-          sed -i "s/__PYVER__/${PYTHON_VERSION}/g" AppRun
           chmod +x AppRun
       
       - name: Deploy Qt dependencies
