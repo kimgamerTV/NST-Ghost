@@ -1,0 +1,220 @@
+name: Build Fedora Release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+        description: 'Version number (e.g., 0.4.3)'
+
+jobs:
+  build-fedora:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    
+    steps:
+      - name: Install dependencies (Fedora)
+        run: |
+          dnf install -y \
+            git \
+            gcc-c++ \
+            make \
+            cmake \
+            ninja-build \
+            rpm-build \
+            libglvnd-devel \
+            mesa-libGL-devel \
+            mesa-libGLU-devel \
+            libxkbcommon-devel \
+            libxkbcommon-x11-devel \
+            xcb-util-image-devel \
+            xcb-util-keysyms-devel \
+            xcb-util-renderutil-devel \
+            xcb-util-wm-devel \
+            xcb-util-cursor-devel \
+            fuse-libs \
+            file \
+            python3-devel \
+            python3-pip \
+            python3-pybind11 \
+            lua-devel \
+            qt6-qtbase-devel \
+            qt6-qttools-devel \
+            qt6-qtwayland-devel \
+            qt6-linguist \
+            desktop-file-utils \
+            libappstream-glib \
+            librsvg2-tools \
+            wget \
+            patchelf
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      # Python Pybind11 Setup
+      - name: Verify Python & Pybind11
+        run: |
+          python3 --version
+          # Fedora usually packages pybind11 cmake files in /usr/share/cmake/pybind11
+          ls -la /usr/share/cmake/pybind11 || echo "Checking python path..."
+          
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DQT_DEPLOY_SUPPORT=OFF \
+            -DSKIP_QT_DEPLOY=ON
+      
+      - name: Build
+        run: cmake --build build --config Release --parallel $(nproc)
+      
+      - name: Test
+        run: |
+          cd build
+          ctest --output-on-failure
+      
+      - name: Install to AppDir
+        run: |
+          mkdir -p AppDir/usr/bin
+          mkdir -p AppDir/usr/share/applications
+          mkdir -p AppDir/usr/share/icons/hicolor/scalable/apps
+          
+          cd build
+          # Manual install to control placement
+          cp NST ../AppDir/usr/bin/
+          cp BGA/libBGACore.so ../AppDir/usr/bin/
+          cp QtLingo/libQtLingo.so ../AppDir/usr/bin/
+          cd ..
+          
+          # Copy scripts
+          cp -r scripts AppDir/usr/bin/scripts
+          
+          # Copy desktop file and icon
+          cp packaging/debian/nst.desktop AppDir/usr/share/applications/
+          cp packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/
+      
+      - name: Prepare AppDir metadata
+        run: |
+          cd AppDir
+          
+          # Icon conversion
+          mkdir -p usr/share/icons/hicolor/256x256/apps
+          rsvg-convert -w 256 -h 256 usr/share/icons/hicolor/scalable/apps/nst.svg -o usr/share/icons/hicolor/256x256/apps/nst.png
+          
+          # Links
+          ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
+          ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
+          
+          # Fix Desktop file for AppImage
+          sed -i 's/Categories=.*/Categories=Development;/' usr/share/applications/nst.desktop
+      
+      - name: Create AppRun script
+        run: |
+          cd AppDir
+          
+          cat > AppRun << 'APPRUN_EOF'
+          #!/bin/bash
+          SELF=$(readlink -f "$0")
+          HERE=${SELF%/*}
+          export APPDIR="${HERE}"
+          
+          # Detect System Python (Fedora logic)
+          SYSTEM_PYTHON=$(which python3 2>/dev/null)
+          PY_LIB_DIR=""
+          
+          if [ -n "$SYSTEM_PYTHON" ]; then
+             PY_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
+             # Fedora 64-bit uses lib64
+             if [ -d "${PY_PREFIX}/lib64" ]; then
+                 PY_LIB_DIR="${PY_PREFIX}/lib64"
+             elif [ -d "${PY_PREFIX}/lib" ]; then
+                 PY_LIB_DIR="${PY_PREFIX}/lib"
+             fi
+             export PYTHONHOME="$PY_PREFIX"
+          fi
+          
+          export PATH="${HERE}/usr/bin:${PATH}"
+          
+          # Prepend System Python Lib to LD_LIBRARY_PATH
+          if [ -n "$PY_LIB_DIR" ]; then
+              export LD_LIBRARY_PATH="${PY_LIB_DIR}:${HERE}/usr/lib:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          else
+              export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          fi
+          
+          export PYTHONPATH="${HERE}/usr/bin/scripts:${PYTHONPATH}"
+          
+          exec "${HERE}/usr/bin/NST" "$@"
+          APPRUN_EOF
+          
+          chmod +x AppRun
+
+      - name: Create RPM Package (Fedora Native)
+        run: |
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          mkdir -p nst-rpm-source/nst-${{ inputs.version }}/usr
+          cp -r AppDir/usr/* nst-rpm-source/nst-${{ inputs.version }}/usr/
+          cd nst-rpm-source
+          tar -czf ~/rpmbuild/SOURCES/nst-${{ inputs.version }}.tar.gz nst-${{ inputs.version }}/
+          cd ..
+          
+          cat > ~/rpmbuild/SPECS/nst.spec << EOF
+          Name: nst
+          Version: ${{ inputs.version }}
+          Release: 1.fc$(rpm -E %fedora)
+          Summary: A tool for translating video games
+          License: MIT
+          URL: https://github.com/${{ github.repository }}
+          Source0: %{name}-%{version}.tar.gz
+          BuildArch: x86_64
+          Requires: python3, qt6-qtbase, qt6-qtwayland
+          
+          %description
+          NST is a tool for translating video games.
+          
+          %prep
+          %setup -q
+          
+          %install
+          rm -rf \$RPM_BUILD_ROOT
+          mkdir -p \$RPM_BUILD_ROOT
+          cp -r usr \$RPM_BUILD_ROOT/
+          
+          %files
+          /usr/bin/*
+          /usr/share/applications/nst.desktop
+          /usr/share/icons/hicolor/scalable/apps/nst.svg
+          
+          %changelog
+          * $(date "+%a %b %d %Y") NST Team - ${{ inputs.version }}-1
+          - Release version ${{ inputs.version }}
+          EOF
+          
+          rpmbuild -bb ~/rpmbuild/SPECS/nst.spec
+          find ~/rpmbuild/RPMS -name "*.rpm" -exec cp {} NST-${{ inputs.version }}-Fedora-x86_64.rpm \;
+      
+      - name: Create tar.gz archive
+        run: |
+          mkdir -p package-tar/NST-${{ inputs.version }}
+          cd AppDir
+          cp -r usr ../package-tar/NST-${{ inputs.version }}/
+          cp AppRun ../package-tar/NST-${{ inputs.version }}/
+          cd ../package-tar
+          tar -czf ../NST-${{ inputs.version }}-Fedora-x86_64.tar.gz NST-${{ inputs.version }}/
+
+      - name: Upload Fedora RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: NST-Fedora-RPM
+          path: NST-${{ inputs.version }}-Fedora-x86_64.rpm
+
+      - name: Upload Fedora Archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: NST-Fedora-Tarball
+          path: NST-${{ inputs.version }}-Fedora-x86_64.tar.gz

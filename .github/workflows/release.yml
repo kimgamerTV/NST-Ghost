@@ -154,6 +154,12 @@ jobs:
     uses: ./.github/workflows/release-linux.yml
     with:
       version: '${{ needs.check-version.outputs.version }}'
+  build-fedora:
+    needs: check-version
+    if: needs.check-version.outputs.should_build == 'true'
+    uses: ./.github/workflows/release-fedora.yml
+    with:
+      version: '${{ needs.check-version.outputs.version }}'
   build-windows:
     needs: check-version
     if: needs.check-version.outputs.should_build == 'true'
@@ -170,11 +176,12 @@ jobs:
     needs:
       - check-version
       - build-linux
+      - build-fedora
       - build-windows
       - build-macos
     if: >-
       always() && needs.check-version.outputs.should_build == 'true' &&
-      (needs.build-linux.result == 'success' || needs.build-windows.result ==
+      (needs.build-linux.result == 'success' || needs.build-fedora.result == 'success' || needs.build-windows.result ==
       'success' || needs.build-macos.result == 'success')
     runs-on: ubuntu-latest
     permissions:
@@ -188,6 +195,14 @@ jobs:
         with:
           path: artifacts
           pattern: NST-*-Linux-*
+          merge-multiple: false
+        continue-on-error: true
+      - name: Download Fedora artifacts
+        if: needs.build-fedora.result == 'success'
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: NST-*-Fedora-*
           merge-multiple: false
         continue-on-error: true
       - name: Download Windows artifacts
@@ -531,6 +546,7 @@ jobs:
           then
             echo "### Build Status" >> $GITHUB_STEP_SUMMARY
             echo "- Linux: ${{ needs.build-linux.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Fedora: ${{ needs.build-fedora.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "- Windows: ${{ needs.build-windows.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "- macOS: ${{ needs.build-macos.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
