@@ -134,9 +134,36 @@ jobs:
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
       
       
-      # Python is no longer bundled - app uses system Python
-      # This allows user-installed pip packages to work naturally
-
+      # Bundle Python stdlib for embedded interpreter
+      - name: Bundle Python stdlib
+        run: |
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+          echo "Bundling Python ${PYTHON_VERSION} stdlib"
+          
+          # Get Python prefix
+          PYTHON_PREFIX=$(python3 -c "import sys; print(sys.prefix)")
+          
+          # Create target directory
+          mkdir -p AppDir/usr/lib/python${PYTHON_VERSION}
+          
+          # Copy stdlib (excluding test directories to save space)
+          cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* AppDir/usr/lib/python${PYTHON_VERSION}/ || true
+          
+          # Remove test directories and __pycache__ to reduce size
+          find AppDir/usr/lib/python${PYTHON_VERSION} -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
+          find AppDir/usr/lib/python${PYTHON_VERSION} -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
+          find AppDir/usr/lib/python${PYTHON_VERSION} -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          find AppDir/usr/lib/python${PYTHON_VERSION} -name "*.pyc" -delete 2>/dev/null || true
+          
+          # Copy libpython shared library
+          if [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" ]; then
+            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* AppDir/usr/lib/ || true
+          elif [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so" ]; then
+            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* AppDir/usr/lib/ || true
+          fi
+          
+          echo "Python stdlib bundled successfully"
+          ls -la AppDir/usr/lib/python${PYTHON_VERSION}/ | head -20
       
       - name: Create AppRun script
         run: |
