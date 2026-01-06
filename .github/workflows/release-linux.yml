@@ -222,30 +222,17 @@ jobs:
           
           chmod +x AppRun
       
-      - name: Deploy Qt dependencies using CQtDeployer
+      - name: Deploy Qt dependencies
         run: |
-          wget -q https://github.com/QuasarApp/CQtDeployer/releases/download/v1.6.2365/CQtDeployer_1.6.2365_Linux_x86_64.deb
-          sudo dpkg -i CQtDeployer_1.6.2365_Linux_x86_64.deb
+          cd AppDir
           
-          # Create CQtDeployer config file to specify Qt paths directly
-          cat > cqtdeploy.json << EOF
-          {
-            "bin": ["${{ github.workspace }}/build/NST"],
-            "libDir": ["${{ github.workspace }}/AppDir/usr/bin", "${{ env.QT_ROOT_DIR }}/lib"],
-            "pluginDir": "${{ env.QT_ROOT_DIR }}/plugins",
-            "targetDir": "${{ github.workspace }}/AppDir/usr",
-            "qmake": "${{ env.QT_ROOT_DIR }}/bin/qmake",
-            "deploySystem": false,
-            "clear": true
-          }
-          EOF
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
           
-          echo "========== CQtDeployer Config =========="
-          cat cqtdeploy.json
-          echo "========================================"
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
           
-          # Run CQtDeployer with config file
-          cqtdeployer -confFile cqtdeploy.json -verbose 3
+          ./linuxdeploy-x86_64.AppImage --appdir . --plugin qt || true
       
       - name: Add Qt Wayland plugins
         run: |
