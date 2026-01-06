@@ -17,9 +17,10 @@
 
 int main(int argc, char *argv[])
 {
-    // Use System Python (Do NOT set PYTHONHOME)
-    // This allows the application to bind to the user's installed Python (e.g. 3.12)
-    // and load user-installed pip packages correctly.
+    // PEP668 Compliant: Unset PYTHONHOME to prevent conflicts with pyenv, conda, etc.
+    // This ensures the embedded Python uses its default configuration
+    // rather than a potentially conflicting PYTHONHOME set by version managers.
+    unsetenv("PYTHONHOME");
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};

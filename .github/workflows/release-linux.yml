@@ -150,34 +150,39 @@ jobs:
           # Set APPDIR for C++ code
           export APPDIR="${HERE}"
           
-          # --- System Python Detection ---
-          # We need to find the system's libpython to ensure pybind11 loads the correct one
-          # that matches the user's pip packages (e.g. Python 3.12)
+          # --- PEP668 Compliant Python Setup ---
+          # Following Fedora/modern distro principles:
+          # - Do NOT set PYTHONHOME (causes conflicts with pyenv, conda, etc.)
+          # - Let the system Python manage its own configuration
+          # - Only add our scripts to PYTHONPATH
           
-          SYSTEM_PYTHON=$(which python3 2>/dev/null || which python 2>/dev/null)
+          # Find system Python library directory for LD_LIBRARY_PATH
+          # Try /usr/bin/python3 first to avoid pyenv/conda shims
+          SYSTEM_PYTHON=""
+          for py in /usr/bin/python3 /usr/bin/python $(which python3 2>/dev/null) $(which python 2>/dev/null); do
+              if [ -x "$py" ] && [ ! -L "$py" ] || [ -x "$py" ]; then
+                  # Verify it's a real Python, not a shim
+                  if "$py" -c "import sys; sys.exit(0)" 2>/dev/null; then
+                      SYSTEM_PYTHON="$py"
+                      break
+                  fi
+              fi
+          done
+          
           PY_LIB_DIR=""
-          
           if [ -n "$SYSTEM_PYTHON" ]; then
-             # Try to find library path
-             # This is a best-effort heuristic to find the dir containing libpython3.X.so
-             PY_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
-             
-             if [ -d "${PY_PREFIX}/lib" ]; then
-                 PY_LIB_DIR="${PY_PREFIX}/lib"
-             elif [ -d "${PY_PREFIX}/lib64" ]; then
-                 PY_LIB_DIR="${PY_PREFIX}/lib64"
-             fi
-             
-             # Also set PYTHONHOME to system prefix to be safe (though default usually works)
-             export PYTHONHOME="$PY_PREFIX"
+              PY_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
+              if [ -d "${PY_PREFIX}/lib" ]; then
+                  PY_LIB_DIR="${PY_PREFIX}/lib"
+              elif [ -d "${PY_PREFIX}/lib64" ]; then
+                  PY_LIB_DIR="${PY_PREFIX}/lib64"
+              fi
           fi
           
           # Standard paths
           export PATH="${HERE}/usr/bin:${PATH}"
           
-          # CRITICAL: Prepend System Python Lib Dir to LD_LIBRARY_PATH
-          # This forces the dynloader to use the system's libpython (e.g. 3.12)
-          # instead of getting confused or failing to find it.
+          # Add Python lib dir to LD_LIBRARY_PATH for libpython discovery
           if [ -n "$PY_LIB_DIR" ]; then
               export LD_LIBRARY_PATH="${PY_LIB_DIR}:${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
           else
@@ -189,7 +194,7 @@ jobs:
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Add application scripts to PYTHONPATH
+          # Add application scripts to PYTHONPATH (PEP668 compliant - no PYTHONHOME)
           export PYTHONPATH="${HERE}/usr/bin/scripts:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
