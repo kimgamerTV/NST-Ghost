@@ -133,66 +133,13 @@ jobs:
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
       
-      - name: Bundle Python distribution
-        run: |
-          cd AppDir
-          
-          # Find Python version and paths
-          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-          PYTHON_PREFIX=$(python3 -c "import sys; print(sys.prefix)")
-          
-          echo "Python version: ${PYTHON_VERSION}"
-          echo "Python prefix: ${PYTHON_PREFIX}"
-          
-          # Create proper Python directory structure
-          mkdir -p usr/python/lib/python${PYTHON_VERSION}
-          mkdir -p usr/python/lib/python${PYTHON_VERSION}/site-packages
-          
-          # Copy Python stdlib
-          cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* usr/python/lib/python${PYTHON_VERSION}/ 2>/dev/null || true
-          
-          # Install dependencies into bundled site-packages
-          # Use --index-url for PyTorch CPU to avoid pulling massive CUDA libs
-          # Use --extra-index-url for standard PyPI packages
-          # Use --no-cache-dir to save disk space on the runner
-          # Install minimal dependencies if needed (e.g. numpy, Pillow)
-          # We skip heavy AI libs (torch, easyocr) to let user manage them
-          echo "Installing minimal Python dependencies..."
-          pip install --no-cache-dir \
-            numpy Pillow \
-            --target usr/python/lib/python${PYTHON_VERSION}/site-packages/
-          
-          # Copy libpython shared library
-          if [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" ]; then
-            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* usr/python/lib/
-          elif [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so" ]; then
-            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* usr/python/lib/
-          fi
-          
-          # Remove unnecessary directories to reduce size
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/test
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/tests
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/unittest/test
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/idlelib
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/tkinter
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/turtle*
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/turtledemo
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/site-packages/pip
-          rm -rf usr/python/lib/python${PYTHON_VERSION}/site-packages/setuptools
-          find usr/python/lib/python${PYTHON_VERSION} -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-          find usr/python/lib/python${PYTHON_VERSION} -name "*.pyc" -delete 2>/dev/null || true
-
-          
-          # Save Python version for reference
-          echo "${PYTHON_VERSION}" > .python_version
-          
-          echo "Python distribution bundled successfully"
-          du -sh usr/python/ || true
+      
+      # Python is no longer bundled - app uses system Python
+      # This allows user-installed pip packages to work naturally
       
       - name: Create AppRun script
         run: |
           cd AppDir
-          PYTHON_VERSION=$(cat .python_version)
           
           cat > AppRun << 'APPRUN_EOF'
           #!/bin/bash
@@ -205,17 +152,15 @@ jobs:
           
           # Standard paths
           export PATH="${HERE}/usr/bin:${PATH}"
-          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${HERE}/usr/python/lib:${LD_LIBRARY_PATH}"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
           
           # Qt plugin paths
           export QT_PLUGIN_PATH="${HERE}/usr/plugins"
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python: PYTHONHOME points to bundled Python, add scripts to PYTHONPATH
-          # Python: PYTHONHOME points to bundled Python, add scripts to PYTHONPATH
-          # Note: PYTHONHOME is set in C++ code via Py_SetPythonHome when $APPDIR is detected
-          export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
+          # Python: Uses system Python - add scripts to PYTHONPATH
+          export PYTHONPATH="${HERE}/usr/bin/scripts:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF
@@ -384,12 +329,8 @@ jobs:
           /usr/share/doc/*"
           fi
           
-          # Add bundled Python distribution
-          if [ -d "AppDir/usr/python" ] && [ "$(ls -A AppDir/usr/python 2>/dev/null)" ]; then
-            FILES_LIST="$FILES_LIST
-          %dir /usr/python
-          /usr/python/*"
-          fi
+          
+          # Python is no longer bundled
           
           echo "=== Files to include in RPM ==="
           echo "$FILES_LIST"
