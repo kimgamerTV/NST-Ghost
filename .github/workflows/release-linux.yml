@@ -227,21 +227,25 @@ jobs:
           wget -q https://github.com/QuasarApp/CQtDeployer/releases/download/v1.6.2365/CQtDeployer_1.6.2365_Linux_x86_64.deb
           sudo dpkg -i CQtDeployer_1.6.2365_Linux_x86_64.deb
           
-          echo "========== Diagnosing qmake =========="
-          which qmake || echo "qmake not in PATH"
-          echo "QT_ROOT_DIR: ${{ env.QT_ROOT_DIR }}"
-          ls -l ${{ env.QT_ROOT_DIR }}/bin/qmake || echo "qmake not found at QT_ROOT_DIR"
-          ${{ env.QT_ROOT_DIR }}/bin/qmake -query || echo "qmake query failed"
-          echo "======================================"
+          # Create CQtDeployer config file to specify Qt paths directly
+          cat > cqtdeploy.json << EOF
+          {
+            "bin": ["${{ github.workspace }}/build/NST"],
+            "libDir": ["${{ github.workspace }}/AppDir/usr/bin", "${{ env.QT_ROOT_DIR }}/lib"],
+            "pluginDir": "${{ env.QT_ROOT_DIR }}/plugins",
+            "targetDir": "${{ github.workspace }}/AppDir/usr",
+            "qmake": "${{ env.QT_ROOT_DIR }}/bin/qmake",
+            "deploySystem": false,
+            "clear": true
+          }
+          EOF
           
-          # Run CQtDeployer with clear and verbose
-          cqtdeployer clear \
-            -bin ${{ github.workspace }}/build/NST \
-            -libDir ${{ github.workspace }}/AppDir/usr/bin \
-            -qmake ${{ env.QT_ROOT_DIR }}/bin/qmake \
-            -targetDir ${{ github.workspace }}/AppDir/usr \
-            -always-overwrite \
-            -verbose 3
+          echo "========== CQtDeployer Config =========="
+          cat cqtdeploy.json
+          echo "========================================"
+          
+          # Run CQtDeployer with config file
+          cqtdeployer -confFile cqtdeploy.json -verbose 3
       
       - name: Add Qt Wayland plugins
         run: |
