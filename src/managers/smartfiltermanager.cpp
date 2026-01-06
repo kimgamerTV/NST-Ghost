@@ -6,8 +6,21 @@
 #include <QFile>
 #include <QSet>
 
+
+#pragma push_macro("slots")
+#undef slots
+#include <pybind11/embed.h>
+#pragma pop_macro("slots")
+
+namespace py = pybind11;
+
+struct SmartFilterManager::SmartFilterManagerPrivate {
+    py::object m_pyFilter;
+};
+
 SmartFilterManager::SmartFilterManager(QObject *parent)
     : QObject(parent)
+    , d(std::make_unique<SmartFilterManagerPrivate>())
 {
     // Initialize Python connection
     try {
@@ -20,18 +33,20 @@ SmartFilterManager::SmartFilterManager(QObject *parent)
         // Fallback if imported as just ai_smart_filter (depends on path)
         if (ai_mod.is_none()) ai_mod = py::module_::import("ai_smart_filter");
         
-        m_pyFilter = ai_mod.attr("AISmartFilter")();
+        d->m_pyFilter = ai_mod.attr("AISmartFilter")();
         
         // Load initial state
-        m_pyFilter.attr("load_state")("ai_filter_config.json");
+        d->m_pyFilter.attr("load_state")("ai_filter_config.json");
         qDebug() << "AI Smart Filter initialized successfully.";
     } catch (const std::exception &e) {
         qDebug() << "Failed to initialize AI Smart Filter:" << e.what();
-        m_pyFilter = py::none();
+        d->m_pyFilter = py::none();
     }
 
     loadPatterns();
 }
+
+SmartFilterManager::~SmartFilterManager() = default;
 
 void SmartFilterManager::learn(const QString &text)
 {
@@ -60,11 +75,11 @@ void SmartFilterManager::learn(const QString &text)
     }
     
     // AI Learn
-    if (!m_pyFilter.is_none()) {
+    if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
-            m_pyFilter.attr("add_example")(text.toStdString());
-            m_pyFilter.attr("save_state")("ai_filter_config.json");
+            d->m_pyFilter.attr("add_example")(text.toStdString());
+            d->m_pyFilter.attr("save_state")("ai_filter_config.json");
         } catch (const std::exception &e) {
             qDebug() << "AI learn error:" << e.what();
         }
@@ -99,11 +114,11 @@ void SmartFilterManager::unlearn(const QString &text)
     }
 
     // AI Unlearn
-    if (!m_pyFilter.is_none()) {
+    if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
-            m_pyFilter.attr("remove_example")(text.toStdString());
-            m_pyFilter.attr("save_state")("ai_filter_config.json");
+            d->m_pyFilter.attr("remove_example")(text.toStdString());
+            d->m_pyFilter.attr("save_state")("ai_filter_config.json");
         } catch (const std::exception &e) {
             qDebug() << "AI unlearn error:" << e.what();
         }
@@ -218,10 +233,10 @@ bool SmartFilterManager::shouldSkip(const QString &text) const
     
     
     // 3. Check AI
-    if (m_aiEnabled && !m_pyFilter.is_none()) {
+    if (m_aiEnabled && !d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
-            bool skip = m_pyFilter.attr("predict")(text.toStdString()).cast<bool>();
+            bool skip = d->m_pyFilter.attr("predict")(text.toStdString()).cast<bool>();
             if (skip) {
                 // qDebug() << "AI Skipped:" << text;
                 return true;
@@ -283,7 +298,7 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
     }
     
     // 2. AI Processing
-    if (!aiTasks.isEmpty() && m_aiEnabled && !m_pyFilter.is_none()) {
+    if (!aiTasks.isEmpty() && m_aiEnabled && !d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
             py::list pyTexts;
@@ -291,7 +306,7 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
                 pyTexts.append(task.text.toStdString());
             }
             
-            py::list pyResults = m_pyFilter.attr("predict_batch")(pyTexts).cast<py::list>();
+            py::list pyResults = d->m_pyFilter.attr("predict_batch")(pyTexts).cast<py::list>();
             
             if (pyResults.size() == aiTasks.size()) {
                  for (int j = 0; j < aiTasks.size(); ++j) {
@@ -337,10 +352,10 @@ void SmartFilterManager::loadPatterns()
     // Load AI Settings
     m_aiEnabled = settings.value("SmartFilter/AI/Enabled", true).toBool();
     m_aiThreshold = settings.value("SmartFilter/AI/Threshold", 0.75).toDouble();
-    if (!m_pyFilter.is_none()) {
+    if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
-            m_pyFilter.attr("set_threshold")(m_aiThreshold);
+            d->m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }
 }
@@ -359,10 +374,10 @@ bool SmartFilterManager::isAIEnabled() const
 void SmartFilterManager::setAIThreshold(double threshold)
 {
     m_aiThreshold = threshold;
-    if (!m_pyFilter.is_none()) {
+    if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
-            m_pyFilter.attr("set_threshold")(m_aiThreshold);
+            d->m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }
     savePatterns();

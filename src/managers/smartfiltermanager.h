@@ -5,15 +5,8 @@
 #include <QStringList>
 #include <QRegularExpression>
 #include <QSettings>
-#include <QRegularExpression>
-#include <QSettings>
+#include <memory>
 
-#pragma push_macro("slots")
-#undef slots
-#include <pybind11/embed.h>
-#pragma pop_macro("slots")
-
-namespace py = pybind11;
 
 class SmartFilterManager : public QObject
 {
@@ -60,8 +53,11 @@ private:
     QList<QRegularExpression> m_compiledPatterns;
     QString m_currentEngine = "Global"; // Default to Global
     
-    // Python Integration
-    py::object m_pyFilter;
+    ~SmartFilterManager(); // Required for PIMPL with unique_ptr
+
+private:
+    struct SmartFilterManagerPrivate;
+    std::unique_ptr<SmartFilterManagerPrivate> d;
     bool m_aiEnabled = true;
     double m_aiThreshold = 0.75;
 
