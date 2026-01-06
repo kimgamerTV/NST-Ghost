@@ -133,9 +133,48 @@ jobs:
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png nst.png
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
       
-      
-      # Python is no longer bundled - app uses system Python
-      # This allows user-installed pip packages to work naturally
+      - name: Bundle Python stdlib
+        run: |
+          cd AppDir
+          
+          # Find Python version and paths
+          PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+          PYTHON_PREFIX=$(python3 -c "import sys; print(sys.prefix)")
+          
+          echo "Python version: ${PYTHON_VERSION}"
+          echo "Python prefix: ${PYTHON_PREFIX}"
+          
+          # Create proper Python directory structure
+          mkdir -p usr/python/lib/python${PYTHON_VERSION}
+          
+          # Copy Python stdlib (required for pybind11 embedded interpreter)
+          cp -r ${PYTHON_PREFIX}/lib/python${PYTHON_VERSION}/* usr/python/lib/python${PYTHON_VERSION}/ 2>/dev/null || true
+          
+          # Copy libpython shared library
+          if [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" ]; then
+            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* usr/python/lib/
+          elif [ -f "${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so" ]; then
+            cp ${PYTHON_PREFIX}/lib/libpython${PYTHON_VERSION}.so* usr/python/lib/
+          fi
+          
+          # Remove unnecessary directories to reduce size
+          # Note: We do NOT bundle site-packages - user installs their own
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/site-packages
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/test
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/tests
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/unittest/test
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/idlelib
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/tkinter
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/turtle*
+          rm -rf usr/python/lib/python${PYTHON_VERSION}/turtledemo
+          find usr/python/lib/python${PYTHON_VERSION} -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          find usr/python/lib/python${PYTHON_VERSION} -name "*.pyc" -delete 2>/dev/null || true
+          
+          # Save Python version for reference
+          echo "${PYTHON_VERSION}" > .python_version
+          
+          echo "Python stdlib bundled successfully"
+          du -sh usr/python/ || true
       
       - name: Create AppRun script
         run: |
@@ -151,24 +190,16 @@ jobs:
           
           # Standard paths
           export PATH="${HERE}/usr/bin:${PATH}"
-          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${HERE}/usr/python/lib:${LD_LIBRARY_PATH}"
           
           # Qt plugin paths
           export QT_PLUGIN_PATH="${HERE}/usr/plugins"
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python: Dynamically discover system Python and set PYTHONHOME
-          # This is needed because pybind11 embedded interpreter requires stdlib
-          SYSTEM_PYTHON=$(which python3 2>/dev/null || which python 2>/dev/null)
-          if [ -n "$SYSTEM_PYTHON" ]; then
-            PYTHON_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
-            if [ -n "$PYTHON_PREFIX" ] && [ -d "$PYTHON_PREFIX" ]; then
-              export PYTHONHOME="$PYTHON_PREFIX"
-            fi
-          fi
-          
-          # Add scripts to PYTHONPATH
+          # Python: Use bundled stdlib, but user pip packages are discovered
+          # via sys.path manipulation in image_translator.py
+            # PYTHONHOME is set by C++ code via Py_SetPythonHome
           export PYTHONPATH="${HERE}/usr/bin/scripts:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
@@ -339,7 +370,12 @@ jobs:
           fi
           
           
-          # Python is no longer bundled
+          # Add bundled Python stdlib
+          if [ -d "AppDir/usr/python" ] && [ "$(ls -A AppDir/usr/python 2>/dev/null)" ]; then
+            FILES_LIST="$FILES_LIST
+          %dir /usr/python
+          /usr/python/*"
+          fi
           
           echo "=== Files to include in RPM ==="
           echo "$FILES_LIST"

@@ -7,6 +7,8 @@
 #include <QTextStream>
 #include <QSettings>
 #include <QTimer>
+#include <cstdlib>
+#include <string>
 
 #pragma push_macro("slots")
 #undef slots
@@ -15,8 +17,18 @@
 
 int main(int argc, char *argv[])
 {
-    // Python uses system Python - no PYTHONHOME override needed
-    // This allows user-installed pip packages to be discovered naturally
+    // Configure Python paths for bundled distribution
+    // Note: User pip packages are discovered via sys.path manipulation in Python code
+#ifdef __linux__
+    const char* appdir = std::getenv("APPDIR");
+    if (appdir) {
+        // Running from AppImage/tar.gz - use bundled Python stdlib
+        static std::wstring pythonHome;
+        std::string appdirStr(appdir);
+        pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr/python";
+        Py_SetPythonHome(pythonHome.c_str());
+    }
+#endif
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
