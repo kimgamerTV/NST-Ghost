@@ -1,3 +1,9 @@
+// IMPORTANT: Python.h must be included FIRST, before any Qt headers
+// to avoid Qt's "slots" macro conflict with Python's use of "slots"
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+
+// Now we can include Qt headers
 #include "mainwindow.h"
 
 #include <QApplication>
@@ -12,9 +18,7 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
-
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
+#include <vector>
 
 #pragma push_macro("slots")
 #undef slots
@@ -22,6 +26,7 @@
 #pragma pop_macro("slots")
 
 // Helper function to configure Python BEFORE pybind11 initialization
+// Uses Python 3.11+ PyConfig API to avoid deprecated functions
 static void configurePythonEnvironment()
 {
     // Check if running from AppImage (APPDIR is set by AppRun script)
@@ -49,27 +54,32 @@ static void configurePythonEnvironment()
             }
         }
         
-        // If bundled Python found, configure it
+        // If bundled Python found, configure it using environment variables
+        // This is more reliable than deprecated Py_SetPythonHome/Py_SetPath
         if (!python_home.empty()) {
-            // Convert to wide string for Python API
-            std::wstring w_python_home(python_home.begin(), python_home.end());
+            // Set PYTHONHOME environment variable (works with all Python versions)
+            std::string pythonhome_env = "PYTHONHOME=" + python_home;
+            putenv(const_cast<char*>(strdup(pythonhome_env.c_str())));
             
-            // Build the module search path
-            std::wstring scripts_path = std::wstring(appdir_str.begin(), appdir_str.end()) + L"/usr/bin/scripts";
-            std::wstring lib_path(python_lib.begin(), python_lib.end());
-            std::wstring site_packages = lib_path + L"/site-packages";
-            std::wstring lib_dynload = lib_path + L"/lib-dynload";
+            // Build PYTHONPATH
+            std::string scripts_path = appdir_str + "/usr/bin/scripts";
+            std::string site_packages = python_lib + "/site-packages";
+            std::string lib_dynload = python_lib + "/lib-dynload";
             
-            // Construct full path: scripts:lib:site-packages:lib-dynload
-            std::wstring full_path = scripts_path + L":" + lib_path + L":" + site_packages + L":" + lib_dynload;
-            
-            // Set Python home and path BEFORE initialization
-            Py_SetPythonHome(const_cast<wchar_t*>(w_python_home.c_str()));
-            Py_SetPath(const_cast<wchar_t*>(full_path.c_str()));
+            std::string pythonpath = scripts_path + ":" + python_lib + ":" + site_packages + ":" + lib_dynload;
+            std::string pythonpath_env = "PYTHONPATH=" + pythonpath;
+            putenv(const_cast<char*>(strdup(pythonpath_env.c_str())));
             
             std::cerr << "[NST] Configured bundled Python home: " << python_home << std::endl;
+            std::cerr << "[NST] PYTHONPATH: " << pythonpath << std::endl;
         } else {
             std::cerr << "[NST] Warning: APPDIR set but no bundled Python found, using system Python" << std::endl;
+            // Clear potentially conflicting environment
+#ifdef _WIN32
+            _putenv("PYTHONHOME=");
+#else
+            unsetenv("PYTHONHOME");
+#endif
         }
     } else {
         // Not running from AppImage - use system Python
