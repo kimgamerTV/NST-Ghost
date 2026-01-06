@@ -30,6 +30,10 @@
 *.swp
 .DS_Store
 Thumbs.db
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
 
 
 
