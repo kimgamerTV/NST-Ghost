@@ -86,7 +86,6 @@
 		"APP_VERSION=\"0.5.2\"",
 		"QT_CORE_LIB",
 		"QT_GUI_LIB",
-		"QT_NO_DEBUG",
 		"QT_WIDGETS_LIB",
 		"UnrpycPlugin_EXPORTS"
 	],

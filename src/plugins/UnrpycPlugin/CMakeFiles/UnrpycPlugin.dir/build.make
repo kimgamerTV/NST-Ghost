@@ -73,7 +73,7 @@ src/plugins/UnrpycPlugin/UnrpycPlugin_autogen/timestamp: /usr/lib64/qt6/libexec/
 src/plugins/UnrpycPlugin/UnrpycPlugin_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 src/plugins/UnrpycPlugin/UnrpycPlugin_autogen/timestamp: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target UnrpycPlugin"
-	cd /home/jop/work/NST/NST/src/plugins/UnrpycPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/AutogenInfo.json Release
+	cd /home/jop/work/NST/NST/src/plugins/UnrpycPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/AutogenInfo.json Debug
 	cd /home/jop/work/NST/NST/src/plugins/UnrpycPlugin && /usr/bin/cmake -E touch /home/jop/work/NST/NST/src/plugins/UnrpycPlugin/UnrpycPlugin_autogen/timestamp
 
 src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/codegen:

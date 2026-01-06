@@ -73,7 +73,7 @@ NST_autogen/timestamp: /usr/lib64/qt6/libexec/moc
 NST_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 NST_autogen/timestamp: CMakeFiles/NST.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target NST"
-	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json Release
+	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json Debug
 	/usr/bin/cmake -E touch /home/jop/work/NST/NST/NST_autogen/timestamp
 
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: src/resources.qrc
@@ -86,7 +86,7 @@ NST_autogen/UVLADIE3JM/qrc_resources.cpp: packaging/icons/icon-app.png
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: /usr/lib64/qt6/libexec/rcc
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: /usr/lib64/qt6/libexec/rcc
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Automatic RCC for src/resources.qrc"
-	/usr/bin/cmake -E cmake_autorcc /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Info.json Release
+	/usr/bin/cmake -E cmake_autorcc /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Info.json Debug
 
 CMakeFiles/NST.dir/codegen:
 .PHONY : CMakeFiles/NST.dir/codegen

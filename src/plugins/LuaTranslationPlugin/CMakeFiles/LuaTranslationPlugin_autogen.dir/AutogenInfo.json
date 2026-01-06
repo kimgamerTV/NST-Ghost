@@ -81,8 +81,7 @@
 		"APP_VERSION=\"0.5.2\"",
 		"LuaTranslationPlugin_EXPORTS",
 		"QT_CORE_LIB",
-		"QT_NETWORK_LIB",
-		"QT_NO_DEBUG"
+		"QT_NETWORK_LIB"
 	],
 	"MOC_DEPEND_FILTERS" : 
 	[

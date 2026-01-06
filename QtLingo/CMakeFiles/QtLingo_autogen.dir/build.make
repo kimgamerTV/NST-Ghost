@@ -72,7 +72,7 @@ QtLingo/QtLingo_autogen/timestamp: /usr/lib64/qt6/libexec/moc
 QtLingo/QtLingo_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 QtLingo/QtLingo_autogen/timestamp: QtLingo/CMakeFiles/QtLingo_autogen.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target QtLingo"
-	cd /home/jop/work/NST/NST/QtLingo && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/QtLingo/CMakeFiles/QtLingo_autogen.dir/AutogenInfo.json Release
+	cd /home/jop/work/NST/NST/QtLingo && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/QtLingo/CMakeFiles/QtLingo_autogen.dir/AutogenInfo.json Debug
 	cd /home/jop/work/NST/NST/QtLingo && /usr/bin/cmake -E touch /home/jop/work/NST/NST/QtLingo/QtLingo_autogen/timestamp
 
 QtLingo/CMakeFiles/QtLingo_autogen.dir/codegen:

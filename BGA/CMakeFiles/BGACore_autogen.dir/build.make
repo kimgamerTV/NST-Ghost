@@ -72,7 +72,7 @@ BGA/BGACore_autogen/timestamp: /usr/lib64/qt6/libexec/moc
 BGA/BGACore_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 BGA/BGACore_autogen/timestamp: BGA/CMakeFiles/BGACore_autogen.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target BGACore"
-	cd /home/jop/work/NST/NST/BGA && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/BGA/CMakeFiles/BGACore_autogen.dir/AutogenInfo.json Release
+	cd /home/jop/work/NST/NST/BGA && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/BGA/CMakeFiles/BGACore_autogen.dir/AutogenInfo.json Debug
 	cd /home/jop/work/NST/NST/BGA && /usr/bin/cmake -E touch /home/jop/work/NST/NST/BGA/BGACore_autogen/timestamp
 
 BGA/CMakeFiles/BGACore_autogen.dir/codegen:
