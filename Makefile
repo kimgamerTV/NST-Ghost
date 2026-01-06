@@ -1243,6 +1243,30 @@ src/ui/filetranslationwidget.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s
 .PHONY : src/ui/filetranslationwidget.cpp.s
 
+src/ui/imageprocessorworker.o: src/ui/imageprocessorworker.cpp.o
+.PHONY : src/ui/imageprocessorworker.o
+
+# target to build an object file
+src/ui/imageprocessorworker.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o
+.PHONY : src/ui/imageprocessorworker.cpp.o
+
+src/ui/imageprocessorworker.i: src/ui/imageprocessorworker.cpp.i
+.PHONY : src/ui/imageprocessorworker.i
+
+# target to preprocess a source file
+src/ui/imageprocessorworker.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.i
+.PHONY : src/ui/imageprocessorworker.cpp.i
+
+src/ui/imageprocessorworker.s: src/ui/imageprocessorworker.cpp.s
+.PHONY : src/ui/imageprocessorworker.s
+
+# target to generate assembly for a file
+src/ui/imageprocessorworker.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.s
+.PHONY : src/ui/imageprocessorworker.cpp.s
+
 src/ui/imagetranslationwidget.o: src/ui/imagetranslationwidget.cpp.o
 .PHONY : src/ui/imagetranslationwidget.o
 
@@ -1538,6 +1562,9 @@ help:
 	@echo "... src/ui/filetranslationwidget.o"
 	@echo "... src/ui/filetranslationwidget.i"
 	@echo "... src/ui/filetranslationwidget.s"
+	@echo "... src/ui/imageprocessorworker.o"
+	@echo "... src/ui/imageprocessorworker.i"
+	@echo "... src/ui/imageprocessorworker.s"
 	@echo "... src/ui/imagetranslationwidget.o"
 	@echo "... src/ui/imagetranslationwidget.i"
 	@echo "... src/ui/imagetranslationwidget.s"

@@ -73,7 +73,7 @@ src/plugins/MockDataPlugin/MockDataPlugin_autogen/timestamp: /usr/lib64/qt6/libe
 src/plugins/MockDataPlugin/MockDataPlugin_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 src/plugins/MockDataPlugin/MockDataPlugin_autogen/timestamp: src/plugins/MockDataPlugin/CMakeFiles/MockDataPlugin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target MockDataPlugin"
-	cd /home/jop/work/NST/NST/src/plugins/MockDataPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/MockDataPlugin/CMakeFiles/MockDataPlugin_autogen.dir/AutogenInfo.json ""
+	cd /home/jop/work/NST/NST/src/plugins/MockDataPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/MockDataPlugin/CMakeFiles/MockDataPlugin_autogen.dir/AutogenInfo.json Release
 	cd /home/jop/work/NST/NST/src/plugins/MockDataPlugin && /usr/bin/cmake -E touch /home/jop/work/NST/NST/src/plugins/MockDataPlugin/MockDataPlugin_autogen/timestamp
 
 src/plugins/MockDataPlugin/CMakeFiles/MockDataPlugin.dir/codegen:

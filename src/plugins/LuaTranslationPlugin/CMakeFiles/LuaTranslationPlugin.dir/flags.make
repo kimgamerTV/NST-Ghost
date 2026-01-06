@@ -6,5 +6,5 @@ CXX_DEFINES = -DAPP_VERSION=\"0.5.2\" -DLuaTranslationPlugin_EXPORTS -DQT_CORE_L
 
 CXX_INCLUDES = -I/home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/include -I/home/jop/work/NST/NST/../../QtLingo/include -I/home/jop/work/NST/NST/QtLingo/include -I/home/jop/work/NST/NST/QtLingo -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib64/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtNetwork
 
-CXX_FLAGS = -std=gnu++20 -fPIC
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++20 -fPIC
 

@@ -73,7 +73,7 @@ NST_autogen/timestamp: /usr/lib64/qt6/libexec/moc
 NST_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 NST_autogen/timestamp: CMakeFiles/NST.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target NST"
-	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json ""
+	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json Release
 	/usr/bin/cmake -E touch /home/jop/work/NST/NST/NST_autogen/timestamp
 
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: src/resources.qrc
@@ -86,7 +86,7 @@ NST_autogen/UVLADIE3JM/qrc_resources.cpp: packaging/icons/icon-app.png
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: /usr/lib64/qt6/libexec/rcc
 NST_autogen/UVLADIE3JM/qrc_resources.cpp: /usr/lib64/qt6/libexec/rcc
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Automatic RCC for src/resources.qrc"
-	/usr/bin/cmake -E cmake_autorcc /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Info.json 
+	/usr/bin/cmake -E cmake_autorcc /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Info.json Release
 
 CMakeFiles/NST.dir/codegen:
 .PHONY : CMakeFiles/NST.dir/codegen
@@ -483,10 +483,24 @@ CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/src/ui/filetranslationwidget.cpp -o CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s
 
+CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o: CMakeFiles/NST.dir/flags.make
+CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o: src/ui/imageprocessorworker.cpp
+CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o"
+	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o -MF CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o.d -o CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o -c /home/jop/work/NST/NST/src/ui/imageprocessorworker.cpp
+
+CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.i"
+	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/jop/work/NST/NST/src/ui/imageprocessorworker.cpp > CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.i
+
+CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.s"
+	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/jop/work/NST/NST/src/ui/imageprocessorworker.cpp -o CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.s
+
 CMakeFiles/NST.dir/src/core/translationserver.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/src/core/translationserver.cpp.o: src/core/translationserver.cpp
 CMakeFiles/NST.dir/src/core/translationserver.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_31) "Building CXX object CMakeFiles/NST.dir/src/core/translationserver.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/NST.dir/src/core/translationserver.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/core/translationserver.cpp.o -MF CMakeFiles/NST.dir/src/core/translationserver.cpp.o.d -o CMakeFiles/NST.dir/src/core/translationserver.cpp.o -c /home/jop/work/NST/NST/src/core/translationserver.cpp
 
 CMakeFiles/NST.dir/src/core/translationserver.cpp.i: cmake_force
@@ -500,7 +514,7 @@ CMakeFiles/NST.dir/src/core/translationserver.cpp.s: cmake_force
 CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o: src/dialogs/processselectordialog.cpp
 CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_32) "Building CXX object CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o -MF CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o.d -o CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o -c /home/jop/work/NST/NST/src/dialogs/processselectordialog.cpp
 
 CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.i: cmake_force
@@ -514,7 +528,7 @@ CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.s: cmake_force
 CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o: src/plugins/LuaPlugin.cpp
 CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_33) "Building CXX object CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o -MF CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o.d -o CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o -c /home/jop/work/NST/NST/src/plugins/LuaPlugin.cpp
 
 CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.i: cmake_force
@@ -528,7 +542,7 @@ CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.s: cmake_force
 CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o: src/plugins/LuaScriptManager.cpp
 CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_34) "Building CXX object CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o -MF CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o.d -o CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.o -c /home/jop/work/NST/NST/src/plugins/LuaScriptManager.cpp
 
 CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.i: cmake_force
@@ -542,7 +556,7 @@ CMakeFiles/NST.dir/src/plugins/LuaScriptManager.cpp.s: cmake_force
 CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o: src/plugins/PluginManager.cpp
 CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_35) "Building CXX object CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o -MF CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o.d -o CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.o -c /home/jop/work/NST/NST/src/plugins/PluginManager.cpp
 
 CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.i: cmake_force
@@ -556,7 +570,7 @@ CMakeFiles/NST.dir/src/plugins/PluginManager.cpp.s: cmake_force
 CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o: CMakeFiles/NST.dir/flags.make
 CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o: NST_autogen/UVLADIE3JM/qrc_resources.cpp
 CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o: CMakeFiles/NST.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_36) "Building CXX object CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Building CXX object CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o"
 	/usr/lib64/ccache/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o -MF CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o.d -o CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.o -c /home/jop/work/NST/NST/NST_autogen/UVLADIE3JM/qrc_resources.cpp
 
 CMakeFiles/NST.dir/NST_autogen/UVLADIE3JM/qrc_resources.cpp.i: cmake_force
@@ -597,6 +611,7 @@ NST_OBJECTS = \
 "CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o" \
 "CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o" \
 "CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o" \
+"CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o" \
 "CMakeFiles/NST.dir/src/core/translationserver.cpp.o" \
 "CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o" \
 "CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o" \
@@ -635,6 +650,7 @@ NST: CMakeFiles/NST.dir/src/ui/customtitlebar.cpp.o
 NST: CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o
 NST: CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o
 NST: CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.o
+NST: CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o
 NST: CMakeFiles/NST.dir/src/core/translationserver.cpp.o
 NST: CMakeFiles/NST.dir/src/dialogs/processselectordialog.cpp.o
 NST: CMakeFiles/NST.dir/src/plugins/LuaPlugin.cpp.o
@@ -656,8 +672,10 @@ NST: /usr/lib64/libQt6Network.so.6.10.1
 NST: /usr/lib64/libQt6Core.so.6.10.1
 NST: /usr/lib64/libpython3.14.so
 NST: CMakeFiles/NST.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_37) "Linking CXX executable NST"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_38) "Linking CXX executable NST"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/NST.dir/link.txt --verbose=$(VERBOSE)
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold "Syncing Python scripts to build directory..."
+	/usr/bin/cmake -E copy_directory /home/jop/work/NST/NST/scripts /home/jop/work/NST/NST/scripts
 
 # Rule to build all files generated by this target.
 CMakeFiles/NST.dir/build: NST

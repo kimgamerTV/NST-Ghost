@@ -73,7 +73,7 @@ src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/timestamp: /usr/li
 src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/timestamp: src/plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target LuaTranslationPlugin"
-	cd /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin_autogen.dir/AutogenInfo.json ""
+	cd /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin && /usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin_autogen.dir/AutogenInfo.json Release
 	cd /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin && /usr/bin/cmake -E touch /home/jop/work/NST/NST/src/plugins/LuaTranslationPlugin/LuaTranslationPlugin_autogen/timestamp
 
 src/plugins/LuaTranslationPlugin/CMakeFiles/LuaTranslationPlugin.dir/codegen:

@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/NST_autogen"
   "NST_autogen/include/src/ui/ui_filetranslationwidget.h"
+  "NST_autogen/include/src/ui/ui_imagetranslationwidget.h"
   "NST_autogen/mocs_compilation.cpp"
   "NST_autogen/timestamp"
 )

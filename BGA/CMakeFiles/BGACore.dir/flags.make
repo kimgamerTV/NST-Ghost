@@ -6,5 +6,5 @@ CXX_DEFINES = -DAPP_VERSION=\"0.5.2\" -DBGACore_EXPORTS -DQT_CORE_LIB -DQT_NO_DE
 
 CXX_INCLUDES = -I/home/jop/work/NST/NST/BGA/BGACore_autogen/include -I/home/jop/work/NST/NST/BGA/core/include -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib64/qt6/mkspecs/linux-g++
 
-CXX_FLAGS = -std=gnu++20 -fPIC
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++20 -fPIC
 

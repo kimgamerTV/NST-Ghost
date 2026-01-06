@@ -315,12 +315,12 @@ CMakeFiles/NST.dir/all: CMakeFiles/NST_autogen_timestamp_deps.dir/all
 CMakeFiles/NST.dir/all: CMakeFiles/NST_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72 "Built target NST"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73 "Built target NST"
 .PHONY : CMakeFiles/NST.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/NST.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/CMakeFiles 56
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/CMakeFiles 57
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/NST.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jop/work/NST/NST/CMakeFiles 0
 .PHONY : CMakeFiles/NST.dir/rule
@@ -333,7 +333,7 @@ NST: CMakeFiles/NST.dir/rule
 CMakeFiles/NST.dir/codegen: CMakeFiles/NST_autogen_timestamp_deps.dir/all
 CMakeFiles/NST.dir/codegen: CMakeFiles/NST_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72 "Finished codegen for target NST"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73 "Finished codegen for target NST"
 .PHONY : CMakeFiles/NST.dir/codegen
 
 # clean rule for target.
@@ -381,7 +381,7 @@ CMakeFiles/NST_autogen_timestamp_deps.dir/clean:
 CMakeFiles/NST_autogen.dir/all: CMakeFiles/NST_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST_autogen.dir/build.make CMakeFiles/NST_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST_autogen.dir/build.make CMakeFiles/NST_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=73 "Built target NST_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=74 "Built target NST_autogen"
 .PHONY : CMakeFiles/NST_autogen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -398,7 +398,7 @@ NST_autogen: CMakeFiles/NST_autogen.dir/rule
 # codegen rule for target.
 CMakeFiles/NST_autogen.dir/codegen: CMakeFiles/NST_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST_autogen.dir/build.make CMakeFiles/NST_autogen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=73 "Finished codegen for target NST_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=74 "Finished codegen for target NST_autogen"
 .PHONY : CMakeFiles/NST_autogen.dir/codegen
 
 # clean rule for target.
@@ -413,7 +413,7 @@ CMakeFiles/NST_autogen.dir/clean:
 BGA/CMakeFiles/bga_rust.dir/all:
 	$(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/bga_rust.dir/build.make BGA/CMakeFiles/bga_rust.dir/depend
 	$(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/bga_rust.dir/build.make BGA/CMakeFiles/bga_rust.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=92 "Built target bga_rust"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=93 "Built target bga_rust"
 .PHONY : BGA/CMakeFiles/bga_rust.dir/all
 
 # Build rule for subdir invocation for target.
@@ -430,7 +430,7 @@ bga_rust: BGA/CMakeFiles/bga_rust.dir/rule
 # codegen rule for target.
 BGA/CMakeFiles/bga_rust.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f BGA/CMakeFiles/bga_rust.dir/build.make BGA/CMakeFiles/bga_rust.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=92 "Finished codegen for target bga_rust"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=93 "Finished codegen for target bga_rust"
 .PHONY : BGA/CMakeFiles/bga_rust.dir/codegen
 
 # clean rule for target.
@@ -580,7 +580,7 @@ BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/all: BGA/tests/CMakeFiles/TestRpgAnalyz
 BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/all: BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/depend
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=82,83,84,85 "Built target TestRpgAnalyzer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=83,84,85,86 "Built target TestRpgAnalyzer"
 .PHONY : BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/all
 
 # Build rule for subdir invocation for target.
@@ -597,7 +597,7 @@ TestRpgAnalyzer: BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/rule
 # codegen rule for target.
 BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/codegen: BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=82,83,84,85 "Finished codegen for target TestRpgAnalyzer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=83,84,85,86 "Finished codegen for target TestRpgAnalyzer"
 .PHONY : BGA/tests/CMakeFiles/TestRpgAnalyzer.dir/codegen
 
 # clean rule for target.
@@ -708,7 +708,7 @@ BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/clean:
 BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/all: BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=86 "Built target TestRpgAnalyzer_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=87 "Built target TestRpgAnalyzer_autogen"
 .PHONY : BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -725,7 +725,7 @@ TestRpgAnalyzer_autogen: BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/rule
 # codegen rule for target.
 BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/codegen: BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/build.make BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=86 "Finished codegen for target TestRpgAnalyzer_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=87 "Finished codegen for target TestRpgAnalyzer_autogen"
 .PHONY : BGA/tests/CMakeFiles/TestRpgAnalyzer_autogen.dir/codegen
 
 # clean rule for target.
@@ -741,7 +741,7 @@ QtLingo/CMakeFiles/QtLingo.dir/all: QtLingo/CMakeFiles/QtLingo_autogen_timestamp
 QtLingo/CMakeFiles/QtLingo.dir/all: QtLingo/CMakeFiles/QtLingo_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo.dir/build.make QtLingo/CMakeFiles/QtLingo.dir/depend
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo.dir/build.make QtLingo/CMakeFiles/QtLingo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=74,75,76,77,78,79,80 "Built target QtLingo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=75,76,77,78,79,80,81 "Built target QtLingo"
 .PHONY : QtLingo/CMakeFiles/QtLingo.dir/all
 
 # Build rule for subdir invocation for target.
@@ -758,7 +758,7 @@ QtLingo: QtLingo/CMakeFiles/QtLingo.dir/rule
 # codegen rule for target.
 QtLingo/CMakeFiles/QtLingo.dir/codegen: QtLingo/CMakeFiles/QtLingo_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo.dir/build.make QtLingo/CMakeFiles/QtLingo.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=74,75,76,77,78,79,80 "Finished codegen for target QtLingo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=75,76,77,78,79,80,81 "Finished codegen for target QtLingo"
 .PHONY : QtLingo/CMakeFiles/QtLingo.dir/codegen
 
 # clean rule for target.
@@ -805,7 +805,7 @@ QtLingo/CMakeFiles/QtLingo_autogen_timestamp_deps.dir/clean:
 QtLingo/CMakeFiles/QtLingo_autogen.dir/all: QtLingo/CMakeFiles/QtLingo_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo_autogen.dir/build.make QtLingo/CMakeFiles/QtLingo_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo_autogen.dir/build.make QtLingo/CMakeFiles/QtLingo_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=81 "Built target QtLingo_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=82 "Built target QtLingo_autogen"
 .PHONY : QtLingo/CMakeFiles/QtLingo_autogen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -822,7 +822,7 @@ QtLingo_autogen: QtLingo/CMakeFiles/QtLingo_autogen.dir/rule
 # codegen rule for target.
 QtLingo/CMakeFiles/QtLingo_autogen.dir/codegen: QtLingo/CMakeFiles/QtLingo_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f QtLingo/CMakeFiles/QtLingo_autogen.dir/build.make QtLingo/CMakeFiles/QtLingo_autogen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=81 "Finished codegen for target QtLingo_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=82 "Finished codegen for target QtLingo_autogen"
 .PHONY : QtLingo/CMakeFiles/QtLingo_autogen.dir/codegen
 
 # clean rule for target.
@@ -935,7 +935,7 @@ src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/all: src/plugins/UnrpycPlug
 src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/all: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/all
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=87,88,89,90 "Built target UnrpycPlugin"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=88,89,90,91 "Built target UnrpycPlugin"
 .PHONY : src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/all
 
 # Build rule for subdir invocation for target.
@@ -952,7 +952,7 @@ UnrpycPlugin: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/rule
 # codegen rule for target.
 src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/codegen: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=87,88,89,90 "Finished codegen for target UnrpycPlugin"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=88,89,90,91 "Finished codegen for target UnrpycPlugin"
 .PHONY : src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin.dir/codegen
 
 # clean rule for target.
@@ -999,7 +999,7 @@ src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen_timestamp_deps.dir/clea
 src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/all: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=91 "Built target UnrpycPlugin_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=92 "Built target UnrpycPlugin_autogen"
 .PHONY : src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1016,7 +1016,7 @@ UnrpycPlugin_autogen: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.d
 # codegen rule for target.
 src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/codegen: src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/build.make src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=91 "Finished codegen for target UnrpycPlugin_autogen"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=92 "Finished codegen for target UnrpycPlugin_autogen"
 .PHONY : src/plugins/UnrpycPlugin/CMakeFiles/UnrpycPlugin_autogen.dir/codegen
 
 # clean rule for target.

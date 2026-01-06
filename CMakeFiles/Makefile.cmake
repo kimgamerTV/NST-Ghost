@@ -401,7 +401,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/NST_autogen.dir/AutogenInfo.json"
   "CMakeFiles/NST_autogen.dir/AutoRcc_resources_UVLADIE3JM_Info.json"
   ".qt/QtDeploySupport.cmake"
-  ".qt/deploy_NST_7c34387742.cmake"
   ".qt/QtDeployTargets.cmake"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "BGA/CMakeFiles/BGACore_autogen.dir/AutogenInfo.json"

@@ -72,7 +72,7 @@ NST_autogen/timestamp: /usr/lib64/qt6/libexec/moc
 NST_autogen/timestamp: /usr/lib64/qt6/libexec/uic
 NST_autogen/timestamp: CMakeFiles/NST_autogen.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/jop/work/NST/NST/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target NST"
-	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json ""
+	/usr/bin/cmake -E cmake_autogen /home/jop/work/NST/NST/CMakeFiles/NST_autogen.dir/AutogenInfo.json Release
 	/usr/bin/cmake -E touch /home/jop/work/NST/NST/NST_autogen/timestamp
 
 CMakeFiles/NST_autogen.dir/codegen:

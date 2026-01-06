@@ -6,5 +6,5 @@ CXX_DEFINES = -DAPP_VERSION=\"0.5.2\" -DMockDataPlugin_EXPORTS -DQT_CORE_LIB -DQ
 
 CXX_INCLUDES = -I/home/jop/work/NST/NST/src/plugins/MockDataPlugin/MockDataPlugin_autogen/include -I/home/jop/work/NST/NST/src -isystem /usr/include/qt6/QtCore -isystem /usr/include/qt6 -isystem /usr/lib64/qt6/mkspecs/linux-g++ -isystem /usr/include/qt6/QtWidgets -isystem /usr/include/qt6/QtGui
 
-CXX_FLAGS = -std=gnu++20 -fPIC
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++20 -fPIC
 

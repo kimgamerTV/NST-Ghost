@@ -9,6 +9,9 @@
 /home/jop/work/NST/NST/src/dialogs/processselectordialog.cpp
 /home/jop/work/NST/NST/src/core/translationserver.h
 /home/jop/work/NST/NST/src/core/translationserver.cpp
+/home/jop/work/NST/NST/src/ui/imageprocessorworker.h
+/home/jop/work/NST/NST/src/ui/imageprocessorworker.cpp
+/home/jop/work/NST/NST/src/ui/imagetranslationwidget.ui
 /home/jop/work/NST/NST/src/ui/filetranslationwidget.ui
 /home/jop/work/NST/NST/src/ui/filetranslationwidget.h
 /home/jop/work/NST/NST/src/ui/filetranslationwidget.cpp
