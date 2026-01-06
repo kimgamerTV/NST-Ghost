@@ -35,6 +35,6 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 
-
+*.d
 
 BGA/bga_rs/target/*
