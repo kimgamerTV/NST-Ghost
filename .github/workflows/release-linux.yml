@@ -227,19 +227,21 @@ jobs:
           wget -q https://github.com/QuasarApp/CQtDeployer/releases/download/v1.6.2365/CQtDeployer_1.6.2365_Linux_x86_64.deb
           sudo dpkg -i CQtDeployer_1.6.2365_Linux_x86_64.deb
           
-          echo "Checking qmake..."
-          ls -l ${{ env.QT_ROOT_DIR }}/bin/qmake
-          ${{ env.QT_ROOT_DIR }}/bin/qmake -v
+          echo "========== Diagnosing qmake =========="
+          which qmake || echo "qmake not in PATH"
+          echo "QT_ROOT_DIR: ${{ env.QT_ROOT_DIR }}"
+          ls -l ${{ env.QT_ROOT_DIR }}/bin/qmake || echo "qmake not found at QT_ROOT_DIR"
+          ${{ env.QT_ROOT_DIR }}/bin/qmake -query || echo "qmake query failed"
+          echo "======================================"
           
-          # Run CQtDeployer
-          # Use absolute paths and build artifact as source to avoid confusion
-          # -verbose 2: Info level logging
-          cqtdeployer -bin $(pwd)/build/NST \
-            -libDir $(pwd)/AppDir/usr/bin \
+          # Run CQtDeployer with clear and verbose
+          cqtdeployer clear \
+            -bin ${{ github.workspace }}/build/NST \
+            -libDir ${{ github.workspace }}/AppDir/usr/bin \
             -qmake ${{ env.QT_ROOT_DIR }}/bin/qmake \
-            -targetDir $(pwd)/AppDir/usr \
+            -targetDir ${{ github.workspace }}/AppDir/usr \
             -always-overwrite \
-            -verbose 2
+            -verbose 3
       
       - name: Add Qt Wayland plugins
         run: |
