@@ -17,17 +17,9 @@
 
 int main(int argc, char *argv[])
 {
-    // Fix: Restore Py_SetPythonHome for bundled Python detection (AppImage/tar.gz)
-    // This is required when running from the bundled environment to find stdlib
-#ifdef __linux__
-    const char* appdir = std::getenv("APPDIR");
-    if (appdir) {
-        static std::wstring pythonHome;
-        std::string appdirStr(appdir);
-        pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr/python";
-        Py_SetPythonHome(pythonHome.c_str());
-    }
-#endif
+    // Use System Python (Do NOT set PYTHONHOME)
+    // This allows the application to bind to the user's installed Python (e.g. 3.12)
+    // and load user-installed pip packages correctly.
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
