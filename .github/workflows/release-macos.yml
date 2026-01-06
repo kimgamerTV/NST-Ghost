@@ -34,6 +34,11 @@ jobs:
           cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_VERBOSE_MAKEFILE=ON
           cmake --build . --config Release --parallel
       
+      - name: Deploy Qt
+        run: |
+          $(brew --prefix qt@6)/bin/macdeployqt build/NST.app -verbose=1 -always-overwrite
+
+      
       - name: Test
         run: |
           cd build
