@@ -147,7 +147,6 @@ jobs:
           HERE=${SELF%/*}
           
           # Set APPDIR for C++ code to detect bundled distribution
-          # This is automatically set inside AppImages, but we need it for tar.gz too
           export APPDIR="${HERE}"
           
           # Standard paths
@@ -159,7 +158,17 @@ jobs:
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
           
-          # Python: Uses system Python - add scripts to PYTHONPATH
+          # Python: Dynamically discover system Python and set PYTHONHOME
+          # This is needed because pybind11 embedded interpreter requires stdlib
+          SYSTEM_PYTHON=$(which python3 2>/dev/null || which python 2>/dev/null)
+          if [ -n "$SYSTEM_PYTHON" ]; then
+            PYTHON_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
+            if [ -n "$PYTHON_PREFIX" ] && [ -d "$PYTHON_PREFIX" ]; then
+              export PYTHONHOME="$PYTHON_PREFIX"
+            fi
+          fi
+          
+          # Add scripts to PYTHONPATH
           export PYTHONPATH="${HERE}/usr/bin/scripts:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
