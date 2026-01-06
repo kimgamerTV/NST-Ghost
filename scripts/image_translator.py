@@ -19,36 +19,33 @@ class ImageTranslator:
         self.device_name = "CPU"
         
         try:
-            # Try to add user site-packages to path to allow user-installed dependencies
-            import site
-            import sys
+            # Add user site-packages directly (bypassing PYTHONHOME isolation)
+            # When PYTHONHOME is set by bundled Python, site.getusersitepackages() 
+            # returns the bundled path instead of user's ~/.local/lib/pythonX.X/site-packages
+            import glob
+            home_dir = os.path.expanduser("~")
             
-            # Add standard user site-packages
-            site_packages = site.getusersitepackages()
-            if os.path.exists(site_packages) and site_packages not in sys.path:
-                sys.path.append(site_packages)
-                
-            # Also try to add local site-packages if running in a venv-like structure or specific locations
-            # This helps if user installed to ~/.local/lib/pythonX.X/site-packages manually
+            # 1. Add ~/.local/lib/pythonX.X/site-packages (user-installed packages)
+            local_site = os.path.join(home_dir, ".local", "lib")
+            for sp in glob.glob(os.path.join(local_site, "python*", "site-packages")):
+                if os.path.isdir(sp) and sp not in sys.path:
+                    sys.path.insert(0, sp)  # Priority over bundled
+                    logger.info(f"Added user site-packages: {sp}")
             
-            # Check for VIRTUAL_ENV
+            # 2. Check VIRTUAL_ENV environment variable
             venv_path = os.environ.get("VIRTUAL_ENV")
             if venv_path:
-                import glob
-                # Look for site-packages in the venv
-                # Support both lib and lib64, and any python version
-                search_patterns = [
+                for pattern in [
                     os.path.join(venv_path, "lib", "python*", "site-packages"),
                     os.path.join(venv_path, "lib64", "python*", "site-packages")
-                ]
-                
-                for pattern in search_patterns:
+                ]:
                     for sp in glob.glob(pattern):
-                        if os.path.exists(sp) and sp not in sys.path:
-                            logger.info(f"Adding venv site-packages: {sp}")
-                            sys.path.append(sp)
-                            # Also add to front to prioritize venv over bundled? 
-                            # sys.path.insert(0, sp) # Maybe safer to append to avoid breaking bundled deps if any
+                        if os.path.isdir(sp) and sp not in sys.path:
+                            sys.path.insert(0, sp)  # Priority over bundled
+                            logger.info(f"Added venv site-packages: {sp}")
+            
+            # 3. Log final sys.path for debugging
+            logger.debug(f"Final sys.path: {sys.path}")
             
             import easyocr
             import torch
