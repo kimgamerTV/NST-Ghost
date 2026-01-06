@@ -20,7 +20,11 @@ int main(int argc, char *argv[])
     // PEP668 Compliant: Unset PYTHONHOME to prevent conflicts with pyenv, conda, etc.
     // This ensures the embedded Python uses its default configuration
     // rather than a potentially conflicting PYTHONHOME set by version managers.
+#ifdef _WIN32
+    _putenv("PYTHONHOME=");
+#else
     unsetenv("PYTHONHOME");
+#endif
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
