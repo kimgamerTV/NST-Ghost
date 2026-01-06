@@ -17,12 +17,11 @@
 
 int main(int argc, char *argv[])
 {
-    // Configure Python paths for bundled distribution
-    // Note: User pip packages are discovered via sys.path manipulation in Python code
+    // Fix: Restore Py_SetPythonHome for bundled Python detection (AppImage/tar.gz)
+    // This is required when running from the bundled environment to find stdlib
 #ifdef __linux__
     const char* appdir = std::getenv("APPDIR");
     if (appdir) {
-        // Running from AppImage/tar.gz - use bundled Python stdlib
         static std::wstring pythonHome;
         std::string appdirStr(appdir);
         pythonHome = std::wstring(appdirStr.begin(), appdirStr.end()) + L"/usr/python";
@@ -36,8 +35,8 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    // Load the stylesheet
-    QFile file(":/style.qss");
+    // Fix: Correct resource path for stylesheet (was :/style.qss, needed :/ui/style.qss)
+    QFile file(":/ui/style.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&file);
         a.setStyleSheet(stream.readAll());
@@ -56,8 +55,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-     // QTimer::singleShot(0, &w, &MainWindow::onNewProject); // Optional: Auto-start new project flow // Optional: Auto-start new project flow
-
+    // QTimer::singleShot(0, &w, &MainWindow::onNewProject); // Optional: Auto-start new project flow
 
     return a.exec();
 }
