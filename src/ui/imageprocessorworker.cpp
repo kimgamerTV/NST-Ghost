@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFileInfo>
+#include <cstdlib>
 
 #if defined(slots)
 #undef slots
@@ -36,8 +37,19 @@ void ImageProcessorWorker::initialize()
         py::gil_scoped_acquire acquire;
         
         py::module_ sys = py::module_::import("sys");
+        
+        // Add paths for finding scripts module
         sys.attr("path").attr("append")(".");
         sys.attr("path").attr("append")("scripts");
+        
+        // Add APPDIR-based path for bundled distribution
+        const char* appdir = std::getenv("APPDIR");
+        if (appdir) {
+            std::string scriptPath = std::string(appdir) + "/usr/bin/scripts";
+            sys.attr("path").attr("insert")(0, scriptPath);
+            std::string binPath = std::string(appdir) + "/usr/bin";
+            sys.attr("path").attr("insert")(0, binPath);
+        }
         
         py::module_ mod = py::module_::import("scripts.image_translator");
         if (mod.is_none()) mod = py::module_::import("image_translator");
