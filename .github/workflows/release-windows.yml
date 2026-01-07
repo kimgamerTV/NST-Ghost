@@ -130,13 +130,15 @@ jobs:
           $pthFile = "package/python/python${pythonVersionShort}._pth"
           if (Test-Path $pthFile) {
             Write-Host "Modifying ${pthFile} to enable site-packages..."
-            $content = @"
-python${pythonVersionShort}.zip
-.
-Lib/site-packages
-import site
-"@
-            Set-Content -Path $pthFile -Value $content
+            # Use array join instead of here-string to avoid YAML indentation issues
+            $content = @(
+              "python${pythonVersionShort}.zip",
+              ".",
+              "Lib/site-packages",
+              "import site"
+            ) -join "`n"
+            Set-Content -Path $pthFile -Value $content -NoNewline
+            Add-Content -Path $pthFile -Value ""
             Write-Host "._pth file updated:"
             Get-Content $pthFile
           }
