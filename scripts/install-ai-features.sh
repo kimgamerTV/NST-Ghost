@@ -4,8 +4,6 @@
 # =============================================================================
 # This script installs the AI-powered features for NST (Neural Screenshot Tool)
 # including OCR (text detection) and AI inpainting (text removal).
-#
-# Uses the bundled Python and pip from the AppImage - no system Python required!
 # =============================================================================
 
 set -e
@@ -23,84 +21,62 @@ echo ""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 NST_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 
-# Check if we're in a valid NST installation
 if [ ! -d "$NST_ROOT/usr/lib" ]; then
     NST_ROOT="$(dirname "$SCRIPT_DIR")"
     if [ ! -d "$NST_ROOT/usr/lib" ]; then
         echo "❌ Error: Cannot find NST installation directory."
-        echo "   Please run this script from the NST folder."
         exit 1
     fi
 fi
 
-# Find bundled Python
-BUNDLED_PYTHON=""
+# Find bundled Python version
 PY_SITE_PACKAGES=""
-PY_VERSION=""
+BUNDLED_PY_VER=""
 
 for pydir in "$NST_ROOT/usr/lib"/python3.*; do
     if [ -d "$pydir/site-packages" ]; then
         PY_SITE_PACKAGES="$pydir/site-packages"
-        PY_VERSION=$(basename "$pydir")
+        BUNDLED_PY_VER=$(basename "$pydir" | sed 's/python//')
         break
     fi
 done
 
-# Find bundled Python executable
-for pybin in "$NST_ROOT/usr/bin/python3" "$NST_ROOT/usr/bin/python"; do
-    if [ -x "$pybin" ]; then
-        BUNDLED_PYTHON="$pybin"
-        break
-    fi
-done
-
-# Check for bundled pip
 if [ -z "$PY_SITE_PACKAGES" ]; then
     echo "❌ Error: Cannot find bundled Python in NST."
     exit 1
 fi
 
-# Check if pip module is available in bundled Python
-if [ -d "$PY_SITE_PACKAGES/pip" ]; then
-    echo "✓ Found bundled Python: $PY_VERSION"
-    echo "✓ Found bundled pip"
-    echo "✓ Install target: $PY_SITE_PACKAGES"
-    
-    # Use bundled Python with bundled pip
-    # Set PYTHONPATH to use bundled site-packages
-    export PYTHONHOME="$NST_ROOT/usr"
-    export PYTHONPATH="$PY_SITE_PACKAGES:$NST_ROOT/usr/lib/$PY_VERSION"
-    
-    # Try to find system python that matches bundled version
-    PY_MINOR=$(echo "$PY_VERSION" | sed 's/python3\.//')
-    PYTHON_CMD=""
-    for py in "/usr/bin/python3.$PY_MINOR" "/usr/bin/python3" "python3.$PY_MINOR" "python3"; do
-        if command -v "$py" &>/dev/null; then
-            PYTHON_CMD="$py"
-            break
-        fi
-    done
-    
-    if [ -z "$PYTHON_CMD" ]; then
-        echo "❌ Error: Cannot find Python 3 on your system."
-        echo "   Please install Python 3: sudo apt install python3"
-        exit 1
-    fi
-    
-    PIP_CMD="$PYTHON_CMD -m pip"
-    INSTALL_TARGET="--target=$PY_SITE_PACKAGES"
+echo "✓ NST bundled Python: $BUNDLED_PY_VER"
+echo "✓ Install target: $PY_SITE_PACKAGES"
+
+# Check system Python version
+if command -v python3 &>/dev/null; then
+    SYSTEM_PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
+    echo "✓ System Python: $SYSTEM_PY_VER"
 else
-    echo "⚠️  Bundled pip not found. Using system pip..."
-    
-    if command -v pip3 &>/dev/null; then
-        PIP_CMD="pip3"
-    elif command -v pip &>/dev/null; then
-        PIP_CMD="pip"
-    else
-        echo "❌ Error: pip is required but not installed."
-        exit 1
-    fi
-    INSTALL_TARGET="--target=$PY_SITE_PACKAGES"
+    echo "❌ Error: Python 3 is required but not installed."
+    exit 1
+fi
+
+# Check if versions match
+if [ "$BUNDLED_PY_VER" != "$SYSTEM_PY_VER" ]; then
+    echo ""
+    echo "⚠️  Python version mismatch detected!"
+    echo "   NST uses Python $BUNDLED_PY_VER but your system has Python $SYSTEM_PY_VER"
+    echo ""
+    echo "   This may cause compatibility issues with binary packages."
+    echo "   The installer will still try to install, but OCR may not work."
+    echo ""
+fi
+
+# Check for pip
+if command -v pip3 &>/dev/null; then
+    PIP_CMD="pip3"
+elif command -v pip &>/dev/null; then
+    PIP_CMD="pip"
+else
+    echo "❌ Error: pip is required but not installed."
+    exit 1
 fi
 
 echo ""
@@ -119,21 +95,34 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 # Install PyTorch CPU version
 echo ""
 echo "[1/2] Installing PyTorch (CPU)..."
-$PIP_CMD install "$INSTALL_TARGET" torch torchvision --index-url https://download.pytorch.org/whl/cpu
+$PIP_CMD install --target="$PY_SITE_PACKAGES" torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
-# Install EasyOCR
+# Install EasyOCR  
 echo ""
 echo "[2/2] Installing EasyOCR..."
-$PIP_CMD install "$INSTALL_TARGET" easyocr
+$PIP_CMD install --target="$PY_SITE_PACKAGES" easyocr
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║  ✅ Installation Complete!                                       ║"
-echo "╠══════════════════════════════════════════════════════════════════╣"
-echo "║  Please restart NST to enable AI features.                       ║"
-echo "║                                                                  ║"
-echo "║  Note: First OCR run will download language models (~100MB).    ║"
-echo "╚══════════════════════════════════════════════════════════════════╝"
+
+if [ "$BUNDLED_PY_VER" != "$SYSTEM_PY_VER" ]; then
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║  ⚠️  Installation completed with warnings                        ║"
+    echo "╠══════════════════════════════════════════════════════════════════╣"
+    echo "║  Packages were installed, but Python version mismatch means     ║"
+    echo "║  OCR may not work. To fix this, either:                         ║"
+    echo "║                                                                  ║"
+    echo "║  1. Install Python $BUNDLED_PY_VER on your system, or           ║"
+    echo "║  2. Wait for a newer NST release matching your Python version   ║"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+else
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║  ✅ Installation Complete!                                       ║"
+    echo "╠══════════════════════════════════════════════════════════════════╣"
+    echo "║  Please restart NST to enable AI features.                       ║"
+    echo "║                                                                  ║"
+    echo "║  Note: First OCR run will download language models (~100MB).    ║"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+fi
 echo ""
