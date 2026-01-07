@@ -16,8 +16,7 @@ echo "║           NST AI Features Installer                              ║"
 echo "╠══════════════════════════════════════════════════════════════════╣"
 echo "║  This will install:                                              ║"
 echo "║  • EasyOCR        - Text detection from images                   ║"
-echo "║  • PyTorch        - AI framework (CPU version, ~800MB)           ║"
-echo "║  • LaMa Inpainting - AI text removal                             ║"
+echo "║  • PyTorch        - AI framework (CPU version)                   ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -39,22 +38,51 @@ if [ ! -d "$NST_ROOT/usr/lib" ]; then
     fi
 fi
 
-# Find bundled Python version
+# Find bundled Python version and its pip
+BUNDLED_PYTHON=""
 PY_SITE_PACKAGES=""
+PY_VERSION=""
+
 for pydir in "$NST_ROOT/usr/lib"/python3.*; do
     if [ -d "$pydir/site-packages" ]; then
         PY_SITE_PACKAGES="$pydir/site-packages"
         PY_VERSION=$(basename "$pydir")
+        # Try to find bundled python executable
+        for pybin in "$NST_ROOT/usr/bin/python3" "$NST_ROOT/usr/bin/python" "/usr/bin/$PY_VERSION"; do
+            if [ -x "$pybin" ]; then
+                BUNDLED_PYTHON="$pybin"
+                break
+            fi
+        done
         break
     fi
 done
 
-if [ -z "$PY_SITE_PACKAGES" ]; then
+# Determine pip command and install target
+if [ -n "$BUNDLED_PYTHON" ] && "$BUNDLED_PYTHON" -m pip --version &>/dev/null 2>&1; then
+    # Use bundled Python's pip
+    PIP_CMD="$BUNDLED_PYTHON -m pip"
+    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
+    echo "✓ Using bundled Python: $BUNDLED_PYTHON"
+    echo "✓ Install target: $PY_SITE_PACKAGES"
+elif [ -n "$PY_SITE_PACKAGES" ]; then
+    # Try system pip with platform flag for compatibility
+    if command -v pip3 &>/dev/null; then
+        PIP_CMD="pip3"
+    elif command -v pip &>/dev/null; then
+        PIP_CMD="pip"
+    else
+        echo "❌ Error: pip is required but not installed."
+        exit 1
+    fi
+    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
+    echo "✓ Found bundled Python: $PY_VERSION"
+    echo "✓ Install target: $PY_SITE_PACKAGES"
+    echo ""
+    echo "⚠️  Warning: Using system pip. Some packages may need rebuilding."
+else
     echo "❌ Error: Cannot find bundled Python in NST."
     echo "   Expected: $NST_ROOT/usr/lib/python3.X/site-packages"
-    echo ""
-    echo "   If you're running from source, packages will be installed"
-    echo "   to your user directory instead."
     echo ""
     read -p "Install to user directory (~/.local) instead? [Y/n] " -n 1 -r
     echo ""
@@ -62,34 +90,20 @@ if [ -z "$PY_SITE_PACKAGES" ]; then
         echo "Installation cancelled."
         exit 0
     fi
+    
+    if command -v pip3 &>/dev/null; then
+        PIP_CMD="pip3"
+    else
+        PIP_CMD="pip"
+    fi
     INSTALL_TARGET="--user"
     echo "📦 Installing to user directory..."
-else
-    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
-    echo "✓ Found bundled Python: $PY_VERSION"
-    echo "✓ Install target: $PY_SITE_PACKAGES"
 fi
 
 echo ""
 
-# Check if pip is available
-if ! command -v pip3 &> /dev/null && ! command -v pip &> /dev/null; then
-    echo "❌ Error: pip is required but not installed."
-    echo ""
-    echo "Please install pip first:"
-    echo "  Ubuntu/Debian: sudo apt install python3-pip"
-    echo "  Fedora:        sudo dnf install python3-pip"
-    echo "  Arch:          sudo pacman -S python-pip"
-    exit 1
-fi
-
-PIP_CMD="pip3"
-if ! command -v pip3 &> /dev/null; then
-    PIP_CMD="pip"
-fi
-
 # Ask for confirmation
-echo "This may take 10-20 minutes and download ~1GB of data."
+echo "This may take 10-20 minutes and download ~500MB of data."
 read -p "Install AI features now? [Y/n] " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Nn]$ ]]; then
@@ -103,18 +117,17 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 
 # Install PyTorch CPU version (smaller than GPU version)
 echo ""
-echo "[1/3] Installing PyTorch (CPU)..."
-$PIP_CMD install "$INSTALL_TARGET" torch torchvision --index-url https://download.pytorch.org/whl/cpu
+echo "[1/2] Installing PyTorch (CPU)..."
+$PIP_CMD install "$INSTALL_TARGET" --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
 # Install EasyOCR
 echo ""
-echo "[2/3] Installing EasyOCR..."
-$PIP_CMD install "$INSTALL_TARGET" easyocr
+echo "[2/2] Installing EasyOCR..."
+$PIP_CMD install "$INSTALL_TARGET" --upgrade easyocr
 
-# Install LaMa Inpainting
-echo ""
-echo "[3/3] Installing LaMa Inpainting..."
-$PIP_CMD install "$INSTALL_TARGET" simple-lama-inpainting
+# NOTE: simple-lama-inpainting is skipped due to incompatible dependencies
+# (requires pillow<10, numpy<2 which conflict with modern Python)
+# The app will fall back to OpenCV inpainting which works fine
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -125,5 +138,8 @@ echo "╠═══════════════════════�
 echo "║  Please restart NST to enable AI features.                       ║"
 echo "║                                                                  ║"
 echo "║  Note: First OCR run will download language models (~100MB).    ║"
+echo "║                                                                  ║"
+echo "║  Inpainting: Uses OpenCV (bundled). For LaMa AI inpainting,     ║"
+echo "║  manually run: pip install simple-lama-inpainting               ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
