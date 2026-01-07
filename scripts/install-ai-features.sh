@@ -98,12 +98,19 @@ TEMP_VENV="/tmp/nst-install-venv"
 echo ""
 echo "📦 Setting up Python $BUNDLED_PY_VER environment..."
 
+# Clean up any previous venv
+rm -rf "$TEMP_VENV"
+
 # uv can download Python if needed
 $UV_CMD venv --python "$BUNDLED_PY_VER" "$TEMP_VENV" 2>/dev/null || {
     echo "Installing Python $BUNDLED_PY_VER..."
     $UV_CMD python install "$BUNDLED_PY_VER"
     $UV_CMD venv --python "$BUNDLED_PY_VER" "$TEMP_VENV"
 }
+
+# Install pip in the venv (uv venv doesn't include pip by default)
+echo "Installing pip in temporary environment..."
+$UV_CMD pip install --python "$TEMP_VENV/bin/python" pip
 
 echo "✓ Python $BUNDLED_PY_VER environment ready"
 
@@ -132,21 +139,25 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 if [ "$USE_GPU" = true ]; then
     echo "[1/2] Installing PyTorch (GPU with CUDA)..."
-    $UV_CMD pip install --python "$TEMP_VENV/bin/python" \
+    # Use pip from venv directly since uv ignores --target flag
+    "$TEMP_VENV/bin/pip" install \
         --target="$PY_SITE_PACKAGES" \
+        --upgrade --no-user \
         torch torchvision
 else
     echo "[1/2] Installing PyTorch (CPU)..."
-    $UV_CMD pip install --python "$TEMP_VENV/bin/python" \
+    "$TEMP_VENV/bin/pip" install \
         --target="$PY_SITE_PACKAGES" \
+        --upgrade --no-user \
         torch torchvision --index-url https://download.pytorch.org/whl/cpu
 fi
 
 # Install EasyOCR
 echo ""
 echo "[2/2] Installing EasyOCR..."
-$UV_CMD pip install --python "$TEMP_VENV/bin/python" \
+"$TEMP_VENV/bin/pip" install \
     --target="$PY_SITE_PACKAGES" \
+    --upgrade --no-user \
     easyocr
 
 # Cleanup
