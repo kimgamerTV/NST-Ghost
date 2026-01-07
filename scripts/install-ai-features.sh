@@ -1,19 +1,13 @@
 #!/bin/bash
 # =============================================================================
-# NST AI Features Installer
+# NST AI Features Check
 # =============================================================================
-# This script installs the AI-powered features for NST (Neural Screenshot Tool)
-# including OCR (text detection) and AI inpainting (text removal).
+# This script checks if AI features are properly installed.
+# In newer versions of NST, AI features (EasyOCR, PyTorch) come pre-installed.
 # =============================================================================
-
-set -e
 
 echo "╔══════════════════════════════════════════════════════════════════╗"
-echo "║           NST AI Features Installer                              ║"
-echo "╠══════════════════════════════════════════════════════════════════╣"
-echo "║  This will install:                                              ║"
-echo "║  • EasyOCR        - Text detection from images                   ║"
-echo "║  • PyTorch        - AI framework (CPU version)                   ║"
+echo "║           NST AI Features                                        ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
 
@@ -23,106 +17,55 @@ NST_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 
 if [ ! -d "$NST_ROOT/usr/lib" ]; then
     NST_ROOT="$(dirname "$SCRIPT_DIR")"
-    if [ ! -d "$NST_ROOT/usr/lib" ]; then
-        echo "❌ Error: Cannot find NST installation directory."
-        exit 1
-    fi
 fi
 
-# Find bundled Python version
+# Find bundled Python site-packages
 PY_SITE_PACKAGES=""
-BUNDLED_PY_VER=""
-
 for pydir in "$NST_ROOT/usr/lib"/python3.*; do
     if [ -d "$pydir/site-packages" ]; then
         PY_SITE_PACKAGES="$pydir/site-packages"
-        BUNDLED_PY_VER=$(basename "$pydir" | sed 's/python//')
         break
     fi
 done
 
-if [ -z "$PY_SITE_PACKAGES" ]; then
-    echo "❌ Error: Cannot find bundled Python in NST."
-    exit 1
-fi
+echo "Checking AI features..."
+echo ""
 
-echo "✓ NST bundled Python: $BUNDLED_PY_VER"
-echo "✓ Install target: $PY_SITE_PACKAGES"
-
-# Check system Python version
-if command -v python3 &>/dev/null; then
-    SYSTEM_PY_VER=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-    echo "✓ System Python: $SYSTEM_PY_VER"
+# Check for torch
+if [ -d "$PY_SITE_PACKAGES/torch" ]; then
+    echo "✅ PyTorch: Installed"
 else
-    echo "❌ Error: Python 3 is required but not installed."
-    exit 1
+    echo "❌ PyTorch: Not found"
 fi
 
-# Check if versions match
-if [ "$BUNDLED_PY_VER" != "$SYSTEM_PY_VER" ]; then
-    echo ""
-    echo "⚠️  Python version mismatch detected!"
-    echo "   NST uses Python $BUNDLED_PY_VER but your system has Python $SYSTEM_PY_VER"
-    echo ""
-    echo "   This may cause compatibility issues with binary packages."
-    echo "   The installer will still try to install, but OCR may not work."
-    echo ""
-fi
-
-# Check for pip
-if command -v pip3 &>/dev/null; then
-    PIP_CMD="pip3"
-elif command -v pip &>/dev/null; then
-    PIP_CMD="pip"
+# Check for easyocr
+if [ -d "$PY_SITE_PACKAGES/easyocr" ]; then
+    echo "✅ EasyOCR: Installed"
 else
-    echo "❌ Error: pip is required but not installed."
-    exit 1
+    echo "❌ EasyOCR: Not found"
 fi
 
-echo ""
-echo "This may take 10-20 minutes and download ~500MB of data."
-read -p "Install AI features now? [Y/n] " -n 1 -r
-echo ""
-if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "Installation cancelled."
-    exit 0
+# Check for numpy
+if [ -d "$PY_SITE_PACKAGES/numpy" ]; then
+    echo "✅ NumPy: Installed"
+else
+    echo "❌ NumPy: Not found"
 fi
-
-echo ""
-echo "📦 Installing packages..."
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-
-# Install PyTorch CPU version
-echo ""
-echo "[1/2] Installing PyTorch (CPU)..."
-$PIP_CMD install --target="$PY_SITE_PACKAGES" torch torchvision --index-url https://download.pytorch.org/whl/cpu
-
-# Install EasyOCR  
-echo ""
-echo "[2/2] Installing EasyOCR..."
-$PIP_CMD install --target="$PY_SITE_PACKAGES" easyocr
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo ""
 
-if [ "$BUNDLED_PY_VER" != "$SYSTEM_PY_VER" ]; then
-    echo "╔══════════════════════════════════════════════════════════════════╗"
-    echo "║  ⚠️  Installation completed with warnings                        ║"
-    echo "╠══════════════════════════════════════════════════════════════════╣"
-    echo "║  Packages were installed, but Python version mismatch means     ║"
-    echo "║  OCR may not work. To fix this, either:                         ║"
-    echo "║                                                                  ║"
-    echo "║  1. Install Python $BUNDLED_PY_VER on your system, or           ║"
-    echo "║  2. Wait for a newer NST release matching your Python version   ║"
-    echo "╚══════════════════════════════════════════════════════════════════╝"
+if [ -d "$PY_SITE_PACKAGES/torch" ] && [ -d "$PY_SITE_PACKAGES/easyocr" ]; then
+    echo ""
+    echo "✅ All AI features are installed and ready!"
+    echo ""
+    echo "Just run NST and the Image Translation feature should work."
+    echo "First OCR run will download language models (~100MB)."
 else
-    echo "╔══════════════════════════════════════════════════════════════════╗"
-    echo "║  ✅ Installation Complete!                                       ║"
-    echo "╠══════════════════════════════════════════════════════════════════╣"
-    echo "║  Please restart NST to enable AI features.                       ║"
-    echo "║                                                                  ║"
-    echo "║  Note: First OCR run will download language models (~100MB).    ║"
-    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo ""
+    echo "⚠️  Some AI features are missing."
+    echo ""
+    echo "Please download the latest version of NST which includes"
+    echo "pre-bundled AI features, or build from source."
 fi
 echo ""

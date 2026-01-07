@@ -25,22 +25,13 @@ cmake ..
 cmake --build .
 ```
 
-## Image Translation (Optional)
+## Image Translation
 
 The Image Translation feature uses AI-powered OCR to detect and translate text in screenshots.
 
-### Installing AI Features
+**AI features (EasyOCR, PyTorch) come pre-installed** in the AppImage - no additional setup required!
 
-Run the included installer script (downloads ~1GB):
-
-```bash
-# From extracted AppImage folder:
-./usr/bin/scripts/install-ai-features.sh
-```
-
-The script automatically installs packages into NST's bundled Python, so it works regardless of your system's Python version.
-
-> **Note:** Without these packages, the app will run in "MOCK mode" for image translation.
+> **Note:** The first OCR run will download language models (~100MB).
 
 ## Contributing
 
