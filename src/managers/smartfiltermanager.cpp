@@ -7,6 +7,7 @@
 #include <QSet>
 
 
+#ifdef HAS_PYTHON
 #pragma push_macro("slots")
 #undef slots
 #include <pybind11/embed.h>
@@ -17,11 +18,15 @@ namespace py = pybind11;
 struct SmartFilterManager::SmartFilterManagerPrivate {
     py::object m_pyFilter;
 };
+#endif
 
 SmartFilterManager::SmartFilterManager(QObject *parent)
     : QObject(parent)
+#ifdef HAS_PYTHON
     , d(std::make_unique<SmartFilterManagerPrivate>())
+#endif
 {
+#ifdef HAS_PYTHON
     // Initialize Python connection
     try {
         py::gil_scoped_acquire acquire;
@@ -42,6 +47,7 @@ SmartFilterManager::SmartFilterManager(QObject *parent)
         qDebug() << "Failed to initialize AI Smart Filter:" << e.what();
         d->m_pyFilter = py::none();
     }
+#endif
 
     loadPatterns();
 }
@@ -74,6 +80,7 @@ void SmartFilterManager::learn(const QString &text)
         qDebug() << "SmartFilterManager: Learned pattern:" << pattern << "for engine:" << m_currentEngine;
     }
     
+#ifdef HAS_PYTHON
     // AI Learn
     if (!d->m_pyFilter.is_none()) {
         try {
@@ -84,6 +91,7 @@ void SmartFilterManager::learn(const QString &text)
             qDebug() << "AI learn error:" << e.what();
         }
     }
+#endif
 }
 
 void SmartFilterManager::unlearn(const QString &text)
@@ -113,6 +121,7 @@ void SmartFilterManager::unlearn(const QString &text)
         qDebug() << "SmartFilterManager: Unlearned pattern:" << pattern << "for engine:" << m_currentEngine;
     }
 
+#ifdef HAS_PYTHON
     // AI Unlearn
     if (!d->m_pyFilter.is_none()) {
         try {
@@ -123,6 +132,7 @@ void SmartFilterManager::unlearn(const QString &text)
             qDebug() << "AI unlearn error:" << e.what();
         }
     }
+#endif
 }
 
 void SmartFilterManager::setEngine(const QString &engineName)
@@ -141,10 +151,6 @@ bool SmartFilterManager::exportRules(const QString &filePath)
     
     settings.beginGroup("SmartFilter");
     QStringList engines = settings.childGroups();
-    
-    // Also handle the case where "IgnoredPatterns" might be at the root of SmartFilter (legacy or Global)
-    // But based on previous code, we save as SmartFilter/<Engine>/IgnoredPatterns
-    // Let's iterate through all groups
     
     for (const QString &engine : engines) {
         settings.beginGroup(engine);
@@ -231,21 +237,20 @@ bool SmartFilterManager::shouldSkip(const QString &text) const
         }
     }
     
-    
+#ifdef HAS_PYTHON
     // 3. Check AI
     if (m_aiEnabled && !d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
             bool skip = d->m_pyFilter.attr("predict")(text.toStdString()).cast<bool>();
             if (skip) {
-                // qDebug() << "AI Skipped:" << text;
                 return true;
             }
         } catch (const std::exception &e) {
             // Be silent on prediction errors to avoid spam
-             // qDebug() << "AI predict error:" << e.what();
         }
     }
+#endif
 
     return false;
 }
@@ -256,14 +261,6 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
     if (texts.isEmpty()) return results;
     
     results.reserve(texts.size());
-    
-    // 1. Pre-fill with Heuristic checks (if heuristic says skip, we don't need AI for that item, but we must align indices)
-    // Actually, predict_batch expects a list. 
-    // We should filter heuristics locally first. If heuristic skips, we pass "mock" or empty?
-    // No, cleaner logic:
-    // Identify indices that PASS heuristics. Gather them into a list for AI.
-    // Send to AI.
-    // Merge results.
     
     struct Task {
         int index;
@@ -297,6 +294,7 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
         }
     }
     
+#ifdef HAS_PYTHON
     // 2. AI Processing
     if (!aiTasks.isEmpty() && m_aiEnabled && !d->m_pyFilter.is_none()) {
         try {
@@ -320,6 +318,9 @@ QList<bool> SmartFilterManager::shouldSkipBatch(const QStringList &texts) const
             qDebug() << "AI Batch Predict Error:" << e.what();
         }
     }
+#else
+    Q_UNUSED(aiTasks)
+#endif
     
     return results;
 }
@@ -352,12 +353,14 @@ void SmartFilterManager::loadPatterns()
     // Load AI Settings
     m_aiEnabled = settings.value("SmartFilter/AI/Enabled", true).toBool();
     m_aiThreshold = settings.value("SmartFilter/AI/Threshold", 0.75).toDouble();
+#ifdef HAS_PYTHON
     if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
             d->m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }
+#endif
 }
 
 void SmartFilterManager::setAIEnabled(bool enabled)
@@ -374,12 +377,14 @@ bool SmartFilterManager::isAIEnabled() const
 void SmartFilterManager::setAIThreshold(double threshold)
 {
     m_aiThreshold = threshold;
+#ifdef HAS_PYTHON
     if (!d->m_pyFilter.is_none()) {
         try {
             py::gil_scoped_acquire acquire;
             d->m_pyFilter.attr("set_threshold")(m_aiThreshold);
         } catch (...) {}
     }
+#endif
     savePatterns();
 }
 

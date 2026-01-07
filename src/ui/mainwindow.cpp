@@ -4,7 +4,8 @@
 #include "pluginmanagerdialog.h"
 #include "pluginmanagerdialog.h"
 #include "loadprojectdialog.h"
-#include "scripteditordialog.h" // Added include
+#include "scripteditordialog.h"
+#include "featuremanagerdialog.h"
 
 #ifdef HAS_LUA
 #include "plugins/LuaScriptManager.h"
@@ -72,20 +73,21 @@ MainWindow::MainWindow(QWidget *parent)
                                          m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
     m_stackedWidget->addWidget(m_fileTranslationWidget); 
     
-    // Page 1: Real-time Translation Widget
-    // Page 1: Real-time Translation Widget
+#ifdef HAS_PYTHON
+    // Page 1: Real-time Translation Widget (requires Python)
     m_realTimeWidget = new RealTimeTranslationWidget(this);
-    m_stackedWidget->addWidget(m_realTimeWidget); // Index 1
+    m_stackedWidget->addWidget(m_realTimeWidget);
 
-    // Page 2: Image Translation Widget
+    // Page 2: Image Translation Widget (requires Python)
     m_imageTranslationWidget = new ImageTranslationWidget(m_translationServiceManager, this);
     m_imageTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi, 
                                           m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
-    m_stackedWidget->addWidget(m_imageTranslationWidget); // Index 2
+    m_stackedWidget->addWidget(m_imageTranslationWidget);
+#endif
     
-    // Page 3: Relationship Widget
+    // Relations Widget (no Python required)
     m_relationshipWidget = new RelationshipWidget(this);
-    m_stackedWidget->addWidget(m_relationshipWidget); // Index 3
+    m_stackedWidget->addWidget(m_relationshipWidget);
     
     // Create a new container widget
     QWidget *mainContainer = new QWidget(this);
@@ -112,6 +114,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_titleBar, &CustomTitleBar::translateModeClicked, this, [this]() {
         onNavigationChanged(0);
     });
+#ifdef HAS_PYTHON
     connect(m_titleBar, &CustomTitleBar::realTimeModeClicked, this, [this]() {
         onNavigationChanged(1);
     });
@@ -121,12 +124,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_titleBar, &CustomTitleBar::relationsModeClicked, this, [this]() {
         onNavigationChanged(3);
     });
+#else
+    // Core build: Relations is at index 1 (no Realtime/Image widgets)
+    connect(m_titleBar, &CustomTitleBar::relationsModeClicked, this, [this]() {
+        onNavigationChanged(1);
+    });
+#endif
     
     // Enable mouse tracking for resizing and moving
     setMouseTracking(true);
     if (centralWidget()) {
         centralWidget()->setMouseTracking(true);
     }
+    
+#ifndef HAS_PYTHON
+    // Core build: hide Python-dependent navigation buttons
+    m_titleBar->setRealTimeVisible(false);
+    m_titleBar->setImageTransVisible(false);
+#endif
     
     // Set minimum size
     setMinimumSize(800, 600);
@@ -145,6 +160,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_menuBar, &MenuBar::exit, this, &QMainWindow::close);
     connect(m_menuBar, &MenuBar::fontManager, this, &MainWindow::onFontManagerActionTriggered);
     connect(m_menuBar, &MenuBar::pluginManager, this, &MainWindow::onPluginManagerActionTriggered);
+    connect(m_menuBar, &MenuBar::featureManager, this, &MainWindow::onFeatureManagerActionTriggered);
     connect(m_menuBar, &MenuBar::editEngineScript, this, &MainWindow::onEditEngineScript); // Renamed
     connect(m_menuBar, &MenuBar::toggleContext, this, &MainWindow::onToggleContext);
     connect(m_menuBar, &MenuBar::hideCompleted, this, &MainWindow::onHideCompleted);
@@ -300,10 +316,12 @@ void MainWindow::updateChildSettings()
         m_fileTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi,
                                              m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
     }
+#ifdef HAS_PYTHON
     if (m_imageTranslationWidget) {
         m_imageTranslationWidget->setSettings(m_apiKey, m_targetLanguage, m_googleApi,
                                               m_llmProvider, m_llmApiKey, m_llmModel, m_llmBaseUrl);
     }
+#endif
 }
 
 void MainWindow::onFontsLoaded(const QJsonArray &fonts) {}
@@ -317,6 +335,12 @@ void MainWindow::onFontManagerActionTriggered()
 void MainWindow::onPluginManagerActionTriggered()
 {
     PluginManagerDialog dialog(this);
+    dialog.exec();
+}
+
+void MainWindow::onFeatureManagerActionTriggered()
+{
+    FeatureManagerDialog dialog(this);
     dialog.exec();
 }
 

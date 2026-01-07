@@ -19,6 +19,7 @@ signals:
     void exit();
     void fontManager();
     void pluginManager();
+    void featureManager();  // Feature Manager dialog
     void editEngineScript(); // Renamed from editRpgmScript
 
     // View signals
@@ -46,6 +47,7 @@ private:
     QAction *exitAction;
     QAction *fontManagerAction;
     QAction *pluginManagerAction;
+    QAction *featureManagerAction;
     QAction *editEngineScriptAction; // Renamed from editRpgmScriptAction
 
     // View actions

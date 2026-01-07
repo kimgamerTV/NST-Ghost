@@ -25,13 +25,23 @@ cmake ..
 cmake --build .
 ```
 
-## Image Translation
+## Image Translation (Optional)
 
 The Image Translation feature uses AI-powered OCR to detect and translate text in screenshots.
 
-**AI features (EasyOCR, PyTorch) come pre-installed** in the AppImage - no additional setup required!
+### Installing AI Features
 
-> **Note:** The first OCR run will download language models (~100MB).
+Run the included installer script:
+
+```bash
+# From extracted AppImage folder:
+./usr/bin/scripts/install-ai-features.sh          # CPU version (default)
+./usr/bin/scripts/install-ai-features.sh --gpu    # GPU version (requires CUDA)
+```
+
+The script uses [uv](https://astral.sh/uv) to ensure correct package versions are installed.
+
+> **Note:** First OCR run will download language models (~100MB).
 
 ## Contributing
 

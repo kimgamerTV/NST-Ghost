@@ -114,6 +114,16 @@ void CustomTitleBar::setRelationsVisible(bool visible)
     m_relationsButton->setVisible(visible);
 }
 
+void CustomTitleBar::setRealTimeVisible(bool visible)
+{
+    m_realTimeButton->setVisible(visible);
+}
+
+void CustomTitleBar::setImageTransVisible(bool visible)
+{
+    m_imageTransButton->setVisible(visible);
+}
+
 void CustomTitleBar::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {

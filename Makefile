@@ -1243,54 +1243,6 @@ src/ui/filetranslationwidget.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/filetranslationwidget.cpp.s
 .PHONY : src/ui/filetranslationwidget.cpp.s
 
-src/ui/imageprocessorworker.o: src/ui/imageprocessorworker.cpp.o
-.PHONY : src/ui/imageprocessorworker.o
-
-# target to build an object file
-src/ui/imageprocessorworker.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.o
-.PHONY : src/ui/imageprocessorworker.cpp.o
-
-src/ui/imageprocessorworker.i: src/ui/imageprocessorworker.cpp.i
-.PHONY : src/ui/imageprocessorworker.i
-
-# target to preprocess a source file
-src/ui/imageprocessorworker.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.i
-.PHONY : src/ui/imageprocessorworker.cpp.i
-
-src/ui/imageprocessorworker.s: src/ui/imageprocessorworker.cpp.s
-.PHONY : src/ui/imageprocessorworker.s
-
-# target to generate assembly for a file
-src/ui/imageprocessorworker.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imageprocessorworker.cpp.s
-.PHONY : src/ui/imageprocessorworker.cpp.s
-
-src/ui/imagetranslationwidget.o: src/ui/imagetranslationwidget.cpp.o
-.PHONY : src/ui/imagetranslationwidget.o
-
-# target to build an object file
-src/ui/imagetranslationwidget.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.o
-.PHONY : src/ui/imagetranslationwidget.cpp.o
-
-src/ui/imagetranslationwidget.i: src/ui/imagetranslationwidget.cpp.i
-.PHONY : src/ui/imagetranslationwidget.i
-
-# target to preprocess a source file
-src/ui/imagetranslationwidget.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.i
-.PHONY : src/ui/imagetranslationwidget.cpp.i
-
-src/ui/imagetranslationwidget.s: src/ui/imagetranslationwidget.cpp.s
-.PHONY : src/ui/imagetranslationwidget.s
-
-# target to generate assembly for a file
-src/ui/imagetranslationwidget.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/imagetranslationwidget.cpp.s
-.PHONY : src/ui/imagetranslationwidget.cpp.s
-
 src/ui/mainwindow.o: src/ui/mainwindow.cpp.o
 .PHONY : src/ui/mainwindow.o
 
@@ -1338,30 +1290,6 @@ src/ui/menubar.s: src/ui/menubar.cpp.s
 src/ui/menubar.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/menubar.cpp.s
 .PHONY : src/ui/menubar.cpp.s
-
-src/ui/realtimetranslationwidget.o: src/ui/realtimetranslationwidget.cpp.o
-.PHONY : src/ui/realtimetranslationwidget.o
-
-# target to build an object file
-src/ui/realtimetranslationwidget.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.o
-.PHONY : src/ui/realtimetranslationwidget.cpp.o
-
-src/ui/realtimetranslationwidget.i: src/ui/realtimetranslationwidget.cpp.i
-.PHONY : src/ui/realtimetranslationwidget.i
-
-# target to preprocess a source file
-src/ui/realtimetranslationwidget.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.i
-.PHONY : src/ui/realtimetranslationwidget.cpp.i
-
-src/ui/realtimetranslationwidget.s: src/ui/realtimetranslationwidget.cpp.s
-.PHONY : src/ui/realtimetranslationwidget.s
-
-# target to generate assembly for a file
-src/ui/realtimetranslationwidget.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NST.dir/build.make CMakeFiles/NST.dir/src/ui/realtimetranslationwidget.cpp.s
-.PHONY : src/ui/realtimetranslationwidget.cpp.s
 
 src/ui/relationitem.o: src/ui/relationitem.cpp.o
 .PHONY : src/ui/relationitem.o
@@ -1562,21 +1490,12 @@ help:
 	@echo "... src/ui/filetranslationwidget.o"
 	@echo "... src/ui/filetranslationwidget.i"
 	@echo "... src/ui/filetranslationwidget.s"
-	@echo "... src/ui/imageprocessorworker.o"
-	@echo "... src/ui/imageprocessorworker.i"
-	@echo "... src/ui/imageprocessorworker.s"
-	@echo "... src/ui/imagetranslationwidget.o"
-	@echo "... src/ui/imagetranslationwidget.i"
-	@echo "... src/ui/imagetranslationwidget.s"
 	@echo "... src/ui/mainwindow.o"
 	@echo "... src/ui/mainwindow.i"
 	@echo "... src/ui/mainwindow.s"
 	@echo "... src/ui/menubar.o"
 	@echo "... src/ui/menubar.i"
 	@echo "... src/ui/menubar.s"
-	@echo "... src/ui/realtimetranslationwidget.o"
-	@echo "... src/ui/realtimetranslationwidget.i"
-	@echo "... src/ui/realtimetranslationwidget.s"
 	@echo "... src/ui/relationitem.o"
 	@echo "... src/ui/relationitem.i"
 	@echo "... src/ui/relationitem.s"

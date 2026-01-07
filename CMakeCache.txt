@@ -353,6 +353,9 @@ MockTranslationPlugin_SOURCE_DIR:STATIC=/home/jop/work/NST/NST/src/plugins/MockT
 //Value Computed by CMake
 NST_BINARY_DIR:STATIC=/home/jop/work/NST/NST
 
+//Enable Python integration for Image/Realtime translation
+NST_ENABLE_PYTHON:BOOL=OFF
+
 //Value Computed by CMake
 NST_IS_TOP_LEVEL:STATIC=ON
 

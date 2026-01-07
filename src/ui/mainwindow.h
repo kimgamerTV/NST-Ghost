@@ -7,11 +7,14 @@
 
 #include "menubar.h"
 #include "customtitlebar.h"
-#include "realtimetranslationwidget.h"
 #include "filetranslationwidget.h"
-#include "imagetranslationwidget.h"
 #include "relationshipwidget.h"
 #include "settingsdialog.h"
+
+#ifdef HAS_PYTHON
+#include "realtimetranslationwidget.h"
+#include "imagetranslationwidget.h"
+#endif
 #include "updatecontroller.h"
 #include "translationservicemanager.h"
 #include "fontmanagerdialog.h"
@@ -38,6 +41,7 @@ private slots:
     void onFontsLoaded(const QJsonArray &fonts);
     void onFontManagerActionTriggered();
     void onPluginManagerActionTriggered();
+    void onFeatureManagerActionTriggered();
     void onEditEngineScript(); // Renamed from onEditRpgmScript
 
     // View slots (delegated)
@@ -69,8 +73,10 @@ private:
     
     // Widgets
     FileTranslationWidget *m_fileTranslationWidget;
+#ifdef HAS_PYTHON
     RealTimeTranslationWidget *m_realTimeWidget;
-    ImageTranslationWidget *m_imageTranslationWidget; // New Widget
+    ImageTranslationWidget *m_imageTranslationWidget;
+#endif
     RelationshipWidget *m_relationshipWidget;
     
     // Managers / Controllers owned by MainWindow but shared/used by children

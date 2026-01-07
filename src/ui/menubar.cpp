@@ -29,6 +29,7 @@ void MenuBar::createMenus()
     toolsMenu = addMenu(tr("&Tools"));
     toolsMenu->addAction(fontManagerAction);
     toolsMenu->addAction(pluginManagerAction);
+    toolsMenu->addAction(featureManagerAction);
     toolsMenu->addAction(editEngineScriptAction); // Renamed
 
     smartFilterMenu = addMenu(tr("&Smart Filter"));
@@ -65,6 +66,9 @@ void MenuBar::createActions()
 
     pluginManagerAction = new QAction(tr("Plugin Manager..."), this);
     connect(pluginManagerAction, &QAction::triggered, this, &MenuBar::pluginManager);
+
+    featureManagerAction = new QAction(tr("Feature Manager..."), this);
+    connect(featureManagerAction, &QAction::triggered, this, &MenuBar::featureManager);
 
     editEngineScriptAction = new QAction(tr("Edit Engine Script..."), this);
     connect(editEngineScriptAction, &QAction::triggered, this, &MenuBar::editEngineScript);

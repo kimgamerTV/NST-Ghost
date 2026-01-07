@@ -53,11 +53,14 @@ private:
     QList<QRegularExpression> m_compiledPatterns;
     QString m_currentEngine = "Global"; // Default to Global
     
+private:
     ~SmartFilterManager(); // Required for PIMPL with unique_ptr
 
 private:
+#ifdef HAS_PYTHON
     struct SmartFilterManagerPrivate;
     std::unique_ptr<SmartFilterManagerPrivate> d;
+#endif
     bool m_aiEnabled = true;
     double m_aiThreshold = 0.75;
 

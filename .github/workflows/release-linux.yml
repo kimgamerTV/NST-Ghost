@@ -7,6 +7,11 @@ on:
         required: true
         type: string
         description: 'Version number (e.g., 0.4.3)'
+      build_variant:
+        required: false
+        type: string
+        default: 'full'
+        description: 'Build variant: core (no Python) or full (with Python)'
 
 jobs:
   build-linux:
@@ -73,13 +78,23 @@ jobs:
       
       - name: Configure CMake
         run: |
+          # Determine Python flag based on build variant
+          if [ "${{ inputs.build_variant }}" = "core" ]; then
+            PYTHON_FLAG="-DNST_ENABLE_PYTHON=OFF"
+            echo "Building Core variant (no Python)"
+          else
+            PYTHON_FLAG="-DNST_ENABLE_PYTHON=ON"
+            echo "Building Full variant (with Python)"
+          fi
+          
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }};${{ env.pybind11_DIR }}" \
             -DCMAKE_INSTALL_PREFIX=/opt/nst \
             -DQT_DEPLOY_SUPPORT=OFF \
-            -DSKIP_QT_DEPLOY=ON
+            -DSKIP_QT_DEPLOY=ON \
+            $PYTHON_FLAG
       
       - name: Build
         run: cmake --build build --config Release --parallel $(nproc)
@@ -135,8 +150,9 @@ jobs:
           ln -sf usr/share/icons/hicolor/256x256/apps/nst.png .DirIcon
       
       
-      # Bundle Python stdlib for embedded interpreter
+      # Bundle Python stdlib for embedded interpreter (Full build only)
       - name: Bundle Python stdlib
+        if: inputs.build_variant != 'core'
         run: |
           PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
           echo "Bundling Python ${PYTHON_VERSION} stdlib"
@@ -166,40 +182,16 @@ jobs:
           echo "Python stdlib bundled successfully"
           ls -la AppDir/usr/lib/python${PYTHON_VERSION}/ | head -20
       
-      - name: Bundle AI dependencies (PyTorch + EasyOCR)
+      - name: Bundle NumPy for OpenCV
+        if: inputs.build_variant != 'core'
         run: |
           PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
           SITE_PACKAGES="AppDir/usr/lib/python${PYTHON_VERSION}/site-packages"
           
-          echo "=== Installing AI dependencies into AppImage ==="
-          echo "This may take a while..."
+          # Install only numpy for OpenCV bindings (AI features installed by user)
+          pip install --target="${SITE_PACKAGES}" numpy
           
-          # Install pip, setuptools, wheel
-          pip install --target="${SITE_PACKAGES}" pip setuptools wheel
-          
-          # Install PyTorch CPU version (much smaller than GPU version)
-          echo "Installing PyTorch CPU..."
-          pip install --target="${SITE_PACKAGES}" torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          
-          # Install EasyOCR and dependencies
-          echo "Installing EasyOCR..."
-          pip install --target="${SITE_PACKAGES}" easyocr
-          
-          # Clean up unnecessary files to reduce size
-          echo "Cleaning up to reduce bundle size..."
-          find "${SITE_PACKAGES}" -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-          find "${SITE_PACKAGES}" -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true
-          find "${SITE_PACKAGES}" -type d -name "test" -exec rm -rf {} + 2>/dev/null || true
-          find "${SITE_PACKAGES}" -name "*.pyc" -delete 2>/dev/null || true
-          rm -rf "${SITE_PACKAGES}"/torch/test 2>/dev/null || true
-          rm -rf "${SITE_PACKAGES}"/caffe2 2>/dev/null || true
-          
-          # Remove CUDA/GPU specific files since we use CPU only
-          rm -rf "${SITE_PACKAGES}"/nvidia-* 2>/dev/null || true
-          rm -rf "${SITE_PACKAGES}"/triton* 2>/dev/null || true
-          
-          echo "=== AI dependencies bundled successfully ==="
-          du -sh "${SITE_PACKAGES}"
+          echo "NumPy bundled successfully"
       
       - name: Create AppRun script
         run: |

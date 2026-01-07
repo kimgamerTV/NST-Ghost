@@ -1,7 +1,14 @@
+// Python includes - only when HAS_PYTHON is defined
+#ifdef HAS_PYTHON
 // IMPORTANT: Python.h must be included FIRST, before any Qt headers
 // to avoid Qt's "slots" macro conflict with Python's use of "slots"
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
+#pragma push_macro("slots")
+#undef slots
+#include <pybind11/embed.h>
+#pragma pop_macro("slots")
+#endif
 
 // Now we can include Qt headers
 #include "mainwindow.h"
@@ -20,11 +27,9 @@
 #include <iostream>
 #include <vector>
 
-#pragma push_macro("slots")
-#undef slots
-#include <pybind11/embed.h>
-#pragma pop_macro("slots")
 
+
+#ifdef HAS_PYTHON
 // Helper function to configure Python BEFORE pybind11 initialization
 // Uses Python 3.11+ PyConfig API to avoid deprecated functions
 static void configurePythonEnvironment()
@@ -93,15 +98,18 @@ static void configurePythonEnvironment()
         std::cerr << "[NST] Using system Python configuration" << std::endl;
     }
 }
+#endif // HAS_PYTHON
 
 int main(int argc, char *argv[])
 {
+#ifdef HAS_PYTHON
     // Configure Python BEFORE creating interpreter
     configurePythonEnvironment();
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
     pybind11::gil_scoped_release release;
+#endif
 
     QApplication a(argc, argv);
 

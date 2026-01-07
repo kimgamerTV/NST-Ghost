@@ -16,6 +16,8 @@ public:
     void setTitle(const QString &title);
     void setIcon(const QIcon &icon);
     void setRelationsVisible(bool visible);
+    void setRealTimeVisible(bool visible);
+    void setImageTransVisible(bool visible);
 
 signals:
     void minimizeClicked();

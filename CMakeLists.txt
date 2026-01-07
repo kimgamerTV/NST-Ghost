@@ -28,7 +28,15 @@ if(Qt6_VERSION_MAJOR EQUAL 6 AND Qt6_VERSION_MINOR GREATER_EQUAL 3)
     qt_standard_project_setup()
 endif()
 
-find_package(pybind11 REQUIRED)
+# Optional Python integration for AI features (Image/Realtime translation)
+option(NST_ENABLE_PYTHON "Enable Python integration for Image/Realtime translation" OFF)
+
+if(NST_ENABLE_PYTHON)
+    find_package(pybind11 REQUIRED)
+    message(STATUS "Python integration ENABLED")
+else()
+    message(STATUS "Python integration DISABLED (Core build)")
+endif()
 
 set(TS_FILES src/NST_en_US.ts)
 
@@ -68,6 +76,8 @@ set(PROJECT_SOURCES
     src/dialogs/fontmanagerdialog.h
     src/dialogs/pluginmanagerdialog.h
     src/dialogs/plugindebuggerdialog.h
+    src/dialogs/featuremanagerdialog.cpp
+    src/dialogs/featuremanagerdialog.h
     src/plugins/LuaTranslationPlugin/luatranslationservice.h
     src/controllers/searchcontroller.h
     src/controllers/shortcutcontroller.h
@@ -80,22 +90,28 @@ set(PROJECT_SOURCES
     src/managers/projectdatamanager.h
     src/ui/customtitlebar.cpp
     src/ui/customtitlebar.h
-    src/ui/realtimetranslationwidget.cpp
-    src/ui/realtimetranslationwidget.h
-    src/ui/imagetranslationwidget.cpp
-    src/ui/imagetranslationwidget.h
     src/ui/filetranslationwidget.cpp
     src/ui/filetranslationwidget.h
     src/ui/filetranslationwidget.ui
-    src/ui/imagetranslationwidget.ui
-    src/ui/imageprocessorworker.cpp
-    src/ui/imageprocessorworker.h
     src/core/translationserver.cpp
     src/core/translationserver.h
     src/dialogs/processselectordialog.cpp
     src/dialogs/processselectordialog.h
     src/resources.qrc
 )
+
+# Python-dependent sources (only included when NST_ENABLE_PYTHON is ON)
+if(NST_ENABLE_PYTHON)
+    list(APPEND PROJECT_SOURCES
+        src/ui/realtimetranslationwidget.cpp
+        src/ui/realtimetranslationwidget.h
+        src/ui/imagetranslationwidget.cpp
+        src/ui/imagetranslationwidget.h
+        src/ui/imagetranslationwidget.ui
+        src/ui/imageprocessorworker.cpp
+        src/ui/imageprocessorworker.h
+    )
+endif()
 
 # Lua plugin sources (optional)
 if(LUA_FOUND)
@@ -128,8 +144,13 @@ target_link_libraries(NST PRIVATE
     Qt6::Network
     BGACore
     QtLingo
-    pybind11::embed
 )
+
+# Conditionally link Python (only when enabled)
+if(NST_ENABLE_PYTHON)
+    target_link_libraries(NST PRIVATE pybind11::embed)
+    target_compile_definitions(NST PRIVATE HAS_PYTHON=1)
+endif()
 
 
 
