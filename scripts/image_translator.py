@@ -3,6 +3,30 @@ import os
 import json
 import logging
 
+# Windows DLL Search Path Fix (Python 3.8+)
+# Since Python 3.8, DLL loading is more restrictive for security.
+# For bundled deployments (embedded Python), we need to explicitly add DLL directories.
+if sys.platform == 'win32':
+    # Get the directory where python.exe lives (bundled Python root)
+    python_dir = os.path.dirname(sys.executable)
+    
+    # Add DLL search directories for NumPy, OpenCV, Torch, etc.
+    if hasattr(os, 'add_dll_directory'):
+        # Python 3.8+ provides this API
+        dll_dirs = [
+            python_dir,
+            os.path.join(python_dir, 'DLLs'),
+            os.path.join(python_dir, 'Lib', 'site-packages', 'numpy', '.libs'),
+            os.path.join(python_dir, 'Lib', 'site-packages', 'cv2'),
+            os.path.join(python_dir, 'Lib', 'site-packages', 'torch', 'lib'),
+        ]
+        for dll_dir in dll_dirs:
+            if os.path.isdir(dll_dir):
+                try:
+                    os.add_dll_directory(dll_dir)
+                except OSError:
+                    pass  # Directory already added or doesn't exist
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

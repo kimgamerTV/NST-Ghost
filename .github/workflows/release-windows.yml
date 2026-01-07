@@ -111,6 +111,71 @@ jobs:
           }
         shell: pwsh
       
+      - name: Bundle Python Embeddable Package
+        if: ${{ !cancelled() }}
+        run: |
+          $pythonVersion = "3.11.9"
+          $pythonVersionShort = "311"
+          $embedUrl = "https://www.python.org/ftp/python/${pythonVersion}/python-${pythonVersion}-embed-amd64.zip"
+          
+          Write-Host "Downloading Python ${pythonVersion} Embeddable Package..."
+          Invoke-WebRequest -Uri $embedUrl -OutFile python-embed.zip
+          
+          # Extract to package/python
+          New-Item -ItemType Directory -Force -Path "package/python" | Out-Null
+          Expand-Archive python-embed.zip -DestinationPath "package/python" -Force
+          
+          # Modify ._pth file to enable site-packages and import site
+          # This is CRITICAL for pip packages to work
+          $pthFile = "package/python/python${pythonVersionShort}._pth"
+          if (Test-Path $pthFile) {
+            Write-Host "Modifying ${pthFile} to enable site-packages..."
+            $content = @"
+python${pythonVersionShort}.zip
+.
+Lib/site-packages
+import site
+"@
+            Set-Content -Path $pthFile -Value $content
+            Write-Host "._pth file updated:"
+            Get-Content $pthFile
+          }
+          
+          # Create site-packages directory
+          New-Item -ItemType Directory -Force -Path "package/python/Lib/site-packages" | Out-Null
+          
+          # Copy Python scripts
+          Write-Host "Copying Python scripts..."
+          Copy-Item -Path "scripts" -Destination "package/" -Recurse -Force
+          
+          Write-Host "Python bundling complete!"
+          Get-ChildItem "package/python" | Select-Object Name, Length | Format-Table
+        shell: pwsh
+      
+      - name: Install pip dependencies for bundled Python
+        if: ${{ !cancelled() }}
+        run: |
+          $sitePackages = "package/python/Lib/site-packages"
+          
+          # Install get-pip first (embeddable package doesn't include pip)
+          Write-Host "Installing pip..."
+          Invoke-WebRequest -Uri "https://bootstrap.pypa.io/get-pip.py" -OutFile "get-pip.py"
+          & "package/python/python.exe" get-pip.py --target="$sitePackages" --no-warn-script-location
+          
+          # Install dependencies using the SAME Python version (critical for binary compatibility)
+          Write-Host "Installing dependencies..."
+          & "package/python/python.exe" -m pip install --target="$sitePackages" --no-warn-script-location `
+            numpy `
+            opencv-python-headless `
+            Pillow
+          
+          # Note: Heavy AI dependencies (torch, easyocr) are installed by user via Feature Manager
+          # This keeps the base package small (~50MB vs ~2GB)
+          
+          Write-Host "`nInstalled packages:"
+          Get-ChildItem "$sitePackages" -Directory | Select-Object Name | Format-Table
+        shell: pwsh
+      
       - name: Create ZIP package
         run: |
           $version = "${{ inputs.version }}"

@@ -30,12 +30,46 @@
 
 
 #ifdef HAS_PYTHON
+// Static storage for environment variables to prevent memory leaks
+// (putenv requires the string to persist for the lifetime of the program)
+static char s_pythonhome_env[4096];
+static char s_pythonpath_env[8192];
+
 // Helper function to configure Python BEFORE pybind11 initialization
-// Uses Python 3.11+ PyConfig API to avoid deprecated functions
+// Supports both Linux AppImage and Windows bundled deployments
 static void configurePythonEnvironment()
 {
     // Check if running from AppImage (APPDIR is set by AppRun script)
     const char* appdir = std::getenv("APPDIR");
+    
+    // Get executable directory for Windows bundled Python detection
+    QString exeDir = QCoreApplication::applicationDirPath();
+    std::string exe_dir_str = exeDir.toStdString();
+    
+#ifdef _WIN32
+    // Windows: Check for bundled Python in exe_dir/python/
+    std::string win_python_home = exe_dir_str + "/python";
+    std::string win_python_dll = win_python_home + "/python311.dll";
+    
+    if (QFile::exists(QString::fromStdString(win_python_dll))) {
+        // Found bundled Python on Windows
+        std::string scripts_path = exe_dir_str + "/scripts";
+        std::string site_packages = win_python_home + "/Lib/site-packages";
+        
+        std::string pythonpath = scripts_path + ";" + site_packages;
+        
+        // Use static storage to avoid memory leak
+        snprintf(s_pythonhome_env, sizeof(s_pythonhome_env), "PYTHONHOME=%s", win_python_home.c_str());
+        snprintf(s_pythonpath_env, sizeof(s_pythonpath_env), "PYTHONPATH=%s", pythonpath.c_str());
+        
+        _putenv(s_pythonhome_env);
+        _putenv(s_pythonpath_env);
+        
+        std::cerr << "[NST] Configured bundled Python (Windows): " << win_python_home << std::endl;
+        std::cerr << "[NST] PYTHONPATH: " << pythonpath << std::endl;
+        return;
+    }
+#endif
     
     if (appdir && appdir[0] != '\0') {
         // Running from AppImage - configure bundled Python
@@ -60,34 +94,29 @@ static void configurePythonEnvironment()
         }
         
         // If bundled Python found, configure it using environment variables
-        // This is more reliable than deprecated Py_SetPythonHome/Py_SetPath
         if (!python_home.empty()) {
-            // Set PYTHONHOME environment variable (works with all Python versions)
-            std::string pythonhome_env = "PYTHONHOME=" + python_home;
-            putenv(const_cast<char*>(strdup(pythonhome_env.c_str())));
-            
             // Build PYTHONPATH
             std::string scripts_path = appdir_str + "/usr/bin";  // Parent dir so "import scripts" works
             std::string site_packages = python_lib + "/site-packages";
             std::string lib_dynload = python_lib + "/lib-dynload";
             
             std::string pythonpath = scripts_path + ":" + python_lib + ":" + site_packages + ":" + lib_dynload;
-            std::string pythonpath_env = "PYTHONPATH=" + pythonpath;
-            putenv(const_cast<char*>(strdup(pythonpath_env.c_str())));
+            
+            // Use static storage to avoid memory leak
+            snprintf(s_pythonhome_env, sizeof(s_pythonhome_env), "PYTHONHOME=%s", python_home.c_str());
+            snprintf(s_pythonpath_env, sizeof(s_pythonpath_env), "PYTHONPATH=%s", pythonpath.c_str());
+            
+            putenv(s_pythonhome_env);
+            putenv(s_pythonpath_env);
             
             std::cerr << "[NST] Configured bundled Python home: " << python_home << std::endl;
             std::cerr << "[NST] PYTHONPATH: " << pythonpath << std::endl;
         } else {
             std::cerr << "[NST] Warning: APPDIR set but no bundled Python found, using system Python" << std::endl;
-            // Clear potentially conflicting environment
-#ifdef _WIN32
-            _putenv("PYTHONHOME=");
-#else
             unsetenv("PYTHONHOME");
-#endif
         }
     } else {
-        // Not running from AppImage - use system Python
+        // Not running from AppImage/bundled - use system Python
         // Clear any conflicting environment variables
 #ifdef _WIN32
         _putenv("PYTHONHOME=");

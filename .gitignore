@@ -35,7 +35,7 @@ CMakeCache.txt
 
 cmake_install.cmake
 Makefile
-
+build-verify/
 *.d
 
 BGA/bga_rs/target/*
