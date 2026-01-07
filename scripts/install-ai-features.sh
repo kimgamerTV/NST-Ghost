@@ -5,8 +5,7 @@
 # This script installs the AI-powered features for NST (Neural Screenshot Tool)
 # including OCR (text detection) and AI inpainting (text removal).
 #
-# The packages are installed directly into NST's bundled Python environment,
-# so they work regardless of your system's Python version.
+# Uses the bundled Python and pip from the AppImage - no system Python required!
 # =============================================================================
 
 set -e
@@ -22,23 +21,19 @@ echo ""
 
 # Find NST root directory from script location
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-
-# Script is in: NST_ROOT/usr/bin/scripts/
-# So NST_ROOT is 3 levels up
 NST_ROOT="$(dirname "$(dirname "$(dirname "$SCRIPT_DIR")")")"
 
 # Check if we're in a valid NST installation
 if [ ! -d "$NST_ROOT/usr/lib" ]; then
-    # Maybe running from source (scripts/ is at root level)
     NST_ROOT="$(dirname "$SCRIPT_DIR")"
-    if [ ! -d "$NST_ROOT/usr/lib" ] && [ ! -f "$NST_ROOT/src/core/main.cpp" ]; then
+    if [ ! -d "$NST_ROOT/usr/lib" ]; then
         echo "❌ Error: Cannot find NST installation directory."
         echo "   Please run this script from the NST folder."
         exit 1
     fi
 fi
 
-# Find bundled Python version and its pip
+# Find bundled Python
 BUNDLED_PYTHON=""
 PY_SITE_PACKAGES=""
 PY_VERSION=""
@@ -47,26 +42,56 @@ for pydir in "$NST_ROOT/usr/lib"/python3.*; do
     if [ -d "$pydir/site-packages" ]; then
         PY_SITE_PACKAGES="$pydir/site-packages"
         PY_VERSION=$(basename "$pydir")
-        # Try to find bundled python executable
-        for pybin in "$NST_ROOT/usr/bin/python3" "$NST_ROOT/usr/bin/python" "/usr/bin/$PY_VERSION"; do
-            if [ -x "$pybin" ]; then
-                BUNDLED_PYTHON="$pybin"
-                break
-            fi
-        done
         break
     fi
 done
 
-# Determine pip command and install target
-if [ -n "$BUNDLED_PYTHON" ] && "$BUNDLED_PYTHON" -m pip --version &>/dev/null 2>&1; then
-    # Use bundled Python's pip
-    PIP_CMD="$BUNDLED_PYTHON -m pip"
-    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
-    echo "✓ Using bundled Python: $BUNDLED_PYTHON"
+# Find bundled Python executable
+for pybin in "$NST_ROOT/usr/bin/python3" "$NST_ROOT/usr/bin/python"; do
+    if [ -x "$pybin" ]; then
+        BUNDLED_PYTHON="$pybin"
+        break
+    fi
+done
+
+# Check for bundled pip
+if [ -z "$PY_SITE_PACKAGES" ]; then
+    echo "❌ Error: Cannot find bundled Python in NST."
+    exit 1
+fi
+
+# Check if pip module is available in bundled Python
+if [ -d "$PY_SITE_PACKAGES/pip" ]; then
+    echo "✓ Found bundled Python: $PY_VERSION"
+    echo "✓ Found bundled pip"
     echo "✓ Install target: $PY_SITE_PACKAGES"
-elif [ -n "$PY_SITE_PACKAGES" ]; then
-    # Try system pip with platform flag for compatibility
+    
+    # Use bundled Python with bundled pip
+    # Set PYTHONPATH to use bundled site-packages
+    export PYTHONHOME="$NST_ROOT/usr"
+    export PYTHONPATH="$PY_SITE_PACKAGES:$NST_ROOT/usr/lib/$PY_VERSION"
+    
+    # Try to find system python that matches bundled version
+    PY_MINOR=$(echo "$PY_VERSION" | sed 's/python3\.//')
+    PYTHON_CMD=""
+    for py in "/usr/bin/python3.$PY_MINOR" "/usr/bin/python3" "python3.$PY_MINOR" "python3"; do
+        if command -v "$py" &>/dev/null; then
+            PYTHON_CMD="$py"
+            break
+        fi
+    done
+    
+    if [ -z "$PYTHON_CMD" ]; then
+        echo "❌ Error: Cannot find Python 3 on your system."
+        echo "   Please install Python 3: sudo apt install python3"
+        exit 1
+    fi
+    
+    PIP_CMD="$PYTHON_CMD -m pip"
+    INSTALL_TARGET="--target=$PY_SITE_PACKAGES"
+else
+    echo "⚠️  Bundled pip not found. Using system pip..."
+    
     if command -v pip3 &>/dev/null; then
         PIP_CMD="pip3"
     elif command -v pip &>/dev/null; then
@@ -75,34 +100,10 @@ elif [ -n "$PY_SITE_PACKAGES" ]; then
         echo "❌ Error: pip is required but not installed."
         exit 1
     fi
-    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
-    echo "✓ Found bundled Python: $PY_VERSION"
-    echo "✓ Install target: $PY_SITE_PACKAGES"
-    echo ""
-    echo "⚠️  Warning: Using system pip. Some packages may need rebuilding."
-else
-    echo "❌ Error: Cannot find bundled Python in NST."
-    echo "   Expected: $NST_ROOT/usr/lib/python3.X/site-packages"
-    echo ""
-    read -p "Install to user directory (~/.local) instead? [Y/n] " -n 1 -r
-    echo ""
-    if [[ $REPLY =~ ^[Nn]$ ]]; then
-        echo "Installation cancelled."
-        exit 0
-    fi
-    
-    if command -v pip3 &>/dev/null; then
-        PIP_CMD="pip3"
-    else
-        PIP_CMD="pip"
-    fi
-    INSTALL_TARGET="--user"
-    echo "📦 Installing to user directory..."
+    INSTALL_TARGET="--target=$PY_SITE_PACKAGES"
 fi
 
 echo ""
-
-# Ask for confirmation
 echo "This may take 10-20 minutes and download ~500MB of data."
 read -p "Install AI features now? [Y/n] " -n 1 -r
 echo ""
@@ -111,32 +112,19 @@ if [[ $REPLY =~ ^[Nn]$ ]]; then
     exit 0
 fi
 
-# Extract Python minor version (e.g., "12" from "python3.12")
-PY_MINOR_VER=$(echo "$PY_VERSION" | sed 's/python3\.//')
-if [ -n "$PY_MINOR_VER" ]; then
-    # Force pip to download wheels for the bundled Python version
-    PIP_PLATFORM_FLAGS="--python-version=3.${PY_MINOR_VER} --platform=manylinux2014_x86_64 --only-binary=:all:"
-else
-    PIP_PLATFORM_FLAGS=""
-fi
-
 echo ""
 echo "📦 Installing packages..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Install PyTorch CPU version (smaller than GPU version)
+# Install PyTorch CPU version
 echo ""
-echo "[1/2] Installing PyTorch (CPU) for Python 3.${PY_MINOR_VER}..."
-$PIP_CMD install "$INSTALL_TARGET" $PIP_PLATFORM_FLAGS torch torchvision --index-url https://download.pytorch.org/whl/cpu
+echo "[1/2] Installing PyTorch (CPU)..."
+$PIP_CMD install "$INSTALL_TARGET" torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
 # Install EasyOCR
 echo ""
-echo "[2/2] Installing EasyOCR for Python 3.${PY_MINOR_VER}..."
-$PIP_CMD install "$INSTALL_TARGET" $PIP_PLATFORM_FLAGS easyocr
-
-# NOTE: simple-lama-inpainting is skipped due to incompatible dependencies
-# (requires pillow<10, numpy<2 which conflict with modern Python)
-# The app will fall back to OpenCV inpainting which works fine
+echo "[2/2] Installing EasyOCR..."
+$PIP_CMD install "$INSTALL_TARGET" easyocr
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -147,8 +135,5 @@ echo "╠═══════════════════════�
 echo "║  Please restart NST to enable AI features.                       ║"
 echo "║                                                                  ║"
 echo "║  Note: First OCR run will download language models (~100MB).    ║"
-echo "║                                                                  ║"
-echo "║  Inpainting: Uses OpenCV (bundled). For LaMa AI inpainting,     ║"
-echo "║  manually run: pip install simple-lama-inpainting               ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""

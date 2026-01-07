@@ -166,11 +166,22 @@ jobs:
           echo "Python stdlib bundled successfully"
           ls -la AppDir/usr/lib/python${PYTHON_VERSION}/ | head -20
       
-      - name: Bundle NumPy for OpenCV
+      - name: Bundle pip and essential packages
         run: |
           PYTHON_VERSION=$(python3 -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-          pip install --target=AppDir/usr/lib/python${PYTHON_VERSION}/site-packages numpy
-          echo "NumPy bundled successfully"
+          SITE_PACKAGES="AppDir/usr/lib/python${PYTHON_VERSION}/site-packages"
+          
+          # Install pip, setuptools, wheel into bundled Python
+          pip install --target="${SITE_PACKAGES}" pip setuptools wheel
+          
+          # Install numpy for OpenCV bindings
+          pip install --target="${SITE_PACKAGES}" numpy
+          
+          # Create python3 symlink in usr/bin for install script
+          ln -sf ../lib/python${PYTHON_VERSION}/bin/python3 AppDir/usr/bin/python3 || true
+          
+          echo "pip and essential packages bundled successfully"
+          ls -la "${SITE_PACKAGES}" | head -20
       
       - name: Create AppRun script
         run: |
