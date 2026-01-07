@@ -202,55 +202,55 @@ jobs:
           SELF=$(readlink -f "$0")
           HERE=${SELF%/*}
           
-          # Set APPDIR for C++ code
+          # Set APPDIR for C++ code to detect bundled Python
           export APPDIR="${HERE}"
           
-          # --- PEP668 Compliant Python Setup ---
-          # Following Fedora/modern distro principles:
-          # - Do NOT set PYTHONHOME (causes conflicts with pyenv, conda, etc.)
-          # - Let the system Python manage its own configuration
-          # - Only add our scripts to PYTHONPATH
+          # ============================================================
+          # CRITICAL: Isolate from pyenv/conda/system Python
+          # ============================================================
+          # Unset variables that could interfere with bundled Python
+          unset PYTHONHOME
+          unset PYTHONPATH  
+          unset VIRTUAL_ENV
+          unset CONDA_PREFIX
+          unset CONDA_DEFAULT_ENV
           
-          # Find system Python library directory for LD_LIBRARY_PATH
-          # Try /usr/bin/python3 first to avoid pyenv/conda shims
-          SYSTEM_PYTHON=""
-          for py in /usr/bin/python3 /usr/bin/python $(which python3 2>/dev/null) $(which python 2>/dev/null); do
-              if [ -x "$py" ] && [ ! -L "$py" ] || [ -x "$py" ]; then
-                  # Verify it's a real Python, not a shim
-                  if "$py" -c "import sys; sys.exit(0)" 2>/dev/null; then
-                      SYSTEM_PYTHON="$py"
-                      break
-                  fi
+          # Disable pyenv shim interference
+          unset PYENV_VERSION
+          unset PYENV_ROOT
+          # Remove pyenv paths from PATH
+          export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v pyenv | tr '\n' ':' | sed 's/:$//')
+          
+          # Find bundled Python version
+          BUNDLED_PY=""
+          for pydir in "${HERE}/usr/lib"/python3.*; do
+              if [ -d "$pydir" ] && [ -f "$pydir/os.py" ]; then
+                  BUNDLED_PY=$(basename "$pydir")
+                  break
               fi
           done
           
-          PY_LIB_DIR=""
-          if [ -n "$SYSTEM_PYTHON" ]; then
-              PY_PREFIX=$("$SYSTEM_PYTHON" -c "import sys; print(sys.prefix)" 2>/dev/null)
-              if [ -d "${PY_PREFIX}/lib" ]; then
-                  PY_LIB_DIR="${PY_PREFIX}/lib"
-              elif [ -d "${PY_PREFIX}/lib64" ]; then
-                  PY_LIB_DIR="${PY_PREFIX}/lib64"
-              fi
-          fi
-          
-          # Standard paths
-          export PATH="${HERE}/usr/bin:${PATH}"
-          
-          # Add Python lib dir to LD_LIBRARY_PATH for libpython discovery
-          if [ -n "$PY_LIB_DIR" ]; then
-              export LD_LIBRARY_PATH="${PY_LIB_DIR}:${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+          if [ -n "$BUNDLED_PY" ]; then
+              # Use bundled Python
+              export PYTHONHOME="${HERE}/usr"
+              export PYTHONPATH="${HERE}/usr/bin:${HERE}/usr/lib/${BUNDLED_PY}:${HERE}/usr/lib/${BUNDLED_PY}/site-packages:${HERE}/usr/lib/${BUNDLED_PY}/lib-dynload"
+              
+              # Bundled libpython MUST come first in LD_LIBRARY_PATH
+              export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
           else
-              export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${HERE}/usr/bin:${LD_LIBRARY_PATH}"
+              echo "[AppRun] Warning: No bundled Python found, using system Python"
+              # Fallback: just set scripts path
+              export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
+              export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
           fi
+          
+          # Standard paths (bundled binaries first)
+          export PATH="${HERE}/usr/bin:${PATH}"
           
           # Qt plugin paths
           export QT_PLUGIN_PATH="${HERE}/usr/plugins"
           export QML_IMPORT_PATH="${HERE}/usr/qml"
           export QML2_IMPORT_PATH="${HERE}/usr/qml"
-          
-          # Add application bin dir to PYTHONPATH so "import scripts" works (scripts is a subdir)
-          export PYTHONPATH="${HERE}/usr/bin:${PYTHONPATH}"
           
           exec "${HERE}/usr/bin/NST" "$@"
           APPRUN_EOF

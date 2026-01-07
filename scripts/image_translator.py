@@ -71,8 +71,29 @@ class ImageTranslator:
             # 3. Log final sys.path for debugging
             logger.debug(f"Final sys.path: {sys.path}")
             
-            import easyocr
-            import torch
+            # DEBUG: Print to stderr for immediate visibility
+            import sys as _sys
+            print(f"[DEBUG] Python executable: {_sys.executable}", file=_sys.stderr)
+            print(f"[DEBUG] Python version: {_sys.version}", file=_sys.stderr)
+            print(f"[DEBUG] sys.path:", file=_sys.stderr)
+            for i, p in enumerate(_sys.path):
+                print(f"  [{i}] {p}", file=_sys.stderr)
+            
+            # Try importing each dependency separately for better error messages
+            try:
+                import torch
+                print(f"[DEBUG] ✓ torch imported successfully (version: {torch.__version__})", file=_sys.stderr)
+            except ImportError as e:
+                print(f"[DEBUG] ✗ torch import FAILED: {e}", file=_sys.stderr)
+                raise
+            
+            try:
+                import easyocr
+                print(f"[DEBUG] ✓ easyocr imported successfully", file=_sys.stderr)
+            except ImportError as e:
+                print(f"[DEBUG] ✗ easyocr import FAILED: {e}", file=_sys.stderr)
+                raise
+            
             self.easyocr = easyocr
             self.torch = torch
             
