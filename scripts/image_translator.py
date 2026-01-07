@@ -46,15 +46,21 @@ class ImageTranslator:
             # Add user site-packages directly (bypassing PYTHONHOME isolation)
             # When PYTHONHOME is set by bundled Python, site.getusersitepackages() 
             # returns the bundled path instead of user's ~/.local/lib/pythonX.X/site-packages
+            # IMPORTANT: Only add site-packages for the CURRENT Python version to avoid
+            # loading incompatible packages from other Python versions.
             import glob
             home_dir = os.path.expanduser("~")
             
+            # Get current Python version string (e.g., "python3.12")
+            current_py_version = f"python{sys.version_info.major}.{sys.version_info.minor}"
+            
             # 1. Add ~/.local/lib/pythonX.X/site-packages (user-installed packages)
+            #    Only for the CURRENT Python version to prevent ABI mismatches
             local_site = os.path.join(home_dir, ".local", "lib")
-            for sp in glob.glob(os.path.join(local_site, "python*", "site-packages")):
-                if os.path.isdir(sp) and sp not in sys.path:
-                    sys.path.insert(0, sp)  # Priority over bundled
-                    logger.info(f"Added user site-packages: {sp}")
+            matching_site = os.path.join(local_site, current_py_version, "site-packages")
+            if os.path.isdir(matching_site) and matching_site not in sys.path:
+                sys.path.insert(0, matching_site)  # Priority over bundled
+                logger.info(f"Added user site-packages for {current_py_version}: {matching_site}")
             
             # 2. Check VIRTUAL_ENV environment variable
             venv_path = os.environ.get("VIRTUAL_ENV")
