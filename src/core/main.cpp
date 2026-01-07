@@ -62,7 +62,7 @@ static void configurePythonEnvironment()
             putenv(const_cast<char*>(strdup(pythonhome_env.c_str())));
             
             // Build PYTHONPATH
-            std::string scripts_path = appdir_str + "/usr/bin/scripts";
+            std::string scripts_path = appdir_str + "/usr/bin";  // Parent dir so "import scripts" works
             std::string site_packages = python_lib + "/site-packages";
             std::string lib_dynload = python_lib + "/lib-dynload";
             

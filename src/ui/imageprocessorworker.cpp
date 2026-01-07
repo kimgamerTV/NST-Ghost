@@ -45,8 +45,7 @@ void ImageProcessorWorker::initialize()
         // Add APPDIR-based path for bundled distribution
         const char* appdir = std::getenv("APPDIR");
         if (appdir) {
-            std::string scriptPath = std::string(appdir) + "/usr/bin/scripts";
-            sys.attr("path").attr("insert")(0, scriptPath);
+            // Insert /usr/bin first so "import scripts" works (scripts is a subdir)
             std::string binPath = std::string(appdir) + "/usr/bin";
             sys.attr("path").attr("insert")(0, binPath);
         }
