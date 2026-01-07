@@ -26,6 +26,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <sys/stat.h>
 
 
 
@@ -37,21 +38,25 @@ static char s_pythonpath_env[8192];
 
 // Helper function to configure Python BEFORE pybind11 initialization
 // Supports both Linux AppImage and Windows bundled deployments
-static void configurePythonEnvironment()
+// Note: This is called BEFORE QApplication, so we can't use Qt APIs
+static void configurePythonEnvironment(const char* argv0)
 {
     // Check if running from AppImage (APPDIR is set by AppRun script)
     const char* appdir = std::getenv("APPDIR");
     
-    // Get executable directory for Windows bundled Python detection
-    QString exeDir = QCoreApplication::applicationDirPath();
-    std::string exe_dir_str = exeDir.toStdString();
-    
 #ifdef _WIN32
+    // Windows: Get executable directory from argv[0]
+    std::string exe_path(argv0);
+    size_t last_sep = exe_path.find_last_of("\\/");
+    std::string exe_dir_str = (last_sep != std::string::npos) ? exe_path.substr(0, last_sep) : ".";
+    
     // Windows: Check for bundled Python in exe_dir/python/
     std::string win_python_home = exe_dir_str + "/python";
     std::string win_python_dll = win_python_home + "/python311.dll";
     
-    if (QFile::exists(QString::fromStdString(win_python_dll))) {
+    // Use C++ filesystem to check file exists (no Qt dependency)
+    struct stat buffer;
+    if (stat(win_python_dll.c_str(), &buffer) == 0) {
         // Found bundled Python on Windows
         std::string scripts_path = exe_dir_str + "/scripts";
         std::string site_packages = win_python_home + "/Lib/site-packages";
@@ -69,6 +74,8 @@ static void configurePythonEnvironment()
         std::cerr << "[NST] PYTHONPATH: " << pythonpath << std::endl;
         return;
     }
+#else
+    (void)argv0; // Unused on Linux (uses APPDIR)
 #endif
     
     if (appdir && appdir[0] != '\0') {
@@ -133,7 +140,7 @@ int main(int argc, char *argv[])
 {
 #ifdef HAS_PYTHON
     // Configure Python BEFORE creating interpreter
-    configurePythonEnvironment();
+    configurePythonEnvironment(argv[0]);
 
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};

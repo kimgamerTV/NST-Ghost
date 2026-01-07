@@ -152,13 +152,21 @@ else
         torch torchvision --index-url https://download.pytorch.org/whl/cpu
 fi
 
-# Install EasyOCR
+# Install EasyOCR (without deps to prevent overwriting torch CPU with CUDA)
 echo ""
 echo "[2/2] Installing EasyOCR..."
+# First install easyocr without dependencies
+"$TEMP_VENV/bin/pip" install \
+    --target="$PY_SITE_PACKAGES" \
+    --upgrade --no-user --no-deps \
+    easyocr
+
+# Then install remaining easyocr dependencies (excluding torch/torchvision which we already have)
+echo "Installing EasyOCR dependencies..."
 "$TEMP_VENV/bin/pip" install \
     --target="$PY_SITE_PACKAGES" \
     --upgrade --no-user \
-    easyocr
+    opencv-python-headless scipy numpy Pillow scikit-image python-bidi PyYAML Shapely pyclipper ninja
 
 # Cleanup
 rm -rf "$TEMP_VENV"
