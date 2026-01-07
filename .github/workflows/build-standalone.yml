@@ -52,11 +52,6 @@ jobs:
     with:
       version: '${{ needs.check-version.outputs.version }}'
 
-  build-fedora:
-    needs: check-version
-    uses: ./.github/workflows/release-fedora.yml
-    with:
-      version: '${{ needs.check-version.outputs.version }}'
 
   build-windows:
     needs: check-version
@@ -71,7 +66,7 @@ jobs:
       version: '${{ needs.check-version.outputs.version }}'
 
   summary:
-    needs: [check-version, build-linux, build-fedora, build-windows, build-macos]
+    needs: [check-version, build-linux, build-windows, build-macos]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -84,7 +79,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Status" >> $GITHUB_STEP_SUMMARY
           echo "- Linux: ${{ needs.build-linux.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Fedora: ${{ needs.build-fedora.result }}" >> $GITHUB_STEP_SUMMARY
+
           echo "- Windows: ${{ needs.build-windows.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- macOS: ${{ needs.build-macos.result }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
