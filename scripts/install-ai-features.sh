@@ -111,19 +111,28 @@ if [[ $REPLY =~ ^[Nn]$ ]]; then
     exit 0
 fi
 
+# Extract Python minor version (e.g., "12" from "python3.12")
+PY_MINOR_VER=$(echo "$PY_VERSION" | sed 's/python3\.//')
+if [ -n "$PY_MINOR_VER" ]; then
+    # Force pip to download wheels for the bundled Python version
+    PIP_PLATFORM_FLAGS="--python-version=3.${PY_MINOR_VER} --platform=manylinux2014_x86_64 --only-binary=:all:"
+else
+    PIP_PLATFORM_FLAGS=""
+fi
+
 echo ""
 echo "📦 Installing packages..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 # Install PyTorch CPU version (smaller than GPU version)
 echo ""
-echo "[1/2] Installing PyTorch (CPU)..."
-$PIP_CMD install "$INSTALL_TARGET" --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cpu
+echo "[1/2] Installing PyTorch (CPU) for Python 3.${PY_MINOR_VER}..."
+$PIP_CMD install "$INSTALL_TARGET" $PIP_PLATFORM_FLAGS torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
 # Install EasyOCR
 echo ""
-echo "[2/2] Installing EasyOCR..."
-$PIP_CMD install "$INSTALL_TARGET" --upgrade easyocr
+echo "[2/2] Installing EasyOCR for Python 3.${PY_MINOR_VER}..."
+$PIP_CMD install "$INSTALL_TARGET" $PIP_PLATFORM_FLAGS easyocr
 
 # NOTE: simple-lama-inpainting is skipped due to incompatible dependencies
 # (requires pillow<10, numpy<2 which conflict with modern Python)
