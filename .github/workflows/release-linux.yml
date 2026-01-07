@@ -103,6 +103,7 @@ jobs:
           
           # Copy Python scripts
           cp -r scripts AppDir/usr/bin/scripts
+          chmod +x AppDir/usr/bin/scripts/install-ai-features.sh
           
           install -D -m 644 packaging/debian/nst.desktop AppDir/usr/share/applications/nst.desktop
           install -D -m 644 packaging/icons/nst.svg AppDir/usr/share/icons/hicolor/scalable/apps/nst.svg

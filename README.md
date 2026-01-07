@@ -1,4 +1,4 @@
-# NST (Novelty Translation Tool)
+    # NST (Novelty Translation Tool)
 
 NST is a desktop application for translating video games. It is built with C++ and the Qt framework.
 
@@ -27,10 +27,26 @@ cmake --build .
 
 ## Image Translation (Optional)
 
-The Image Translation feature uses AI-powered OCR to detect and translate text in screenshots. To enable this feature, install the required Python packages:
+The Image Translation feature uses AI-powered OCR to detect and translate text in screenshots.
+
+### Easy Install (Recommended)
+
+Run the included installer script:
 
 ```bash
-pip install easyocr torch opencv-python Pillow numpy simple-lama-inpainting
+# Linux/macOS
+./scripts/install-ai-features.sh
+
+# Or if downloaded as AppImage, run from the extracted folder:
+./usr/bin/scripts/install-ai-features.sh
+```
+
+### Manual Install
+
+If you prefer manual installation:
+
+```bash
+pip install easyocr torch simple-lama-inpainting
 ```
 
 > **Note:** These packages are large (~2GB). Without them, the app will run in "MOCK mode" for image translation.
