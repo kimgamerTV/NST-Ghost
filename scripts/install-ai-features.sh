@@ -65,7 +65,7 @@ if [ -z "$PY_SITE_PACKAGES" ]; then
     INSTALL_TARGET="--user"
     echo "📦 Installing to user directory..."
 else
-    INSTALL_TARGET="--target=$PY_SITE_PACKAGES"
+    INSTALL_TARGET="--target=${PY_SITE_PACKAGES}"
     echo "✓ Found bundled Python: $PY_VERSION"
     echo "✓ Install target: $PY_SITE_PACKAGES"
 fi
@@ -104,17 +104,17 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 # Install PyTorch CPU version (smaller than GPU version)
 echo ""
 echo "[1/3] Installing PyTorch (CPU)..."
-$PIP_CMD install $INSTALL_TARGET torch torchvision --index-url https://download.pytorch.org/whl/cpu
+$PIP_CMD install "$INSTALL_TARGET" torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
 # Install EasyOCR
 echo ""
 echo "[2/3] Installing EasyOCR..."
-$PIP_CMD install $INSTALL_TARGET easyocr
+$PIP_CMD install "$INSTALL_TARGET" easyocr
 
 # Install LaMa Inpainting
 echo ""
 echo "[3/3] Installing LaMa Inpainting..."
-$PIP_CMD install $INSTALL_TARGET simple-lama-inpainting
+$PIP_CMD install "$INSTALL_TARGET" simple-lama-inpainting
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
