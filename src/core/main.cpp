@@ -60,8 +60,12 @@ static void configurePythonEnvironment(const char* argv0)
         // Found bundled Python on Windows
         std::string scripts_path = exe_dir_str + "/scripts";
         std::string site_packages = win_python_home + "/Lib/site-packages";
+        std::string stdlib_zip = win_python_home + "/python311.zip";
+        std::string stdlib_lib = win_python_home + "/Lib";
+        std::string stdlib_dlls = win_python_home + "/DLLs";
         
-        std::string pythonpath = scripts_path + ";" + site_packages;
+        // Build complete PYTHONPATH: scripts, stdlib zip, stdlib lib, DLLs, site-packages
+        std::string pythonpath = scripts_path + ";" + stdlib_zip + ";" + stdlib_lib + ";" + stdlib_dlls + ";" + site_packages;
         
         // Use static storage to avoid memory leak
         snprintf(s_pythonhome_env, sizeof(s_pythonhome_env), "PYTHONHOME=%s", win_python_home.c_str());
