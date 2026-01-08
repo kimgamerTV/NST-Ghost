@@ -179,6 +179,13 @@ jobs:
           
           Write-Host "Python bundling complete!"
           Get-ChildItem "package/python" | Select-Object Name, Length | Format-Table
+          
+          # Copy Python DLLs to package root
+          Write-Host "Copying Python DLLs to package root..."
+          Get-ChildItem "package/python/*.dll" | ForEach-Object {
+            Write-Host "  Copying $($_.Name) to package root"
+            Copy-Item $_.FullName -Destination "package/" -Force
+          }
         shell: pwsh
       
       - name: Install pip dependencies for bundled Python
