@@ -120,7 +120,11 @@ static void configurePythonEnvironment(const char* argv0)
             std::cerr << "[NST] PYTHONPATH: " << pythonpath << std::endl;
         } else {
             std::cerr << "[NST] Warning: APPDIR set but no bundled Python found, using system Python" << std::endl;
+#ifdef _WIN32
+            _putenv("PYTHONHOME=");
+#else
             unsetenv("PYTHONHOME");
+#endif
         }
     } else {
         // Not running from AppImage/bundled - use system Python
