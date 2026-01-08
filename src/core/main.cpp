@@ -146,12 +146,19 @@ int main(int argc, char *argv[])
     // Configure Python BEFORE creating interpreter
     configurePythonEnvironment(argv[0]);
 
+    std::cerr << "[NST] About to initialize Python interpreter..." << std::endl;
+    
     // Initialize Python Interpreter
     pybind11::scoped_interpreter guard{};
+    std::cerr << "[NST] Python interpreter initialized successfully" << std::endl;
+    
     pybind11::gil_scoped_release release;
+    std::cerr << "[NST] GIL released, starting Qt..." << std::endl;
 #endif
 
+    std::cerr << "[NST] Creating QApplication..." << std::endl;
     QApplication a(argc, argv);
+    std::cerr << "[NST] QApplication created" << std::endl;
 
     // Fix: Correct resource path for stylesheet (was :/style.qss, needed :/ui/style.qss)
     QFile file(":/ui/style.qss");
@@ -170,10 +177,14 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    
+    std::cerr << "[NST] Creating MainWindow..." << std::endl;
     MainWindow w;
+    std::cerr << "[NST] Showing MainWindow..." << std::endl;
     w.show();
 
     // QTimer::singleShot(0, &w, &MainWindow::onNewProject); // Optional: Auto-start new project flow
 
+    std::cerr << "[NST] Entering event loop..." << std::endl;
     return a.exec();
 }
