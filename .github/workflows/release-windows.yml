@@ -7,6 +7,11 @@ on:
         required: true
         type: string
         description: 'Version number (e.g., 0.4.3)'
+      build_variant:
+        required: false
+        type: string
+        default: 'full'
+        description: 'Build variant: core (no Python) or full (with Python)'
 
 jobs:
   build-windows:
@@ -59,11 +64,21 @@ jobs:
       
       - name: Configure CMake
         run: |
+          # Determine Python flag based on build variant
+          if ("${{ inputs.build_variant }}" -eq "core") {
+            $pythonFlag = "-DNST_ENABLE_PYTHON=OFF"
+            Write-Host "Building Core variant (no Python)"
+          } else {
+            $pythonFlag = "-DNST_ENABLE_PYTHON=ON"
+            Write-Host "Building Full variant (with Python)"
+          }
+          
           cmake -S . -B build `
             -G Ninja `
             -DCMAKE_BUILD_TYPE=Release `
             -DCMAKE_PREFIX_PATH="${{ github.workspace }}\6.10.0\msvc2022_64;${{ env.pybind11_DIR }}" `
-            -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            -DCMAKE_TOOLCHAIN_FILE="C:/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+            $pythonFlag
         shell: pwsh
       
       - name: Build
